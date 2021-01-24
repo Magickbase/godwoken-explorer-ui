@@ -1,0 +1,35 @@
+name: E2E Tests
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  push:
+  pull_request:
+
+jobs:
+  e2e_tests:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install Node.js
+        uses: actions/setup-node@v2-beta
+
+      - name: Restore
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+          key: ${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Bootstrap
+        run: npm install
+
+      - name: Test
+        run: npm run test:e2e
+
+      - name: Upload Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
