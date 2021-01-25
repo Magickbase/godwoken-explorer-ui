@@ -15,21 +15,55 @@ jobs:
 
       - name: Install Node.js
         uses: actions/setup-node@v2-beta
+        with:
+          node-version: 12
 
-      - name: Restore
+      - name: Cache node modules
         uses: actions/cache@v2
         with:
-          path: |
-            node_modules
-          key: ${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Cache cypress binary
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/Cypress
+          key: cypress-${{ runner.os }}-cypress-${{ hashFiles('**/package.json') }}
+          restore-keys: |
+            cypress-${{ runner.os }}-cypress-
 
       - name: Bootstrap
-        run: npm install
+        env:
+          CI: 1
+        run: |
+          npm ci
+          npx cypress verify
+          npx cypress info
+          npx cypress version
+          npx cypress version --component package
+          npx cypress version --component binary
+          npx cypress version --component electron
+          npx cypress version --component node
 
       - name: Test
         run: npm run test:e2e
 
+      - name: Upload screenshots
+        uses: actions/upload-artifact@master
+        with:
+          name: screenshots
+          path: cypress/screenshots
+          if-no-files-found: ignore
+
+      - name: Upload videos
+        uses: actions/upload-artifact@master
+        with:
+          name: videos
+          path: cypress/videos
+
       - name: Upload Codecov
         uses: codecov/codecov-action@v1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.CODECOV_TOKEN }}
