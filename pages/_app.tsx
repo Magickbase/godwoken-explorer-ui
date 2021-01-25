@@ -1,7 +1,11 @@
+import Layout from 'components/Layout'
+import { AppProps } from 'next/app'
 import '../styles/globals.scss'
 
-function MyApp({ Component, pageProps }) {
-  return <Component {...pageProps} />
-}
+const Agera = ({ Component, pageProps }: AppProps) => (
+  <Layout>
+    <Component {...pageProps} />
+  </Layout>
+)
 
-export default MyApp
+export default Agera

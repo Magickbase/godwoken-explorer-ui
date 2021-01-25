@@ -15,7 +15,7 @@
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
     "test:e2e": "npm run dev & npm run cypress:run",
-    "format": "prettier -w --ignore-unknown pages/**/* styles/**/* cypress/**/*{.ts,.json}"
+    "format": "prettier -w --ignore-unknown pages/* pages/**/* components/**/* styles/* cypress/**/*{.ts,.json}"
   },
   "dependencies": {
     "next": "10.0.5",
