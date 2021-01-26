@@ -17,9 +17,6 @@ const Home = (initState: State) => {
   return (
     <main>
       <div>
-        <input />
-      </div>
-      <div>
         <table>
           <thead>
             <tr>
