@@ -1,5 +1,6 @@
 import { GetServerSideProps } from 'next'
-import Link from 'next/link'
+import TxList from 'components/TxList'
+import { useTranslation } from 'utils/i18n'
 
 interface Tx {
   hash: string
@@ -17,50 +18,18 @@ interface State {
   txList: Array<Tx>
 }
 const Account = ({ id, nonce, txList }: State) => {
+  const [t] = useTranslation('account')
   return (
     <main>
       <div>
-        <div>Account Id: {id}</div>
-        <div>Nonce: {nonce}</div>
+        <div>
+          {t('id')}: {id}
+        </div>
+        <div>
+          {t('nonce')}: {nonce}
+        </div>
       </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Tx Hash</th>
-            <th>Type</th>
-            <th>From</th>
-            <th>To</th>
-            <th>Amount</th>
-            <th>Fee</th>
-            <th>Created At</th>
-          </tr>
-        </thead>
-        <tbody>
-          {txList.map(tx => (
-            <tr key={tx.hash}>
-              <td>
-                <Link href={`/tx/${tx.hash}`}>
-                  <a>{tx.hash}</a>
-                </Link>
-              </td>
-              <td>{tx.type}</td>
-              <td>
-                <Link href={`/account/${tx.from}`}>
-                  <a>{tx.from}</a>
-                </Link>
-              </td>
-              <td>
-                <Link href={`/account/${tx.to}`}>
-                  <a>{tx.to}</a>
-                </Link>
-              </td>
-              <td>{tx.amount}</td>
-              <td>{tx.fee}</td>
-              <td>{new Date(+tx.createdAt).toLocaleDateString()}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <TxList list={txList} />
     </main>
   )
 }

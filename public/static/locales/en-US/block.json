@@ -1,0 +1,10 @@
+{
+  "block": "block",
+  "hash": "block hash",
+  "number": "block number",
+  "txCount": "tx count",
+  "createdAt": "created at",
+  "rootHash": "root hash",
+  "committedAt": "committed at",
+  "commitTxHash": "commit tx hash"
+}

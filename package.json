@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "next": "10.0.5",
+    "next-i18next": "7.0.1",
     "react": "17.0.1",
     "react-dom": "17.0.1"
   },

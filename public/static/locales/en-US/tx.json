@@ -1,0 +1,13 @@
+{
+  "hash": "tx hash",
+  "blockHash": "block hash",
+  "type": "type",
+  "from": "from",
+  "to": "to",
+  "amount": "amount",
+  "fee": "fee",
+  "createdAt": "created at",
+  "nonce": "nonce",
+  "transferredAt": "transferred at",
+  "confirmedAt": "confirmed at"
+}

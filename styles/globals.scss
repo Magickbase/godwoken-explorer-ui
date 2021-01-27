@@ -5,6 +5,12 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans,
     Helvetica Neue, sans-serif;
   --primary-color: rgb(33, 44, 61);
+  --header-height: 69px;
+}
+
+main {
+  max-width: 1200px;
+  margin: var(--header-height) auto 0;
 }
 
 a {
