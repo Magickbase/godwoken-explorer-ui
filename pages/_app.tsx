@@ -1,4 +1,5 @@
 import Layout from 'components/Layout'
+import { appWithTranslation } from 'utils/i18n'
 import { AppProps } from 'next/app'
 import '../styles/globals.scss'
 
@@ -8,4 +9,4 @@ const Agera = ({ Component, pageProps }: AppProps) => (
   </Layout>
 )
 
-export default Agera
+export default appWithTranslation(Agera)

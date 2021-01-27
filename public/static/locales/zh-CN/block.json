@@ -1,0 +1,10 @@
+{
+  "block": "区块",
+  "hash": "区块哈希",
+  "number": "区块高度",
+  "txCount": "交易数量",
+  "createdAt": "创建时间",
+  "rootHash": "根哈希",
+  "committedAt": "提交时间",
+  "commitTxHash": "提交交易哈希"
+}

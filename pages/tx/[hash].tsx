@@ -1,5 +1,6 @@
 import { GetServerSideProps } from 'next'
 import Link from 'next/link'
+import { useTranslation } from 'utils/i18n'
 
 interface State {
   hash: string
@@ -15,34 +16,51 @@ interface State {
   confirmedAt: string
 }
 const Tx = ({ hash, blockHash, type, nonce, amount, fee, from, to, transferedAt, confirmedAt, status }: State) => {
+  const [t] = useTranslation('tx')
   return (
     <main>
       <div>
-        Block Hash:{' '}
+        {t('blockHash')}:{' '}
         <Link href={`/block/${blockHash}`}>
           <a>{blockHash}</a>
         </Link>
       </div>
-      <div>Tx Hash: {hash}</div>
-      <div>Type: {type}</div>
-      <div>Status: {status}</div>
-      <div>Nonce: {nonce}</div>
       <div>
-        From:{' '}
+        {t('hash')}: {hash}
+      </div>
+      <div>
+        {t('type')}: {type}
+      </div>
+      <div>
+        {t('status')}: {status}
+      </div>
+      <div>
+        {t('nonce')}: {nonce}
+      </div>
+      <div>
+        {t('from')}:{' '}
         <Link href={`/account/${from}`}>
           <a>{from}</a>
         </Link>
       </div>
       <div>
-        To:{' '}
+        {t('to')}:{' '}
         <Link href={`/account/${to}`}>
           <a>{to}</a>
         </Link>
       </div>
-      <div>Amount: {amount}</div>
-      <div>Fee: {fee}</div>
-      <div>Transfered At: {transferedAt}</div>
-      <div>Confirmed At: {confirmedAt}</div>
+      <div>
+        {t('amount')}: {amount}
+      </div>
+      <div>
+        {t('fee')}: {fee}
+      </div>
+      <div>
+        {t('transferredAt')}: {transferedAt}
+      </div>
+      <div>
+        {t('confirmedAt')}: {confirmedAt}
+      </div>
     </main>
   )
 }
