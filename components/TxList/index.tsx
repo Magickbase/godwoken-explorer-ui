@@ -16,7 +16,7 @@ export interface TxListProps {
 }
 
 const Tx = ({ tx }: { tx: Tx }) => (
-  <tr>
+  <tr className="odd:bg-gray-100">
     <td>
       <Link href={`/tx/${tx.hash}`}>
         <a>{tx.hash}</a>
@@ -43,7 +43,7 @@ const fields = ['hash', 'type', 'from', 'to', 'amount', 'fee', 'createdAt']
 const TxList = ({ list }: TxListProps) => {
   const [t] = useTranslation('tx')
   return (
-    <table>
+    <table className="table-auto w-full">
       <thead>
         <tr>
           {fields.map(field => (
