@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import Spinner from 'components/Spinner'
-import styles from './search.module.scss'
 
 const Search = () => {
   const [keyword, setKeyword] = useState('')
@@ -17,9 +16,17 @@ const Search = () => {
     e.preventDefault()
   }
   return (
-    <form className={styles.container} onSubmit={handleSubmit}>
-      <input type="text" placeholder="Search block, transaction, account..." value={keyword} onChange={handleChange} />
-      {keyword ? <div className={styles.result}>{result ? result : <Spinner />}</div> : null}
+    <form className="flex w-full relative" onSubmit={handleSubmit}>
+      <input
+        type="text"
+        placeholder="Search block, transaction, account..."
+        value={keyword}
+        onChange={handleChange}
+        className="flex-1 text-sm px-2 focus:ring-2 rounded-md"
+      />
+      {keyword ? (
+        <div className="absolute top-10 left-0 w-full flex border bg-white">{result ? result : <Spinner />}</div>
+      ) : null}
     </form>
   )
 }
