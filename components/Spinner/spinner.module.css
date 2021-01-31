@@ -1,13 +1,12 @@
-$size: 16px;
-$border-size: $size/7;
-$color: var(--primary-color);
-
 .container {
+  --color: var(--primary-color);
+  --size: 16px;
+  --border-size: 2px;
   position: relative;
-  top: calc(50% - $size);
-  left: calc(50% - $size);
-  width: 2 * $size;
-  height: 2 * $size;
+  top: calc(50% - var(--size));
+  left: calc(50% - var(--size));
+  width: calc(2 * var(--size));
+  height: calc(2 * var(--size));
   border-radius: 50%;
   perspective: 800px;
 
@@ -19,25 +18,25 @@ $color: var(--primary-color);
     border-radius: 50%;
   }
 
-  div:nth-child(1) {
+  & div:nth-child(1) {
     left: 0%;
     top: 0%;
     animation: rotate-one 1s linear infinite;
-    border-bottom: $border-size solid $color;
+    border-bottom: var(--border-size) solid var(--color);
   }
 
-  div:nth-child(2) {
+  & div:nth-child(2) {
     right: 0%;
     top: 0%;
     animation: rotate-two 1s linear infinite;
-    border-right: $border-size solid $color;
+    border-right: var(--border-size) solid var(--color);
   }
 
-  div:nth-child(3) {
+  & div:nth-child(3) {
     right: 0%;
     bottom: 0%;
     animation: rotate-three 1s linear infinite;
-    border-top: $border-size solid $color;
+    border-top: var(--border-size) solid var(--color);
   }
 }
 

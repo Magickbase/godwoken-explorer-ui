@@ -7,7 +7,7 @@ export type BlockListProps = { list: Array<Block> }
 const fields = ['number', 'hash', 'txCount', 'createdAt']
 
 const Block = ({ block }: { block: Block }) => (
-  <tr>
+  <tr className="odd:bg-gray-100">
     <td>
       <Link href={`/block/${block.hash}`}>
         <a>{block.number}</a>
@@ -26,7 +26,7 @@ const Block = ({ block }: { block: Block }) => (
 const BlockList = ({ list }: BlockListProps) => {
   const [t] = useTranslation('block')
   return (
-    <table>
+    <table className="table-auto w-full">
       <thead>
         <tr>
           {fields.map(field => (

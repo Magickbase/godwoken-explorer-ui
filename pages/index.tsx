@@ -21,6 +21,17 @@ const Home = (initState: State) => {
       <div>
         <BlockList list={blockList} />
       </div>
+      <div>
+        <div className="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-md flex items-center space-x-4">
+          <div className="flex-shrink-0">
+            <img src="/favicon.ico" alt="logo" className="h12 w12" />
+          </div>
+          <div>
+            <div className="text-xl font-medium text-black">Chat</div>
+            <p className="text-grey-500">You have a message</p>
+          </div>
+        </div>
+      </div>
     </main>
   )
 }

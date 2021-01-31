@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary-color: rgb(33, 44, 61);
+  --header-height: 69px;
+}
+
+main {
+  @apply max-w-7xl m-auto;
+  margin-bottom: 0;
+}
+* {
+  box-sizing: border-box;
+  outline: none;
+}
+
+a {
+  text-decoration: underline;
+}
