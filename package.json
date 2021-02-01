@@ -18,6 +18,7 @@
     "format": "prettier -w --ignore-unknown pages/* pages/**/* components/**/* styles/* cypress/**/*{.ts,.json}"
   },
   "dependencies": {
+    "date-fns": "2.16.1",
     "next": "10.0.6",
     "next-i18next": "7.0.1",
     "react": "17.0.1",

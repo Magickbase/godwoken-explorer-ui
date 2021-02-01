@@ -1,7 +1,7 @@
 import { GetServerSideProps } from 'next'
 import Link from 'next/link'
 import TxList from 'components/TxList'
-import { useTranslation } from 'utils/i18n'
+import { useTranslation, formatDatetime } from 'utils'
 
 interface Tx {
   hash: string
@@ -23,24 +23,37 @@ interface State {
 
 const Block = ({ hash, rootHash, commitTxHash, commitedAt, txList }: State) => {
   const [t] = useTranslation('block')
+  const infoList = [
+    {
+      label: 'hash',
+      value: hash,
+    },
+    {
+      label: 'rootHash',
+      value: rootHash,
+    },
+    {
+      label: 'commitTxHash',
+      value: (
+        <Link href={`/tx/${commitTxHash}`}>
+          <a>{commitTxHash}</a>
+        </Link>
+      ),
+    },
+    {
+      label: 'committedAt',
+      value: formatDatetime(+commitedAt),
+    },
+  ]
   return (
     <main>
-      <div>
-        <div>
-          {t('hash')}: {hash}
-        </div>
-        <div>
-          {t('rootHash')}: {rootHash}
-        </div>
-        <div>
-          {t('commitTxHash')}:{' '}
-          <Link href={`/tx/${commitTxHash}`}>
-            <a>{commitTxHash}</a>
-          </Link>
-        </div>
-        <div>
-          {t('committedAt')}: {new Date(+commitedAt).toLocaleDateString()}
-        </div>
+      <div className="basic-info-list">
+        {infoList.map(info => (
+          <div key={info.label}>
+            <span>{t(info.label)}</span>
+            <div>{info.value}</div>
+          </div>
+        ))}
       </div>
       <TxList list={txList} />
     </main>

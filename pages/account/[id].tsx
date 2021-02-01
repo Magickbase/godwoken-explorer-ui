@@ -19,15 +19,25 @@ interface State {
 }
 const Account = ({ id, nonce, txList }: State) => {
   const [t] = useTranslation('account')
+  const infoList = [
+    {
+      label: 'id',
+      value: id,
+    },
+    {
+      label: 'nonce',
+      value: nonce,
+    },
+  ]
   return (
     <main>
-      <div>
-        <div>
-          {t('id')}: {id}
-        </div>
-        <div>
-          {t('nonce')}: {nonce}
-        </div>
+      <div className="basic-info-list">
+        {infoList.map(info => (
+          <div key={info.label}>
+            <span>{t(info.label)}</span>
+            <div>{info.value}</div>
+          </div>
+        ))}
       </div>
       <TxList list={txList} />
     </main>

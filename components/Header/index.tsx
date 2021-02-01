@@ -1,8 +1,11 @@
+import Link from 'next/link'
 import Search from 'components/Search'
 
 const Header = () => (
   <header className="flex bg-primary p-4 sticky top-0 left-0">
-    <div className="text-lg flex-1 text-white">Agera</div>
+    <Link href="/">
+      <a className="text-lg flex-1 text-white">Agera</a>
+    </Link>
     <div className="flex flex-1">
       <Search />
     </div>
