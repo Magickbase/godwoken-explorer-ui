@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { useTranslation } from 'utils/i18n'
+import { useTranslation, formatDatetime } from 'utils'
 
 export interface Tx {
   hash: string
@@ -16,7 +16,7 @@ export interface TxListProps {
 }
 
 const Tx = ({ tx }: { tx: Tx }) => (
-  <tr className="odd:bg-gray-100">
+  <tr>
     <td>
       <Link href={`/tx/${tx.hash}`}>
         <a>{tx.hash}</a>
@@ -35,7 +35,7 @@ const Tx = ({ tx }: { tx: Tx }) => (
     </td>
     <td>{tx.amount}</td>
     <td>{tx.fee}</td>
-    <td>{new Date(+tx.createdAt).toLocaleDateString()}</td>
+    <td>{formatDatetime(+tx.createdAt)}</td>
   </tr>
 )
 const fields = ['hash', 'type', 'from', 'to', 'amount', 'fee', 'createdAt']
@@ -43,7 +43,7 @@ const fields = ['hash', 'type', 'from', 'to', 'amount', 'fee', 'createdAt']
 const TxList = ({ list }: TxListProps) => {
   const [t] = useTranslation('tx')
   return (
-    <table className="table-auto w-full">
+    <table className="basic-table">
       <thead>
         <tr>
           {fields.map(field => (

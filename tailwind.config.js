@@ -14,7 +14,7 @@ module.exports = {
   },
   variants: {
     extend: {
-      backgroundColor: ['odd', 'hover', 'focus'],
+      backgroundColor: ['odd', 'even', 'hover', 'focus'],
       borderColor: ['hover', 'focus'],
     },
   },

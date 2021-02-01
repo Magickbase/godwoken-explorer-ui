@@ -1,0 +1,39 @@
+@layer components {
+  .basic-table {
+    @apply table-auto w-full;
+    & thead {
+      & tr {
+        @apply bg-gray-300;
+      }
+      & th {
+        @apply text-left p-4;
+      }
+    }
+    & tbody {
+      & tr {
+        @apply even:bg-gray-100 hover:bg-gray-200;
+      }
+      & td {
+        @apply p-4;
+      }
+    }
+  }
+}
+
+@layer components {
+  .basic-info-list {
+    @apply table w-full py-5;
+    & > div {
+      @apply table-row-group space-y-0.5 hover:bg-gray-100;
+      & > span {
+        @apply table-cell;
+        &:after {
+          content: ':';
+        }
+      }
+      & > div {
+        @apply table-cell;
+      }
+    }
+  }
+}

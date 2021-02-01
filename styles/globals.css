@@ -1,6 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import './tailwind.presets.css';
+@import './components.css';
 
 :root {
   --primary-color: rgb(33, 44, 61);
@@ -14,8 +13,10 @@ main {
 * {
   box-sizing: border-box;
   outline: none;
+  cursor: default;
 }
 
 a {
   text-decoration: underline;
+  cursor: pointer;
 }

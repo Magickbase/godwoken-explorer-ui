@@ -22,6 +22,7 @@ const Search = () => {
         placeholder="Search block, transaction, account..."
         value={keyword}
         onChange={handleChange}
+        autoFocus
         className="flex-1 text-sm px-2 focus:ring-2 rounded-md"
       />
       {keyword ? (
