@@ -44,19 +44,22 @@ const Account = ({ id, nonce, txList }: State) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<State, { id: string }> = async context => {
-  const { id } = context.params
+export const getServerSideProps: GetServerSideProps<State, { id: string }> = async ({ res, params }) => {
+  const { id } = params
+  const accountRes = await fetch(`${process.env.SERVER_URL}account/${id}`)
+  if (accountRes.status === 404) {
+    res.setHeader('location', '/404')
+    res.statusCode = 302
+    res.end()
+    return
+  }
+
+  const account = await accountRes.json()
   return {
     props: {
-      id,
-      nonce: `nonce-of-${id}`,
-      txList: Array.from({ length: 10 }).map((_, idx) => ({
-        hash: `tx-hash-${idx}`,
-        type: `type-${idx}`,
-        from: `from-${idx}`,
-        to: `to-${idx}`,
-        amount: `amount-${idx}`,
-        fee: `fee-${idx}`,
+      ...account,
+      txList: account.txList.map(tx => ({
+        ...tx,
         createdAt: Date.now().toString(),
       })),
     },

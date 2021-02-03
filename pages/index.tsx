@@ -25,16 +25,20 @@ const Home = (initState: State) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<State> = async () => {
+export const getServerSideProps: GetServerSideProps<State> = async ({ res }) => {
+  const blockListRes = await fetch(`${process.env.SERVER_URL}blocks`)
+
+  if (blockListRes.status === 404) {
+    res.setHeader('location', '/404')
+    res.statusCode = 302
+    res.end()
+    return
+  }
+
+  const blockList = await blockListRes.json()
   return {
     props: {
-      blockList: Array.from({ length: 10 }).map((_, idx) => ({
-        number: `number-${idx}`,
-        hash: `hash-${idx}`,
-        txCount: `txCount-${idx}`,
-        createdAt: Date.now().toString(),
-      })),
-      namespacesRequired: [],
+      blockList: blockList,
     },
   }
 }

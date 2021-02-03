@@ -25,10 +25,10 @@
     "react-dom": "17.0.1"
   },
   "devDependencies": {
-    "autoprefixer": "10.2.4",
     "@cypress/code-coverage": "3.9.2",
     "@types/node": "14.14.22",
     "@types/react": "17.0.1",
+    "autoprefixer": "10.2.4",
     "babel-plugin-istanbul": "6.0.0",
     "cypress": "6.4.0",
     "husky": "4.3.8",

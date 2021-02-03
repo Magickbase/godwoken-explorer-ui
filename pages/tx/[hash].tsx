@@ -89,19 +89,21 @@ const Tx = ({ hash, blockHash, type, nonce, amount, fee, from, to, transferredAt
   )
 }
 
-export const getServerSideProps: GetServerSideProps<State, { hash: string }> = async context => {
-  const { hash } = context.params
+export const getServerSideProps: GetServerSideProps<State, { hash: string }> = async ({ res, params }) => {
+  const { hash } = params
+  const txRes = await fetch(process.env.SERVER_URL + `/tx/${hash}`)
+
+  if (txRes.status === 404) {
+    res.setHeader('location', '/404')
+    res.statusCode = 302
+    res.end()
+    return
+  }
+
+  const tx = await txRes.json()
   return {
     props: {
-      hash,
-      blockHash: `block-hash-of-${hash}`,
-      type: `type-of-${hash}`,
-      status: `status-of-${hash}`,
-      nonce: `nonce-of-${hash}`,
-      from: `from-of-${hash}`,
-      to: `to-of-${hash}`,
-      amount: `amount-of-${hash}`,
-      fee: `fee-of-${hash}`,
+      ...tx,
       transferredAt: Date.now().toString(),
       confirmedAt: Date.now().toString(),
     },
