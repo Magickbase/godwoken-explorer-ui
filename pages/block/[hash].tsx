@@ -60,21 +60,23 @@ const Block = ({ hash, rootHash, commitTxHash, commitedAt, txList }: State) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async context => {
-  const { hash } = context.params
+export const getServerSideProps: GetServerSideProps = async ({ res, params }) => {
+  const { hash } = params
+  const blockRes = await fetch(`${process.env.SERVER_URL}blocks/${hash}`)
+  if (blockRes.status === 404) {
+    res.setHeader('location', '/404')
+    res.statusCode = 302
+    res.end()
+    return
+  }
+
+  const block = await blockRes.json()
   return {
     props: {
-      hash,
-      number: `block-number-of-${hash}`,
-      commitTxHash: `commit-tx-hash-of-${hash}`,
+      ...block,
       commitedAt: Date.now().toString(),
-      txList: Array.from({ length: 10 }).map((_, idx) => ({
-        hash: `hash-${idx}`,
-        type: `type-${idx}`,
-        from: `from-${idx}`,
-        to: `to-${idx}`,
-        amount: `amount-${idx}`,
-        fee: `fee-${idx}`,
+      txList: block.txList.map(tx => ({
+        ...tx,
         createdAt: Date.now().toString(),
       })),
     },
