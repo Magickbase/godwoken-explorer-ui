@@ -7,16 +7,12 @@
 }
 
 main {
-  @apply max-w-7xl m-auto;
-  margin-bottom: 0;
+  @apply max-w-7xl m-auto mb-0;
 }
 * {
-  box-sizing: border-box;
-  outline: none;
-  cursor: default;
+  @apply tracking-wide box-border outline-none cursor-default;
 }
 
 a {
-  text-decoration: underline;
-  cursor: pointer;
+  @apply underline cursor-pointer;
 }

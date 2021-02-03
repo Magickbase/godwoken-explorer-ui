@@ -22,17 +22,17 @@
 
 @layer components {
   .basic-info-list {
-    @apply table w-full py-5;
+    @apply table w-full py-5 text-sm;
     & > div {
       @apply table-row-group space-y-0.5 hover:bg-gray-100;
       & > span {
-        @apply table-cell;
+        @apply table-cell font-semibold px-4 py-2 text-gray-900;
         &:after {
           content: ':';
         }
       }
       & > div {
-        @apply table-cell;
+        @apply table-cell px-4 py-2 text-gray-700;
       }
     }
   }
