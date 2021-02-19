@@ -3,8 +3,9 @@
   "hash": "区块哈希",
   "number": "区块高度",
   "txCount": "交易数量",
-  "createdAt": "创建时间",
-  "rootHash": "根哈希",
-  "committedAt": "提交时间",
-  "commitTxHash": "提交交易哈希"
+  "timestamp": "时间",
+  "l1Block": "l1 区块",
+  "finalizeState": "finalize 状态",
+  "aggregator": "聚合者",
+  "txHash": "交易哈希"
 }

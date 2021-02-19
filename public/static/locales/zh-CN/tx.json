@@ -3,11 +3,16 @@
   "blockHash": "区块哈希",
   "type": "类型",
   "from": "发送账户",
-  "to": "接受账户",
+  "to": "接收账户",
   "amount": "金额",
+  "l1Block": "l1 区块",
+  "l2Block": "l2 区块",
+  "args": "参数",
+  "gasPrice": "gas 价格",
   "fee": "手续费",
-  "createdAt": "创建时间",
   "nonce": "nonce",
-  "transferredAt": "跨链时间",
-  "confirmedAt": "确认时间"
+  "timestamp": "时间",
+  "action": "行为",
+  "success": "成功",
+  "finalizeState": "finalize 状态"
 }

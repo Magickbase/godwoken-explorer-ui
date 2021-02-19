@@ -1,82 +1,57 @@
+import { useState } from 'react'
 import { GetServerSideProps } from 'next'
 import Link from 'next/link'
-import { useTranslation, formatDatetime } from 'utils'
+import { useTranslation, formatDatetime, fetchTx, API, handleApiError, ckbExplorerUrl } from 'utils'
 
-interface State {
-  hash: string
-  blockHash: string
-  type: string
-  status: string
-  nonce: string
-  from: string
-  to: string
-  amount: string
-  fee: string
-  transferredAt: string
-  confirmedAt: string
-}
-const Tx = ({ hash, blockHash, type, nonce, amount, fee, from, to, transferredAt, confirmedAt, status }: State) => {
+type State = API.Tx.Parsed
+
+const Tx = (initState: State) => {
+  const [tx, setTx] = useState(initState)
   const [t] = useTranslation('tx')
   const infoList = [
+    { label: 'hash', value: tx.hash },
+    { label: 'timestamp', value: formatDatetime(+tx.timestamp) },
+    { label: 'finalizeState', value: tx.finalizeState },
     {
-      label: 'blockHash',
+      label: 'l2Block',
       value: (
-        <Link href={`/block/${blockHash}`}>
-          <a>{blockHash}</a>
+        <Link href={`/block/${tx.l2Block}`}>
+          <a>{tx.l2Block}</a>
         </Link>
       ),
     },
     {
-      label: 'hash',
-      value: hash,
-    },
-    {
-      label: 'type',
-      value: type,
-    },
-    {
-      label: 'status',
-      value: status,
-    },
-    {
-      label: 'nonce',
-      value: nonce,
+      label: 'l1Block',
+      value: (
+        <Link href={`${ckbExplorerUrl}block/${tx.l1Block}`}>
+          <a>{tx.l1Block}</a>
+        </Link>
+      ),
     },
     {
       label: 'from',
       value: (
-        <Link href={`/account/${from}`}>
-          <a>{from}</a>
+        <Link href={`/account/${tx.from}`}>
+          <a>{tx.from}</a>
         </Link>
       ),
     },
     {
       label: 'to',
       value: (
-        <Link href={`/account/${to}`}>
-          <a>{to}</a>
+        <Link href={`/account/${tx.to}`}>
+          <a>{tx.to}</a>
         </Link>
       ),
     },
-    {
-      label: 'amount',
-      value: amount,
-    },
-    {
-      label: 'fee',
-      value: fee,
-    },
-    {
-      label: 'transferredAt',
-      value: formatDatetime(+transferredAt),
-    },
-    {
-      label: 'confirmedAt',
-      value: formatDatetime(+confirmedAt),
-    },
+    { label: 'nonce', value: tx.nonce },
+    { label: 'args', value: tx.args },
+    { label: 'type', value: tx.type },
+    { label: 'gasPrice', value: tx.gasPrice },
+    { label: 'fee', value: tx.fee },
   ]
   return (
-    <main>
+    <>
       <div className="basic-info-list">
         {infoList.map(info => (
           <div key={info.label}>
@@ -85,28 +60,17 @@ const Tx = ({ hash, blockHash, type, nonce, amount, fee, from, to, transferredAt
           </div>
         ))}
       </div>
-    </main>
+    </>
   )
 }
 
 export const getServerSideProps: GetServerSideProps<State, { hash: string }> = async ({ res, params }) => {
   const { hash } = params
-  const txRes = await fetch(process.env.SERVER_URL + `/tx/${hash}`)
-
-  if (txRes.status === 404) {
-    res.setHeader('location', '/404')
-    res.statusCode = 302
-    res.end()
-    return
-  }
-
-  const tx = await txRes.json()
-  return {
-    props: {
-      ...tx,
-      transferredAt: Date.now().toString(),
-      confirmedAt: Date.now().toString(),
-    },
+  try {
+    const tx = await fetchTx(hash)
+    return { props: tx }
+  } catch (err) {
+    handleApiError(err, res)
   }
 }
 export default Tx

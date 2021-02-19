@@ -1,4 +1,7 @@
 {
   "id": "账户 id",
-  "nonce": "nonce"
+  "nonce": "nonce",
+  "type": "账户类型",
+  "ckb": "ckb",
+  "txCount": "交易总数"
 }

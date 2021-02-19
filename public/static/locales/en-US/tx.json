@@ -5,9 +5,14 @@
   "from": "from",
   "to": "to",
   "amount": "amount",
+  "l1Block": "l1 block",
+  "l2Block": "l2 block",
+  "args": "args",
+  "gasPrice": "gas price",
   "fee": "fee",
-  "createdAt": "created at",
   "nonce": "nonce",
-  "transferredAt": "transferred at",
-  "confirmedAt": "confirmed at"
+  "timestamp": "timestamp",
+  "action": "action",
+  "success": "success",
+  "finalizeState": "finalize state"
 }

@@ -3,8 +3,9 @@
   "hash": "block hash",
   "number": "block number",
   "txCount": "tx count",
-  "createdAt": "created at",
-  "rootHash": "root hash",
-  "committedAt": "committed at",
-  "commitTxHash": "commit tx hash"
+  "timestamp": "timestamp",
+  "l1Block": "l1 block",
+  "finalizeState": "finalize state",
+  "aggregator": "aggregator",
+  "txHash": "tx hash"
 }
