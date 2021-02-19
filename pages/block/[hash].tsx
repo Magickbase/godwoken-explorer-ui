@@ -1,85 +1,70 @@
+import { useState } from 'react'
 import { GetServerSideProps } from 'next'
 import Link from 'next/link'
-import TxList from 'components/TxList'
-import { useTranslation, formatDatetime } from 'utils'
+import { useTranslation, fetchBlock, handleApiError, API, formatDatetime, ckbExplorerUrl } from 'utils'
 
-interface Tx {
-  hash: string
-  type: string
-  from: string
-  to: string
-  amount: string
-  fee: string
-  createdAt: string
-}
+type State = API.Block.Parsed
 
-interface State {
-  hash: string
-  rootHash: string
-  commitTxHash: string
-  commitedAt: string
-  txList: Array<Tx>
-}
-
-const Block = ({ hash, rootHash, commitTxHash, commitedAt, txList }: State) => {
+const Block = (initState: State) => {
+  const [block, setBlock] = useState(initState)
   const [t] = useTranslation('block')
-  const infoList = [
+  const infoList: Array<{ label: keyof State; value: string | React.ReactNode }> = [
     {
-      label: 'hash',
-      value: hash,
+      label: 'number',
+      value: block.number,
     },
     {
-      label: 'rootHash',
-      value: rootHash,
+      label: 'timestamp',
+      value: formatDatetime(+block.timestamp),
     },
     {
-      label: 'commitTxHash',
+      label: 'l1Block',
       value: (
-        <Link href={`/tx/${commitTxHash}`}>
-          <a>{commitTxHash}</a>
+        <Link href={`${ckbExplorerUrl}block/${block.l1Block}`}>
+          <a>{block.l1Block}</a>
         </Link>
       ),
     },
     {
-      label: 'committedAt',
-      value: formatDatetime(+commitedAt),
+      label: 'txHash',
+      value: (
+        <Link href={`${ckbExplorerUrl}transaction/${block.txHash}`}>
+          <a>{block.txHash}</a>
+        </Link>
+      ),
+    },
+    {
+      label: 'finalizeState',
+      value: block.finalizeState,
+    },
+    {
+      label: 'txCount',
+      value: block.txCount,
+    },
+    {
+      label: 'aggregator',
+      value: block.aggregator,
     },
   ]
   return (
-    <main>
-      <div className="basic-info-list">
-        {infoList.map(info => (
-          <div key={info.label}>
-            <span>{t(info.label)}</span>
-            <div>{info.value}</div>
-          </div>
-        ))}
-      </div>
-      <TxList list={txList} />
-    </main>
+    <div className="basic-info-list">
+      {infoList.map(info => (
+        <div key={info.label}>
+          <span>{t(info.label)}</span>
+          <div>{info.value}</div>
+        </div>
+      ))}
+    </div>
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ res, params }) => {
+export const getServerSideProps: GetServerSideProps<State> = async ({ res, params }) => {
   const { hash } = params
-  const blockRes = await fetch(`${process.env.SERVER_URL}blocks/${hash}`)
-  if (blockRes.status === 404) {
-    res.setHeader('location', '/404')
-    res.statusCode = 302
-    res.end()
-    return
-  }
-
-  const block = await blockRes.json()
-  return {
-    props: {
-      ...block,
-      commitedAt: Date.now().toString(),
-      txList: block.txList.map(tx => ({
-        ...tx,
-        createdAt: Date.now().toString(),
-      })),
-    },
+  try {
+    const block = await fetchBlock(hash as string)
+    return { props: block }
+  } catch (err) {
+    handleApiError(err, res)
   }
 }
 

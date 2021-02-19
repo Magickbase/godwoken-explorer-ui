@@ -1,4 +1,7 @@
 {
   "id": "account id",
-  "nonce": "nonce"
+  "nonce": "nonce",
+  "type": "account type",
+  "ckb": "ckb",
+  "txCount": "transaction count"
 }
