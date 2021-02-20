@@ -23,7 +23,7 @@ const Tx = (initState: State) => {
     {
       label: 'l1Block',
       value: (
-        <Link href={`${ckbExplorerUrl}block/${tx.l1Block}`}>
+        <Link href={`${ckbExplorerUrl}/block/${tx.l1Block}`}>
           <a>{tx.l1Block}</a>
         </Link>
       ),
@@ -70,7 +70,7 @@ export const getServerSideProps: GetServerSideProps<State, { hash: string }> = a
     const tx = await fetchTx(hash)
     return { props: tx }
   } catch (err) {
-    handleApiError(err, res)
+    return handleApiError(err, res)
   }
 }
 export default Tx

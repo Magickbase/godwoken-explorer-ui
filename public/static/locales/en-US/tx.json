@@ -14,5 +14,7 @@
   "timestamp": "timestamp",
   "action": "action",
   "success": "success",
-  "finalizeState": "finalize state"
+  "finalizeState": "finalize state",
+  "age": "age",
+  "tx-list-title": "Transactions related to {{account}}"
 }
