@@ -20,7 +20,7 @@ const Block = (initState: State) => {
     {
       label: 'l1Block',
       value: (
-        <Link href={`${ckbExplorerUrl}block/${block.l1Block}`}>
+        <Link href={`${ckbExplorerUrl}/block/${block.l1Block}`}>
           <a>{block.l1Block}</a>
         </Link>
       ),
@@ -28,7 +28,7 @@ const Block = (initState: State) => {
     {
       label: 'txHash',
       value: (
-        <Link href={`${ckbExplorerUrl}transaction/${block.txHash}`}>
+        <Link href={`${ckbExplorerUrl}/transaction/${block.txHash}`}>
           <a>{block.txHash}</a>
         </Link>
       ),
@@ -64,7 +64,7 @@ export const getServerSideProps: GetServerSideProps<State> = async ({ res, param
     const block = await fetchBlock(hash as string)
     return { props: block }
   } catch (err) {
-    handleApiError(err, res)
+    return handleApiError(err, res)
   }
 }
 

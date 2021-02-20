@@ -97,7 +97,7 @@ export const getServerSideProps: GetServerSideProps<State> = async ({ res }) => 
     const home = await fetchHome()
     return { props: home }
   } catch (err) {
-    handleApiError(err, res)
+    return handleApiError(err, res)
   }
 }
 

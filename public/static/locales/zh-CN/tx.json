@@ -14,5 +14,7 @@
   "timestamp": "时间",
   "action": "行为",
   "success": "成功",
-  "finalizeState": "finalize 状态"
+  "finalizeState": "finalize 状态",
+  "age": "时间",
+  "tx-list-title": "账户 {{account}} 的交易"
 }

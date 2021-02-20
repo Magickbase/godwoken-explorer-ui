@@ -1,12 +1,11 @@
 import { ServerResponse } from 'http'
 import { NotFoundException } from './exceptions'
 
-export const handleApiError = (err: Error, res: ServerResponse) => {
+export const handleApiError = (err: Error, res: ServerResponse): { notFound: true } => {
   if (err instanceof NotFoundException) {
-    res.setHeader('location', '/404')
-    res.statusCode = 302
-    res.end()
-    return
+    return {
+      notFound: true,
+    }
   }
   console.warn(err.message)
   res.setHeader('location', '/')

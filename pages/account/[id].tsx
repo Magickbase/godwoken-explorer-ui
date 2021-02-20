@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { GetServerSideProps } from 'next'
+import Link from 'next/link'
 import { useTranslation, fetchAccount, API, handleApiError } from 'utils'
 
 type State = API.Account.Parsed
@@ -10,7 +11,14 @@ const Account = (initState: State) => {
     { label: 'id', value: account.id },
     { label: 'type', value: account.type },
     { label: 'ckb', value: account.ckb },
-    { label: 'txCount', value: account.txCount },
+    {
+      label: 'txCount',
+      value: (
+        <Link href={`/txs?account=${account.id}`}>
+          <a>{account.txCount}</a>
+        </Link>
+      ),
+    },
   ]
   return (
     <div className="basic-info-list">
@@ -30,7 +38,7 @@ export const getServerSideProps: GetServerSideProps<State, { id: string }> = asy
     const account = await fetchAccount(id)
     return { props: account }
   } catch (err) {
-    handleApiError(err, res)
+    return handleApiError(err, res)
   }
 }
 export default Account
