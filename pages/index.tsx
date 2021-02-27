@@ -1,94 +1,130 @@
 import { GetServerSideProps } from 'next'
 import Link from 'next/link'
 import { useState } from 'react'
+import Search from 'components/Search'
 import { useTranslation, timeDistance, fetchHome, API, handleApiError } from 'utils'
 
 type State = API.Home.Parsed
 
-const statisticFields = ['blockCount', 'txCount', 'tps', 'accountCount']
-const blockFields = ['number', 'time', 'txCount']
-const txFields = ['hash', 'time', 'from', 'to', 'action', 'success']
+const statisticGroups = [
+  ['blockCount', 'txCount'],
+  ['tps', 'accountCount'],
+]
+
+const Statistic = (statistic: State['statistic']) => {
+  const [t] = useTranslation('statistic')
+
+  return (
+    <div className="flex flex-wrap w-full px-4 rounded-md bg-gradient-to-r from-secondary to-primary text-white divide-y divide-white divide-opacity-20 md:divide-y-0 md:divide-x md:px-0 md:py-4">
+      {statisticGroups.map(group => (
+        <div
+          key={group.join()}
+          className="flex w-full py-4 divide-x divide-white divide-opacity-20 md:w-1/2 md:flex-col md:divide-x-0 md:divide-y md:py-0 md:px-4 xl:divide-y-0 xl:divide-x xl:flex-row xl:px-0"
+        >
+          {group.map(field => (
+            <div
+              key={field}
+              className="flex-1 whitespace-pre capitalize even:pl-4 md:even:pl-0 md:odd:pb-4 md:even:pt-4 xl:odd:pb-0 xl:even:p-0 xl:odd:pl-4 xl:even:pl-4"
+            >
+              {t(field.toString(), { value: Number(statistic[field]).toLocaleString('en') })}
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  )
+}
 
 const BlockList = ({ list }: { list: State['blockList'] }) => {
   const [t, { language }] = useTranslation('block')
   return (
-    <table className="basic-table col-span-2">
-      <thead>
-        <tr>
-          {blockFields.map(field => (
-            <th key={field}>{t(field)}</th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
+    <div className="list-container my-4 md:flex-1 md:mr-2">
+      <h2 className="border-b px-4 py-2 list-header">{t('latest-blocks')}</h2>
+      <div className="divide-y">
         {list.map(block => (
-          <tr key={block.hash}>
-            <td>
+          <div key={block.hash} className="px-4 py-5">
+            <div className="flex justify-between mb-4 md:mb-3">
               <Link href={`/block/${block.hash}`}>
-                <a>{block.number}</a>
+                <span>
+                  #<a title={t('number')}>{block.number}</a>
+                </span>
               </Link>
-            </td>
-            <td>{timeDistance(block.timestamp, language)}</td>
-            <td>{block.txCount}</td>
-          </tr>
+              <span className="text-right" title={t('txCount')}>
+                {block.txCount} TXs
+              </span>
+            </div>
+            <time
+              dateTime={new Date(+block.timestamp).toISOString()}
+              className="flex justify-end list-datetime md:h-6"
+              title={t('timestamp')}
+            >
+              {timeDistance(block.timestamp, language)}
+            </time>
+          </div>
         ))}
-      </tbody>
-    </table>
+      </div>
+    </div>
   )
 }
 
 const TxList = ({ list }: { list: State['txList'] }) => {
   const [t, { language }] = useTranslation('tx')
   return (
-    <table className="basic-table col-span-2">
-      <thead>
-        <tr>
-          {txFields.map(field => (
-            <th key={field}>{t(field)}</th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
+    <div className="list-container my-4 md:flex-1 md:ml-2">
+      <h2 className="border-b px-4 py-2 list-header">{t('latest-txs')}</h2>
+      <div className="divide-y">
         {list.map(tx => (
-          <tr key={tx.hash}>
-            <td>
+          <div key={tx.hash} className="px-4 py-5">
+            <div className="flex items-center mb-3">
               <Link href={`/tx/${tx.hash}`}>
-                <a>{tx.hash}</a>
+                <span>
+                  #<a title={t('hash')}>{tx.hash}</a>
+                </span>
               </Link>
-            </td>
-            <td>{timeDistance(tx.timestamp, language)}</td>
-            <td>
+              <span className="tx-type-badge mx-2" title={t('action')}>
+                {tx.action}
+              </span>
+              <span title={t('success')}>{tx.success.toString()}</span>
+            </div>
+            <div className="flex">
+              {t('from')}
               <Link href={`/account/${tx.from}`}>
-                <a>{tx.from}</a>
+                <a title={t('from')}>{tx.from}</a>
               </Link>
-            </td>
-            <td>
+              {'>>>'}
+              {t('to')}
               <Link href={`/account/${tx.to}`}>
-                <a>{tx.to}</a>
+                <a title={t('to')}>{tx.to}</a>
               </Link>
-            </td>
-            <td>{tx.action}</td>
-            <td>{tx.success.toString()}</td>
-          </tr>
+              <time
+                dateTime={new Date(+tx.timestamp).toISOString()}
+                className="flex flex-1 justify-end items-end list-datetime md:h-6 "
+                title={t('timestamp')}
+              >
+                {timeDistance(tx.timestamp, language)}
+              </time>
+            </div>
+          </div>
         ))}
-      </tbody>
-    </table>
+      </div>
+    </div>
   )
 }
 
 const Home = (initState: State) => {
   const [home, setHome] = useState(initState)
-  const [t] = useTranslation('statistic')
   return (
-    <div className="grid grid-cols-4 gap-5">
-      {statisticFields.map(field => (
-        <div key={field} className="whitespace-pre text-center capitalize">
-          {t(field.toString(), { value: Number(home.statistic[field]).toLocaleString('en') })}
-        </div>
-      ))}
-      <BlockList list={home.blockList} />
-      <TxList list={home.txList} />
-    </div>
+    <>
+      <div className="py-8">
+        <Search />
+      </div>
+
+      <Statistic {...home.statistic} />
+      <div className="md:flex">
+        <BlockList list={home.blockList} />
+        <TxList list={home.txList} />
+      </div>
+    </>
   )
 }
 

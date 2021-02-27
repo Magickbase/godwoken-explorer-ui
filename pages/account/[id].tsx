@@ -7,27 +7,27 @@ type State = API.Account.Parsed
 const Account = (initState: State) => {
   const [account, setAccount] = useState(initState)
   const [t] = useTranslation('account')
-  const infoList = [
-    { label: 'id', value: account.id },
-    { label: 'type', value: account.type },
-    { label: 'ckb', value: account.ckb },
-    {
-      label: 'txCount',
-      value: (
-        <Link href={`/txs?account=${account.id}`}>
-          <a>{account.txCount}</a>
-        </Link>
-      ),
-    },
-  ]
+  // const infoList = [
+  //   { label: 'type', value: account.type },
+  // ]
   return (
-    <div className="basic-info-list">
-      {infoList.map(info => (
-        <div key={info.label}>
-          <span>{t(info.label)}</span>
-          <div>{info.value}</div>
+    <div>
+      <div className="flex flex-col card-container md:flex-row md:pb-3">
+        <h2 className="card-header border-b pb-3 md:flex-1 md:border-b-0 md:border-r md:pb-0">{`${t('account')} ${account.id}`}</h2>
+        <div className="divide-y divide-light-grey divide-dashed md:divide-y-0 md:flex-1 md:pl-3">
+          <div className="flex justify-between py-3 md:py-0">
+            <span>{t('ckb')}</span>
+            <span>{account.ckb}</span>
+          </div>
+          <div className="flex justify-between pt-3 pb-2 md:pb-0">
+            <span>{t('txCount')}</span>
+            <Link href={`/txs?account=${account.id}`}>
+              <a>{account.txCount}</a>
+            </Link>
+          </div>
         </div>
-      ))}
+        {/* <CardFieldsetList fieldsetList={fieldsetList} t={t} /> */}
+      </div>
     </div>
   )
 }

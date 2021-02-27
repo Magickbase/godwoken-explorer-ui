@@ -1,4 +1,5 @@
 {
+  "latest-blocks": "latest blocks",
   "block": "block",
   "hash": "block hash",
   "number": "block number",

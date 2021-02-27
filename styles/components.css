@@ -1,39 +1,48 @@
 @layer components {
-  .basic-table {
-    @apply table-auto w-full;
-    & thead {
-      & tr {
-        @apply bg-gray-300;
-      }
-      & th {
-        @apply text-left p-4;
-      }
-    }
-    & tbody {
-      & tr {
-        @apply even:bg-gray-100 hover:bg-gray-200;
-      }
-      & td {
-        @apply p-4;
-      }
-    }
+  .main-container {
+    @apply flex flex-col mx-auto w-full p-4 xl:max-w-7xl;
   }
 }
 
 @layer components {
-  .basic-info-list {
-    @apply table w-full py-5 text-sm;
-    & > div {
-      @apply table-row-group space-y-0.5 hover:bg-gray-100;
-      & > span {
-        @apply table-cell font-semibold px-4 py-2 text-gray-900;
-        &:after {
-          content: ':';
-        }
-      }
-      & > div {
-        @apply table-cell px-4 py-2 text-gray-700;
-      }
+  .list-container {
+    @apply bg-white rounded-md shadow-md;
+  }
+  .list-header {
+    @apply text-sm font-bold;
+  }
+  .list-datetime {
+    @apply text-xs text-dark-grey;
+  }
+}
+
+@layer components {
+  .card-container {
+    @apply bg-white rounded-md shadow-md p-4 mt-4 pb-1;
+  }
+  .card-header {
+    @apply text-xl font-bold;
+  }
+  .card-fieldset {
+    @apply md:w-1/2 md:odd:pr-4 md:even:pl-4;
+  }
+  .card-field {
+    @apply flex py-2 justify-between items-center border-b border-dashed border-light-grey text-sm md:border-0 md:first:pt-0 md:last:pb-0;
+    &[attr-last='true'] {
+      @apply last:border-0;
     }
+  }
+  .card-label {
+    @apply text-sm text-dark-grey capitalize;
+  }
+}
+
+@layer components {
+  .tx-type-badge {
+    @apply flex justify-center items-center capitalize font-bold text-tag-primary bg-tag-secondary border border-tag-primary;
+    border-radius: 4px;
+    font-size: 10px;
+    padding: 0 4px;
+    height: 17px;
   }
 }

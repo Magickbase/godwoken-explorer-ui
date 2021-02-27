@@ -1,4 +1,5 @@
 {
+  "latest-txs": "latest transactions",
   "hash": "tx hash",
   "blockHash": "block hash",
   "type": "type",

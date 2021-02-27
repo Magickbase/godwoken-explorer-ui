@@ -6,6 +6,6 @@ context('Home Page', () => {
   })
 
   it('cy.title() - get the title', () => {
-    cy.title().should('include', 'Agera')
+    cy.title().should('include', 'Godwoken Explorer')
   })
 })

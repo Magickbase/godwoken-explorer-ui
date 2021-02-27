@@ -1,15 +1,13 @@
 import Link from 'next/link'
-import Search from 'components/Search'
+import { explorerTitle } from 'utils'
 
 const Header = () => (
-  <header className="flex bg-primary p-4 sticky top-0 left-0">
-    <Link href="/">
-      <a className="text-lg flex-1 text-white font-bold no-underline">Agera</a>
-    </Link>
-    <div className="flex flex-1">
-      <Search />
+  <header className="fixed t-0 l-0 w-full h-14 bg-black flex">
+    <div className="main-container items-center">
+      <Link href="/">
+        <a className="text-xl text-white font-bold no-underline flex-0">{explorerTitle}</a>
+      </Link>
     </div>
-    <div className="flex-1"></div>
   </header>
 )
 export default Header

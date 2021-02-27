@@ -1,4 +1,5 @@
 {
+  "latest-txs": "最新交易",
   "hash": "交易哈希",
   "blockHash": "区块哈希",
   "type": "类型",
