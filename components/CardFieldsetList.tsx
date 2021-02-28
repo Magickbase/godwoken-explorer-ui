@@ -1,12 +1,11 @@
 import { TFunction } from 'next-i18next'
 
-const CardFieldsetList = ({
-  fieldsetList,
-  t,
-}: {
+export interface CardFieldsetListProps {
   fieldsetList: Array<Array<{ label: string; value: React.ReactNode }>>
   t: TFunction
-}) => (
+}
+
+const CardFieldsetList = ({ fieldsetList, t }: CardFieldsetListProps) => (
   <div className="md:flex md:divide-x md:divide-light-grey md:my-3">
     {fieldsetList.map((fieldset, fidx) => (
       <div key={fieldset.map(i => i.label).join()} className="card-fieldset">
