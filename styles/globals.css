@@ -1,18 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
 @import './tailwind.presets.css';
 @import './components.css';
-
-:root {
-  --primary-color: rgb(33, 44, 61);
-  --header-height: 69px;
-}
 
 html,
 body {
   background-color: #ededed;
+  @apply font-sans font-normal;
 }
 main {
   @apply main-container;
-  min-height: calc(100vh - 156px);
+  min-height: calc(100vh - 216px);
   padding-top: 56px;
 }
 * {
@@ -20,5 +17,5 @@ main {
 }
 
 a {
-  @apply no-underline cursor-pointer text-primary;
+  @apply no-underline cursor-pointer text-secondary;
 }

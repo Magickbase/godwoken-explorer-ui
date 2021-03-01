@@ -1,18 +1,16 @@
-import { useState } from 'react'
-import { useTranslation } from 'utils'
+import { useTranslation, imgUrl, useIsHidden } from 'utils'
 import CardFieldsetList, { CardFieldsetListProps } from 'components/CardFieldsetList'
 
 const SUDT = () => {
   const [t] = useTranslation('account')
+  const [isHidden, HiddenIcon] = useIsHidden()
 
-  const [isHidden, setisHidden] = useState(true)
   const script = {
     codeHash: 'code hash',
     hashType: 'type',
     args: 'args',
     name: '',
   }
-  const handleShowScript = () => setisHidden(h => !h)
 
   const fieldsetList: CardFieldsetListProps['fieldsetList'] = [
     [
@@ -39,10 +37,7 @@ const SUDT = () => {
         <div className="card-field" attr-last="true">
           <span className="card-label">
             {t('l1TypeScript')}
-            <span onClick={handleShowScript}>
-              {isHidden ? 'show' : 'hide'}
-              <i className="iconfont godwoken-show-more" />
-            </span>
+            <HiddenIcon />
           </span>
           <span className="script-type-badge">{script.name || t('unknownScript')}</span>
         </div>

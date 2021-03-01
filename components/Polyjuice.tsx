@@ -1,16 +1,16 @@
 import { useState } from 'react'
-import { useTranslation } from 'utils'
+import Image from 'next/image'
+import { useTranslation, imgUrl, useIsHidden } from 'utils'
 
 const Polyjuice = () => {
   const [t] = useTranslation('account')
-  const [isHidden, setisHidden] = useState(true)
+  const [isHidden, HiddenIcon] = useIsHidden()
   const script = {
     codeHash: 'code hash',
     hashType: 'type',
     args: 'args',
     name: '',
   }
-  const handleShowScript = () => setisHidden(h => !h)
 
   return (
     <div className="md:flex">
@@ -23,10 +23,7 @@ const Polyjuice = () => {
           <div className="card-field" attr-last="true">
             <span className="card-label">
               {t('script')}
-              <span onClick={handleShowScript}>
-                {isHidden ? 'show' : 'hide'}
-                <i className="iconfont godwoken-show-more" />
-              </span>
+              <HiddenIcon />
             </span>
             <span className="script-type-badge">{script.name || t('unknownScript')}</span>
           </div>

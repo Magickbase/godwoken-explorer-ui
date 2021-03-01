@@ -9,7 +9,7 @@ const links = [
   { label: 'CKB Explorer', url: ckbExplorerUrl },
 ]
 const Footer = () => (
-  <footer className="bg-black overflow-hidden relative" style={{ height: 156 }}>
+  <footer className="bg-black overflow-hidden relative" style={{ height: 156, marginTop: 60 }}>
     <div className="mx-auto flex flex-wrap mt-8 font-bold text-sm" style={{ width: 300 }}>
       {links.map(link => (
         <Link key={link.label} href={link.url}>

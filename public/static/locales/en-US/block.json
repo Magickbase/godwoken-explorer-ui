@@ -3,7 +3,7 @@
   "block": "block",
   "hash": "block hash",
   "number": "block number",
-  "txCount": "tx count",
+  "txCount": "transactions",
   "timestamp": "timestamp",
   "l1Block": "l1 block",
   "finalizeState": "finalize state",

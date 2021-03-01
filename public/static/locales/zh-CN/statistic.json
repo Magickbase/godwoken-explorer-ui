@@ -1,6 +1,6 @@
 {
-  "blockCount": "区块总数\n{{value}}",
-  "txCount": "交易总数\n{{value}}",
-  "tps": "TPS\n{{value}} tx/s",
-  "accountCount": "账户总数\n{{value}}"
+  "blockCount": "区块总数\n",
+  "txCount": "交易总数\n",
+  "tps": "TPS",
+  "accountCount": "账户总数"
 }

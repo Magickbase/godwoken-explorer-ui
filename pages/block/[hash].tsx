@@ -55,8 +55,11 @@ const Block = (initState: State) => {
     ],
   ]
   return (
-    <div className="card-container">
-      <h2 className="card-header border-b pb-3">{`${t('block')} #${block.number}`}</h2>
+    <div className="card-container mt-8">
+      <h2 className="card-header">
+        {t('block')}
+        <span>{`#${block.number}`}</span>
+      </h2>
       <CardFieldsetList fieldsetList={fieldsetList} t={t} />
     </div>
   )

@@ -9,7 +9,13 @@
     @apply bg-white rounded-md shadow-md;
   }
   .list-header {
-    @apply text-sm font-bold;
+    @apply flex items-center text-sm font-bold capitalize text-ink px-4 py-1.5 border-b;
+    & > span {
+      @apply ml-1;
+    }
+  }
+  .list-item-container {
+    @apply mx-4 py-5 text-sm leading-4;
   }
   .list-datetime {
     @apply text-xs text-dark-grey;
@@ -21,7 +27,10 @@
     @apply bg-white rounded-md shadow-md p-4 mt-4 pb-1;
   }
   .card-header {
-    @apply text-xl font-bold capitalize;
+    @apply text-xl leading-6 font-bold capitalize border-b pb-2.5;
+    & > span {
+      @apply font-light ml-2;
+    }
   }
   .card-subheader {
     @apply font-bold text-base text-dark-grey border-b pb-3 capitalize;
@@ -33,13 +42,22 @@
     @apply md:w-1/2 md:odd:pr-4 md:even:pl-4;
   }
   .card-field {
-    @apply flex py-2 justify-between items-center border-b border-dashed border-light-grey text-sm select-none md:border-0 md:first:pt-0 md:last:pb-0;
+    @apply flex py-2.5 justify-between items-center border-b border-dashed border-light-grey text-sm md:border-0 md:first:pt-0 md:last:pb-0;
+
     &[attr-last='true'] {
       @apply last:border-0;
     }
+
+    & > span {
+      @apply overflow-ellipsis overflow-hidden;
+    }
+
+    & a {
+      @apply overflow-ellipsis overflow-hidden;
+    }
   }
   .card-label {
-    @apply text-sm text-dark-grey capitalize;
+    @apply flex items-center text-sm text-dark-grey capitalize whitespace-nowrap mr-2 flex-shrink-0 select-none;
   }
 }
 
@@ -59,5 +77,11 @@
 @layer components {
   .script-code {
     @apply flex w-full text-dark-grey bg-code-bg font-bold text-xs p-1;
+  }
+}
+
+@layer components {
+  .inverted-icon {
+    filter: invert(1);
   }
 }

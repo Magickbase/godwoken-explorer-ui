@@ -1,14 +1,13 @@
-import { useState } from 'react'
-import { useTranslation } from 'utils'
+import {  useTranslation, useIsHidden } from 'utils'
 import AssetList from 'components/AssetList'
 
 const User = () => {
   const [t] = useTranslation('account')
-  const [isHidden, setisHidden] = useState(true)
+  const [isHidden, HiddenIcon] = useIsHidden()
   const infoList = [
-    { label: t('ethAddr'), value: <span title={t('ethAddr')}>eth address</span> },
+    { label: t('ethAddr'), value: <span title={t('ethAddr')}>0xbd215e27867bcf0faa04fd563a7b9ce559674a83</span> },
     { label: t('nonce'), value: <span title={t('nonce')}>nonce</span> },
-    { label: t('ckbAddr'), value: <span title={t('ckbAddr')}>ckb address</span> },
+    { label: t('ckbAddr'), value: <span title={t('ckbAddr')}>ckt1qyqw975zuu9svtyxgjuq44lv7mspte0n2tmqa703cd</span> },
   ]
   const assetList = [
     { label: 'udt 1', value: 'udt 1' },
@@ -20,7 +19,6 @@ const User = () => {
     args: 'args',
     name: '',
   }
-  const handleShowScript = () => setisHidden(h => !h)
 
   return (
     <div className="md:flex">
@@ -39,10 +37,7 @@ const User = () => {
           <div className="card-field" attr-last="true">
             <span className="card-label">
               {t('ckbLockScript')}
-              <span onClick={handleShowScript}>
-                {isHidden ? 'show' : 'hide'}
-                <i className="iconfont godwoken-show-more" />
-              </span>
+              <HiddenIcon />
             </span>
             <span className="script-type-badge">{script.name || t('unknownScript')}</span>
           </div>

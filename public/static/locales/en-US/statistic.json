@@ -1,6 +1,6 @@
 {
-  "blockCount": "blocks\n{{value}}",
-  "txCount": "transactions\n{{value}}",
-  "tps": "TPS\n{{value}} tx/s",
-  "accountCount": "account count\n{{value}}"
+  "blockCount": "blocks",
+  "txCount": "transactions",
+  "tps": "TPS",
+  "accountCount": "account count"
 }

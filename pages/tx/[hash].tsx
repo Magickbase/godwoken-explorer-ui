@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { GetServerSideProps } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
-import { useTranslation, formatDatetime, fetchTx, API, handleApiError, ckbExplorerUrl } from 'utils'
+import { useTranslation, formatDatetime, fetchTx, API, handleApiError, ckbExplorerUrl, imgUrl } from 'utils'
 import CardFieldsetList from 'components/CardFieldsetList'
 type State = API.Tx.Parsed
 
@@ -46,19 +47,22 @@ const Tx = (initState: State) => {
   ]
   return (
     <div className="card-container">
-      <h2 className="card-header border-b pb-3">{`${t('hash')} #${tx.hash}`}</h2>
-      <div className="flex justify-center items-center border-b py-3 ">
-        <span className="flex-1 text-right">
+      <h2 className="card-header">
+        {`${t('hash')}`}
+        <span>{`#${tx.hash}`}</span>
+      </h2>
+      <div className="flex justify-center items-center border-b py-3 capitalize">
+        <span className="flex-1 mr-2 overflow-hidden overflow-ellipsis text-right">
           {t('from')}
           <Link href={`/account/${tx.from}`}>
-            <a>{tx.from}</a>
+            <a className="ml-1">{tx.from}</a>
           </Link>
         </span>
-        {'>>>'}
-        <span className="flex-1">
+        <Image src={`${imgUrl}arrow-down-rounded.svg`} width="14" height="14" className="transform -rotate-90" />
+        <span className="flex-1 ml-2 overflow-hidden overflow-ellipsis">
           {t('to')}
           <Link href={`/account/${tx.to}`}>
-            <a>{tx.to}</a>
+            <a className="ml-1">{tx.to}</a>
           </Link>
         </span>
       </div>
