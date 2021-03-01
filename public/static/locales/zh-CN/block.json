@@ -1,5 +1,5 @@
 {
-  "latest-blocks": "最新区块",
+  "latestBlocks": "最新区块",
   "block": "区块",
   "hash": "区块哈希",
   "number": "区块高度",

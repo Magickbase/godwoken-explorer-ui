@@ -10,7 +10,8 @@ module.exports = {
         "light-grey": "#CCCCCC",
         "dark-grey": '#666666',
         "tag-primary": "#F69E4C",
-        "tag-secondary": "#FFF1DE"
+        "tag-secondary": "#FFF1DE",
+        "code-bg": "#E6E6E6"
       },
     },
   },

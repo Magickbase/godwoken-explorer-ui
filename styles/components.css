@@ -21,13 +21,19 @@
     @apply bg-white rounded-md shadow-md p-4 mt-4 pb-1;
   }
   .card-header {
-    @apply text-xl font-bold;
+    @apply text-xl font-bold capitalize;
+  }
+  .card-subheader {
+    @apply font-bold text-base text-dark-grey border-b pb-3 capitalize;
+    & span {
+      @apply font-normal text-black ml-2;
+    }
   }
   .card-fieldset {
     @apply md:w-1/2 md:odd:pr-4 md:even:pl-4;
   }
   .card-field {
-    @apply flex py-2 justify-between items-center border-b border-dashed border-light-grey text-sm md:border-0 md:first:pt-0 md:last:pb-0;
+    @apply flex py-2 justify-between items-center border-b border-dashed border-light-grey text-sm select-none md:border-0 md:first:pt-0 md:last:pb-0;
     &[attr-last='true'] {
       @apply last:border-0;
     }
@@ -44,5 +50,14 @@
     font-size: 10px;
     padding: 0 4px;
     height: 17px;
+  }
+  .script-type-badge {
+    @apply tx-type-badge;
+  }
+}
+
+@layer components {
+  .script-code {
+    @apply flex w-full text-dark-grey bg-code-bg font-bold text-xs p-1;
   }
 }

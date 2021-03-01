@@ -1,5 +1,5 @@
 import NextHead from 'next/head'
-import {explorerTitle} from 'utils'
+import { explorerTitle } from 'utils'
 
 const Head = () => (
   <NextHead>

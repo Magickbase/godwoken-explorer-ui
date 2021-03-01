@@ -1,5 +1,5 @@
 {
-  "latest-txs": "latest transactions",
+  "latestTxs": "latest transactions",
   "hash": "tx hash",
   "blockHash": "block hash",
   "type": "type",
@@ -17,5 +17,5 @@
   "success": "success",
   "finalizeState": "finalize state",
   "age": "age",
-  "tx-list-title": "Transactions related to {{account}}"
+  "txListTitle": "Transactions related to {{account}}"
 }

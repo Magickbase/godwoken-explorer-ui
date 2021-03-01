@@ -54,7 +54,7 @@ const TxList = (initState: State) => {
   const [t] = useTranslation('tx')
   return (
     <div>
-      <h2 className="text-center font-bold mt-10 mb-5">{t('tx-list-title', query)}</h2>
+      <h2 className="text-center font-bold mt-10 mb-5">{t('txListTitle', query)}</h2>
       <List list={txList} />
     </div>
   )

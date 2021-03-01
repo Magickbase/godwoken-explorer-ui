@@ -1,5 +1,5 @@
 {
-  "latest-txs": "最新交易",
+  "latestTxs": "最新交易",
   "hash": "交易哈希",
   "blockHash": "区块哈希",
   "type": "类型",
@@ -17,5 +17,5 @@
   "success": "成功",
   "finalizeState": "finalize 状态",
   "age": "时间",
-  "tx-list-title": "账户 {{account}} 的交易"
+  "txListTitle": "账户 {{account}} 的交易"
 }

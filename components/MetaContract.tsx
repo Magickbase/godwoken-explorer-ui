@@ -19,7 +19,7 @@ const MetaContract = () => {
   ]
   return (
     <div className="card-container">
-      <h2 className="card-header">{`${t('type')}: Meta Contract`}</h2>
+        <h2 className="card-subheader">{`${t('type')}:`}<span>Meta Contract</span></h2>
       <CardFieldsetList fieldsetList={fieldsetList} t={t} />
     </div>
   )

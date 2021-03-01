@@ -1,4 +1,4 @@
-import { TFunction } from 'next-i18next'
+import type { TFunction } from 'next-i18next'
 
 export interface CardFieldsetListProps {
   fieldsetList: Array<Array<{ label: string; value: React.ReactNode }>>

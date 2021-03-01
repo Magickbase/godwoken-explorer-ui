@@ -39,7 +39,7 @@ const BlockList = ({ list }: { list: State['blockList'] }) => {
   const [t, { language }] = useTranslation('block')
   return (
     <div className="list-container my-4 md:flex-1 md:mr-2">
-      <h2 className="border-b px-4 py-2 list-header">{t('latest-blocks')}</h2>
+      <h2 className="border-b px-4 py-2 list-header">{t('latestBlocks')}</h2>
       <div className="divide-y">
         {list.map(block => (
           <div key={block.hash} className="px-4 py-5">
@@ -71,7 +71,7 @@ const TxList = ({ list }: { list: State['txList'] }) => {
   const [t, { language }] = useTranslation('tx')
   return (
     <div className="list-container my-4 md:flex-1 md:ml-2">
-      <h2 className="border-b px-4 py-2 list-header">{t('latest-txs')}</h2>
+      <h2 className="border-b px-4 py-2 list-header">{t('latestTxs')}</h2>
       <div className="divide-y">
         {list.map(tx => (
           <div key={tx.hash} className="px-4 py-5">
