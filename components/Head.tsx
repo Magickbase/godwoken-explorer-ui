@@ -4,7 +4,7 @@ import { explorerTitle } from 'utils'
 const Head = () => (
   <NextHead>
     <title>{explorerTitle}</title>
-    <link rel="icon" href="/favicon.ico" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   </NextHead>
 )
 

@@ -29,7 +29,7 @@ const Account = (initState: State) => {
           <div className="flex justify-between pt-3 pb-2 md:pb-0">
             <span className="card-label">{t('txCount')}</span>
             <Link href={`/txs?account=${account.id}`}>
-              <a>{account.txCount}</a>
+              <a>{Number(account.txCount).toLocaleString('en')}</a>
             </Link>
           </div>
         </div>
