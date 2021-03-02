@@ -85,7 +85,7 @@ const BlockList = ({ list }: { list: State['blockList'] }) => {
                 <span className="overflow-hidden overflow-ellipsis">
                   #
                   <a title={t('number')} className="font-bold">
-                    {block.number}
+                    {Number(block.number).toLocaleString('en')}
                   </a>
                 </span>
               </Link>

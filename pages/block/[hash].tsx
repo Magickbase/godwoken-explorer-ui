@@ -48,7 +48,7 @@ const Block = (initState: State) => {
       },
       {
         label: 'txCount',
-        value: <span title={t('txCount')}>{block.txCount}</span>,
+        value: <span title={t('txCount')}>{Number(block.txCount).toLocaleString('en')}</span>,
       },
       {
         label: 'aggregator',
