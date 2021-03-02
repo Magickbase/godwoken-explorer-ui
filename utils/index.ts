@@ -1,5 +1,4 @@
 export * from './date'
-export * from './i18n'
 export * from './constants'
 export * from './api'
 export * from './handler'

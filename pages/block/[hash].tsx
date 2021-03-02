@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { GetServerSideProps } from 'next'
 import Link from 'next/link'
-import { useTranslation, fetchBlock, handleApiError, API, formatDatetime, ckbExplorerUrl } from 'utils'
+import { useTranslation } from 'next-i18next'
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { fetchBlock, handleApiError, API, formatDatetime, ckbExplorerUrl } from 'utils'
 import CardFieldsetList from 'components/CardFieldsetList'
 
 type State = API.Block.Parsed
@@ -65,11 +67,12 @@ const Block = (initState: State) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<State> = async ({ res, params }) => {
+export const getServerSideProps: GetServerSideProps<State> = async ({ locale, res, params }) => {
   const { hash } = params
   try {
     const block = await fetchBlock(hash as string)
-    return { props: block }
+    const lng = await serverSideTranslations(locale, ['block'])
+    return { props: { ...block, ...lng } }
   } catch (err) {
     return handleApiError(err, res)
   }

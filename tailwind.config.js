@@ -32,6 +32,9 @@ module.exports = {
           'Noto Color Emoji',
         ],
       },
+      lineHeight:{
+        default: '1.2'
+      }
     },
   },
   variants: {

@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { useTranslation } from 'utils'
+import { useTranslation } from 'next-i18next'
 import AssetList from 'components/AssetList'
 
 const SmartContract = () => {
@@ -23,7 +23,10 @@ const SmartContract = () => {
   return (
     <div className="md:flex">
       <div className="card-container md:mr-2 md:w-1/2 self-start">
-        <h2 className="card-subheader">{`${t('type')}:`}<span>Smart Contract</span></h2>
+        <h2 className="card-subheader">
+          {`${t('type')}:`}
+          <span>Smart Contract</span>
+        </h2>
         <div className="md:my-3">
           {infoList.map(i => (
             <div key={i.label} className="card-field border-b-0">

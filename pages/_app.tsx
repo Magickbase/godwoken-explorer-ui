@@ -1,5 +1,5 @@
 import Layout from 'components/Layout'
-import { appWithTranslation } from 'utils/i18n'
+import { appWithTranslation } from 'next-i18next'
 import { AppProps } from 'next/app'
 import '../styles/globals.css'
 

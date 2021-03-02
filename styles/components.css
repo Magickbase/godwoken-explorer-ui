@@ -1,6 +1,7 @@
 @layer components {
   .main-container {
-    @apply flex flex-col mx-auto w-full p-4 xl:max-w-7xl;
+    @apply flex flex-col mx-auto w-full p-4;
+    @apply xl:max-w-7xl;
   }
 }
 
@@ -9,13 +10,14 @@
     @apply bg-white rounded-md shadow-md;
   }
   .list-header {
-    @apply flex items-center text-sm font-bold capitalize text-ink px-4 py-1.5 border-b;
+    @apply flex items-center px-4 py-1.5 border-b border-light-grey;
+    @apply text-sm font-bold capitalize text-ink;
     & > span {
       @apply ml-1;
     }
   }
   .list-item-container {
-    @apply mx-4 py-5 text-sm leading-4;
+    @apply mx-4 py-5 text-sm leading-default;
   }
   .list-datetime {
     @apply text-xs text-dark-grey;
@@ -27,13 +29,14 @@
     @apply bg-white rounded-md shadow-md p-4 mt-4 pb-1;
   }
   .card-header {
-    @apply text-xl leading-6 font-bold capitalize border-b pb-2.5;
+    @apply border-b border-light-grey pb-2.5;
+    @apply text-xl leading-default font-bold capitalize;
     & > span {
       @apply font-light ml-2;
     }
   }
   .card-subheader {
-    @apply font-bold text-base text-dark-grey border-b pb-3 capitalize;
+    @apply font-bold text-base text-dark-grey border-b border-light-grey pb-3 capitalize;
     & span {
       @apply font-normal text-black ml-2;
     }
@@ -42,7 +45,8 @@
     @apply md:w-1/2 md:odd:pr-4 md:even:pl-4;
   }
   .card-field {
-    @apply flex py-2.5 justify-between items-center border-b border-dashed border-light-grey text-sm md:border-0 md:first:pt-0 md:last:pb-0;
+    @apply flex justify-between items-center border-b border-dashed border-light-grey py-2.5 text-sm;
+    @apply md:border-0 md:first:pt-0 md:last:pb-0;
 
     &[attr-last='true'] {
       @apply last:border-0;
@@ -57,13 +61,15 @@
     }
   }
   .card-label {
-    @apply flex items-center text-sm text-dark-grey capitalize whitespace-nowrap mr-2 flex-shrink-0 select-none;
+    @apply flex items-center flex-shrink-0 mr-2;
+    @apply select-none text-sm text-dark-grey capitalize whitespace-nowrap;
   }
 }
 
 @layer components {
   .tx-type-badge {
-    @apply flex justify-center items-center capitalize font-bold text-tag-primary bg-tag-secondary border border-tag-primary;
+    @apply flex justify-center items-center bg-tag-secondary border border-tag-primary;
+    @apply text-tag-primary font-bold capitalize;
     border-radius: 4px;
     font-size: 10px;
     padding: 0 4px;

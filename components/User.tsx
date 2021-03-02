@@ -1,4 +1,5 @@
-import {  useTranslation, useIsHidden } from 'utils'
+import { useTranslation } from 'next-i18next'
+import { useIsHidden } from 'utils'
 import AssetList from 'components/AssetList'
 
 const User = () => {

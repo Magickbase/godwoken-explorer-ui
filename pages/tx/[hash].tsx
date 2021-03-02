@@ -2,7 +2,9 @@ import { useState } from 'react'
 import { GetServerSideProps } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useTranslation, formatDatetime, fetchTx, API, handleApiError, ckbExplorerUrl, imgUrl } from 'utils'
+import { useTranslation } from 'next-i18next'
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { formatDatetime, fetchTx, API, handleApiError, ckbExplorerUrl, imgUrl } from 'utils'
 import CardFieldsetList from 'components/CardFieldsetList'
 type State = API.Tx.Parsed
 
@@ -46,12 +48,12 @@ const Tx = (initState: State) => {
     ],
   ]
   return (
-    <div className="card-container">
+    <div className="card-container mt-8">
       <h2 className="card-header">
         {`${t('hash')}`}
         <span>{`#${tx.hash}`}</span>
       </h2>
-      <div className="flex justify-center items-center border-b py-3 capitalize">
+      <div className="flex justify-center items-center border-b border-light-grey py-3 capitalize">
         <span className="flex-1 mr-2 overflow-hidden overflow-ellipsis text-right">
           {t('from')}
           <Link href={`/account/${tx.from}`}>
@@ -71,11 +73,12 @@ const Tx = (initState: State) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<State, { hash: string }> = async ({ res, params }) => {
+export const getServerSideProps: GetServerSideProps<State, { hash: string }> = async ({ locale, res, params }) => {
   const { hash } = params
   try {
     const tx = await fetchTx(hash)
-    return { props: tx }
+    const lng = await serverSideTranslations(locale, ['tx'])
+    return { props: { ...tx, ...lng } }
   } catch (err) {
     return handleApiError(err, res)
   }

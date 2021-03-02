@@ -1,6 +1,5 @@
-import { useState } from 'react'
-import Image from 'next/image'
-import { useTranslation, imgUrl, useIsHidden } from 'utils'
+import { useTranslation } from 'next-i18next'
+import { useIsHidden } from 'utils'
 
 const Polyjuice = () => {
   const [t] = useTranslation('account')

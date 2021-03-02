@@ -1,4 +1,5 @@
-import { useTranslation, imgUrl, useIsHidden } from 'utils'
+import { useTranslation } from 'next-i18next'
+import { useIsHidden } from 'utils'
 import CardFieldsetList, { CardFieldsetListProps } from 'components/CardFieldsetList'
 
 const SUDT = () => {

@@ -17,5 +17,5 @@
   "success": "成功",
   "finalizeState": "finalize 状态",
   "age": "时间",
-  "txListTitle": "账户 {{account}} 的交易"
+  "txListTitle": "交易列表关联账户"
 }
