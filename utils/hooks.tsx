@@ -12,14 +12,7 @@ export const useIsHidden = () => {
         className="flex items-center cursor-pointer"
         style={{ transform: isHidden ? 'unset' : 'rotate(0.5turn)' }}
       >
-        <Image
-          loading="lazy"
-          src={`${imgUrl}show-more.svg`}
-          width="17"
-          height="17"
-          alt="toggle"
-          layout="fixed"
-        />
+        <Image loading="lazy" src={`${imgUrl}show-more.svg`} width="17" height="17" alt="toggle" layout="fixed" />
       </span>
     )
     return [isHidden, HiddenIcon] as [boolean, () => JSX.Element]

@@ -115,7 +115,7 @@ const TxList = (initState: State) => {
           <button type="submit">{t('goTo')}</button>
         </form>
 
-        <div className="links" attr-disable={`${+txList.page === pageCount}`} >
+        <div className="links" attr-disable={`${+txList.page === pageCount}`}>
           <Link href={getLink(query.account, Math.min(+txList.page + 1, pageCount))}>
             <a title="next">
               <Image src={`${imgUrl}page-previous.svg`} width="14" height="14" loading="lazy" layout="fixed" />

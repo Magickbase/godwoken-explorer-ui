@@ -6,8 +6,8 @@ const MetaContract = () => {
   const fieldsetList: CardFieldsetListProps['fieldsetList'] = [
     [
       { label: t('status'), value: <span title={t('status')}>status</span> },
-      { label: t('accountMerkelState'), value: <span title={t('accountMerkelState')}>accountMerkelState</span> },
-      { label: t('blockMerkelState'), value: <span title={t('blockMerkelState')}>blockMerkelState</span> },
+      { label: t('accountMerkleState'), value: <span title={t('accountMerkleState')}>accountMerkleState</span> },
+      { label: t('blockMerkleState'), value: <span title={t('blockMerkleState')}>blockMerkleState</span> },
     ],
     [
       { label: t('revertedBlockRoot'), value: <span title={t('revertedBlockRoot')}>revertedBlockRoot</span> },

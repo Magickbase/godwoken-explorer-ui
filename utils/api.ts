@@ -115,23 +115,22 @@ export const fetchHome = (): Promise<API.Home.Parsed> =>
   })
 
 export const fetchBlock = (id: string): Promise<API.Block.Parsed> =>
-  fetch(`${serverUrl}/blocks/${id}`)
-    .then(async res => {
-      if (res.status === HttpStatus.NotFound) {
-        throw new NotFoundException()
-      }
-      const block: API.Block.Raw = await res.json()
-      return {
-        hash: block.hash,
-        number: block.number,
-        l1Block: block.l1_block,
-        txHash: block.tx_hash,
-        finalizeState: block.finalize_state ? 'finalized' : 'committed',
-        txCount: block.tx_count,
-        aggregator: block.aggregator,
-        timestamp: Date.now().toString(),
-      }
-    })
+  fetch(`${serverUrl}/blocks/${id}`).then(async res => {
+    if (res.status === HttpStatus.NotFound) {
+      throw new NotFoundException()
+    }
+    const block: API.Block.Raw = await res.json()
+    return {
+      hash: block.hash,
+      number: block.number,
+      l1Block: block.l1_block,
+      txHash: block.tx_hash,
+      finalizeState: block.finalize_state ? 'finalized' : 'committed',
+      txCount: block.tx_count,
+      aggregator: block.aggregator,
+      timestamp: Date.now().toString(),
+    }
+  })
 
 export const fetchTx = (hash: string): Promise<API.Tx.Parsed> =>
   fetch(`${serverUrl}/txs/${hash}`).then(async res => {

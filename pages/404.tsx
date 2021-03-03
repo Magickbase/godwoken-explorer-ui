@@ -12,9 +12,16 @@ const Custom404 = () => {
       {t('notFoundMessage', { keyword: query.keyword })}
       <b className="block mt-1">{SEARCH_FIELDS}</b>
       <span className="flex items-center text-secondary text-sm mt-6 gap-1" onClick={back}>
-        <Image src={`${imgUrl}arrow-down.svg`} width="12" height="12" layout="fixed" loading="lazy" className="transform rotate-90" />
+        <Image
+          src={`${imgUrl}arrow-down.svg`}
+          width="12"
+          height="12"
+          layout="fixed"
+          loading="lazy"
+          className="transform rotate-90"
+        />
         {t('back')}
-        </span>
+      </span>
     </div>
   )
 }
