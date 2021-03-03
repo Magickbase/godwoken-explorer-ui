@@ -1,5 +1,6 @@
 .container {
   @apply absolute flex items-stretch h-9 rounded-md overflow-hidden ring-1 ring-white;
+  z-index: 99;
   & .toggle {
     @apply hidden;
   }
@@ -39,7 +40,6 @@
   }
 
   &[attr-position='header'] {
-    z-index: 999;
     position: fixed;
     top: 10px;
     right: 16px;
@@ -51,6 +51,10 @@
   @media screen and (min-width: 768px) {
     & input {
       width: 320px;
+    }
+    &[attr-position='home'] {
+      transform: translate(-50%, 96px);
+      left: 50%;
     }
     &[attr-position='middle'] {
       top: 144px;

@@ -160,3 +160,22 @@
     @apply whitespace-pre-line text-sm font-normal text-dark-grey leading-default mt-32 w-80 mx-auto md:mt-36 md:w-96;
   }
 }
+
+@layer components {
+  .statistic-container {
+    @apply flex flex-wrap w-full z-10 px-4 rounded-md bg-gradient-to-r from-secondary to-primary shadow-md  md:px-0 md:py-4;
+    @apply text-white divide-y divide-white divide-opacity-20 md:divide-y-0 md:divide-x;
+    margin-top: 100px;
+    @media screen and (min-width: 768px) {
+      margin-top: 116px;
+    }
+  }
+}
+
+@layer components {
+  .home-bg {
+    @apply absolute top-0 left-0 w-full;
+    background-color: #161616;
+    height: 296px;
+  }
+}
