@@ -16,8 +16,8 @@ const SmartContract = () => {
     },
   ]
   const assetList = [
-    { label: 'udt 1', value: 'udt 1' },
-    { label: 'udt 2', value: 'udt 2' },
+    { label: 'udt 1', value: '1111111111' },
+    { label: 'udt 2', value: '22222222' },
   ]
 
   return (

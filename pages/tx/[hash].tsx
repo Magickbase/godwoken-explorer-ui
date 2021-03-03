@@ -18,7 +18,7 @@ const Tx = (initState: State) => {
         label: 'l2Block',
         value: (
           <Link href={`/block/${tx.l2Block}`}>
-            <a title={t('l2Block')}>{tx.l2Block}</a>
+            <a title={t('l2Block')}>{Number(tx.l2Block).toLocaleString('en')}</a>
           </Link>
         ),
       },
@@ -26,7 +26,7 @@ const Tx = (initState: State) => {
         label: 'l1Block',
         value: (
           <Link href={`${ckbExplorerUrl}/block/${tx.l1Block}`}>
-            <a title={t('l1Block')}>{tx.l1Block}</a>
+            <a title={t('l1Block')}>{Number(tx.l1Block).toLocaleString('en')}</a>
           </Link>
         ),
       },
@@ -41,10 +41,10 @@ const Tx = (initState: State) => {
       { label: 'finalizeState', value: <span title={t('finalizeState')}>{tx.finalizeState}</span> },
     ],
     [
-      { label: 'nonce', value: <span title={t('nonce')}>{tx.nonce}</span> },
+      { label: 'nonce', value: <span title={t('nonce')}>{Number(tx.nonce).toLocaleString('en')}</span> },
       { label: 'args', value: <span title={t('args')}>{tx.args}</span> },
-      { label: 'gasPrice', value: <span title={t('gasPrice')}>{tx.gasPrice}</span> },
-      { label: 'fee', value: <span title={t('fee')}>{tx.fee}</span> },
+      { label: 'gasPrice', value: <span title={t('gasPrice')}>{Number(tx.gasPrice).toLocaleString('en')}</span> },
+      { label: 'fee', value: <span title={t('fee')}>{Number(tx.fee).toLocaleString('en')}</span> },
     ],
   ]
   return (

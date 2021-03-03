@@ -92,7 +92,7 @@ const BlockList = ({ list }: { list: State['blockList'] }) => {
                 </span>
               </Link>
               <span className="text-right" title={t('txCount')}>
-                {block.txCount} TXs
+                {Number(block.txCount).toLocaleString('en')} TXs
               </span>
             </div>
             <time

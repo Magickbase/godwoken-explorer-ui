@@ -27,7 +27,7 @@ const Block = (initState: State) => {
         value: (
           <Link href={`${ckbExplorerUrl}/block/${block.l1Block}`}>
             <div>
-              #<a title={t('l1Block')}>{block.l1Block}</a>
+              #<a title={t('l1Block')}>{Number(block.l1Block).toLocaleString('en')}</a>
             </div>
           </Link>
         ),
@@ -60,7 +60,7 @@ const Block = (initState: State) => {
     <div className="card-container mt-8">
       <h2 className="card-header">
         {t('block')}
-        <span>{`#${block.number}`}</span>
+        <span>{`#${Number(block.number).toLocaleString('en')}`}</span>
       </h2>
       <CardFieldsetList fieldsetList={fieldsetList} t={t} />
     </div>
@@ -68,9 +68,9 @@ const Block = (initState: State) => {
 }
 
 export const getServerSideProps: GetServerSideProps<State> = async ({ locale, res, params }) => {
-  const { hash } = params
+  const { id } = params
   try {
-    const block = await fetchBlock(hash as string)
+    const block = await fetchBlock(id as string)
     const lng = await serverSideTranslations(locale, ['block'])
     return { props: { ...block, ...lng } }
   } catch (err) {

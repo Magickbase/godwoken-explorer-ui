@@ -20,10 +20,10 @@ const SUDT = () => {
       { label: t('decimal'), value: <span title={t('decimal')}>decimal</span> },
     ],
     [
-      { label: t('l2Supply'), value: <span title={t('l2Supply')}>l2Supply</span> },
+      { label: t('l2Supply'), value: <span title={t('l2Supply')}>1111111111111111111111111</span> },
       {
         label: t('holders'),
-        value: <span title={t('holders')}>holders</span>,
+        value: <span title={t('holders')}>{Number('11111111').toLocaleString('en')}</span>,
       },
     ],
   ]
