@@ -1,10 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { GetServerSideProps } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import Search from 'components/Search'
 import { timeDistance, fetchHome, API, handleApiError, imgUrl } from 'utils'
 
 type State = API.Home.Parsed
@@ -27,7 +26,10 @@ const Statistic = (statistic: State['statistic']) => {
   const [t] = useTranslation('statistic')
 
   return (
-    <div className="flex flex-wrap w-full px-4 rounded-md bg-gradient-to-r from-secondary to-primary text-white divide-y divide-white divide-opacity-20 md:divide-y-0 md:divide-x md:px-0 md:py-4">
+    <div
+      className="flex flex-wrap w-full px-4 rounded-md bg-gradient-to-r from-secondary to-primary text-white divide-y divide-white divide-opacity-20 md:divide-y-0 md:divide-x md:px-0 md:py-4"
+      style={{ marginTop: 100 }}
+    >
       {statisticGroups.map(group => (
         <div
           key={group.map(g => g.key).join()}
@@ -165,10 +167,6 @@ const Home = (initState: State) => {
   const [home, setHome] = useState(initState)
   return (
     <>
-      <div className="py-8">
-        <Search />
-      </div>
-
       <Statistic {...home.statistic} />
       <div className="md:flex">
         <BlockList list={home.blockList} />
@@ -181,7 +179,7 @@ const Home = (initState: State) => {
 export const getServerSideProps: GetServerSideProps<State> = async ({ res, locale }) => {
   try {
     const home = await fetchHome()
-    const lng = await serverSideTranslations(locale, ['common', 'block', 'tx', 'statistic'])
+    const lng = await serverSideTranslations(locale, ['block', 'tx', 'statistic'])
     return { props: { ...home, ...lng } }
   } catch (err) {
     return handleApiError(err, res)

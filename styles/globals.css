@@ -5,7 +5,7 @@
 html,
 body {
   background-color: #ededed;
-  @apply font-sans font-normal;
+  @apply font-sans font-normal overflow-visible;
 }
 main {
   @apply main-container;
@@ -19,4 +19,8 @@ main {
 
 a {
   @apply no-underline cursor-pointer text-secondary;
+}
+
+input:placeholder-shown {
+  text-overflow: ellipsis;
 }
