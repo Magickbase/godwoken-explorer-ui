@@ -155,13 +155,8 @@
 }
 
 @layer components {
-  .notFount {
-    @apply whitespace-pre-line text-sm font-normal text-dark-grey leading-default mt-32 w-80 mx-auto md:mt-36;
+  .notFound {
     width: 343px;
-    @media screen and (min-width: 768px) {
-      & {
-        width: 384px;
-      }
-    }
+    @apply whitespace-pre-line text-sm font-normal text-dark-grey leading-default mt-32 w-80 mx-auto md:mt-36 md:w-96;
   }
 }

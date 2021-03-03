@@ -8,7 +8,7 @@ const Custom404 = () => {
   const [t] = useTranslation('common')
   const { query, back } = useRouter()
   return (
-    <div className="notFount">
+    <div className="notFound">
       {t('notFoundMessage', { keyword: query.keyword })}
       <b className="block mt-1">{SEARCH_FIELDS}</b>
       <span className="flex items-center text-secondary text-sm mt-6 gap-1" onClick={back}>
