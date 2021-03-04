@@ -13,7 +13,6 @@
   "fee": "手续费",
   "nonce": "nonce",
   "timestamp": "时间",
-  "action": "行为",
   "success": "成功",
   "finalizeState": "finalize 状态",
   "age": "时间",

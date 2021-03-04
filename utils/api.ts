@@ -6,7 +6,7 @@ enum HttpStatus {
 }
 export namespace API {
   export namespace Home {
-    type Tx = Record<'hash' | 'timestamp' | 'from' | 'to' | 'action', string> & { success: boolean }
+    type Tx = Record<'hash' | 'timestamp' | 'from' | 'to' | 'type', string> & { success: boolean }
     export interface Raw {
       block_list: Array<Record<'hash' | 'number' | 'timestamp' | 'tx_count', string>>
       tx_list: Array<Tx>
@@ -73,7 +73,7 @@ export namespace API {
       page: string
       total_count: string
       txs: Array<
-        Record<'hash' | 'block_number' | 'block_hash' | 'from' | 'to' | 'timestamp' | 'action', string> & {
+        Record<'hash' | 'block_number' | 'block_hash' | 'from' | 'to' | 'timestamp' | 'type', string> & {
           success: boolean
         }
       >
@@ -83,7 +83,7 @@ export namespace API {
       page: string
       totalCount: string
       txs: Array<
-        Record<'hash' | 'blockNumber' | 'blockHash' | 'from' | 'to' | 'timestamp' | 'action', string> & {
+        Record<'hash' | 'blockNumber' | 'blockHash' | 'from' | 'to' | 'timestamp' | 'type', string> & {
           success: boolean
         }
       >
@@ -187,7 +187,7 @@ export const fetchTxList = (query: string): Promise<API.Txs.Parsed> =>
           from: tx.from,
           to: tx.to,
           timestamp: tx.timestamp,
-          action: tx.action,
+          type: tx.type,
           success: tx.success,
         })),
       }
@@ -204,7 +204,7 @@ export const fetchTxList = (query: string): Promise<API.Txs.Parsed> =>
           from: 'from' + idx,
           to: 'to' + idx,
           timestamp: Date.now().toString(),
-          action: 'withdraw',
+          type: 'withdraw',
           success: true,
         })),
       }

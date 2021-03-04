@@ -126,8 +126,8 @@ const TxList = ({ list }: { list: State['txList'] }) => {
                   </a>
                 </span>
               </Link>
-              <span className="tx-type-badge h-full mx-2" title={t('action')}>
-                {tx.action}
+              <span className="tx-type-badge h-full mx-2" title={t('type')}>
+                {tx.type}
               </span>
               {tx.success ? SuccessIcon : FailureIcon}
             </div>
