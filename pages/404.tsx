@@ -9,8 +9,14 @@ const Custom404 = () => {
   const { query, back } = useRouter()
   return (
     <div className="notFound">
-      {t('notFoundMessage', { keyword: query.keyword })}
-      <b className="block mt-1">{SEARCH_FIELDS}</b>
+      {query.keyword ? (
+        <>
+          {t('notFoundMessage', { keyword: query.keyword })}
+          <b className="block mt-1">{SEARCH_FIELDS}</b>
+        </>
+      ) : (
+        <>{t('pageNotFound')}</>
+      )}
       <span className="flex items-center text-secondary text-sm mt-6 gap-1" onClick={back}>
         <Image
           src={`${IMG_URL}arrow-down.svg`}

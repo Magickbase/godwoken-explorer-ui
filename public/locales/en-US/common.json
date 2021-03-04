@@ -3,5 +3,6 @@
   "goTo": "go to",
   "search": "search",
   "back": "back",
-  "notFoundMessage": "Your input \"{{keyword}}\" did not match any record.\n\nPlease make sure your input contains only one of the following items:"
+  "notFoundMessage": "Your input \"{{keyword}}\" did not match any record.\n\nPlease make sure your input contains only one of the following items:",
+  "pageNotFound": "404 | This page could not be found"
 }
