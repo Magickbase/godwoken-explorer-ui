@@ -8,3 +8,4 @@ export const nervosFoundationUrl = process.env.NEXT_PUBLIC_NERVOS_FOUNDATION_URL
 export const imgUrl = '/icons/'
 export const PAGE_SIZE = 10
 export const SEARCH_FIELDS = 'block hash/tx hash/account id/lockhash/CKB address/ETH address'
+export const WS_ENDPOINT = 'ws://localhost:4000/socket' // TODO: read it from env

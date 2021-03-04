@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { timeDistance, fetchHome, API, handleApiError, imgUrl } from 'utils'
+import { timeDistance, fetchHome, API, handleApiError, imgUrl, Socket, WS_ENDPOINT } from 'utils'
 
 type State = API.Home.Parsed
 
@@ -162,6 +162,16 @@ const TxList = ({ list }: { list: State['txList'] }) => {
 
 const Home = (initState: State) => {
   const [home, setHome] = useState(initState)
+  useEffect(() => {
+    const socket = new Socket(WS_ENDPOINT)
+    socket.connect()
+    const channel = socket.channel('room:lobby', {})
+    channel.on('new_msg', console.info)
+    channel.join().receive('ok', console.info).receive('error', console.warn)
+    return () => {
+      socket.disconnect()
+    }
+  }, [])
   return (
     <>
       <div className="home-bg"></div>
