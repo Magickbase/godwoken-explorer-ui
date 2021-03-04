@@ -1,4 +1,4 @@
-import { serverUrl } from './constants'
+import { SERVER_URL } from './constants'
 import { NotFoundException } from './exceptions'
 
 enum HttpStatus {
@@ -92,7 +92,7 @@ export namespace API {
 }
 
 export const fetchHome = (): Promise<API.Home.Parsed> =>
-  fetch(`${serverUrl}/home/1`).then(async res => {
+  fetch(`${SERVER_URL}/home/1`).then(async res => {
     if (res.status === HttpStatus.NotFound) {
       throw new NotFoundException()
     }
@@ -115,7 +115,7 @@ export const fetchHome = (): Promise<API.Home.Parsed> =>
   })
 
 export const fetchBlock = (id: string): Promise<API.Block.Parsed> =>
-  fetch(`${serverUrl}/blocks/${id}`).then(async res => {
+  fetch(`${SERVER_URL}/blocks/${id}`).then(async res => {
     if (res.status === HttpStatus.NotFound) {
       throw new NotFoundException()
     }
@@ -133,7 +133,7 @@ export const fetchBlock = (id: string): Promise<API.Block.Parsed> =>
   })
 
 export const fetchTx = (hash: string): Promise<API.Tx.Parsed> =>
-  fetch(`${serverUrl}/txs/${hash}`).then(async res => {
+  fetch(`${SERVER_URL}/txs/${hash}`).then(async res => {
     if (res.status === HttpStatus.NotFound) {
       throw new NotFoundException()
     }
@@ -155,7 +155,7 @@ export const fetchTx = (hash: string): Promise<API.Tx.Parsed> =>
   })
 
 export const fetchAccount = (id: string): Promise<API.Account.Parsed> =>
-  fetch(`${serverUrl}/accounts/${id}`).then(async res => {
+  fetch(`${SERVER_URL}/accounts/${id}`).then(async res => {
     if (res.status === HttpStatus.NotFound) {
       throw new NotFoundException()
     }
@@ -169,7 +169,7 @@ export const fetchAccount = (id: string): Promise<API.Account.Parsed> =>
   })
 
 export const fetchTxList = (query: string): Promise<API.Txs.Parsed> =>
-  fetch(`${serverUrl}/txs?${query}`)
+  fetch(`${SERVER_URL}/txs?${query}`)
     .then(async res => {
       if (res.status === HttpStatus.NotFound) {
         throw new NotFoundException()

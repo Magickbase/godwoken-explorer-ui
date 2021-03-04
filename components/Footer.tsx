@@ -1,12 +1,12 @@
 import Link from 'next/link'
 
-import { ckbExplorerUrl, nervinaGitHubUrl, nervinaWebsiteUrl, nervosFoundationUrl } from 'utils'
+import { CKB_EXPLORER_URL, NERVINA_GITHUB_URL, NERVINA_WEBSITE_URL, NERVOS_FOUNDATION_URL } from 'utils'
 
 const links = [
-  { label: 'Nervina Labs', url: nervinaWebsiteUrl },
-  { label: 'Nervos Foundation', url: nervosFoundationUrl },
-  { label: 'GitHub', url: nervinaGitHubUrl },
-  { label: 'CKB Explorer', url: ckbExplorerUrl },
+  { label: 'Nervina Labs', url: NERVINA_WEBSITE_URL },
+  { label: 'Nervos Foundation', url: NERVOS_FOUNDATION_URL },
+  { label: 'GitHub', url: NERVINA_GITHUB_URL },
+  { label: 'CKB Explorer', url: CKB_EXPLORER_URL },
 ]
 const Footer = () => (
   <footer className="bg-black overflow-hidden relative" style={{ height: 156, marginTop: 60 }}>

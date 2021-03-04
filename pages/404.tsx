@@ -2,7 +2,7 @@ import { useTranslation } from 'next-i18next'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { imgUrl, SEARCH_FIELDS } from 'utils'
+import { IMG_URL, SEARCH_FIELDS } from 'utils'
 
 const Custom404 = () => {
   const [t] = useTranslation('common')
@@ -13,7 +13,7 @@ const Custom404 = () => {
       <b className="block mt-1">{SEARCH_FIELDS}</b>
       <span className="flex items-center text-secondary text-sm mt-6 gap-1" onClick={back}>
         <Image
-          src={`${imgUrl}arrow-down.svg`}
+          src={`${IMG_URL}arrow-down.svg`}
           width="12"
           height="12"
           layout="fixed"

@@ -5,12 +5,12 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { fetchTxList, API, handleApiError, timeDistance, imgUrl, PAGE_SIZE } from 'utils'
+import { fetchTxList, API, handleApiError, timeDistance, IMG_URL, PAGE_SIZE } from 'utils'
 
 type State = { query: Record<string, string>; txList: API.Txs.Parsed }
 
-const SuccessIcon = <Image src={`${imgUrl}success.svg`} alt="success" width="15" height="15" layout="fixed" />
-const FailureIcon = <Image src={`${imgUrl}failure.svg`} alt="success" width="15" height="15" layout="fixed" />
+const SuccessIcon = <Image src={`${IMG_URL}success.svg`} alt="success" width="15" height="15" layout="fixed" />
+const FailureIcon = <Image src={`${IMG_URL}failure.svg`} alt="success" width="15" height="15" layout="fixed" />
 
 const getLink = (account: string, page: number) => `/txs?account=${account}&page=${page}`
 const List = ({ list }: { list: State['txList'] }) => {
@@ -34,7 +34,7 @@ const List = ({ list }: { list: State['txList'] }) => {
               </span>
               {tx.success ? SuccessIcon : FailureIcon}
               <div className="flex justify-end items-center flex-1">
-                <Image src={`${imgUrl}blocks.svg`} width="15" height="15" layout="fixed" loading="lazy" />
+                <Image src={`${IMG_URL}blocks.svg`} width="15" height="15" layout="fixed" loading="lazy" />
                 <Link href={`/blocks/${tx.blockHash}`}>
                   <a className="ml-1">{tx.blockNumber}</a>
                 </Link>
@@ -47,7 +47,7 @@ const List = ({ list }: { list: State['txList'] }) => {
                   {tx.from}
                 </a>
               </Link>
-              <Image src={`${imgUrl}arrow-down-rounded.svg`} width="14" height="14" className="transform -rotate-90" />
+              <Image src={`${IMG_URL}arrow-down-rounded.svg`} width="14" height="14" className="transform -rotate-90" />
               <span className="ml-1 mr-0.5">{t('to')}</span>
               <Link href={`/account/${tx.to}`}>
                 <a title={t('to')} className="mx-0.5">
@@ -98,12 +98,12 @@ const TxList = (initState: State) => {
         <div className="links" attr-disable={`${+txList.page === 1}`}>
           <Link href={getLink(query.account, 1)}>
             <a title="first">
-              <Image src={`${imgUrl}page-first.svg`} width="14" height="14" loading="lazy" layout="fixed" />
+              <Image src={`${IMG_URL}page-first.svg`} width="14" height="14" loading="lazy" layout="fixed" />
             </a>
           </Link>
           <Link href={getLink(query.account, Math.max(+txList.page - 1, 1))}>
             <a title="previous">
-              <Image src={`${imgUrl}page-previous.svg`} width="14" height="14" loading="lazy" layout="fixed" />
+              <Image src={`${IMG_URL}page-previous.svg`} width="14" height="14" loading="lazy" layout="fixed" />
             </a>
           </Link>
         </div>
@@ -118,12 +118,12 @@ const TxList = (initState: State) => {
         <div className="links" attr-disable={`${+txList.page === pageCount}`}>
           <Link href={getLink(query.account, Math.min(+txList.page + 1, pageCount))}>
             <a title="next">
-              <Image src={`${imgUrl}page-previous.svg`} width="14" height="14" loading="lazy" layout="fixed" />
+              <Image src={`${IMG_URL}page-previous.svg`} width="14" height="14" loading="lazy" layout="fixed" />
             </a>
           </Link>
           <Link href={getLink(query.account, pageCount)}>
             <a title="last">
-              <Image src={`${imgUrl}page-first.svg`} width="14" height="14" loading="lazy" layout="fixed" />
+              <Image src={`${IMG_URL}page-first.svg`} width="14" height="14" loading="lazy" layout="fixed" />
             </a>
           </Link>
         </div>

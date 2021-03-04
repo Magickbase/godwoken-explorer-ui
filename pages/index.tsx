@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { timeDistance, fetchHome, API, handleApiError, imgUrl, Socket, WS_ENDPOINT } from 'utils'
+import { timeDistance, fetchHome, API, handleApiError, IMG_URL, Socket, WS_ENDPOINT } from 'utils'
 
 type State = API.Home.Parsed
 
@@ -19,8 +19,8 @@ const statisticGroups = [
   ],
 ]
 
-const SuccessIcon = <Image src={`${imgUrl}success.svg`} alt="success" width="15" height="15" layout="fixed" />
-const FailureIcon = <Image src={`${imgUrl}failure.svg`} alt="success" width="15" height="15" layout="fixed" />
+const SuccessIcon = <Image src={`${IMG_URL}success.svg`} alt="success" width="15" height="15" layout="fixed" />
+const FailureIcon = <Image src={`${IMG_URL}failure.svg`} alt="success" width="15" height="15" layout="fixed" />
 
 const Statistic = (statistic: State['statistic']) => {
   const [t] = useTranslation('statistic')
@@ -41,7 +41,7 @@ const Statistic = (statistic: State['statistic']) => {
                 <Image
                   loading="lazy"
                   className="inverted-icon"
-                  src={`${imgUrl}${field.icon}.svg`}
+                  src={`${IMG_URL}${field.icon}.svg`}
                   height="17"
                   width="17"
                   layout="fixed"
@@ -68,7 +68,7 @@ const BlockList = ({ list }: { list: State['blockList'] }) => {
       <h2 className="list-header">
         <Image
           loading="lazy"
-          src={`${imgUrl}blocks.svg`}
+          src={`${IMG_URL}blocks.svg`}
           height="17"
           width="17"
           layout="fixed"
@@ -111,7 +111,7 @@ const TxList = ({ list }: { list: State['txList'] }) => {
   return (
     <div className="list-container z-10 my-4 md:w-1/2 md:ml-2">
       <h2 className="list-header">
-        <Image loading="lazy" src={`${imgUrl}txs.svg`} height="17" width="17" layout="fixed" alt={t('latestBlocks')} />
+        <Image loading="lazy" src={`${IMG_URL}txs.svg`} height="17" width="17" layout="fixed" alt={t('latestBlocks')} />
         <span>{t('latestTxs')}</span>
       </h2>
       <div className="divide-y divide-light-grey">
@@ -138,7 +138,7 @@ const TxList = ({ list }: { list: State['txList'] }) => {
                   {tx.from}
                 </a>
               </Link>
-              <Image src={`${imgUrl}arrow-down-rounded.svg`} width="14" height="14" className="transform -rotate-90" />
+              <Image src={`${IMG_URL}arrow-down-rounded.svg`} width="14" height="14" className="transform -rotate-90" />
               <span className="ml-1 mr-0.5">{t('to')}</span>
               <Link href={`/account/${tx.to}`}>
                 <a title={t('to')} className="mx-0.5">

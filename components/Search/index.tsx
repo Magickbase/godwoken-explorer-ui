@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import { imgUrl, SEARCH_FIELDS } from 'utils'
+import { IMG_URL, SEARCH_FIELDS } from 'utils'
 import styles from './search.module.css'
 
 const TOP = 50
@@ -68,13 +68,13 @@ const Search = () => {
     <form className={styles.container} onSubmit={handleSubmit} attr-position={position} attr-display={`${isDisplay}`}>
       <div className={styles.toggle} onClick={() => setIsDisplay(is => !is)}>
         {isDisplay ? (
-          <Image src={`${imgUrl}close.svg`} width="24" height="24" loading="lazy" layout="fixed" />
+          <Image src={`${IMG_URL}close.svg`} width="24" height="24" loading="lazy" layout="fixed" />
         ) : (
-          <Image src={`${imgUrl}search.svg`} width="24" height="24" loading="lazy" layout="fixed" />
+          <Image src={`${IMG_URL}search.svg`} width="24" height="24" loading="lazy" layout="fixed" />
         )}
       </div>
       <div className={styles.icon}>
-        <Image src={`${imgUrl}search.svg`} width="18" height="17" loading="lazy" layout="fixed" title="search" />
+        <Image src={`${IMG_URL}search.svg`} width="18" height="17" loading="lazy" layout="fixed" title="search" />
       </div>
       <input id="search" type="text" placeholder={SEARCH_FIELDS} autoFocus title={SEARCH_FIELDS} />
       <button type="submit">Search</button>

@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { formatDatetime, fetchTx, API, handleApiError, ckbExplorerUrl, imgUrl } from 'utils'
+import { formatDatetime, fetchTx, API, handleApiError, CKB_EXPLORER_URL, IMG_URL } from 'utils'
 import CardFieldsetList from 'components/CardFieldsetList'
 type State = API.Tx.Parsed
 
@@ -25,7 +25,7 @@ const Tx = (initState: State) => {
       {
         label: 'l1Block',
         value: (
-          <Link href={`${ckbExplorerUrl}/block/${tx.l1Block}`}>
+          <Link href={`${CKB_EXPLORER_URL}/block/${tx.l1Block}`}>
             <a title={t('l1Block')}>{Number(tx.l1Block).toLocaleString('en')}</a>
           </Link>
         ),
@@ -60,7 +60,7 @@ const Tx = (initState: State) => {
             <a className="ml-1">{tx.from}</a>
           </Link>
         </span>
-        <Image src={`${imgUrl}arrow-down-rounded.svg`} width="14" height="14" className="transform -rotate-90" />
+        <Image src={`${IMG_URL}arrow-down-rounded.svg`} width="14" height="14" className="transform -rotate-90" />
         <span className="flex-1 ml-2 overflow-hidden overflow-ellipsis">
           {t('to')}
           <Link href={`/account/${tx.to}`}>

@@ -3,7 +3,7 @@ import { GetServerSideProps } from 'next'
 import Link from 'next/link'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { fetchBlock, handleApiError, API, formatDatetime, ckbExplorerUrl } from 'utils'
+import { fetchBlock, handleApiError, API, formatDatetime, CKB_EXPLORER_URL } from 'utils'
 import CardFieldsetList from 'components/CardFieldsetList'
 
 type State = API.Block.Parsed
@@ -25,7 +25,7 @@ const Block = (initState: State) => {
       {
         label: 'l1Block',
         value: (
-          <Link href={`${ckbExplorerUrl}/block/${block.l1Block}`}>
+          <Link href={`${CKB_EXPLORER_URL}/block/${block.l1Block}`}>
             <div>
               #<a title={t('l1Block')}>{Number(block.l1Block).toLocaleString('en')}</a>
             </div>
@@ -35,7 +35,7 @@ const Block = (initState: State) => {
       {
         label: 'txHash',
         value: (
-          <Link href={`${ckbExplorerUrl}/transaction/${block.txHash}`}>
+          <Link href={`${CKB_EXPLORER_URL}/transaction/${block.txHash}`}>
             <a title={t('txHash')}>{block.txHash}</a>
           </Link>
         ),
