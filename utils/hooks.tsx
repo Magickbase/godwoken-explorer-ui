@@ -1,6 +1,7 @@
 import Image from 'next/image'
-import { useState, useMemo } from 'react'
-import { IMG_URL } from './constants'
+import { useState, useMemo, useEffect } from 'react'
+import { Socket } from 'phoenix'
+import { IMG_URL, WS_ENDPOINT } from './constants'
 
 export const useIsHidden = () => {
   const [isHidden, setisHidden] = useState(true)
@@ -17,4 +18,19 @@ export const useIsHidden = () => {
     )
     return [isHidden, HiddenIcon] as [boolean, () => JSX.Element]
   }, [isHidden, setisHidden])
+}
+
+export const useWS = (topic: 'room:lobby', onReceivingData: (res?: any) => void) => {
+  useEffect(() => {
+    const socket = new Socket(WS_ENDPOINT)
+    socket.connect()
+    const channel = socket.channel(topic)
+    channel.on('new_msg', onReceivingData)
+    channel.join().receive('ok', console.info).receive('error', console.warn)
+    return () => {
+      socket.disconnect(() => {
+        console.info(`disconnect to ${topic}`)
+      })
+    }
+  }, [])
 }
