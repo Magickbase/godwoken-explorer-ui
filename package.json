@@ -19,7 +19,7 @@
     "prepare": "husky install"
   },
   "dependencies": {
-    "date-fns": "2.17.0",
+    "date-fns": "2.19.0",
     "next": "10.0.8",
     "next-i18next": "8.0.3",
     "phoenix": "1.5.8",
