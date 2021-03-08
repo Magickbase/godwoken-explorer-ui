@@ -17,7 +17,7 @@
     }
   }
   .list-item-container {
-    @apply mx-4 py-5 text-sm leading-default;
+    @apply mx-4 px-2 py-5 text-sm leading-default hover:bg-hover-bg;
   }
   .list-datetime {
     @apply text-xs text-dark-grey;
@@ -183,7 +183,7 @@
 
 @layer components {
   .hashLink {
-    @apply font-bold overflow-hidden overflow-ellipsis;
+    @apply flex-1 font-bold overflow-hidden overflow-ellipsis;
   }
   .hashLink::before {
     content: '#';

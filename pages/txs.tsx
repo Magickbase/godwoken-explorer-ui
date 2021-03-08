@@ -1,4 +1,4 @@
-import { FormEvent, useState } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
 import { GetServerSideProps } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -12,7 +12,7 @@ type State = { query: Record<string, string>; txList: API.Txs.Parsed }
 const SuccessIcon = <Image src={`${IMG_URL}success.svg`} alt="success" width="15" height="15" layout="fixed" />
 const FailureIcon = <Image src={`${IMG_URL}failure.svg`} alt="success" width="15" height="15" layout="fixed" />
 
-const getLink = (account: string, page: number) => `/txs?account=${account}&page=${page}`
+const getLink = (id: string, page: number) => `/txs?account_id=${id}&page=${page}`
 const List = ({ list }: { list: State['txList'] }) => {
   const [t, { language }] = useTranslation('tx')
   return (
@@ -22,17 +22,17 @@ const List = ({ list }: { list: State['txList'] }) => {
           <div key={tx.hash} className="list-item-container">
             <div className="flex items-center mb-3">
               <Link href={`/tx/${tx.hash}`}>
-                <a title={t('hash')} className="hashLink">
+                <a title={t('hash')} className="hashLink flex-none flex-shrink">
                   {tx.hash}
                 </a>
               </Link>
               <span className="tx-type-badge h-full mx-2" title={t('type')}>
                 {tx.type}
               </span>
-              {tx.success ? SuccessIcon : FailureIcon}
-              <div className="flex justify-end items-center flex-1">
+              <div style={{ width: 15, height: 15 }}>{tx.success ? SuccessIcon : FailureIcon}</div>
+              <div className="flex justify-end items-center ml-auto pl-7">
                 <Image src={`${IMG_URL}blocks.svg`} width="15" height="15" layout="fixed" loading="lazy" />
-                <Link href={`/blocks/${tx.blockHash}`}>
+                <Link href={`/blocks/${tx.blockNumber}`}>
                   <a className="ml-1">{tx.blockNumber}</a>
                 </Link>
               </div>
@@ -67,12 +67,22 @@ const List = ({ list }: { list: State['txList'] }) => {
 }
 
 const TxList = (initState: State) => {
-  const [{ query, txList }, setTxList] = useState(initState)
+  const [
+    {
+      query: { account_id: id },
+      txList,
+    },
+    setTxList,
+  ] = useState(initState)
   const [t] = useTranslation('common')
   const [txT] = useTranslation('tx')
   const router = useRouter()
 
-  const pageCount = Math.ceil(+txList.totalCount / PAGE_SIZE)
+  useEffect(() => {
+    setTxList(initState)
+  }, [initState])
+
+  const pageCount = Math.ceil(+txList.totalCount / PAGE_SIZE) || 1
   const handleGoTo = (e: FormEvent) => {
     e.stopPropagation()
     e.preventDefault()
@@ -80,25 +90,25 @@ const TxList = (initState: State) => {
     if (Number.isNaN(page) || page > pageCount) {
       return
     }
-    router.push(getLink(query.account, page))
+    router.push(getLink(id, page))
   }
   return (
     <div>
       <h2 className="text-base leading-default font-bold mt-8 mb-2">
         {txT('txListTitle')}
-        <Link href={`/account/${query.account}`}>
-          <a className="ml-2 font-normal">{query.account}</a>
+        <Link href={`/account/${id}`}>
+          <a className="ml-2 font-normal">{id}</a>
         </Link>
       </h2>
-      <List list={txList} />
+      {+txList.totalCount ? <List list={txList} /> : <span className="text-dark-grey">{txT('emptyTxList')}</span>}
       <div className="pager">
         <div className="links" attr-disable={`${+txList.page === 1}`}>
-          <Link href={getLink(query.account, 1)}>
+          <Link href={getLink(id, 1)}>
             <a title="first">
               <Image src={`${IMG_URL}page-first.svg`} width="14" height="14" loading="lazy" layout="fixed" />
             </a>
           </Link>
-          <Link href={getLink(query.account, Math.max(+txList.page - 1, 1))}>
+          <Link href={getLink(id, Math.max(+txList.page - 1, 1))}>
             <a title="previous">
               <Image src={`${IMG_URL}page-previous.svg`} width="14" height="14" loading="lazy" layout="fixed" />
             </a>
@@ -113,12 +123,12 @@ const TxList = (initState: State) => {
         </form>
 
         <div className="links" attr-disable={`${+txList.page === pageCount}`}>
-          <Link href={getLink(query.account, Math.min(+txList.page + 1, pageCount))}>
+          <Link href={getLink(id, Math.min(+txList.page + 1, pageCount))}>
             <a title="next">
               <Image src={`${IMG_URL}page-previous.svg`} width="14" height="14" loading="lazy" layout="fixed" />
             </a>
           </Link>
-          <Link href={getLink(query.account, pageCount)}>
+          <Link href={getLink(id, pageCount)}>
             <a title="last">
               <Image src={`${IMG_URL}page-first.svg`} width="14" height="14" loading="lazy" layout="fixed" />
             </a>

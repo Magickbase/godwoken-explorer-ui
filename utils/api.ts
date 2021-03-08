@@ -85,7 +85,7 @@ export namespace API {
       page: string
       total_count: string
       txs: Array<
-        Record<'hash' | 'block_number' | 'block_hash' | 'from' | 'to' | 'type', string> & {
+        Record<'hash' | 'block_number' | 'from' | 'to' | 'type', string> & {
           success: boolean
           timestamp: Timestamp
         }
@@ -96,7 +96,7 @@ export namespace API {
       page: string
       totalCount: string
       txs: Array<
-        Record<'hash' | 'blockNumber' | 'blockHash' | 'from' | 'to' | 'type', string> & {
+        Record<'hash' | 'blockNumber' | 'from' | 'to' | 'type', string> & {
           success: boolean
           timestamp: Timestamp
         }
@@ -188,19 +188,19 @@ export const fetchAccount = (id: string): Promise<API.Account.Parsed> =>
 export const fetchTxList = (query: string): Promise<API.Txs.Parsed> =>
   fetch(`${SERVER_URL}/txs?${query}`)
     .then(res => pretreat<API.Txs.Raw>(res))
-    .then(async txs => {
+    .then(async res => {
       return {
-        page: txs.page,
-        totalCount: txs.total_count,
-        txs: txs.txs.map(tx => ({
-          hash: tx.hash,
-          blockNumber: tx.block_number,
-          blockHash: tx.block_hash,
-          from: tx.from,
-          to: tx.to,
-          timestamp: tx.timestamp,
-          type: tx.type,
-          success: tx.success,
-        })),
+        page: res.page,
+        totalCount: res.total_count,
+        txs:
+          res.txs?.map(tx => ({
+            hash: tx.hash,
+            blockNumber: tx.block_number,
+            from: tx.from,
+            to: tx.to,
+            timestamp: tx.timestamp * 1000,
+            type: tx.type,
+            success: tx.success ?? true,
+          })) ?? [],
       }
     })

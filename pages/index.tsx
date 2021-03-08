@@ -20,7 +20,7 @@ const statisticGroups = [
 ]
 
 const SuccessIcon = <Image src={`${IMG_URL}success.svg`} alt="success" width="15" height="15" layout="fixed" />
-const FailureIcon = <Image src={`${IMG_URL}failure.svg`} alt="success" width="15" height="15" layout="fixed" />
+const FailureIcon = <Image src={`${IMG_URL}failure.svg`} alt="failure" width="15" height="15" layout="fixed" />
 
 const Statistic = (statistic: State['statistic']) => {
   const [t] = useTranslation('statistic')
@@ -116,7 +116,7 @@ const TxList = ({ list }: { list: State['txList'] }) => {
           <div key={tx.hash} className="list-item-container">
             <div className="flex items-center mb-3">
               <Link href={`/tx/${tx.hash}`}>
-                <a title={t('hash')} className="font-bold overflow-hidden overflow-ellipsis">
+                <a title={t('hash')} className="hashLink">
                   {tx.hash}
                 </a>
               </Link>
