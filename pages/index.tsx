@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { timeDistance, fetchHome, API, handleApiError, IMG_URL, useWS } from 'utils'
+import { timeDistance, fetchHome, API, handleApiError, IMG_URL } from 'utils'
 
 type State = API.Home.Parsed
 
@@ -81,12 +81,9 @@ const BlockList = ({ list }: { list: State['blockList'] }) => {
           <div key={block.hash} className="list-item-container">
             <div className="flex justify-between mb-4 md:mb-3">
               <Link href={`/block/${block.hash}`}>
-                <span className="overflow-hidden overflow-ellipsis">
-                  #
-                  <a title={t('number')} className="font-bold">
-                    {Number(block.number).toLocaleString('en')}
-                  </a>
-                </span>
+                <a title={t('number')} className="hashLink">
+                  {Number(block.number).toLocaleString('en')}
+                </a>
               </Link>
               <span className="text-right" title={t('txCount')}>
                 {Number(block.txCount).toLocaleString('en')} TXs
@@ -119,12 +116,9 @@ const TxList = ({ list }: { list: State['txList'] }) => {
           <div key={tx.hash} className="list-item-container">
             <div className="flex items-center mb-3">
               <Link href={`/tx/${tx.hash}`}>
-                <span>
-                  #
-                  <a title={t('hash')} className="font-bold">
-                    {tx.hash}
-                  </a>
-                </span>
+                <a title={t('hash')} className="font-bold overflow-hidden overflow-ellipsis">
+                  {tx.hash}
+                </a>
               </Link>
               <span className="tx-type-badge h-full mx-2" title={t('type')}>
                 {tx.type}
@@ -162,7 +156,7 @@ const TxList = ({ list }: { list: State['txList'] }) => {
 
 const Home = (initState: State) => {
   const [home, setHome] = useState(initState)
-  useWS('room:lobby', console.info)
+  // useWS('room:lobby', console.info)
   return (
     <>
       <div className="home-bg"></div>

@@ -38,7 +38,14 @@ const Tx = (initState: State) => {
           </span>
         ),
       },
-      { label: 'finalizeState', value: <span title={t('finalizeState')}>{tx.finalizeState}</span> },
+      {
+        label: 'finalizeState',
+        value: (
+          <span className="capitalize" title={t('finalizeState')}>
+            {t(tx.finalizeState)}
+          </span>
+        ),
+      },
     ],
     [
       { label: 'nonce', value: <span title={t('nonce')}>{Number(tx.nonce).toLocaleString('en')}</span> },

@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-context('Block Page', () => {
+context.skip('Block Page', () => {
   const hash = '1'
   beforeEach(() => {
     cy.visit(`/block/${hash}`)

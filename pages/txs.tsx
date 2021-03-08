@@ -22,12 +22,9 @@ const List = ({ list }: { list: State['txList'] }) => {
           <div key={tx.hash} className="list-item-container">
             <div className="flex items-center mb-3">
               <Link href={`/tx/${tx.hash}`}>
-                <span>
-                  #
-                  <a title={t('hash')} className="font-bold">
-                    {tx.hash}
-                  </a>
-                </span>
+                <a title={t('hash')} className="hashLink">
+                  {tx.hash}
+                </a>
               </Link>
               <span className="tx-type-badge h-full mx-2" title={t('type')}>
                 {tx.type}

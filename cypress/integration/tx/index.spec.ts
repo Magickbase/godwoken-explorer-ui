@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-context('Transaction Page', () => {
+context.skip('Transaction Page', () => {
   const hash = '1'
   beforeEach(() => {
     cy.visit(`/tx/${hash}`)

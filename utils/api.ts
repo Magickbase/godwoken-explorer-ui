@@ -26,35 +26,37 @@ const handleError = ({ error_code, message }: ErrorResponse) => {
 }
 
 export namespace API {
+  type Timestamp = number // second from server
   export namespace Home {
-    type Tx = Record<'hash' | 'timestamp' | 'from' | 'to' | 'type', string> & { success: boolean }
+    type Tx = Record<'hash' | 'from' | 'to' | 'type', string> & { success: boolean; timestamp: Timestamp }
     export interface Raw {
-      block_list: Array<Record<'hash' | 'number' | 'timestamp' | 'tx_count', string>>
+      block_list: Array<Record<'hash' | 'number' | 'tx_count', string> & { timestamp: Timestamp }>
       tx_list: Array<Tx>
       statistic: Record<'block_count' | 'tx_count' | 'tps' | 'account_count', string>
     }
     export interface Parsed {
-      blockList: Array<Record<'hash' | 'number' | 'timestamp' | 'txCount', string>>
+      blockList: Array<Record<'hash' | 'number' | 'txCount', string> & { timestamp: Timestamp }>
       txList: Array<Tx>
       statistic: Record<'blockCount' | 'txCount' | 'tps' | 'accountCount', string>
     }
   }
 
   export namespace Block {
-    export type Raw = Record<
-      'hash' | 'number' | 'l1_block' | 'tx_hash' | 'finalize_state' | 'tx_count' | 'aggregator',
-      string
-    >
-    export type Parsed = Record<
-      'hash' | 'number' | 'l1Block' | 'txHash' | 'finalizeState' | 'txCount' | 'aggregator' | 'timestamp',
-      string
-    >
+    export type Raw = Record<'hash' | 'number' | 'finalize_state' | 'tx_count' | 'aggregator', string> & {
+      timestamp: Timestamp
+      l1_block: string | null
+      tx_hash: string | null
+    }
+    export type Parsed = Record<'hash' | 'number' | 'finalizeState' | 'txCount' | 'aggregator', string> & {
+      timestamp: Timestamp
+      l1Block: string | null
+      txHash: string | null
+    }
   }
 
   export namespace Tx {
     export type Raw = Record<
       | 'hash'
-      | 'timestamp'
       | 'finalize_state'
       | 'l2_block'
       | 'l1_block'
@@ -66,22 +68,11 @@ export namespace API {
       | 'gas_price'
       | 'fee',
       string
-    >
+    > & { timestamp: Timestamp }
     export type Parsed = Record<
-      | 'hash'
-      | 'timestamp'
-      | 'finalizeState'
-      | 'l2Block'
-      | 'l1Block'
-      | 'from'
-      | 'to'
-      | 'nonce'
-      | 'args'
-      | 'type'
-      | 'gasPrice'
-      | 'fee',
+      'hash' | 'finalizeState' | 'l2Block' | 'l1Block' | 'from' | 'to' | 'nonce' | 'args' | 'type' | 'gasPrice' | 'fee',
       string
-    >
+    > & { timestamp: Timestamp }
   }
 
   export namespace Account {
@@ -94,8 +85,9 @@ export namespace API {
       page: string
       total_count: string
       txs: Array<
-        Record<'hash' | 'block_number' | 'block_hash' | 'from' | 'to' | 'timestamp' | 'type', string> & {
+        Record<'hash' | 'block_number' | 'block_hash' | 'from' | 'to' | 'type', string> & {
           success: boolean
+          timestamp: Timestamp
         }
       >
     }
@@ -104,119 +96,103 @@ export namespace API {
       page: string
       totalCount: string
       txs: Array<
-        Record<'hash' | 'blockNumber' | 'blockHash' | 'from' | 'to' | 'timestamp' | 'type', string> & {
+        Record<'hash' | 'blockNumber' | 'blockHash' | 'from' | 'to' | 'type', string> & {
           success: boolean
+          timestamp: Timestamp
         }
       >
     }
   }
 }
 
+const pretreat = async <T>(res: Response) => {
+  if (res.status === HttpStatus.NotFound) {
+    throw new NotFoundException()
+  }
+  const parsed: T | ErrorResponse = await res.json()
+  if (isError(parsed)) {
+    return handleError(parsed)
+  }
+  return parsed
+}
+
 export const fetchHome = (): Promise<API.Home.Parsed> =>
-  fetch(`${SERVER_URL}/home/1`).then(async res => {
-    if (res.status === HttpStatus.NotFound) {
-      throw new NotFoundException()
-    }
-    const home: API.Home.Raw | ErrorResponse = await res.json()
-    if (isError(home)) {
-      return handleError(home)
-    }
-    return {
-      blockList: home.block_list.map(({ hash, number, tx_count, timestamp }) => ({
-        hash,
-        number,
-        txCount: tx_count,
-        timestamp,
-      })),
-      txList: home.tx_list,
-      statistic: {
-        blockCount: home.statistic.block_count,
-        txCount: home.statistic.tx_count,
-        tps: home.statistic.tps,
-        accountCount: home.statistic.account_count,
-      },
-    }
-  })
+  fetch(`${SERVER_URL}/home`)
+    .then(res => pretreat<API.Home.Raw>(res))
+    .then(async home => {
+      return {
+        blockList: home.block_list.map(({ hash, number, tx_count, timestamp }) => ({
+          hash,
+          number,
+          txCount: tx_count,
+          timestamp: timestamp * 1000,
+        })),
+        txList: home.tx_list.map(tx => ({ ...tx, timestamp: tx.timestamp * 1000 })),
+        statistic: {
+          blockCount: home.statistic.block_count,
+          txCount: home.statistic.tx_count,
+          tps: home.statistic.tps,
+          accountCount: home.statistic.account_count,
+        },
+      }
+    })
 
 export const fetchBlock = (id: string): Promise<API.Block.Parsed> =>
-  fetch(`${SERVER_URL}/blocks/${id}`).then(async res => {
-    if (res.status === HttpStatus.NotFound) {
-      throw new NotFoundException()
-    }
-    const block: API.Block.Raw | ErrorResponse = await res.json()
-    if (isError(block)) {
-      return handleError(block)
-    }
-    return {
-      hash: block.hash,
-      number: block.number,
-      l1Block: block.l1_block,
-      txHash: block.tx_hash,
-      finalizeState: block.finalize_state ? 'finalized' : 'committed',
-      txCount: block.tx_count,
-      aggregator: block.aggregator,
-      timestamp: Date.now().toString(),
-    }
-  })
+  fetch(`${SERVER_URL}/block/${id}`)
+    .then(res => pretreat<API.Block.Raw>(res))
+    .then(async block => {
+      return {
+        hash: block.hash,
+        number: block.number,
+        l1Block: block.l1_block,
+        txHash: block.tx_hash,
+        finalizeState: block.finalize_state,
+        txCount: block.tx_count,
+        aggregator: block.aggregator,
+        timestamp: block.timestamp * 1000,
+      }
+    })
 
 export const fetchTx = (hash: string): Promise<API.Tx.Parsed> =>
-  fetch(`${SERVER_URL}/txs/${hash}`).then(async res => {
-    if (res.status === HttpStatus.NotFound) {
-      throw new NotFoundException()
-    }
-    const tx: API.Tx.Raw | ErrorResponse = await res.json()
-    if (isError(tx)) {
-      return handleError(tx)
-    }
-    return {
-      hash: tx.hash,
-      timestamp: tx.timestamp,
-      finalizeState: tx.finalize_state,
-      l2Block: tx.l2_block,
-      l1Block: tx.l1_block,
-      from: tx.from,
-      to: tx.to,
-      nonce: tx.nonce,
-      args: tx.args,
-      type: tx.type,
-      gasPrice: tx.gas_price,
-      fee: tx.fee,
-    }
-  })
+  fetch(`${SERVER_URL}/txs/${hash}`)
+    .then(res => pretreat<API.Tx.Raw>(res))
+    .then(async tx => {
+      return {
+        hash: tx.hash,
+        timestamp: tx.timestamp * 1000,
+        finalizeState: tx.finalize_state,
+        l2Block: tx.l2_block,
+        l1Block: tx.l1_block,
+        from: tx.from,
+        to: tx.to,
+        nonce: tx.nonce,
+        args: tx.args,
+        type: tx.type,
+        gasPrice: tx.gas_price,
+        fee: tx.fee,
+      }
+    })
 
 export const fetchAccount = (id: string): Promise<API.Account.Parsed> =>
-  fetch(`${SERVER_URL}/accounts/${id}`).then(async res => {
-    if (res.status === HttpStatus.NotFound) {
-      throw new NotFoundException()
-    }
-    const account: API.Account.Raw | ErrorResponse = await res.json()
-    if (isError(account)) {
-      return handleError(account)
-    }
-    return {
-      id: account.id,
-      type: account.type,
-      ckb: account.ckb,
-      txCount: account.tx_count,
-    }
-  })
+  fetch(`${SERVER_URL}/accounts/${id}`)
+    .then(res => pretreat<API.Account.Raw>(res))
+    .then(async account => {
+      return {
+        id: account.id,
+        type: account.type,
+        ckb: account.ckb,
+        txCount: account.tx_count,
+      }
+    })
 
 export const fetchTxList = (query: string): Promise<API.Txs.Parsed> =>
   fetch(`${SERVER_URL}/txs?${query}`)
-    .then(async res => {
-      if (res.status === HttpStatus.NotFound) {
-        throw new NotFoundException()
-      }
-
-      const txsRes: API.Txs.Raw | ErrorResponse = await res.json()
-      if (isError(txsRes)) {
-        return handleError(txsRes)
-      }
-
+    .then(res => pretreat<API.Txs.Raw>(res))
+    .then(async txs => {
       return {
-        page: txsRes.page,
-        totalCount: txsRes.total_count,
-        txs: txsRes.txs.map(tx => ({
+        page: txs.page,
+        totalCount: txs.total_count,
+        txs: txs.txs.map(tx => ({
           hash: tx.hash,
           blockNumber: tx.block_number,
           blockHash: tx.block_hash,
@@ -225,23 +201,6 @@ export const fetchTxList = (query: string): Promise<API.Txs.Parsed> =>
           timestamp: tx.timestamp,
           type: tx.type,
           success: tx.success,
-        })),
-      }
-    })
-    .catch(() => {
-      // mock data
-      return {
-        page: '1',
-        totalCount: '200',
-        txs: Array.from({ length: 10 }).map((_, idx) => ({
-          hash: 'hash' + idx,
-          blockNumber: 'block_number' + idx,
-          blockHash: 'block_hash' + idx,
-          from: 'from' + idx,
-          to: 'to' + idx,
-          timestamp: Date.now().toString(),
-          type: 'withdraw',
-          success: true,
         })),
       }
     })

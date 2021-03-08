@@ -16,5 +16,7 @@
   "success": "success",
   "finalizeState": "finalize state",
   "age": "age",
-  "txListTitle": "Transactions related to account"
+  "txListTitle": "Transactions related to account",
+  "committed": "committedd",
+  "finalized": "finalized"
 }
