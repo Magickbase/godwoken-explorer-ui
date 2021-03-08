@@ -18,5 +18,6 @@
   "age": "age",
   "txListTitle": "Transactions related to account",
   "committed": "committedd",
-  "finalized": "finalized"
+  "finalized": "finalized",
+  "emptyTxList": "No transactions found"
 }

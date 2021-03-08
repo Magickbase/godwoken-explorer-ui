@@ -8,10 +8,11 @@ module.exports = {
         'secondary': '#9A5FE4',
         'light-grey': '#CCCCCC',
         'dark-grey': '#666666',
-        "ink": "#333",
+        'ink': '#333',
         'tag-primary': '#F69E4C',
         'tag-secondary': '#FFF1DE',
         'code-bg': '#E6E6E6',
+        'hover-bg': '#f5f5f5',
       },
       fontFamily: {
         sans: [
@@ -32,9 +33,9 @@ module.exports = {
           'Noto Color Emoji',
         ],
       },
-      lineHeight:{
-        default: '1.2'
-      }
+      lineHeight: {
+        default: '1.2',
+      },
     },
   },
   variants: {

@@ -18,5 +18,6 @@
   "age": "时间",
   "txListTitle": "交易列表关联账户",
   "committed": "已提交",
-  "finalized": "已确认"
+  "finalized": "已确认",
+  "emptyTxList": "没有交易"
 }
