@@ -19,6 +19,10 @@ const Search = () => {
       defaultPosition = 'middle'
       break
     }
+    case '/error': {
+      defaultPosition = 'middle'
+      break
+    }
     default: {
       break
     }

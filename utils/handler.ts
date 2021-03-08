@@ -8,7 +8,7 @@ export const handleApiError = (err: Error, res: ServerResponse): { notFound: tru
     }
   }
   console.warn(err.message)
-  res.setHeader('location', '/')
+  res.setHeader('location', `/error?message=${err.message}`)
   res.statusCode = 302
   res.end()
   return
