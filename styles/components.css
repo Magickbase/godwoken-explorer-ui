@@ -155,7 +155,8 @@
 }
 
 @layer components {
-  .notFound {
+  .notFound,
+  .errorPage {
     width: 343px;
     @apply whitespace-pre-line text-sm font-normal text-dark-grey leading-default mt-32 w-80 mx-auto md:mt-36 md:w-96;
   }

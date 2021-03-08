@@ -4,6 +4,27 @@ import { NotFoundException } from './exceptions'
 enum HttpStatus {
   NotFound = 404,
 }
+
+type ErrorResponse = {
+  error_code?: number
+  message?: string
+}
+
+const isError = (res: any): res is ErrorResponse => {
+  return res.error_code
+}
+
+const handleError = ({ error_code, message }: ErrorResponse) => {
+  if (error_code === 404) {
+    throw new NotFoundException()
+  }
+  const error = new Error(message)
+  Object.defineProperty(error, 'code', {
+    value: error_code,
+  })
+  throw error
+}
+
 export namespace API {
   export namespace Home {
     type Tx = Record<'hash' | 'timestamp' | 'from' | 'to' | 'type', string> & { success: boolean }
@@ -96,7 +117,10 @@ export const fetchHome = (): Promise<API.Home.Parsed> =>
     if (res.status === HttpStatus.NotFound) {
       throw new NotFoundException()
     }
-    const home: API.Home.Raw = await res.json()
+    const home: API.Home.Raw | ErrorResponse = await res.json()
+    if (isError(home)) {
+      return handleError(home)
+    }
     return {
       blockList: home.block_list.map(({ hash, number, tx_count, timestamp }) => ({
         hash,
@@ -119,7 +143,10 @@ export const fetchBlock = (id: string): Promise<API.Block.Parsed> =>
     if (res.status === HttpStatus.NotFound) {
       throw new NotFoundException()
     }
-    const block: API.Block.Raw = await res.json()
+    const block: API.Block.Raw | ErrorResponse = await res.json()
+    if (isError(block)) {
+      return handleError(block)
+    }
     return {
       hash: block.hash,
       number: block.number,
@@ -137,7 +164,10 @@ export const fetchTx = (hash: string): Promise<API.Tx.Parsed> =>
     if (res.status === HttpStatus.NotFound) {
       throw new NotFoundException()
     }
-    const tx: API.Tx.Raw = await res.json()
+    const tx: API.Tx.Raw | ErrorResponse = await res.json()
+    if (isError(tx)) {
+      return handleError(tx)
+    }
     return {
       hash: tx.hash,
       timestamp: tx.timestamp,
@@ -159,7 +189,10 @@ export const fetchAccount = (id: string): Promise<API.Account.Parsed> =>
     if (res.status === HttpStatus.NotFound) {
       throw new NotFoundException()
     }
-    const account: API.Account.Raw = await res.json()
+    const account: API.Account.Raw | ErrorResponse = await res.json()
+    if (isError(account)) {
+      return handleError(account)
+    }
     return {
       id: account.id,
       type: account.type,
@@ -175,7 +208,10 @@ export const fetchTxList = (query: string): Promise<API.Txs.Parsed> =>
         throw new NotFoundException()
       }
 
-      const txsRes: API.Txs.Raw = await res.json()
+      const txsRes: API.Txs.Raw | ErrorResponse = await res.json()
+      if (isError(txsRes)) {
+        return handleError(txsRes)
+      }
 
       return {
         page: txsRes.page,
