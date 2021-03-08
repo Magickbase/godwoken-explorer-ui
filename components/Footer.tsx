@@ -13,7 +13,7 @@ const Footer = () => (
     <div className="mx-auto flex flex-wrap mt-8 font-bold text-sm" style={{ width: 300 }}>
       {links.map(link => (
         <Link key={link.label} href={link.url}>
-          <a className={'flex-0 w-1/2 text-white text-center pb-2 opacity-60 hover:opacity-100'} title={link.label}>
+          <a className="flex-0 w-1/2 text-white text-center pb-2 opacity-60 hover:opacity-100" title={link.label}>
             {link.label}
           </a>
         </Link>

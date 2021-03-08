@@ -6,7 +6,10 @@
   "txCount": "交易数量",
   "timestamp": "时间",
   "l1Block": "l1 区块",
-  "finalizeState": "finalize 状态",
+  "finalizeState": "确定性状态",
   "aggregator": "聚合者",
-  "txHash": "交易哈希"
+  "txHash": "交易哈希",
+  "pending": "待确认",
+  "committed": "已提交",
+  "finalized": "已确认"
 }

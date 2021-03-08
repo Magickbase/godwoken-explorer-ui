@@ -17,34 +17,42 @@ const Block = (initState: State) => {
       {
         label: 'timestamp',
         value: (
-          <time dateTime={new Date(+block.timestamp).toISOString()} title={t('timestamp')}>
-            {formatDatetime(+block.timestamp)}
+          <time dateTime={new Date(block.timestamp).toISOString()} title={t('timestamp')}>
+            {formatDatetime(block.timestamp)}
           </time>
         ),
       },
       {
         label: 'l1Block',
-        value: (
+        value: block.l1Block ? (
           <Link href={`${CKB_EXPLORER_URL}/block/${block.l1Block}`}>
-            <div>
-              #<a title={t('l1Block')}>{Number(block.l1Block).toLocaleString('en')}</a>
-            </div>
+            <a title={t('l1Block')} className="hashLink">
+              {Number(block.l1Block).toLocaleString('en')}
+            </a>
           </Link>
+        ) : (
+          t('pending')
         ),
       },
       {
         label: 'txHash',
-        value: (
+        value: block.txHash ? (
           <Link href={`${CKB_EXPLORER_URL}/transaction/${block.txHash}`}>
             <a title={t('txHash')}>{block.txHash}</a>
           </Link>
+        ) : (
+          t('pending')
         ),
       },
     ],
     [
       {
         label: 'finalizeState',
-        value: <span title={t('finalizeState')}>{block.finalizeState}</span>,
+        value: (
+          <span className="capitalize" title={t('finalizeState')}>
+            {t(block.finalizeState)}
+          </span>
+        ),
       },
       {
         label: 'txCount',

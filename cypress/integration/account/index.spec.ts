@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-context('Account Page', () => {
+context.skip('Account Page', () => {
   const id = 1
   beforeEach(() => {
     cy.visit(`/account/${id}`)

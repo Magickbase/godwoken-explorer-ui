@@ -14,7 +14,9 @@
   "nonce": "nonce",
   "timestamp": "时间",
   "success": "成功",
-  "finalizeState": "finalize 状态",
+  "finalizeState": "确定性状态",
   "age": "时间",
-  "txListTitle": "交易列表关联账户"
+  "txListTitle": "交易列表关联账户",
+  "committed": "已提交",
+  "finalized": "已确认"
 }

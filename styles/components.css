@@ -180,3 +180,13 @@
     height: 296px;
   }
 }
+
+@layer components {
+  .hashLink {
+    @apply font-bold overflow-hidden overflow-ellipsis;
+  }
+  .hashLink::before {
+    content: '#';
+    @apply text-black font-normal pr-0.5;
+  }
+}
