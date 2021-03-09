@@ -17,11 +17,11 @@ const Account = (initState: State) => {
   return (
     <>
       <div className="flex flex-col card-container mt-8 md:flex-row md:pb-3">
-        <h2 className="card-header md:flex-1 md:border-b-0 md:border-r md:pb-0">
+        <h2 className="card-header md:w-1/2 md:border-b-0 md:border-r md:pb-0">
           {`${t('account')}`}
           <span>{account.id}</span>
         </h2>
-        <div className="divide-y divide-light-grey divide-dashed text-sm md:divide-y-0 md:flex-1 md:pl-3">
+        <div className="divide-y divide-light-grey divide-dashed text-sm md:divide-y-0 md:w-1/2 md:pl-3">
           <div className="flex justify-between py-3 md:py-0">
             <span className="card-label">{t('ckb')}</span>
             <span className="overflow-hidden overflow-ellipsis">{account.ckb}</span>
@@ -29,16 +29,16 @@ const Account = (initState: State) => {
           <div className="flex justify-between pt-3 pb-2 md:pb-0">
             <span className="card-label">{t('txCount')}</span>
             <Link href={`/txs?account_id=${account.id}&page=1`}>
-              <a>{Number(account.txCount).toLocaleString('en')}</a>
+              <a>{BigInt(account.txCount).toLocaleString('en')}</a>
             </Link>
           </div>
         </div>
       </div>
-      <MetaContract />
-      <User />
-      <SmartContract />
-      <Polyjuice />
-      <SUDT />
+      {account.metaContract ? <MetaContract {...account.metaContract} /> : null}
+      {account.user ? <User {...account.user} /> : null}
+      {account.smartContract ? <SmartContract {...account.smartContract} /> : null}
+      {account.polyjuice ? <Polyjuice {...account.polyjuice} /> : null}
+      {account.sudt ? <SUDT {...account.sudt} /> : null}
     </>
   )
 }

@@ -27,7 +27,7 @@ const Block = (initState: State) => {
         value: block.l1Block ? (
           <Link href={`${CKB_EXPLORER_URL}/block/${block.l1Block}`}>
             <a title={t('l1Block')} className="hashLink">
-              {Number(block.l1Block).toLocaleString('en')}
+              {BigInt(block.l1Block).toLocaleString('en')}
             </a>
           </Link>
         ) : (
@@ -56,7 +56,7 @@ const Block = (initState: State) => {
       },
       {
         label: 'txCount',
-        value: <span title={t('txCount')}>{Number(block.txCount).toLocaleString('en')}</span>,
+        value: <span title={t('txCount')}>{BigInt(block.txCount).toLocaleString('en')}</span>,
       },
       {
         label: 'aggregator',
@@ -68,7 +68,7 @@ const Block = (initState: State) => {
     <div className="card-container mt-8">
       <h2 className="card-header">
         {t('block')}
-        <span>{`#${Number(block.number).toLocaleString('en')}`}</span>
+        <span>{`#${BigInt(block.number).toLocaleString('en')}`}</span>
       </h2>
       <CardFieldsetList fieldsetList={fieldsetList} t={t} />
     </div>

@@ -1,25 +1,16 @@
 import { useTranslation } from 'next-i18next'
-import { useIsHidden } from 'utils'
+import { useIsHidden, API } from 'utils'
 import AssetList from 'components/AssetList'
 
-const User = () => {
+type State = API.Account.Parsed['user']
+const User = ({ ckbAddr, ethAddr, nonce, udtList, ckbLockScript }: State) => {
   const [t] = useTranslation('account')
   const [isHidden, HiddenIcon] = useIsHidden()
   const infoList = [
-    { label: t('ethAddr'), value: <span title={t('ethAddr')}>0xbd215e27867bcf0faa04fd563a7b9ce559674a83</span> },
-    { label: t('nonce'), value: <span title={t('nonce')}>{Number('111111111111').toLocaleString('en')}</span> },
-    { label: t('ckbAddr'), value: <span title={t('ckbAddr')}>ckt1qyqw975zuu9svtyxgjuq44lv7mspte0n2tmqa703cd</span> },
+    { label: t('ethAddr'), value: <span title={t('ethAddr')}>{ethAddr || '-'} </span> },
+    { label: t('nonce'), value: <span title={t('nonce')}>{BigInt(nonce).toLocaleString('en')}</span> },
+    { label: t('ckbAddr'), value: <span title={t('ckbAddr')}>{ckbAddr || '-'}</span> },
   ]
-  const assetList = [
-    { label: 'udt 1', value: '111111111111' },
-    { label: 'udt 2', value: '22222222222' },
-  ]
-  const script = {
-    codeHash: 'code hash',
-    hashType: 'type',
-    args: 'args',
-    name: '',
-  }
 
   return (
     <div className="md:flex">
@@ -40,14 +31,14 @@ const User = () => {
               {t('ckbLockScript')}
               <HiddenIcon />
             </span>
-            <span className="script-type-badge">{script.name || t('unknownScript')}</span>
+            <span className="script-type-badge">{ckbLockScript.name || t('unknownScript')}</span>
           </div>
         </div>
         <pre
           className={isHidden ? 'hidden' : 'script-code mb-3'}
-        >{`{\n\t"code_hash": "${script.codeHash}",\n\t"args": "${script.args}",\n\t"hash_type": "${script.hashType}"\n}`}</pre>
+        >{`{\n\t"code_hash": "${ckbLockScript.codeHash}",\n\t"args": "${ckbLockScript.args}",\n\t"hash_type": "${ckbLockScript.hashType}"\n}`}</pre>
       </div>
-      <AssetList assetList={assetList} t={t} />
+      <AssetList assetList={udtList} t={t} />
     </div>
   )
 }

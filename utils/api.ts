@@ -76,8 +76,61 @@ export namespace API {
   }
 
   export namespace Account {
-    export type Raw = Record<'id' | 'type' | 'ckb' | 'tx_count', string>
-    export type Parsed = Record<'id' | 'type' | 'ckb' | 'txCount', string>
+    type UDT = Record<'name' | 'balance' | 'icon', string>
+    export type RawScript = Record<'args' | 'code_hash' | 'hash_type' | 'name', string>
+    export type ParsedScript = Record<'args' | 'codeHash' | 'hashType' | 'name', string>
+    export type Raw = Record<'id' | 'type' | 'ckb' | 'tx_count', string> &
+      Partial<{
+        meta_contract: {
+          status: 'running' | 'halting'
+          account_merkle_state: any
+          block_merkle_state: any
+          last_finalized_block_number: string
+          reverted_block_root: string
+        }
+        sudt: Record<'decimal' | 'holders' | 'name' | 'supply' | 'symbol' | 'icon', string> & {
+          type_script: RawScript | null
+        }
+        user: {
+          ckb_addr: string | null
+          eth_addr: string | null
+          ckb_lock_script: RawScript | null
+          nonce: string
+          udt_list: Array<UDT>
+        }
+        polyjuice: {
+          script: RawScript
+        }
+        smart_contract: {
+          tx_hash: string
+          udt_list: Array<UDT>
+        }
+      }>
+    export type Parsed = Record<'id' | 'type' | 'ckb' | 'txCount', string> &
+      Partial<{
+        metaContract: {
+          status: 'running' | 'halting'
+          accountMerkleState: any
+          blockMerkleState: any
+          lastFinalizedBlockNumber: string
+          revertedBlockRoot: string
+        }
+        sudt: Record<'decimal' | 'holders' | 'name' | 'supply' | 'symbol' | 'icon', string> & {
+          typeScript: ParsedScript | null
+        }
+        user: {
+          ckbAddr: string | null
+          ethAddr: string | null
+          ckbLockScript: ParsedScript | null
+          nonce: string
+          udtList: Array<UDT>
+        }
+        polyjuice: { script: ParsedScript }
+        smartContract: {
+          txHash: string
+          udtList: Array<UDT>
+        }
+      }>
   }
 
   export namespace Txs {
@@ -138,7 +191,7 @@ export const fetchHome = (): Promise<API.Home.Parsed> =>
     })
 
 export const fetchBlock = (id: string): Promise<API.Block.Parsed> =>
-  fetch(`${SERVER_URL}/block/${id}`)
+  fetch(`${SERVER_URL}/blocks/${id}`)
     .then(res => pretreat<API.Block.Raw>(res))
     .then(async block => {
       return {
@@ -173,6 +226,48 @@ export const fetchTx = (hash: string): Promise<API.Tx.Parsed> =>
       }
     })
 
+const getMetaContract = (metaContract: API.Account.Raw['meta_contract']): API.Account.Parsed['metaContract'] => ({
+  status: metaContract.status || 'running',
+  accountMerkleState: metaContract.account_merkle_state,
+  blockMerkleState: metaContract.block_merkle_state,
+  lastFinalizedBlockNumber: metaContract.last_finalized_block_number,
+  revertedBlockRoot: metaContract.reverted_block_root,
+})
+
+const getScript = (script: API.Account.RawScript): API.Account.ParsedScript => ({
+  args: script.args,
+  codeHash: script.code_hash,
+  hashType: script.hash_type,
+  name: script.name,
+})
+
+const getSUDT = (sudt: API.Account.Raw['sudt']): API.Account.Parsed['sudt'] => ({
+  decimal: sudt.decimal,
+  holders: sudt.holders,
+  name: sudt.name,
+  supply: sudt.supply,
+  symbol: sudt.symbol,
+  icon: sudt.icon || null,
+  typeScript: sudt.type_script ? getScript(sudt.type_script) : null,
+})
+
+const getUser = (user: API.Account.Raw['user']): API.Account.Parsed['user'] => ({
+  ckbAddr: user.ckb_addr,
+  ethAddr: user.eth_addr,
+  ckbLockScript: user.ckb_lock_script ? getScript(user.ckb_lock_script) : null,
+  nonce: user.nonce,
+  udtList: user.udt_list || [],
+})
+
+const getPolyjuice = (polyjuice: API.Account.Raw['polyjuice']): API.Account.Parsed['polyjuice'] => ({
+  script: getScript(polyjuice.script),
+})
+
+const getSmartContract = (smartContract: API.Account.Raw['smart_contract']): API.Account.Parsed['smartContract'] => ({
+  txHash: smartContract.tx_hash,
+  udtList: smartContract.udt_list || [],
+})
+
 export const fetchAccount = (id: string): Promise<API.Account.Parsed> =>
   fetch(`${SERVER_URL}/accounts/${id}`)
     .then(res => pretreat<API.Account.Raw>(res))
@@ -182,6 +277,11 @@ export const fetchAccount = (id: string): Promise<API.Account.Parsed> =>
         type: account.type,
         ckb: account.ckb,
         txCount: account.tx_count,
+        metaContract: account.meta_contract ? getMetaContract(account.meta_contract) : null,
+        sudt: account.sudt ? getSUDT(account.sudt) : null,
+        user: account.user ? getUser(account.user) : null,
+        polyjuice: account.polyjuice ? getPolyjuice(account.polyjuice) : null,
+        smartContract: account.smart_contract ? getSmartContract(account.smart_contract) : null,
       }
     })
 

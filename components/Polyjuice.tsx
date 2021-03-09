@@ -1,16 +1,11 @@
 import { useTranslation } from 'next-i18next'
-import { useIsHidden } from 'utils'
+import { useIsHidden, API } from 'utils'
 
-const Polyjuice = () => {
+type State = API.Account.Parsed['polyjuice']
+
+const Polyjuice = ({ script }: State) => {
   const [t] = useTranslation('account')
   const [isHidden, HiddenIcon] = useIsHidden()
-  const script = {
-    codeHash: 'code hash',
-    hashType: 'type',
-    args: 'args',
-    name: '',
-  }
-
   return (
     <div className="md:flex">
       <div className="card-container w-full">

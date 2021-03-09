@@ -1,29 +1,33 @@
 import { useTranslation } from 'next-i18next'
-import { useIsHidden } from 'utils'
+import Image from 'next/image'
+import { useIsHidden, IMG_URL, API } from 'utils'
 import CardFieldsetList, { CardFieldsetListProps } from 'components/CardFieldsetList'
 
-const SUDT = () => {
+type State = API.Account.Parsed['sudt']
+
+const SUDT = ({ name, symbol, decimal, supply, holders, icon, typeScript }: State) => {
   const [t] = useTranslation('account')
   const [isHidden, HiddenIcon] = useIsHidden()
 
-  const script = {
-    codeHash: 'code hash',
-    hashType: 'type',
-    args: 'args',
-    name: '',
-  }
-
   const fieldsetList: CardFieldsetListProps['fieldsetList'] = [
     [
-      { label: t('name'), value: <span title={t('name')}>name</span> },
-      { label: t('symbol'), value: <span title={t('symbol')}>symbol</span> },
-      { label: t('decimal'), value: <span title={t('decimal')}>decimal</span> },
+      { label: t('name'), value: <span title={t('name')}>{name}</span> },
+      {
+        label: t('symbol'),
+        value: (
+          <div className="flex items-center gap-1" title={t('symbol')}>
+            <Image src={icon || `${IMG_URL}unknown-token.svg`} width="15" height="15" loading="lazy" layout="fixed" />
+            {symbol}
+          </div>
+        ),
+      },
+      { label: t('decimal'), value: <span title={t('decimal')}>{decimal}</span> },
     ],
     [
-      { label: t('l2Supply'), value: <span title={t('l2Supply')}>1111111111111111111111111</span> },
+      { label: t('l2Supply'), value: <span title={t('l2Supply')}>{BigInt(supply).toLocaleString('en')}</span> },
       {
         label: t('holders'),
-        value: <span title={t('holders')}>{Number('11111111').toLocaleString('en')}</span>,
+        value: <span title={t('holders')}>{BigInt(holders).toLocaleString('en')}</span>,
       },
     ],
   ]
@@ -34,7 +38,7 @@ const SUDT = () => {
         <span className="normal-case">sUDT</span>
       </h2>
       <CardFieldsetList fieldsetList={fieldsetList} t={t} />
-      {script ? (
+      {typeScript ? (
         <>
           <div className="md:my-3 border-t border-dashed border-light-grey md:border-t-0">
             <div className="card-field" attr-last="true">
@@ -42,12 +46,12 @@ const SUDT = () => {
                 {t('l1TypeScript')}
                 <HiddenIcon />
               </span>
-              <span className="script-type-badge">{script.name || t('unknownScript')}</span>
+              <span className="script-type-badge">{typeScript.name || t('unknownScript')}</span>
             </div>
           </div>
           <pre
             className={isHidden ? 'hidden' : 'script-code mb-3'}
-          >{`{\n\t"code_hash": "${script.codeHash}",\n\t"args": "${script.args}",\n\t"hash_type": "${script.hashType}"\n}`}</pre>
+          >{`{\n\t"code_hash": "${typeScript.codeHash}",\n\t"args": "${typeScript.args}",\n\t"hash_type": "${typeScript.hashType}"\n}`}</pre>
         </>
       ) : null}
     </div>

@@ -22,7 +22,7 @@ const List = ({ list }: { list: State['txList'] }) => {
           <div key={tx.hash} className="list-item-container">
             <div className="flex items-center mb-3">
               <Link href={`/tx/${tx.hash}`}>
-                <a title={t('hash')} className="hashLink flex-none flex-shrink">
+                <a title={t('hash')} className="hashLink flex-shrink">
                   {tx.hash}
                 </a>
               </Link>

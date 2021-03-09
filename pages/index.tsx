@@ -81,12 +81,12 @@ const BlockList = ({ list }: { list: State['blockList'] }) => {
           <div key={block.hash} className="list-item-container">
             <div className="flex justify-between mb-4 md:mb-3">
               <Link href={`/block/${block.hash}`}>
-                <a title={t('number')} className="hashLink">
-                  {Number(block.number).toLocaleString('en')}
+                <a title={t('number')} className="hashLink flex-1">
+                  {BigInt(block.number).toLocaleString('en')}
                 </a>
               </Link>
               <span className="text-right" title={t('txCount')}>
-                {Number(block.txCount).toLocaleString('en')} TXs
+                {BigInt(block.txCount).toLocaleString('en')} TXs
               </span>
             </div>
             <time
@@ -116,7 +116,7 @@ const TxList = ({ list }: { list: State['txList'] }) => {
           <div key={tx.hash} className="list-item-container">
             <div className="flex items-center mb-3">
               <Link href={`/tx/${tx.hash}`}>
-                <a title={t('hash')} className="hashLink">
+                <a title={t('hash')} className="hashLink flex-1">
                   {tx.hash}
                 </a>
               </Link>

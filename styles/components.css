@@ -26,7 +26,7 @@
 
 @layer components {
   .card-container {
-    @apply bg-white rounded-md shadow-md p-4 mt-4 pb-1;
+    @apply bg-white rounded-md shadow-md p-4 mt-4 pb-1 overflow-hidden;
   }
   .card-header {
     @apply border-b border-light-grey pb-2.5;
@@ -53,7 +53,7 @@
     }
 
     & > span {
-      @apply overflow-ellipsis overflow-hidden;
+      @apply whitespace-nowrap overflow-ellipsis overflow-hidden;
     }
 
     & a {
@@ -82,7 +82,7 @@
 
 @layer components {
   .script-code {
-    @apply flex w-full text-dark-grey bg-code-bg font-bold text-xs p-1;
+    @apply w-full text-dark-grey bg-code-bg font-bold text-xs p-1 overflow-auto;
   }
 }
 
@@ -186,7 +186,7 @@
 
 @layer components {
   .hashLink {
-    @apply flex-1 font-bold overflow-hidden overflow-ellipsis;
+    @apply font-bold overflow-hidden overflow-ellipsis;
   }
   .hashLink::before {
     content: '#';

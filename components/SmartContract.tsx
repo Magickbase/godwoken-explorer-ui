@@ -1,9 +1,11 @@
 import Link from 'next/link'
 import { useTranslation } from 'next-i18next'
+import { API } from 'utils'
 import AssetList from 'components/AssetList'
 
-const SmartContract = () => {
-  const txHash = 'tx hash'
+type State = API.Account.Parsed['smartContract']
+
+const SmartContract = ({ txHash, udtList }: State) => {
   const [t] = useTranslation('account')
   const infoList = [
     {
@@ -14,10 +16,6 @@ const SmartContract = () => {
         </Link>
       ),
     },
-  ]
-  const assetList = [
-    { label: 'udt 1', value: '1111111111' },
-    { label: 'udt 2', value: '22222222' },
   ]
 
   return (
@@ -36,7 +34,7 @@ const SmartContract = () => {
           ))}
         </div>
       </div>
-      <AssetList assetList={assetList} t={t} />
+      <AssetList assetList={udtList} t={t} />
     </div>
   )
 }

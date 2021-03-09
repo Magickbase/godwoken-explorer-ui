@@ -1,4 +1,4 @@
-import { format, formatDistance } from 'date-fns'
+import { format, formatDistanceToNow } from 'date-fns'
 import { enUS, zhCN } from 'date-fns/locale'
 
 export const formatDatetime = (datetime: number) => {
@@ -6,4 +6,8 @@ export const formatDatetime = (datetime: number) => {
 }
 
 export const timeDistance = (time: number, locale?: 'zh-CN' | 'en-US' | string) =>
-  formatDistance(new Date(time), new Date(), { addSuffix: true, locale: locale === 'zh-CN' ? zhCN : enUS })
+  formatDistanceToNow(new Date(time), {
+    addSuffix: true,
+    includeSeconds: true,
+    locale: locale === 'zh-CN' ? zhCN : enUS,
+  })

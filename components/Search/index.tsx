@@ -9,7 +9,7 @@ type Position = 'home' | 'header' | 'middle'
 const Search = () => {
   let defaultPosition: Position = 'header'
 
-  const { pathname, push } = useRouter() // '/' | '/404' |'other'
+  const { pathname, push, locale } = useRouter() // '/' | '/404' |'other'
   switch (pathname) {
     case '/': {
       defaultPosition = 'home'
@@ -27,6 +27,7 @@ const Search = () => {
       break
     }
   }
+  console.log(locale)
 
   const [position, setPosition] = useState<Position>(defaultPosition)
   const [isDisplay, setIsDisplay] = useState(false)
@@ -83,7 +84,7 @@ const Search = () => {
         <Image src={`${IMG_URL}search.svg`} width="18" height="17" loading="lazy" layout="fixed" title="search" />
       </div>
       <input id="search" type="text" placeholder={SEARCH_FIELDS} autoFocus title={SEARCH_FIELDS} />
-      <button type="submit">Search</button>
+      <button type="submit">{locale === 'zh-CN' ? '搜索' : 'Search'}</button>
     </form>
   )
 }

@@ -18,7 +18,7 @@ const Tx = (initState: State) => {
         label: 'l2Block',
         value: (
           <Link href={`/block/${tx.l2Block}`}>
-            <a title={t('l2Block')}>{Number(tx.l2Block).toLocaleString('en')}</a>
+            <a title={t('l2Block')}>{BigInt(tx.l2Block).toLocaleString('en')}</a>
           </Link>
         ),
       },
@@ -26,7 +26,7 @@ const Tx = (initState: State) => {
         label: 'l1Block',
         value: (
           <Link href={`${CKB_EXPLORER_URL}/block/${tx.l1Block}`}>
-            <a title={t('l1Block')}>{Number(tx.l1Block).toLocaleString('en')}</a>
+            <a title={t('l1Block')}>{BigInt(tx.l1Block).toLocaleString('en')}</a>
           </Link>
         ),
       },
