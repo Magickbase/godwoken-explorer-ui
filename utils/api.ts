@@ -204,3 +204,28 @@ export const fetchTxList = (query: string): Promise<API.Txs.Parsed> =>
           })) ?? [],
       }
     })
+
+export const fetchSearch = (keyword: string) =>
+  fetch(`${SERVER_URL}/search?keyword=${keyword}`).then(async res => {
+    if (res.status === HttpStatus.NotFound) {
+      return `/404?keyword=${keyword}`
+    }
+    const found: Record<'id' | 'type', string> | ErrorResponse = await res.json()
+    if (isError(found)) {
+      return `/404?keyword=${keyword}`
+    }
+    switch (found.type) {
+      case 'block': {
+        return `/block/${found.id}`
+      }
+      case 'transaction': {
+        return `/tx/${found.id}`
+      }
+      case 'account': {
+        return `account/${found.id}`
+      }
+      default: {
+        return `/404?keyword=${keyword}`
+      }
+    }
+  })

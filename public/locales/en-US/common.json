@@ -1,6 +1,6 @@
 {
   "page": "page",
-  "goTo": "go to",
+  "goTo": "Go to",
   "search": "search",
   "back": "back",
   "notFoundMessage": "Your input \"{{keyword}}\" did not match any record.\n\nPlease make sure your input contains only one of the following items:",

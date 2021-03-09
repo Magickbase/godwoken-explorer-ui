@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import { IMG_URL, SEARCH_FIELDS } from 'utils'
+import { IMG_URL, SEARCH_FIELDS, fetchSearch } from 'utils'
 import styles from './search.module.css'
 
 const TOP = 50
@@ -9,7 +9,7 @@ type Position = 'home' | 'header' | 'middle'
 const Search = () => {
   let defaultPosition: Position = 'header'
 
-  const { pathname } = useRouter() // '/' | '/404' |'other'
+  const { pathname, push } = useRouter() // '/' | '/404' |'other'
   switch (pathname) {
     case '/': {
       defaultPosition = 'home'
@@ -65,7 +65,9 @@ const Search = () => {
     e.preventDefault()
     e.stopPropagation()
     const keyword = e.currentTarget['search']?.value
-    console.info(keyword)
+    fetchSearch(keyword)
+      .then(push)
+      .catch(err => window.alert(err.message))
   }
 
   return (

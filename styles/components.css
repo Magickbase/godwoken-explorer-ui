@@ -114,6 +114,9 @@
             filter: brightness(1000);
           }
         }
+        & > div {
+          pointer-events: none;
+        }
       }
       &[attr-disable='true'] {
         @apply opacity-60 pointer-events-none;
