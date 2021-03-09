@@ -34,18 +34,22 @@ const SUDT = () => {
         <span className="normal-case">sUDT</span>
       </h2>
       <CardFieldsetList fieldsetList={fieldsetList} t={t} />
-      <div className="md:my-3 border-t border-dashed border-light-grey md:border-t-0">
-        <div className="card-field" attr-last="true">
-          <span className="card-label">
-            {t('l1TypeScript')}
-            <HiddenIcon />
-          </span>
-          <span className="script-type-badge">{script.name || t('unknownScript')}</span>
-        </div>
-      </div>
-      <pre
-        className={isHidden ? 'hidden' : 'script-code mb-3'}
-      >{`{\n\t"code_hash": "${script.codeHash}",\n\t"args": "${script.args}",\n\t"hash_type": "${script.hashType}"\n}`}</pre>
+      {script ? (
+        <>
+          <div className="md:my-3 border-t border-dashed border-light-grey md:border-t-0">
+            <div className="card-field" attr-last="true">
+              <span className="card-label">
+                {t('l1TypeScript')}
+                <HiddenIcon />
+              </span>
+              <span className="script-type-badge">{script.name || t('unknownScript')}</span>
+            </div>
+          </div>
+          <pre
+            className={isHidden ? 'hidden' : 'script-code mb-3'}
+          >{`{\n\t"code_hash": "${script.codeHash}",\n\t"args": "${script.args}",\n\t"hash_type": "${script.hashType}"\n}`}</pre>
+        </>
+      ) : null}
     </div>
   )
 }

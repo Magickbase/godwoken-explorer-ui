@@ -50,7 +50,9 @@ const Tx = (initState: State) => {
     [
       { label: 'nonce', value: <span title={t('nonce')}>{Number(tx.nonce).toLocaleString('en')}</span> },
       { label: 'args', value: <span title={t('args')}>{tx.args}</span> },
-      { label: 'gasPrice', value: <span title={t('gasPrice')}>{Number(tx.gasPrice).toLocaleString('en')}</span> },
+      tx.gasPrice
+        ? { label: 'gasPrice', value: <span title={t('gasPrice')}>{Number(tx.gasPrice).toLocaleString('en')}</span> }
+        : null,
       { label: 'fee', value: <span title={t('fee')}>{Number(tx.fee).toLocaleString('en')}</span> },
     ],
   ]
