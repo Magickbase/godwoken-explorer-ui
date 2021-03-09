@@ -1,4 +1,4 @@
-export * from './date'
+export * from './convertors'
 export * from './constants'
 export * from './api'
 export * from './handler'

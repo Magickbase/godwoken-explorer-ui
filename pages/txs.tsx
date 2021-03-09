@@ -32,7 +32,7 @@ const List = ({ list }: { list: State['txList'] }) => {
               <div style={{ width: 15, height: 15 }}>{tx.success ? SuccessIcon : FailureIcon}</div>
               <div className="flex justify-end items-center ml-auto pl-7">
                 <Image src={`${IMG_URL}blocks.svg`} width="15" height="15" layout="fixed" loading="lazy" />
-                <Link href={`/blocks/${tx.blockNumber}`}>
+                <Link href={`/block/${tx.blockNumber}`}>
                   <a className="ml-1">{tx.blockNumber}</a>
                 </Link>
               </div>

@@ -1,3 +1,4 @@
+import { addressToScript } from '@nervosnetwork/ckb-sdk-utils'
 import { SERVER_URL } from './constants'
 import { NotFoundException } from './exceptions'
 
@@ -92,7 +93,6 @@ export namespace API {
           type_script: RawScript | null
         }
         user: {
-          ckb_addr: string | null
           eth_addr: string | null
           ckb_lock_script: RawScript | null
           nonce: string
@@ -119,7 +119,6 @@ export namespace API {
           typeScript: ParsedScript | null
         }
         user: {
-          ckbAddr: string | null
           ethAddr: string | null
           ckbLockScript: ParsedScript | null
           nonce: string
@@ -252,7 +251,6 @@ const getSUDT = (sudt: API.Account.Raw['sudt']): API.Account.Parsed['sudt'] => (
 })
 
 const getUser = (user: API.Account.Raw['user']): API.Account.Parsed['user'] => ({
-  ckbAddr: user.ckb_addr,
   ethAddr: user.eth_addr,
   ckbLockScript: user.ckb_lock_script ? getScript(user.ckb_lock_script) : null,
   nonce: user.nonce,
@@ -305,8 +303,18 @@ export const fetchTxList = (query: string): Promise<API.Txs.Parsed> =>
       }
     })
 
-export const fetchSearch = (keyword: string) =>
-  fetch(`${SERVER_URL}/search?keyword=${keyword}`).then(async res => {
+export const fetchSearch = (keyword: string) => {
+  let query = keyword
+  if (query.startsWith('ck')) {
+    try {
+      const script = addressToScript(query)
+      query = `${script.codeHash}_${script.hashType}_${script.args}`
+    } catch (err) {
+      console.warn(err)
+    }
+  }
+
+  return fetch(`${SERVER_URL}/search?keyword=${query}`).then(async res => {
     if (res.status === HttpStatus.NotFound) {
       return `/404?keyword=${keyword}`
     }
@@ -329,3 +337,4 @@ export const fetchSearch = (keyword: string) =>
       }
     }
   })
+}

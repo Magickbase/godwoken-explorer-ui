@@ -1,15 +1,22 @@
 import { useTranslation } from 'next-i18next'
-import { useIsHidden, API } from 'utils'
+import { useIsHidden, scriptToCkbAddress, API } from 'utils'
 import AssetList from 'components/AssetList'
 
 type State = API.Account.Parsed['user']
-const User = ({ ckbAddr, ethAddr, nonce, udtList, ckbLockScript }: State) => {
+const User = ({ ethAddr, nonce, udtList, ckbLockScript }: State) => {
   const [t] = useTranslation('account')
   const [isHidden, HiddenIcon] = useIsHidden()
+  let ckbAddr = '-'
+  try {
+    ckbAddr = scriptToCkbAddress(ckbLockScript as CKBComponents.Script)
+  } catch {
+    // ignore
+  }
+
   const infoList = [
     { label: t('ethAddr'), value: <span title={t('ethAddr')}>{ethAddr || '-'} </span> },
     { label: t('nonce'), value: <span title={t('nonce')}>{BigInt(nonce).toLocaleString('en')}</span> },
-    { label: t('ckbAddr'), value: <span title={t('ckbAddr')}>{ckbAddr || '-'}</span> },
+    { label: t('ckbAddr'), value: <span title={t('ckbAddr')}>{ckbAddr}</span> },
   ]
 
   return (

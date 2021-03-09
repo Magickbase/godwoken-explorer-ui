@@ -27,7 +27,6 @@ const Search = () => {
       break
     }
   }
-  console.log(locale)
 
   const [position, setPosition] = useState<Position>(defaultPosition)
   const [isDisplay, setIsDisplay] = useState(false)
