@@ -1,5 +1,8 @@
-import { format, formatDistanceToNow } from 'date-fns'
-import { enUS, zhCN } from 'date-fns/locale'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+import 'dayjs/locale/zh-cn'
+import 'dayjs/locale/en'
 import {
   systemScripts,
   bech32Address,
@@ -9,16 +12,16 @@ import {
 } from '@nervosnetwork/ckb-sdk-utils'
 import { IS_MAINNET } from './constants'
 
+dayjs.extend(relativeTime)
+dayjs.extend(customParseFormat)
 export const formatDatetime = (datetime: number) => {
-  return format(new Date(datetime), 'yyyy/MM/dd hh:mm:ss')
+  return dayjs(datetime).format('YYYY/MM/DD hh:mm:ss')
 }
 
-export const timeDistance = (time: number, locale?: 'zh-CN' | 'en-US' | string) =>
-  formatDistanceToNow(new Date(time), {
-    addSuffix: true,
-    includeSeconds: true,
-    locale: locale === 'zh-CN' ? zhCN : enUS,
-  })
+export const timeDistance = (time: number, locale?: 'zh-CN' | 'en-US' | string) => {
+  dayjs.locale(locale?.toLowerCase())
+  return dayjs(time).fromNow()
+}
 
 export const scriptToCkbAddress = (lockScript: CKBComponents.Script) => {
   const scriptList = [

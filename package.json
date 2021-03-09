@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@nervosnetwork/ckb-sdk-utils": "0.40.0",
-    "date-fns": "2.19.0",
+    "dayjs": "1.10.4",
     "next": "10.0.8",
     "next-i18next": "8.0.3",
     "phoenix": "1.5.8",
