@@ -3,7 +3,7 @@ import { GetServerSideProps } from 'next'
 import Link from 'next/link'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { fetchAccount, API, handleApiError } from 'utils'
+import { fetchAccount, API, handleApiError, formatBalance } from 'utils'
 import User from 'components/User'
 import MetaContract from 'components/MetaContract'
 import SmartContract from 'components/SmartContract'
@@ -24,7 +24,7 @@ const Account = (initState: State) => {
         <div className="divide-y divide-light-grey divide-dashed text-sm md:divide-y-0 md:w-1/2 md:pl-3">
           <div className="flex justify-between py-3 md:py-0">
             <span className="card-label">{t('ckb')}</span>
-            <span className="overflow-hidden overflow-ellipsis">{account.ckb}</span>
+            <span className="overflow-hidden overflow-ellipsis">{formatBalance(account.ckb)}</span>
           </div>
           <div className="flex justify-between pt-3 pb-2 md:pb-0">
             <span className="card-label">{t('txCount')}</span>

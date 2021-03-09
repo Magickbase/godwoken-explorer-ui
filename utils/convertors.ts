@@ -41,3 +41,9 @@ export const scriptToCkbAddress = (lockScript: CKBComponents.Script) => {
     codeHash: lockScript.codeHash,
   })
 }
+
+export const formatBalance = (balance: string) => {
+  const [int, dec] = balance.split('.')
+  const formattedInt = BigInt(int).toLocaleString('en')
+  return dec ? [formattedInt, dec].join('.') : formattedInt
+}
