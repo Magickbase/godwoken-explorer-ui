@@ -9,7 +9,7 @@ export const NERVOS_FOUNDATION_URL = process.env.NEXT_PUBLIC_NERVOS_FOUNDATION_U
 export const IMG_URL = '/icons/'
 export const PAGE_SIZE = 10
 export const SEARCH_FIELDS = 'block hash/tx hash/account id/lockhash/CKB address/ETH address'
-export const WS_ENDPOINT = 'ws://localhost:4000/socket' // TODO: read it from env
+export const WS_ENDPOINT = process.env.NEXT_PUBLIC_WS_URL
 
 export enum CHANNEL {
   HOME = 'channel:home',
