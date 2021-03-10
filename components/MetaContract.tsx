@@ -14,7 +14,14 @@ const MetaContract = ({
   const [t] = useTranslation('account')
   const fieldsetList: CardFieldsetListProps['fieldsetList'] = [
     [
-      { label: t('status'), value: <span title={t('status')}>{status}</span> },
+      {
+        label: t('status'),
+        value: (
+          <span title={t('status')} className="capitalize">
+            {t(status)}
+          </span>
+        ),
+      },
       {
         label: t('accountMerkleState'),
         value: (

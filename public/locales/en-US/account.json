@@ -22,5 +22,7 @@
   "symbol": "symbol",
   "decimal": "decimal",
   "l2Supply": "l2Supply",
-  "holders": "holders"
+  "holders": "holders",
+  "running": "running",
+  "halting": "halting"
 }

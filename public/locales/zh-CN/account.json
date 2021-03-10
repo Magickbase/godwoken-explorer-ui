@@ -22,5 +22,7 @@
   "symbol": "符号",
   "decimal": "小数位",
   "l2Supply": "L2 供应总量",
-  "holders": "持有者"
+  "holders": "持有者",
+  "running": "运行",
+  "halting": "停机"
 }

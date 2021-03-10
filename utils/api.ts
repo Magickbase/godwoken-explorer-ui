@@ -226,7 +226,7 @@ export const fetchTx = (hash: string): Promise<API.Tx.Parsed> =>
     })
 
 const getMetaContract = (metaContract: API.Account.Raw['meta_contract']): API.Account.Parsed['metaContract'] => ({
-  status: metaContract.status || 'running',
+  status: metaContract.status,
   accountMerkleState: metaContract.account_merkle_state,
   blockMerkleState: metaContract.block_merkle_state,
   lastFinalizedBlockNumber: metaContract.last_finalized_block_number,
