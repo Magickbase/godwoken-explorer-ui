@@ -1,8 +1,8 @@
 # Godwoken Explorer UI
 
 <p align="center">
-  <a aria-label="Website" href="https://agera.vercel.app">
-    <img alt="" src="https://img.shields.io/badge/website-agera?style=for-the-badge&labelColor=000000&url=agera.vercel.app">
+  <a aria-label="Website" href="https://godwoken-explorer-ui.vercel.app">
+    <img alt="" src="https://img.shields.io/badge/website-godwoken?style=for-the-badge&labelColor=000000&url=godwoken-explorer-ui.vercel.app">
   </a>
   <a aria-label="Vercel logo" href="https://vercel.com">
     <img src="https://img.shields.io/badge/SUPPORTED%20BY%20Vercel-000000.svg?style=for-the-badge&logo=Vercel&labelColor=000">
