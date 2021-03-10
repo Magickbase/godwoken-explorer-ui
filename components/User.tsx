@@ -38,12 +38,12 @@ const User = ({ ethAddr, nonce, udtList, ckbLockScript }: State) => {
               {t('ckbLockScript')}
               <HiddenIcon />
             </span>
-            <span className="script-type-badge">{ckbLockScript.name || t('unknownScript')}</span>
+            <span className="script-type-badge">{ckbLockScript?.name || t('unknownScript')}</span>
           </div>
         </div>
-        <pre
-          className={isHidden ? 'hidden' : 'script-code mb-3'}
-        >{`{\n\t"code_hash": "${ckbLockScript.codeHash}",\n\t"args": "${ckbLockScript.args}",\n\t"hash_type": "${ckbLockScript.hashType}"\n}`}</pre>
+        <pre className={isHidden ? 'hidden' : 'script-code mb-3'}>{`{\n\t"code_hash": "${
+          ckbLockScript?.codeHash ?? ''
+        }",\n\t"args": "${ckbLockScript?.args ?? ''}",\n\t"hash_type": "${ckbLockScript?.hashType ?? ''}"\n}`}</pre>
       </div>
       <AssetList assetList={udtList} t={t} />
     </div>

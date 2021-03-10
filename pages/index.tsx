@@ -159,8 +159,14 @@ const Home = (initState: State) => {
 
   useWS(
     CHANNEL.HOME,
-    (res: { payload: API.Home.Raw }) => {
-      setHome(getHomeRes(res.payload))
+    (res: API.Home.Raw) => {
+      const { blockList, statistic, txList } = getHomeRes(res)
+      const MAX_COUNT = 10
+      setHome(state => ({
+        statistic,
+        blockList: [...blockList, ...state.blockList].sort((b1, b2) => b2.timestamp - b1.timestamp).slice(0, MAX_COUNT),
+        txList: [...txList, ...state.txList].sort((t1, t2) => t2.timestamp - t1.timestamp).slice(0, MAX_COUNT),
+      }))
     },
     [setHome],
   )
