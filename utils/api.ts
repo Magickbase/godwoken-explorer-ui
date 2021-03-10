@@ -168,26 +168,26 @@ const pretreat = async <T>(res: Response) => {
   return parsed
 }
 
+export const getHomeRes = (home: API.Home.Raw): API.Home.Parsed => ({
+  blockList: home.block_list.map(({ hash, number, tx_count, timestamp }) => ({
+    hash,
+    number,
+    txCount: tx_count,
+    timestamp: timestamp * 1000,
+  })),
+  txList: home.tx_list.map(tx => ({ ...tx, timestamp: tx.timestamp * 1000 })),
+  statistic: {
+    blockCount: home.statistic.block_count,
+    txCount: home.statistic.tx_count,
+    tps: home.statistic.tps,
+    accountCount: home.statistic.account_count,
+  },
+})
+
 export const fetchHome = (): Promise<API.Home.Parsed> =>
   fetch(`${SERVER_URL}/home`)
     .then(res => pretreat<API.Home.Raw>(res))
-    .then(async home => {
-      return {
-        blockList: home.block_list.map(({ hash, number, tx_count, timestamp }) => ({
-          hash,
-          number,
-          txCount: tx_count,
-          timestamp: timestamp * 1000,
-        })),
-        txList: home.tx_list.map(tx => ({ ...tx, timestamp: tx.timestamp * 1000 })),
-        statistic: {
-          blockCount: home.statistic.block_count,
-          txCount: home.statistic.tx_count,
-          tps: home.statistic.tps,
-          accountCount: home.statistic.account_count,
-        },
-      }
-    })
+    .then(getHomeRes)
 
 export const fetchBlock = (id: string): Promise<API.Block.Parsed> =>
   fetch(`${SERVER_URL}/blocks/${id}`)

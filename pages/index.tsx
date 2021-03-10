@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { timeDistance, fetchHome, API, handleApiError, IMG_URL } from 'utils'
+import { timeDistance, fetchHome, API, handleApiError, IMG_URL, useWS, CHANNEL, getHomeRes } from 'utils'
 
 type State = API.Home.Parsed
 
@@ -156,7 +156,15 @@ const TxList = ({ list }: { list: State['txList'] }) => {
 
 const Home = (initState: State) => {
   const [home, setHome] = useState(initState)
-  // useWS('room:lobby', console.info)
+
+  useWS(
+    CHANNEL.HOME,
+    (res: { payload: API.Home.Raw }) => {
+      setHome(getHomeRes(res.payload))
+    },
+    [setHome],
+  )
+
   return (
     <>
       <div className="home-bg"></div>

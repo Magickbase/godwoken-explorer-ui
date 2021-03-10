@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import { useState, useMemo, useEffect } from 'react'
 import { Socket } from 'phoenix'
-import { IMG_URL, WS_ENDPOINT } from './constants'
+import { CHANNEL, IMG_URL, WS_ENDPOINT } from './constants'
 
 export const useIsHidden = () => {
   const [isHidden, setisHidden] = useState(true)
@@ -20,7 +20,7 @@ export const useIsHidden = () => {
   }, [isHidden, setisHidden])
 }
 
-export const useWS = (topic: 'room:lobby', onReceivingData: (res?: any) => void) => {
+export const useWS = (topic: CHANNEL, onReceivingData: (res?: any) => void, deps = []) => {
   useEffect(() => {
     const socket = new Socket(WS_ENDPOINT)
     socket.connect()
@@ -32,5 +32,5 @@ export const useWS = (topic: 'room:lobby', onReceivingData: (res?: any) => void)
         console.info(`disconnect to ${topic}`)
       })
     }
-  }, [])
+  }, deps)
 }
