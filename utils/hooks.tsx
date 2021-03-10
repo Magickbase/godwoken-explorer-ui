@@ -25,8 +25,11 @@ export const useWS = (topic: CHANNEL, onReceivingData: (res?: any) => void, deps
     const socket = new Socket(WS_ENDPOINT)
     socket.connect()
     const channel = socket.channel(topic)
-    channel.on('new_msg', onReceivingData)
-    channel.join().receive('ok', console.info).receive('error', console.warn)
+    channel.on('refresh', onReceivingData)
+    channel
+      .join()
+      .receive('ok', () => console.info(`connect to ${topic}`))
+      .receive('error', console.warn)
     return () => {
       socket.disconnect(() => {
         console.info(`disconnect to ${topic}`)
