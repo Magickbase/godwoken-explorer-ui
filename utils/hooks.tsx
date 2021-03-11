@@ -20,16 +20,13 @@ export const useIsHidden = () => {
   }, [isHidden, setisHidden])
 }
 
-export const useWS = (topic: CHANNEL, onReceivingData: (res?: any) => void, deps = []) => {
+export const useWS = (topic: CHANNEL, onJoin: (res?: any) => void, onReceivingData: (res?: any) => void, deps = []) => {
   useEffect(() => {
     const socket = new Socket(WS_ENDPOINT)
     socket.connect()
     const channel = socket.channel(topic)
     channel.on('refresh', onReceivingData)
-    channel
-      .join()
-      .receive('ok', () => console.info(`connect to ${topic}`))
-      .receive('error', console.warn)
+    channel.join().receive('ok', onJoin).receive('error', console.warn)
     return () => {
       socket.disconnect(() => {
         console.info(`disconnect to ${topic}`)
