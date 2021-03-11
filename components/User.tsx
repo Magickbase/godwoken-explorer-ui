@@ -9,8 +9,8 @@ const User = ({ ethAddr, nonce, udtList, ckbLockScript }: State) => {
   let ckbAddr = '-'
   try {
     ckbAddr = scriptToCkbAddress(ckbLockScript as CKBComponents.Script)
-  } catch {
-    // ignore
+  } catch (err) {
+    console.warn(err)
   }
 
   const infoList = [
