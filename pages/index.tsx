@@ -37,7 +37,7 @@ const Statistic = (statistic: State['statistic']) => {
               key={field.key}
               className="w-1/2 whitespace-pre capitalize text-sm even:pl-4 md:w-full md:even:pl-0 md:odd:pb-4 md:even:pt-4 xl:w-1/2 xl:odd:pb-0 xl:even:p-0 xl:odd:pl-4 xl:even:pl-4"
             >
-              <div className="flex items-center leading-default">
+              <div className="flex items-center leading-default" aria-label={t(field.key)}>
                 <Image
                   loading="lazy"
                   className="inverted-icon"
@@ -64,8 +64,8 @@ const Statistic = (statistic: State['statistic']) => {
 const BlockList = ({ list }: { list: State['blockList'] }) => {
   const [t, { language }] = useTranslation('block')
   return (
-    <div className="list-container z-10 my-4 md:w-1/2 md:mr-2">
-      <h2 className="list-header">
+    <div className="list-container z-10 my-4 md:w-1/2 md:mr-2" aria-label="">
+      <h2 className="list-header" aria-label={t('latestBlocks')}>
         <Image
           loading="lazy"
           src={`${IMG_URL}blocks.svg`}
@@ -107,7 +107,7 @@ const TxList = ({ list }: { list: State['txList'] }) => {
   const [t, { language }] = useTranslation('tx')
   return (
     <div className="list-container z-10 my-4 md:w-1/2 md:ml-2">
-      <h2 className="list-header">
+      <h2 className="list-header" aria-label={t('latestTxs')}>
         <Image loading="lazy" src={`${IMG_URL}txs.svg`} height="17" width="17" layout="fixed" alt={t('latestBlocks')} />
         <span>{t('latestTxs')}</span>
       </h2>

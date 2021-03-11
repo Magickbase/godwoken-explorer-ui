@@ -21,7 +21,7 @@
   "name": "name",
   "symbol": "symbol",
   "decimal": "decimal",
-  "l2Supply": "l2Supply",
+  "l2Supply": "L2 Supply",
   "holders": "holders",
   "running": "running",
   "halting": "halting"

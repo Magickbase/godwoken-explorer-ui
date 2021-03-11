@@ -22,7 +22,7 @@ const User = ({ ethAddr, nonce, udtList, ckbLockScript }: State) => {
   return (
     <div className="md:flex">
       <div className="card-container md:mr-2 md:w-1/2 self-start">
-        <h2 className="card-subheader">
+        <h2 className="card-subheader" aria-label="user">
           {`${t('type')}:`}
           <span>User</span>
         </h2>
