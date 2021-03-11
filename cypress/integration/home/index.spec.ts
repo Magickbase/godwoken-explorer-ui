@@ -53,8 +53,7 @@ context('Home Page', () => {
           .children()
           .first()
           .find(`a[title='block number']+span`)
-          .invoke('text')
-          .should('contain', ' TXs')
+          .should('contain.text', ' TXs')
       })
       it('should has time', () => {
         cy.get(`${ROOT_SELECTOR}+div`).children().first().find('time').should('not.be.undefined')
