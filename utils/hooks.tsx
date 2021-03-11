@@ -12,6 +12,7 @@ export const useIsHidden = () => {
         onClick={handleShowScript}
         className="flex items-center cursor-pointer"
         style={{ transform: isHidden ? 'unset' : 'rotate(0.5turn)' }}
+        aria-label="toggle"
       >
         <Image loading="lazy" src={`${IMG_URL}show-more.svg`} width="17" height="17" alt="toggle" layout="fixed" />
       </span>

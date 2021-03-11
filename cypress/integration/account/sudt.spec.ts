@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-context('MetaContract Account Page', () => {
+context('SUDT Account Page', () => {
   const id = 1
   before(() => {
     cy.visit(`/en-US/account/${id}`)
