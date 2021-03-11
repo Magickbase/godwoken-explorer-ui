@@ -8,10 +8,10 @@ context('Smart Contract Account Page', () => {
 
   describe('smart contract info', () => {
     const ROOT_SELECTOR = `.card-subheader[aria-label='smart contract']`
-    it('should has account type', () => {
+    it('should have account type', () => {
       cy.get(ROOT_SELECTOR).should('have.text', 'account type:Smart Contract')
     })
-    it('should has deployed transaction which is a link', () => {
+    it('should have deployed transaction which is a link', () => {
       cy.get(`${ROOT_SELECTOR}+div .card-label`).should('have.text', 'deploy transaction')
       cy.get(`${ROOT_SELECTOR}+div a[title='deploy transaction']`).should(link => {
         const hash = link.text()
@@ -22,7 +22,7 @@ context('Smart Contract Account Page', () => {
 
   describe.skip('asset list info', () => {
     const ROOT_SELECTOR = `.card-subheader[aria-label='user defined assets']`
-    it('should has title with item count', () => {
+    it('should have title with item count', () => {
       cy.get(`${ROOT_SELECTOR}+div`)
         .children()
         .its('length')

@@ -6,11 +6,11 @@ context.skip('Transaction Page', () => {
     cy.visit(`/tx/${hash}`)
   })
 
-  it('cy.title() - get the title', () => {
-    cy.title().should('include', 'Godwoken Explorer')
+  describe('general sets', () => {
+    it('cy.title() - get the title', () => {
+      cy.title().should('include', 'Godwoken Explorer')
+    })
   })
 
-  it('main content', () => {
-    // cy.get('main').should('contain', `Transaction Info of ${hash}`)
-  })
+  describe('transaction info', () => {})
 })

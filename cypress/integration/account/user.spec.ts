@@ -8,11 +8,11 @@ context('User Account Page', () => {
 
   describe('user info', () => {
     const ROOT_SELECTOR = `.card-subheader[aria-label='user']`
-    it('should has account type', () => {
+    it('should have account type', () => {
       cy.get(ROOT_SELECTOR).should('have.text', 'account type:User')
     })
 
-    it('should has eth address', () => {
+    it('should have eth address', () => {
       cy.get(`${ROOT_SELECTOR}+div`)
         .find('.card-field')
         .should(fields => {
@@ -23,7 +23,7 @@ context('User Account Page', () => {
         })
     })
 
-    it('should has nonce', () => {
+    it('should have nonce', () => {
       cy.get(`${ROOT_SELECTOR}+div`)
         .find('.card-field')
         .should(fields => {
@@ -33,7 +33,7 @@ context('User Account Page', () => {
         })
     })
 
-    it('should has ckb address', () => {
+    it('should have ckb address', () => {
       cy.get(`${ROOT_SELECTOR}+div`)
         .find('.card-field')
         .should(fields => {
@@ -61,7 +61,7 @@ context('User Account Page', () => {
 
   describe('asset list info', () => {
     const ROOT_SELECTOR = `.card-subheader[aria-label='user defined assets']`
-    it('should has title with item count', () => {
+    it('should have title with item count', () => {
       cy.get(`${ROOT_SELECTOR}+div`)
         .children()
         .its('length')

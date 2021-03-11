@@ -8,11 +8,11 @@ context('SUDT Account Page', () => {
 
   describe('sudt info', () => {
     const ROOT_SELECTOR = `.card-subheader[aria-label='sudt']`
-    it('should has account type', () => {
+    it('should have account type', () => {
       cy.get(ROOT_SELECTOR).should('have.text', 'account type:sUDT')
     })
 
-    it('should has name', () => {
+    it('should have name', () => {
       cy.get(`${ROOT_SELECTOR}+div`)
         .find('.card-field')
         .should(fields => {
@@ -22,7 +22,7 @@ context('SUDT Account Page', () => {
         })
     })
 
-    it('should has symbol', () => {
+    it('should have symbol', () => {
       cy.get(`${ROOT_SELECTOR}+div`)
         .find('.card-field')
         .should(fields => {
@@ -33,7 +33,7 @@ context('SUDT Account Page', () => {
         })
     })
 
-    it('should has decimal', () => {
+    it('should have decimal', () => {
       cy.get(`${ROOT_SELECTOR}+div`)
         .find('.card-field')
         .should(fields => {
@@ -43,7 +43,7 @@ context('SUDT Account Page', () => {
         })
     })
 
-    it('should has l2 supply', () => {
+    it('should have l2 supply', () => {
       cy.get(`${ROOT_SELECTOR}+div`)
         .find('.card-field')
         .should(fields => {
@@ -53,7 +53,7 @@ context('SUDT Account Page', () => {
         })
     })
 
-    it('should has holders', () => {
+    it('should have holders', () => {
       cy.get(`${ROOT_SELECTOR}+div`)
         .find('.card-field')
         .should(fields => {

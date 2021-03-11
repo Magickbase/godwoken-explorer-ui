@@ -13,32 +13,32 @@ context('Home Page', () => {
 
   describe('statistic', () => {
     const ROOT_SELECTOR = `.statistic-container`
-    it('should has blocks field', () => {
+    it('should have blocks field', () => {
       cy.get(`${ROOT_SELECTOR} div[aria-label=blocks]`).should('have.text', 'blocks')
     })
-    it('should has transaction field', () => {
+    it('should have transaction field', () => {
       cy.get(`${ROOT_SELECTOR} div[aria-label=transactions]`).should('have.text', 'transactions')
     })
-    it('should has tps field', () => {
+    it('should have tps field', () => {
       cy.get(`${ROOT_SELECTOR} div[aria-label=TPS]`).should('have.text', 'TPS')
     })
-    it('should has account count field', () => {
+    it('should have account count field', () => {
       cy.get(`${ROOT_SELECTOR} div[aria-label='account count']`).should('have.text', 'account count')
     })
   })
 
   describe('latest blocks', () => {
     const ROOT_SELECTOR = `[aria-label='latest blocks']`
-    it('should has a list title', () => {
+    it('should have a list title', () => {
       cy.get(ROOT_SELECTOR).contains('latest blocks')
     })
 
-    it('should has 10 items at most', () => {
+    it('should have 10 items at most', () => {
       cy.get(`${ROOT_SELECTOR}+div`).children().should('have.length.lte', 10)
     })
 
     describe('each block', () => {
-      it('should has number which is a link', () => {
+      it('should have number which is a link', () => {
         cy.get(`${ROOT_SELECTOR}+div`)
           .children()
           .first()
@@ -48,14 +48,14 @@ context('Home Page', () => {
             expect(link).to.has.attr('href').contains('/block/')
           })
       })
-      it('should has tx count', () => {
+      it('should have tx count', () => {
         cy.get(`${ROOT_SELECTOR}+div`)
           .children()
           .first()
           .find(`a[title='block number']+span`)
           .should('contain.text', ' TXs')
       })
-      it('should has time', () => {
+      it('should have time', () => {
         cy.get(`${ROOT_SELECTOR}+div`).children().first().find('time').should('not.be.undefined')
       })
     })
@@ -63,16 +63,16 @@ context('Home Page', () => {
 
   describe('latest transactions', () => {
     const ROOT_SELECTOR = `[aria-label='latest transactions']`
-    it('should has a list title', () => {
+    it('should have a list title', () => {
       cy.get(ROOT_SELECTOR).contains('latest transactions')
     })
 
-    it('should has 10 items at most', () => {
+    it('should have 10 items at most', () => {
       cy.get(`${ROOT_SELECTOR}+div`).children().should('have.length.lte', 10)
     })
 
     describe('each transaction', () => {
-      it('should has hash which is a link', () => {
+      it('should have hash which is a link', () => {
         cy.get(`${ROOT_SELECTOR}+div`)
           .children()
           .first()
@@ -83,7 +83,7 @@ context('Home Page', () => {
             expect(link).to.has.attr('href').to.eq(`/tx/${hash}`)
           })
       })
-      it('should has success or failure', () => {
+      it('should have success or failure', () => {
         cy.get(`${ROOT_SELECTOR}+div`)
           .children()
           .first()
@@ -94,7 +94,7 @@ context('Home Page', () => {
               .to.match(/success|failure/)
           })
       })
-      it('should has a from account', () => {
+      it('should have a from account', () => {
         cy.get(`${ROOT_SELECTOR}+div`)
           .children()
           .first()
@@ -104,7 +104,7 @@ context('Home Page', () => {
             expect(link).to.has.attr('href').to.eq(`/account/${id}`)
           })
       })
-      it('should has a to account', () => {
+      it('should have a to account', () => {
         cy.get(`${ROOT_SELECTOR}+div`)
           .children()
           .first()
@@ -114,7 +114,7 @@ context('Home Page', () => {
             expect(link).to.has.attr('href').to.eq(`/account/${id}`)
           })
       })
-      it('should has time', () => {
+      it('should have time', () => {
         cy.get(`${ROOT_SELECTOR}+div`).children().first().find('time').should('not.be.undefined')
       })
     })

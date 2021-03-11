@@ -13,17 +13,17 @@ context('Account Page', () => {
   })
 
   describe('basic info', () => {
-    it('should has id', () => {
+    it('should have id', () => {
       cy.get(`h2[aria-label='account']`).should('have.text', `account${id}`)
     })
-    it('should has ckb balance', () => {
+    it('should have ckb balance', () => {
       cy.get(`span[aria-label='CKB']`).should('have.text', 'CKB')
       cy.get(`span[aria-label='CKB']+span`)
         .invoke('text')
         .then(ckb => isNaN(+ckb.replace(/,/g, '')))
         .should('be.false')
     })
-    it('should has transaction count which is a link to transaction list', () => {
+    it('should have transaction count which is a link to transaction list', () => {
       cy.get(`span[aria-label='transaction count']`).should('have.text', 'transaction count')
     })
   })

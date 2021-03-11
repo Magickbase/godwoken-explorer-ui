@@ -8,7 +8,7 @@ context('Polyjuice Account Page', () => {
 
   describe('polyjuice info', () => {
     const ROOT_SELECTOR = `.card-subheader[aria-label='polyjuice']`
-    it('should has account type', () => {
+    it('should have account type', () => {
       cy.get(ROOT_SELECTOR).should('have.text', 'account type:Polyjuice')
     })
 

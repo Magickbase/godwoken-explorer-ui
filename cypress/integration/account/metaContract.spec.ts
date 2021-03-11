@@ -8,10 +8,10 @@ context('MetaContract Account Page', () => {
 
   describe('meta contract info', () => {
     const ROOT_SELECTOR = `.card-subheader[aria-label='meta contract']`
-    it('should has account type', () => {
+    it('should have account type', () => {
       cy.get(ROOT_SELECTOR).should('have.text', 'account type:Meta Contract')
     })
-    it('should has status', () => {
+    it('should have status', () => {
       cy.get(`${ROOT_SELECTOR}+div`)
         .find('.card-field')
         .should(fields => {
@@ -20,7 +20,7 @@ context('MetaContract Account Page', () => {
           expect(status.querySelector(`[title='status']`).textContent).to.match(/running|halting/)
         })
     })
-    it('should has account merkle state', () => {
+    it('should have account merkle state', () => {
       cy.get(`${ROOT_SELECTOR}+div`)
         .find('.card-field')
         .should(fields => {
@@ -29,7 +29,7 @@ context('MetaContract Account Page', () => {
           // TODO: test content
         })
     })
-    it('should has block merkle state', () => {
+    it('should have block merkle state', () => {
       cy.get(`${ROOT_SELECTOR}+div`)
         .find('.card-field')
         .should(fields => {
@@ -38,7 +38,7 @@ context('MetaContract Account Page', () => {
           // TODO: test content
         })
     })
-    it('should has reverted block root', () => {
+    it('should have reverted block root', () => {
       cy.get(`${ROOT_SELECTOR}+div`)
         .find('.card-field')
         .should(fields => {
@@ -47,7 +47,7 @@ context('MetaContract Account Page', () => {
           // TODO: test content
         })
     })
-    it('should has last finalized block number', () => {
+    it('should have last finalized block number', () => {
       cy.get(`${ROOT_SELECTOR}+div`)
         .find('.card-field')
         .should(fields => {
