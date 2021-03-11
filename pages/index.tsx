@@ -159,6 +159,7 @@ const Home = (initState: State) => {
 
   useWS(
     CHANNEL.HOME,
+    (res: API.Home.Raw) => setHome(getHomeRes(res)),
     (res: API.Home.Raw) => {
       const { blockList, statistic, txList } = getHomeRes(res)
       const MAX_COUNT = 10
