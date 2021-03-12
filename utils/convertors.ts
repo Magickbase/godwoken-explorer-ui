@@ -35,7 +35,7 @@ export const scriptToCkbAddress = (lockScript: CKBComponents.Script) => {
   const prefix = IS_MAINNET ? AddressPrefix.Mainnet : AddressPrefix.Testnet
   if (shortIdx > -1) {
     // short address
-    return bech32Address(lockScript.args, { prefix, codeHashOrCodeHashIndex: `${shortIdx}` })
+    return bech32Address(lockScript.args, { prefix, codeHashOrCodeHashIndex: `0x${shortIdx.toString(16)}` })
   }
   return fullPayloadToAddress({
     args: lockScript.args,

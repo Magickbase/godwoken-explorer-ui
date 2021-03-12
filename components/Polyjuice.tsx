@@ -9,7 +9,7 @@ const Polyjuice = ({ script }: State) => {
   return (
     <div className="md:flex">
       <div className="card-container w-full">
-        <h2 className="card-subheader">
+        <h2 className="card-subheader" aria-label="polyjuice">
           {`${t('type')}:`}
           <span>Polyjuice</span>
         </h2>

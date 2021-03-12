@@ -2,6 +2,7 @@
   "latestTxs": "最新交易",
   "hash": "交易哈希",
   "blockHash": "区块哈希",
+  "blockNumber": "区块高度",
   "type": "类型",
   "from": "发送账户",
   "to": "接收账户",

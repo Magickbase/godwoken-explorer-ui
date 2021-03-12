@@ -33,7 +33,7 @@ const SUDT = ({ name, symbol, decimal, supply, holders, icon, typeScript }: Stat
   ]
   return (
     <div className="card-container">
-      <h2 className="card-subheader">
+      <h2 className="card-subheader" aria-label="sudt">
         {`${t('type')}:`}
         <span className="normal-case">sUDT</span>
       </h2>
