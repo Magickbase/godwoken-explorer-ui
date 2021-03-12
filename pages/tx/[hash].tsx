@@ -13,7 +13,10 @@ const Tx = (initState: State) => {
   const [t] = useTranslation('tx')
   const fieldsetList = [
     [
-      { label: 'timestamp', value: formatDatetime(+tx.timestamp) },
+      {
+        label: 'timestamp',
+        value: <time dateTime={new Date(tx.timestamp).toISOString()}>{formatDatetime(tx.timestamp)}</time>,
+      },
       {
         label: 'l2Block',
         value: (
@@ -66,14 +69,18 @@ const Tx = (initState: State) => {
         <span className="flex-1 mr-2 overflow-hidden overflow-ellipsis text-right">
           {t('from')}
           <Link href={`/account/${tx.from}`}>
-            <a className="ml-1">{tx.from}</a>
+            <a className="ml-1" title={t('from')} aria-label={t('from')}>
+              {tx.from}
+            </a>
           </Link>
         </span>
         <Image src={`${IMG_URL}arrow-down-rounded.svg`} width="14" height="14" className="transform -rotate-90" />
         <span className="flex-1 ml-2 overflow-hidden overflow-ellipsis">
           {t('to')}
           <Link href={`/account/${tx.to}`}>
-            <a className="ml-1">{tx.to}</a>
+            <a className="ml-1" title={t('to')} aria-label={t('to')}>
+              {tx.to}
+            </a>
           </Link>
         </span>
       </div>
