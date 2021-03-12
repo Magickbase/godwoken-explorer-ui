@@ -33,7 +33,9 @@ const List = ({ list }: { list: State['txList'] }) => {
               <div className="flex justify-end items-center ml-auto pl-7">
                 <Image src={`${IMG_URL}blocks.svg`} width="15" height="15" layout="fixed" loading="lazy" />
                 <Link href={`/block/${tx.blockNumber}`}>
-                  <a className="ml-1">{tx.blockNumber}</a>
+                  <a title={t('blockNumber')} className="ml-1">
+                    {tx.blockNumber}
+                  </a>
                 </Link>
               </div>
             </div>
@@ -86,11 +88,11 @@ const TxList = (initState: State) => {
   const handleGoTo = (e: FormEvent) => {
     e.stopPropagation()
     e.preventDefault()
-    const page = +e.currentTarget['page']?.value
-    if (Number.isNaN(page) || page > pageCount) {
+    const page: string = e.currentTarget['page']?.value
+    if (!page) {
       return
     }
-    router.push(getLink(id, page))
+    router.push(getLink(id, +page))
   }
   return (
     <div>
@@ -102,7 +104,7 @@ const TxList = (initState: State) => {
       </h2>
       {+txList.totalCount ? <List list={txList} /> : <span className="text-dark-grey">{txT('emptyTxList')}</span>}
       <div className="pager">
-        <div className="links" attr-disable={`${+txList.page === 1}`}>
+        <div className="links" attr-disabled={`${+txList.page === 1}`}>
           <Link href={getLink(id, 1)}>
             <a title="first">
               <Image src={`${IMG_URL}page-first.svg`} width="14" height="14" loading="lazy" layout="fixed" />
@@ -117,12 +119,12 @@ const TxList = (initState: State) => {
 
         <form onSubmit={handleGoTo}>
           {t('page')}
-          <input id="page" placeholder={txList.page} />
+          <input type="number" min="1" max={pageCount} id="page" placeholder={txList.page} />
           {`of ${pageCount}`}
           <button type="submit">{t('goTo')}</button>
         </form>
 
-        <div className="links" attr-disable={`${+txList.page === pageCount}`}>
+        <div className="links" attr-disabled={`${+txList.page === pageCount}`}>
           <Link href={getLink(id, Math.min(+txList.page + 1, pageCount))}>
             <a title="next">
               <Image src={`${IMG_URL}page-previous.svg`} width="14" height="14" loading="lazy" layout="fixed" />
