@@ -89,7 +89,7 @@ context('Transaction List Page', () => {
     })
   })
 
-  describe.only('should change url on paging', () => {
+  describe('should change url on paging', () => {
     const id = 2
     const TOTAL_PAGE = 3 // TODO: should fetch from fixture
     const ROOT_SELECTOR = '.pager'
