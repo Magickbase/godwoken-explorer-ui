@@ -6,6 +6,7 @@ html,
 body {
   background-color: #ededed;
   @apply font-sans font-normal overflow-visible;
+  font-size: 16px;
 }
 main {
   @apply main-container;
