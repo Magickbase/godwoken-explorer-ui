@@ -118,7 +118,7 @@
           pointer-events: none;
         }
       }
-      &[attr-disable='true'] {
+      &[attr-disabled='true'] {
         @apply opacity-60 pointer-events-none;
       }
     }
@@ -147,12 +147,16 @@
       @apply flex items-center;
     }
     & input {
+      appearance: textfield;
       color: #000;
       width: 58px;
       height: 30px;
       margin: 0 6px;
       padding: 0 4px;
       border: 1px solid #ccc;
+      &::-webkit-inner-spin-button {
+        display: none;
+      }
     }
   }
 }
