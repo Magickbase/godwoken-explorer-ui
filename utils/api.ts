@@ -330,7 +330,7 @@ export const fetchSearch = (keyword: string) => {
         return `/tx/${found.id}`
       }
       case 'account': {
-        return `account/${found.id}`
+        return `/account/${found.id}`
       }
       default: {
         return `/404?keyword=${keyword}`
