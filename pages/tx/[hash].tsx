@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { GetServerSideProps } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -11,6 +11,11 @@ type State = API.Tx.Parsed
 const Tx = (initState: State) => {
   const [tx, setTx] = useState(initState)
   const [t] = useTranslation('tx')
+
+  useEffect(() => {
+    setTx(initState)
+  }, [setTx, initState])
+
   const fieldsetList = [
     [
       {

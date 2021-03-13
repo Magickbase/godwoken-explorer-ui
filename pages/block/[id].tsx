@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { GetServerSideProps } from 'next'
 import Link from 'next/link'
 import { useTranslation } from 'next-i18next'
@@ -11,6 +11,10 @@ type State = API.Block.Parsed
 const Block = (initState: State) => {
   const [block, setBlock] = useState(initState)
   const [t] = useTranslation('block')
+
+  useEffect(() => {
+    setBlock(initState)
+  }, [setBlock, initState])
 
   const fieldsetList: Array<Array<{ label: Exclude<keyof State, 'number'>; value: React.ReactNode }>> = [
     [

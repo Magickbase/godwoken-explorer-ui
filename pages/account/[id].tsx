@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { GetServerSideProps } from 'next'
 import Link from 'next/link'
 import { useTranslation } from 'next-i18next'
@@ -14,6 +14,11 @@ type State = API.Account.Parsed
 const Account = (initState: State) => {
   const [account, setAccount] = useState(initState)
   const [t] = useTranslation('account')
+
+  useEffect(() => {
+    setAccount(initState)
+  }, [setAccount, initState])
+
   return (
     <>
       <div className="flex flex-col card-container mt-8 md:flex-row md:pb-3">
