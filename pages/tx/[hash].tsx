@@ -60,10 +60,12 @@ const Tx = (initState: State) => {
       },
       {
         label: 'l1Block',
-        value: (
+        value: tx.l1Block ? (
           <Link href={`${CKB_EXPLORER_URL}/block/${tx.l1Block}`}>
             <a title={t('l1Block')}>{BigInt(tx.l1Block).toLocaleString('en')}</a>
           </Link>
+        ) : (
+          t('pending')
         ),
       },
       {
