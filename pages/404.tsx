@@ -6,12 +6,15 @@ import { IMG_URL, SEARCH_FIELDS } from 'utils'
 
 const Custom404 = () => {
   const [t] = useTranslation('common')
-  const { query, back } = useRouter()
+  const {
+    query: { search },
+    back,
+  } = useRouter()
   return (
     <div className="notFound">
-      {query.keyword ? (
+      {search ? (
         <>
-          {t('notFoundMessage', { keyword: query.keyword })}
+          {t('notFoundMessage', { search })}
           <b className="block mt-1">{SEARCH_FIELDS}</b>
         </>
       ) : (
