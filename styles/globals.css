@@ -2,6 +2,12 @@
 @import './tailwind.presets.css';
 @import './components.css';
 
+:root {
+  --footer-mt: 60px;
+  --footer-height: 156px;
+  --footer-height-md: 127px;
+}
+
 html,
 body {
   background-color: #ededed;
@@ -10,7 +16,7 @@ body {
 }
 main {
   @apply main-container;
-  min-height: calc(100vh - 216px);
+  min-height: calc(100vh - var(--footer-height) - var(--footer-mt));
   padding-top: 56px;
   line-height: 1.2;
 }
@@ -24,4 +30,10 @@ a {
 
 input:placeholder-shown {
   text-overflow: ellipsis;
+}
+
+@media screen and (min-width: 768px) {
+  main {
+    min-height: calc(100vh - var(--footer-height-md) - var(--footer-mt));
+  }
 }
