@@ -204,25 +204,24 @@ export const fetchBlock = (id: string): Promise<API.Block.Parsed> =>
     .then(res => pretreat<API.Block.Raw>(res))
     .then(getBlockRes)
 
+export const getTxRes = (tx: API.Tx.Raw): API.Tx.Parsed => ({
+  hash: tx.hash,
+  timestamp: tx.timestamp * 1000,
+  finalizeState: tx.finalize_state,
+  l2Block: tx.l2_block,
+  l1Block: tx.l1_block,
+  from: tx.from,
+  to: tx.to,
+  nonce: tx.nonce,
+  args: tx.args,
+  type: tx.type,
+  gasPrice: tx.gas_price,
+  fee: tx.fee,
+})
 export const fetchTx = (hash: string): Promise<API.Tx.Parsed> =>
   fetch(`${SERVER_URL}/txs/${hash}`)
     .then(res => pretreat<API.Tx.Raw>(res))
-    .then(async tx => {
-      return {
-        hash: tx.hash,
-        timestamp: tx.timestamp * 1000,
-        finalizeState: tx.finalize_state,
-        l2Block: tx.l2_block,
-        l1Block: tx.l1_block,
-        from: tx.from,
-        to: tx.to,
-        nonce: tx.nonce,
-        args: tx.args,
-        type: tx.type,
-        gasPrice: tx.gas_price,
-        fee: tx.fee,
-      }
-    })
+    .then(getTxRes)
 
 const getMetaContract = (metaContract: API.Account.Raw['meta_contract']): API.Account.Parsed['metaContract'] => ({
   status: metaContract.status,

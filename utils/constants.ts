@@ -14,6 +14,6 @@ export const WS_ENDPOINT = process.env.NEXT_PUBLIC_WS_URL
 export enum CHANNEL {
   HOME = 'home:refresh',
   BLOCK_INFO = 'blocks:',
-  TX_INFO = 'txs:',
+  TX_INFO = 'transactions:',
   ACCOUNT_INFO = 'accounts:',
 }
