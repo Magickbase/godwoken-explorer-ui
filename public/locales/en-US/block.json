@@ -10,6 +10,6 @@
   "aggregator": "aggregator",
   "txHash": "tx hash",
   "pending": "pending",
-  "committed": "committedd",
+  "committed": "committed",
   "finalized": "finalized"
 }
