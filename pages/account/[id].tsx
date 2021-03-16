@@ -3,7 +3,7 @@ import { GetServerSideProps } from 'next'
 import Link from 'next/link'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { fetchAccount, API, handleApiError, formatBalance } from 'utils'
+import { fetchAccount, API, useWS, getAccountRes, handleApiError, formatBalance, CHANNEL } from 'utils'
 import User from 'components/User'
 import MetaContract from 'components/MetaContract'
 import SmartContract from 'components/SmartContract'
@@ -18,6 +18,17 @@ const Account = (initState: State) => {
   useEffect(() => {
     setAccount(initState)
   }, [setAccount, initState])
+
+  useWS(
+    `${CHANNEL.ACCOUNT_INFO}${account.id}`,
+    (init: API.Account.Raw) => {
+      setAccount(getAccountRes(init))
+    },
+    (update: API.Account.Raw) => {
+      setAccount(getAccountRes(update))
+    },
+    [setAccount, account.id],
+  )
 
   return (
     <>

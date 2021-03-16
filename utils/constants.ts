@@ -16,4 +16,5 @@ export enum CHANNEL {
   BLOCK_INFO = 'blocks:',
   TX_INFO = 'transactions:',
   ACCOUNT_INFO = 'accounts:',
+  ACCOUNT_TX_LIST = 'account_transactions:',
 }

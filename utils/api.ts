@@ -264,42 +264,41 @@ const getSmartContract = (smartContract: API.Account.Raw['smart_contract']): API
   udtList: smartContract.udt_list || [],
 })
 
+export const getAccountRes = (account: API.Account.Raw): API.Account.Parsed => ({
+  id: account.id,
+  type: account.type,
+  ckb: account.ckb,
+  txCount: account.tx_count,
+  metaContract: account.meta_contract ? getMetaContract(account.meta_contract) : null,
+  sudt: account.sudt ? getSUDT(account.sudt) : null,
+  user: account.user ? getUser(account.user) : null,
+  polyjuice: account.polyjuice ? getPolyjuice(account.polyjuice) : null,
+  smartContract: account.smart_contract ? getSmartContract(account.smart_contract) : null,
+})
+
 export const fetchAccount = (id: string): Promise<API.Account.Parsed> =>
   fetch(`${SERVER_URL}/accounts/${id}`)
     .then(res => pretreat<API.Account.Raw>(res))
-    .then(async account => {
-      return {
-        id: account.id,
-        type: account.type,
-        ckb: account.ckb,
-        txCount: account.tx_count,
-        metaContract: account.meta_contract ? getMetaContract(account.meta_contract) : null,
-        sudt: account.sudt ? getSUDT(account.sudt) : null,
-        user: account.user ? getUser(account.user) : null,
-        polyjuice: account.polyjuice ? getPolyjuice(account.polyjuice) : null,
-        smartContract: account.smart_contract ? getSmartContract(account.smart_contract) : null,
-      }
-    })
+    .then(getAccountRes)
 
+export const getTxListRes = (txListRes: API.Txs.Raw): API.Txs.Parsed => ({
+  page: txListRes.page,
+  totalCount: txListRes.total_count,
+  txs:
+    txListRes.txs?.map(tx => ({
+      hash: tx.hash,
+      blockNumber: tx.block_number,
+      from: tx.from,
+      to: tx.to,
+      timestamp: tx.timestamp * 1000,
+      type: tx.type,
+      success: tx.success ?? true,
+    })) ?? [],
+})
 export const fetchTxList = (query: string): Promise<API.Txs.Parsed> =>
   fetch(`${SERVER_URL}/txs?${query}`)
     .then(res => pretreat<API.Txs.Raw>(res))
-    .then(async res => {
-      return {
-        page: res.page,
-        totalCount: res.total_count,
-        txs:
-          res.txs?.map(tx => ({
-            hash: tx.hash,
-            blockNumber: tx.block_number,
-            from: tx.from,
-            to: tx.to,
-            timestamp: tx.timestamp * 1000,
-            type: tx.type,
-            success: tx.success ?? true,
-          })) ?? [],
-      }
-    })
+    .then(getTxListRes)
 
 export const fetchSearch = (search: string) => {
   let query = search
