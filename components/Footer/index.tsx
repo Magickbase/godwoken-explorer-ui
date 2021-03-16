@@ -14,7 +14,9 @@ const Footer = () => (
     <div className={styles.links}>
       {links.map(link => (
         <Link key={link.label} href={link.url}>
-          <a title={link.label}>{link.label}</a>
+          <a title={link.label} target="_blank" rel="noopener noreferrer">
+            {link.label}
+          </a>
         </Link>
       ))}
     </div>
