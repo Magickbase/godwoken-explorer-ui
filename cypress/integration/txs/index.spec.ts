@@ -91,8 +91,15 @@ context('Transaction List Page', () => {
 
   describe('should change url on paging', () => {
     const id = 2
-    const TOTAL_PAGE = 4 // TODO: should fetch from fixture
+    let TOTAL_PAGE = 4 // TODO: should fetch from fixture
     const ROOT_SELECTOR = '.pager'
+
+    before(() => {
+      cy.visit(`/en-US/txs?account_id=${id}`)
+      cy.get('.pager').then(el => {
+        TOTAL_PAGE = +el.attr('attr-total-page')
+      })
+    })
 
     describe('default to 1', () => {
       before(() => {
@@ -104,21 +111,25 @@ context('Transaction List Page', () => {
           expect(input).to.have.attr('placeholder').to.eq('1')
         })
       })
+
       it('should disable navigation to previous pages', () => {
         cy.get(`${ROOT_SELECTOR} .links:first`).should(links => {
           expect(links).to.have.attr('attr-disabled').to.eq('true')
         })
       })
+
       it('should enable navigation to next pages', () => {
         cy.get(`${ROOT_SELECTOR} .links:last`).should(links => {
           expect(links).to.have.attr('attr-disabled').to.eq('false')
         })
       })
+
       it('should have a next page button to page 2', () => {
         cy.get(`${ROOT_SELECTOR} a[title='next']`).should(link => {
           expect(link).to.have.attr('href').to.eq(`/txs?account_id=${id}&page=2`)
         })
       })
+
       it('should have a last page button to the last page', () => {
         cy.get(`${ROOT_SELECTOR} a[title='last']`).should(link => {
           expect(link).to.have.attr('href').to.eq(`/txs?account_id=${id}&page=${TOTAL_PAGE}`)

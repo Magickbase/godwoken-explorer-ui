@@ -87,13 +87,13 @@ const TxList = (initState: State) => {
   useWS(
     `${CHANNEL.ACCOUNT_TX_LIST}${id}`,
     (init: API.Txs.Raw) => {
-      setTxList(prev => (prev.txList.page === '1' ? { ...prev, txList: getTxListRes(init) } : prev))
+      setTxList(prev => (prev.txList.page === 1 ? { ...prev, txList: getTxListRes(init) } : prev))
     },
     (update: API.Txs.Raw) => {
       setTxList(prev => {
-        const totalCount = `${+prev.txList.totalCount + update.txs.length}`
+        const totalCount = prev.txList.totalCount + update.total_count
         const txs =
-          prev.txList.page === '1'
+          prev.txList.page === 1
             ? [...getTxListRes(update).txs, ...prev.txList.txs].slice(0, PAGE_SIZE)
             : prev.txList.txs
         return {
@@ -109,7 +109,7 @@ const TxList = (initState: State) => {
     [setTxList, id],
   )
 
-  const pageCount = Math.ceil(+txList.totalCount / PAGE_SIZE) || 1
+  const pageCount = Math.ceil(txList.totalCount / PAGE_SIZE) || 1
   const handleGoTo = (e: FormEvent) => {
     e.stopPropagation()
     e.preventDefault()
@@ -127,15 +127,15 @@ const TxList = (initState: State) => {
           <a className="ml-2 font-normal">{id}</a>
         </Link>
       </h2>
-      {+txList.totalCount ? <List list={txList} /> : <span className="text-dark-grey">{txT('emptyTxList')}</span>}
-      <div className="pager">
-        <div className="links" attr-disabled={`${+txList.page === 1}`}>
+      {txList.totalCount ? <List list={txList} /> : <span className="text-dark-grey">{txT('emptyTxList')}</span>}
+      <div className="pager" attr-total-page={pageCount}>
+        <div className="links" attr-disabled={`${txList.page === 1}`}>
           <Link href={getLink(id, 1)}>
             <a title="first">
               <Image src={`${IMG_URL}page-first.svg`} width="14" height="14" loading="lazy" layout="fixed" />
             </a>
           </Link>
-          <Link href={getLink(id, Math.max(+txList.page - 1, 1))}>
+          <Link href={getLink(id, Math.max(txList.page - 1, 1))}>
             <a title="previous">
               <Image src={`${IMG_URL}page-previous.svg`} width="14" height="14" loading="lazy" layout="fixed" />
             </a>
@@ -144,13 +144,13 @@ const TxList = (initState: State) => {
 
         <form onSubmit={handleGoTo}>
           {t('page')}
-          <input type="number" min="1" max={pageCount} id="page" placeholder={txList.page} />
+          <input type="number" min="1" max={pageCount} id="page" placeholder={`${txList.page}`} />
           {`of ${pageCount}`}
           <button type="submit">{t('goTo')}</button>
         </form>
 
-        <div className="links" attr-disabled={`${+txList.page === pageCount}`}>
-          <Link href={getLink(id, Math.min(+txList.page + 1, pageCount))}>
+        <div className="links" attr-disabled={`${txList.page === pageCount}`}>
+          <Link href={getLink(id, Math.min(txList.page + 1, pageCount))}>
             <a title="next">
               <Image src={`${IMG_URL}page-previous.svg`} width="14" height="14" loading="lazy" layout="fixed" />
             </a>

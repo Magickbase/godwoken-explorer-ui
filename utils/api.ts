@@ -134,8 +134,8 @@ export namespace API {
 
   export namespace Txs {
     export interface Raw {
-      page: string
-      total_count: string
+      page: number
+      total_count: number
       txs: Array<
         Record<'hash' | 'block_number' | 'from' | 'to' | 'type', string> & {
           success: boolean
@@ -145,8 +145,8 @@ export namespace API {
     }
 
     export interface Parsed {
-      page: string
-      totalCount: string
+      page: number
+      totalCount: number
       txs: Array<
         Record<'hash' | 'blockNumber' | 'from' | 'to' | 'type', string> & {
           success: boolean
