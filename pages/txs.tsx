@@ -128,7 +128,7 @@ const TxList = (initState: State) => {
         </Link>
       </h2>
       {+txList.totalCount ? <List list={txList} /> : <span className="text-dark-grey">{txT('emptyTxList')}</span>}
-      <div className="pager">
+      <div className="pager" attr-total-page={pageCount}>
         <div className="links" attr-disabled={`${+txList.page === 1}`}>
           <Link href={getLink(id, 1)}>
             <a title="first">
