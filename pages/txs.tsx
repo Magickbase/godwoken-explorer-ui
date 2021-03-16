@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { fetchTxList, API, handleApiError, timeDistance, IMG_URL, PAGE_SIZE } from 'utils'
+import { fetchTxList, API, useWS, getTxListRes, handleApiError, timeDistance, IMG_URL, PAGE_SIZE, CHANNEL } from 'utils'
 
 type State = { query: Record<string, string>; txList: API.Txs.Parsed }
 
@@ -83,6 +83,31 @@ const TxList = (initState: State) => {
   useEffect(() => {
     setTxList(initState)
   }, [initState])
+
+  useWS(
+    `${CHANNEL.ACCOUNT_TX_LIST}${id}`,
+    (init: API.Txs.Raw) => {
+      setTxList(prev => (prev.txList.page === '1' ? { ...prev, txList: getTxListRes(init) } : prev))
+    },
+    (update: API.Txs.Raw) => {
+      setTxList(prev => {
+        const totalCount = `${+prev.txList.totalCount + update.txs.length}`
+        const txs =
+          prev.txList.page === '1'
+            ? [...getTxListRes(update).txs, ...prev.txList.txs].slice(0, PAGE_SIZE)
+            : prev.txList.txs
+        return {
+          ...prev,
+          txList: {
+            ...prev.txList,
+            totalCount,
+            txs,
+          },
+        }
+      })
+    },
+    [setTxList, id],
+  )
 
   const pageCount = Math.ceil(+txList.totalCount / PAGE_SIZE) || 1
   const handleGoTo = (e: FormEvent) => {
