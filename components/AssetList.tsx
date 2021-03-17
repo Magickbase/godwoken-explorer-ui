@@ -3,7 +3,7 @@ import { formatBalance } from 'utils'
 
 const AssetList = ({ assetList = [], t }: { assetList: Array<Record<'name' | 'balance', string>>; t: TFunction }) => (
   <div className="card-container md:ml-2 md:w-1/2 md:self-start">
-    <h2 className="card-subheader" aria-label={t('userDefinedAssets')}>
+    <h2 className="card-subheader normal-case" aria-label={t('userDefinedAssets')}>
       {`${t('userDefinedAssets')}:`}
       <span>{assetList.length}</span>
     </h2>

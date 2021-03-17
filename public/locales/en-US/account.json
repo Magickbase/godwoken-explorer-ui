@@ -5,7 +5,7 @@
   "type": "account type",
   "ckb": "CKB",
   "txCount": "transaction count",
-  "userDefinedAssets": "user defined assets",
+  "userDefinedAssets": "User Defined Asset(s)",
   "ethAddr": "ethereum address",
   "ckbAddr": "CKB address",
   "ckbLockScript": "CKB lock script",
