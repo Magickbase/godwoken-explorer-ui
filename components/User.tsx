@@ -9,8 +9,8 @@ const User = ({ ethAddr, nonce, udtList, ckbLockScript }: State) => {
   let ckbAddr = '-'
   try {
     ckbAddr = scriptToCkbAddress(ckbLockScript as CKBComponents.Script)
-  } catch {
-    // ignore
+  } catch (err) {
+    console.warn(err)
   }
 
   const infoList = [
@@ -22,7 +22,7 @@ const User = ({ ethAddr, nonce, udtList, ckbLockScript }: State) => {
   return (
     <div className="md:flex">
       <div className="card-container md:mr-2 md:w-1/2 self-start">
-        <h2 className="card-subheader">
+        <h2 className="card-subheader" aria-label="user">
           {`${t('type')}:`}
           <span>User</span>
         </h2>
@@ -38,12 +38,12 @@ const User = ({ ethAddr, nonce, udtList, ckbLockScript }: State) => {
               {t('ckbLockScript')}
               <HiddenIcon />
             </span>
-            <span className="script-type-badge">{ckbLockScript.name || t('unknownScript')}</span>
+            <span className="script-type-badge">{ckbLockScript?.name || t('unknownScript')}</span>
           </div>
         </div>
-        <pre
-          className={isHidden ? 'hidden' : 'script-code mb-3'}
-        >{`{\n\t"code_hash": "${ckbLockScript.codeHash}",\n\t"args": "${ckbLockScript.args}",\n\t"hash_type": "${ckbLockScript.hashType}"\n}`}</pre>
+        <pre className={isHidden ? 'hidden' : 'script-code mb-3'}>{`{\n\t"code_hash": "${
+          ckbLockScript?.codeHash ?? ''
+        }",\n\t"args": "${ckbLockScript?.args ?? ''}",\n\t"hash_type": "${ckbLockScript?.hashType ?? ''}"\n}`}</pre>
       </div>
       <AssetList assetList={udtList} t={t} />
     </div>

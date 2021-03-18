@@ -55,7 +55,7 @@ const MetaContract = ({
   ]
   return (
     <div className="card-container">
-      <h2 className="card-subheader">
+      <h2 className="card-subheader" aria-label="meta contract">
         {`${t('type')}:`}
         <span>Meta Contract</span>
       </h2>

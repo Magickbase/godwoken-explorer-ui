@@ -2,6 +2,7 @@
   "latestTxs": "latest transactions",
   "hash": "tx hash",
   "blockHash": "block hash",
+  "blockNumber": "block number",
   "type": "type",
   "from": "from",
   "to": "to",
@@ -17,7 +18,7 @@
   "finalizeState": "finalize state",
   "age": "age",
   "txListTitle": "Transactions related to account",
-  "committed": "committedd",
+  "committed": "committed",
   "finalized": "finalized",
   "emptyTxList": "No transactions found"
 }

@@ -12,6 +12,7 @@ export const useIsHidden = () => {
         onClick={handleShowScript}
         className="flex items-center cursor-pointer"
         style={{ transform: isHidden ? 'unset' : 'rotate(0.5turn)' }}
+        aria-label="toggle"
       >
         <Image loading="lazy" src={`${IMG_URL}show-more.svg`} width="17" height="17" alt="toggle" layout="fixed" />
       </span>
@@ -20,16 +21,21 @@ export const useIsHidden = () => {
   }, [isHidden, setisHidden])
 }
 
-export const useWS = (topic: CHANNEL, onReceivingData: (res?: any) => void, deps = []) => {
+export const useWS = (
+  channel: CHANNEL | string,
+  onJoin: (res?: any) => void,
+  onReceivingData: (res?: any) => void,
+  deps = [],
+) => {
   useEffect(() => {
     const socket = new Socket(WS_ENDPOINT)
     socket.connect()
-    const channel = socket.channel(topic)
-    channel.on('new_msg', onReceivingData)
-    channel.join().receive('ok', console.info).receive('error', console.warn)
+    const _channel = socket.channel(channel)
+    _channel.on('refresh', onReceivingData)
+    _channel.join().receive('ok', onJoin).receive('error', console.warn)
     return () => {
       socket.disconnect(() => {
-        console.info(`disconnect to ${topic}`)
+        console.info(`disconnect to ${channel}`)
       })
     }
   }, deps)

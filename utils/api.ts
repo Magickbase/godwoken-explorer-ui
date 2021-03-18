@@ -189,41 +189,39 @@ export const fetchHome = (): Promise<API.Home.Parsed> =>
     .then(res => pretreat<API.Home.Raw>(res))
     .then(getHomeRes)
 
+export const getBlockRes = (block: API.Block.Raw): API.Block.Parsed => ({
+  hash: block.hash,
+  number: block.number,
+  l1Block: block.l1_block,
+  txHash: block.tx_hash,
+  finalizeState: block.finalize_state,
+  txCount: block.tx_count,
+  aggregator: block.aggregator,
+  timestamp: block.timestamp * 1000,
+})
 export const fetchBlock = (id: string): Promise<API.Block.Parsed> =>
   fetch(`${SERVER_URL}/blocks/${id}`)
     .then(res => pretreat<API.Block.Raw>(res))
-    .then(async block => {
-      return {
-        hash: block.hash,
-        number: block.number,
-        l1Block: block.l1_block,
-        txHash: block.tx_hash,
-        finalizeState: block.finalize_state,
-        txCount: block.tx_count,
-        aggregator: block.aggregator,
-        timestamp: block.timestamp * 1000,
-      }
-    })
+    .then(getBlockRes)
 
+export const getTxRes = (tx: API.Tx.Raw): API.Tx.Parsed => ({
+  hash: tx.hash,
+  timestamp: tx.timestamp * 1000,
+  finalizeState: tx.finalize_state,
+  l2Block: tx.l2_block,
+  l1Block: tx.l1_block,
+  from: tx.from,
+  to: tx.to,
+  nonce: tx.nonce,
+  args: tx.args,
+  type: tx.type,
+  gasPrice: tx.gas_price,
+  fee: tx.fee,
+})
 export const fetchTx = (hash: string): Promise<API.Tx.Parsed> =>
   fetch(`${SERVER_URL}/txs/${hash}`)
     .then(res => pretreat<API.Tx.Raw>(res))
-    .then(async tx => {
-      return {
-        hash: tx.hash,
-        timestamp: tx.timestamp * 1000,
-        finalizeState: tx.finalize_state,
-        l2Block: tx.l2_block,
-        l1Block: tx.l1_block,
-        from: tx.from,
-        to: tx.to,
-        nonce: tx.nonce,
-        args: tx.args,
-        type: tx.type,
-        gasPrice: tx.gas_price,
-        fee: tx.fee,
-      }
-    })
+    .then(getTxRes)
 
 const getMetaContract = (metaContract: API.Account.Raw['meta_contract']): API.Account.Parsed['metaContract'] => ({
   status: metaContract.status,
@@ -266,45 +264,44 @@ const getSmartContract = (smartContract: API.Account.Raw['smart_contract']): API
   udtList: smartContract.udt_list || [],
 })
 
+export const getAccountRes = (account: API.Account.Raw): API.Account.Parsed => ({
+  id: account.id,
+  type: account.type,
+  ckb: account.ckb,
+  txCount: account.tx_count,
+  metaContract: account.meta_contract ? getMetaContract(account.meta_contract) : null,
+  sudt: account.sudt ? getSUDT(account.sudt) : null,
+  user: account.user ? getUser(account.user) : null,
+  polyjuice: account.polyjuice ? getPolyjuice(account.polyjuice) : null,
+  smartContract: account.smart_contract ? getSmartContract(account.smart_contract) : null,
+})
+
 export const fetchAccount = (id: string): Promise<API.Account.Parsed> =>
   fetch(`${SERVER_URL}/accounts/${id}`)
     .then(res => pretreat<API.Account.Raw>(res))
-    .then(async account => {
-      return {
-        id: account.id,
-        type: account.type,
-        ckb: account.ckb,
-        txCount: account.tx_count,
-        metaContract: account.meta_contract ? getMetaContract(account.meta_contract) : null,
-        sudt: account.sudt ? getSUDT(account.sudt) : null,
-        user: account.user ? getUser(account.user) : null,
-        polyjuice: account.polyjuice ? getPolyjuice(account.polyjuice) : null,
-        smartContract: account.smart_contract ? getSmartContract(account.smart_contract) : null,
-      }
-    })
+    .then(getAccountRes)
 
+export const getTxListRes = (txListRes: API.Txs.Raw): API.Txs.Parsed => ({
+  page: txListRes.page,
+  totalCount: txListRes.total_count,
+  txs:
+    txListRes.txs?.map(tx => ({
+      hash: tx.hash,
+      blockNumber: tx.block_number,
+      from: tx.from,
+      to: tx.to,
+      timestamp: tx.timestamp * 1000,
+      type: tx.type,
+      success: tx.success ?? true,
+    })) ?? [],
+})
 export const fetchTxList = (query: string): Promise<API.Txs.Parsed> =>
   fetch(`${SERVER_URL}/txs?${query}`)
     .then(res => pretreat<API.Txs.Raw>(res))
-    .then(async res => {
-      return {
-        page: res.page,
-        totalCount: res.total_count,
-        txs:
-          res.txs?.map(tx => ({
-            hash: tx.hash,
-            blockNumber: tx.block_number,
-            from: tx.from,
-            to: tx.to,
-            timestamp: tx.timestamp * 1000,
-            type: tx.type,
-            success: tx.success ?? true,
-          })) ?? [],
-      }
-    })
+    .then(getTxListRes)
 
-export const fetchSearch = (keyword: string) => {
-  let query = keyword
+export const fetchSearch = (search: string) => {
+  let query = search
   if (query.startsWith('ck')) {
     try {
       const script = addressToScript(query)
@@ -314,27 +311,29 @@ export const fetchSearch = (keyword: string) => {
     }
   }
 
-  return fetch(`${SERVER_URL}/search?keyword=${query}`).then(async res => {
-    if (res.status === HttpStatus.NotFound) {
-      return `/404?keyword=${keyword}`
-    }
-    const found: Record<'id' | 'type', string> | ErrorResponse = await res.json()
-    if (isError(found)) {
-      return `/404?keyword=${keyword}`
-    }
-    switch (found.type) {
-      case 'block': {
-        return `/block/${found.id}`
+  return fetch(`${SERVER_URL}/search?keyword=${query}`)
+    .then(async res => {
+      if (res.status === HttpStatus.NotFound) {
+        return `/404`
       }
-      case 'transaction': {
-        return `/tx/${found.id}`
+      const found: Record<'id' | 'type', string> | ErrorResponse = await res.json()
+      if (isError(found)) {
+        return `/404`
       }
-      case 'account': {
-        return `account/${found.id}`
+      switch (found.type) {
+        case 'block': {
+          return `/block/${found.id}`
+        }
+        case 'transaction': {
+          return `/tx/${found.id}`
+        }
+        case 'account': {
+          return `/account/${found.id}`
+        }
+        default: {
+          return `/404`
+        }
       }
-      default: {
-        return `/404?keyword=${keyword}`
-      }
-    }
-  })
+    })
+    .then(url => `${url}?search=${search}`)
 }

@@ -8,20 +8,21 @@ type State = API.Account.Parsed['smartContract']
 const SmartContract = ({ txHash, udtList }: State) => {
   const [t] = useTranslation('account')
   const infoList = [
-    {
-      label: t('deployTx'),
-      value: (
-        <Link href={`/tx/${txHash}`}>
-          <a title={t('deployTx')}>{txHash}</a>
-        </Link>
-      ),
-    },
+    // TODO: enable this later
+    // {
+    //   label: t('deployTx'),
+    //   value: (
+    //     <Link href={`/tx/${txHash}`}>
+    //       <a title={t('deployTx')}>{txHash}</a>
+    //     </Link>
+    //   ),
+    // },
   ]
 
   return (
     <div className="md:flex">
       <div className="card-container md:mr-2 md:w-1/2 self-start">
-        <h2 className="card-subheader">
+        <h2 className="card-subheader" aria-label="smart contract">
           {`${t('type')}:`}
           <span>Smart Contract</span>
         </h2>

@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { GetServerSideProps } from 'next'
 import Link from 'next/link'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { fetchAccount, API, handleApiError, formatBalance } from 'utils'
+import { fetchAccount, API, useWS, getAccountRes, handleApiError, formatBalance, CHANNEL } from 'utils'
 import User from 'components/User'
 import MetaContract from 'components/MetaContract'
 import SmartContract from 'components/SmartContract'
@@ -14,20 +14,40 @@ type State = API.Account.Parsed
 const Account = (initState: State) => {
   const [account, setAccount] = useState(initState)
   const [t] = useTranslation('account')
+
+  useEffect(() => {
+    setAccount(initState)
+  }, [setAccount, initState])
+
+  useWS(
+    `${CHANNEL.ACCOUNT_INFO}${account.id}`,
+    (init: API.Account.Raw) => {
+      setAccount(getAccountRes(init))
+    },
+    (update: API.Account.Raw) => {
+      setAccount(getAccountRes(update))
+    },
+    [setAccount, account.id],
+  )
+
   return (
     <>
       <div className="flex flex-col card-container mt-8 md:flex-row md:pb-3">
-        <h2 className="card-header md:w-1/2 md:border-b-0 md:border-r md:pb-0">
+        <h2 className="card-header md:w-1/2 md:border-b-0 md:border-r md:pb-0" aria-label={t('account')}>
           {`${t('account')}`}
           <span>{account.id}</span>
         </h2>
         <div className="divide-y divide-light-grey divide-dashed text-sm md:divide-y-0 md:w-1/2 md:pl-3">
           <div className="flex justify-between py-3 md:py-0">
-            <span className="card-label">{t('ckb')}</span>
+            <span className="card-label" aria-label={t('ckb')}>
+              {t('ckb')}
+            </span>
             <span className="overflow-hidden overflow-ellipsis">{formatBalance(account.ckb)}</span>
           </div>
           <div className="flex justify-between pt-3 pb-2 md:pb-0">
-            <span className="card-label">{t('txCount')}</span>
+            <span className="card-label" aria-label={t('txCount')}>
+              {t('txCount')}
+            </span>
             <Link href={`/txs?account_id=${account.id}&page=1`}>
               <a>{BigInt(account.txCount).toLocaleString('en')}</a>
             </Link>
