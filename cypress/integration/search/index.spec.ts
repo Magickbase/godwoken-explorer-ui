@@ -148,4 +148,56 @@ context('Search', () => {
       })
     })
   })
+
+  describe.only('redirection', () => {
+    beforeEach(() => {
+      cy.visit('/en-US')
+    })
+
+    it('should redirect to block page when keyword is a block hash', () => {
+      cy.get(`a[title='block number']:first`)
+        .then(block => {
+          const hash = block.attr('href').slice('/block/'.length)
+          const number = block.text().replace(/,/g, '')
+          return { hash, number }
+        })
+        .should(({ hash, number }) => {
+          cy.get(`${ROOT_SELECTOR} input`).type(hash)
+          cy.get(ROOT_SELECTOR).submit()
+          cy.location('pathname').should('eq', `/block/${number}`)
+          cy.location('search').should('eq', `?search=${hash}`)
+        })
+    })
+
+    it('should redirect to transaction page when keyword is a tx hash', () => {
+      cy.get(`a[title='tx hash']:first`)
+        .then(tx => tx.text())
+        .should(hash => {
+          cy.get(`${ROOT_SELECTOR} input`).type(hash)
+          cy.get(ROOT_SELECTOR).submit()
+          cy.location('pathname').should('eq', `/tx/${hash}`)
+          cy.location('search').should('eq', `?search=${hash}`)
+        })
+    })
+
+    it(`should redirect to account page when keyword is a account id`, () => {
+      const ACCOUNT_ID = '1'
+      cy.get(`${ROOT_SELECTOR} input`).type(ACCOUNT_ID)
+      cy.get(ROOT_SELECTOR).submit()
+      cy.location('pathname').should('to.eq', `/account/${ACCOUNT_ID}`)
+      cy.location('search').should('eq', `?search=${ACCOUNT_ID}`)
+    })
+
+    it('404', () => {
+      const INVALID_SEARCH = 'unknown'
+      cy.get(`${ROOT_SELECTOR} input`).type(INVALID_SEARCH)
+      cy.get(ROOT_SELECTOR).submit()
+      cy.location('pathname').should('to.eq', `/404`)
+      cy.location('search').should('eq', `?search=${INVALID_SEARCH}`)
+    })
+
+    it.skip('lockhash', () => {})
+    it.skip('ckb address', () => {})
+    it.skip('eth address', () => {})
+  })
 })
