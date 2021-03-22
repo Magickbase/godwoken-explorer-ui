@@ -11,7 +11,7 @@ context('Smart Contract Account Page', () => {
     it('should have account type', () => {
       cy.get(ROOT_SELECTOR).should('have.text', 'account type:Smart Contract')
     })
-    it('should have deployed transaction which is a link', () => {
+    it.skip('should have deployed transaction which is a link', () => {
       cy.get(`${ROOT_SELECTOR}+div .card-label`).should('have.text', 'deploy transaction')
       cy.get(`${ROOT_SELECTOR}+div a[title='deploy transaction']`).should(link => {
         const hash = link.text()
@@ -21,13 +21,13 @@ context('Smart Contract Account Page', () => {
   })
 
   describe.skip('asset list info', () => {
-    const ROOT_SELECTOR = `.card-subheader[aria-label='user defined assets']`
+    const ROOT_SELECTOR = `.card-subheader[aria-label='User Defined Asset(s)']`
     it('should have title with item count', () => {
       cy.get(`${ROOT_SELECTOR}+div`)
         .children()
         .its('length')
         .then(count => {
-          cy.get(ROOT_SELECTOR).should('have.text', `user defined assets:${count}`)
+          cy.get(ROOT_SELECTOR).should('have.text', `User Defined Asset(s):${count}`)
         })
     })
 

@@ -1,16 +1,49 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { GetServerSideProps } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { formatDatetime, fetchTx, API, handleApiError, CKB_EXPLORER_URL, IMG_URL } from 'utils'
+import {
+  formatDatetime,
+  fetchTx,
+  API,
+  handleApiError,
+  useWS,
+  getTxRes,
+  CKB_EXPLORER_URL,
+  IMG_URL,
+  CHANNEL,
+} from 'utils'
 import CardFieldsetList from 'components/CardFieldsetList'
 type State = API.Tx.Parsed
 
 const Tx = (initState: State) => {
   const [tx, setTx] = useState(initState)
   const [t] = useTranslation('tx')
+
+  useEffect(() => {
+    setTx(initState)
+  }, [setTx, initState])
+
+  useWS(
+    `${CHANNEL.TX_INFO}${tx.hash}`,
+    (init: API.Tx.Raw) => {
+      setTx(getTxRes(init))
+    },
+    ({ l1_block, finalize_state }: Partial<Pick<API.Tx.Raw, 'l1_block' | 'finalize_state'>>) => {
+      const update: Partial<Pick<API.Tx.Parsed, 'l1Block' | 'finalizeState'>> = {}
+      if (l1_block) {
+        update.l1Block = l1_block
+      }
+      if (finalize_state) {
+        update.finalizeState = finalize_state
+      }
+      setTx(prev => ({ ...prev, ...update }))
+    },
+    [setTx, tx.hash],
+  )
+
   const fieldsetList = [
     [
       {
@@ -27,10 +60,12 @@ const Tx = (initState: State) => {
       },
       {
         label: 'l1Block',
-        value: (
+        value: tx.l1Block ? (
           <Link href={`${CKB_EXPLORER_URL}/block/${tx.l1Block}`}>
             <a title={t('l1Block')}>{BigInt(tx.l1Block).toLocaleString('en')}</a>
           </Link>
+        ) : (
+          t('pending')
         ),
       },
       {

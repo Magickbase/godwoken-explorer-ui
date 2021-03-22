@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { GetServerSideProps } from 'next'
 import Link from 'next/link'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { fetchAccount, API, handleApiError, formatBalance } from 'utils'
+import { fetchAccount, API, useWS, getAccountRes, handleApiError, formatBalance, CHANNEL } from 'utils'
 import User from 'components/User'
 import MetaContract from 'components/MetaContract'
 import SmartContract from 'components/SmartContract'
@@ -14,6 +14,22 @@ type State = API.Account.Parsed
 const Account = (initState: State) => {
   const [account, setAccount] = useState(initState)
   const [t] = useTranslation('account')
+
+  useEffect(() => {
+    setAccount(initState)
+  }, [setAccount, initState])
+
+  useWS(
+    `${CHANNEL.ACCOUNT_INFO}${account.id}`,
+    (init: API.Account.Raw) => {
+      setAccount(getAccountRes(init))
+    },
+    (update: API.Account.Raw) => {
+      setAccount(getAccountRes(update))
+    },
+    [setAccount, account.id],
+  )
+
   return (
     <>
       <div className="flex flex-col card-container mt-8 md:flex-row md:pb-3">

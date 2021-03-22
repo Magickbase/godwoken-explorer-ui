@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { IMG_URL, SEARCH_FIELDS, fetchSearch } from 'utils'
@@ -9,7 +9,12 @@ type Position = 'home' | 'header' | 'middle'
 const Search = () => {
   let defaultPosition: Position = 'header'
 
-  const { pathname, push, locale } = useRouter() // '/' | '/404' |'other'
+  const {
+    pathname,
+    push,
+    locale,
+    query: { search },
+  } = useRouter() // '/' | '/404' |'other'
   switch (pathname) {
     case '/': {
       defaultPosition = 'home'
@@ -30,6 +35,7 @@ const Search = () => {
 
   const [position, setPosition] = useState<Position>(defaultPosition)
   const [isDisplay, setIsDisplay] = useState(false)
+  const formRef = useRef<HTMLFormElement>(null)
 
   useEffect(() => {
     let timer
@@ -61,17 +67,37 @@ const Search = () => {
     }
   }, [setPosition, defaultPosition])
 
+  useEffect(() => {
+    if (formRef.current) {
+      formRef.current['search'].value = search ?? ''
+    }
+    return () => {
+      if (formRef.current) {
+        formRef.current['search'].value = ''
+      }
+    }
+  }, [search, formRef])
+
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
     e.stopPropagation()
-    const keyword = e.currentTarget['search']?.value
-    fetchSearch(keyword)
+    const search = e.currentTarget['search']?.value
+    if (!search) {
+      return
+    }
+    fetchSearch(search)
       .then(push)
       .catch(err => window.alert(err.message))
   }
 
   return (
-    <form className={styles.container} onSubmit={handleSubmit} attr-position={position} attr-display={`${isDisplay}`}>
+    <form
+      ref={formRef}
+      className={styles.container}
+      onSubmit={handleSubmit}
+      attr-position={position}
+      attr-display={`${isDisplay}`}
+    >
       <div className={styles.toggle} onClick={() => setIsDisplay(is => !is)}>
         {isDisplay ? (
           <Image src={`${IMG_URL}close.svg`} width="24" height="24" loading="lazy" layout="fixed" />

@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { GetServerSideProps } from 'next'
 import Link from 'next/link'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { fetchBlock, handleApiError, API, formatDatetime, CKB_EXPLORER_URL } from 'utils'
+import { fetchBlock, handleApiError, API, formatDatetime, useWS, getBlockRes, CKB_EXPLORER_URL, CHANNEL } from 'utils'
 import CardFieldsetList from 'components/CardFieldsetList'
 
 type State = API.Block.Parsed
@@ -11,6 +11,35 @@ type State = API.Block.Parsed
 const Block = (initState: State) => {
   const [block, setBlock] = useState(initState)
   const [t] = useTranslation('block')
+
+  useEffect(() => {
+    setBlock(initState)
+  }, [setBlock, initState])
+
+  useWS(
+    `${CHANNEL.BLOCK_INFO}${block.number}`,
+    (init: API.Block.Raw) => {
+      setBlock(getBlockRes(init))
+    },
+    ({
+      l1_block,
+      tx_hash,
+      finalize_state,
+    }: Partial<Pick<API.Block.Raw, 'l1_block' | 'tx_hash' | 'finalize_state'>>) => {
+      let update: Partial<Pick<API.Block.Parsed, 'l1Block' | 'txHash' | 'finalizeState'>> = {}
+      if (l1_block) {
+        update.l1Block = l1_block
+      }
+      if (tx_hash) {
+        update.txHash = tx_hash
+      }
+      if (finalize_state) {
+        update.finalizeState = finalize_state
+      }
+      setBlock(prev => ({ ...prev, ...update }))
+    },
+    [setBlock, block.number],
+  )
 
   const fieldsetList: Array<Array<{ label: Exclude<keyof State, 'number'>; value: React.ReactNode }>> = [
     [
