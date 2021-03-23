@@ -8,12 +8,14 @@ const AssetList = ({ assetList = [], t }: { assetList: Array<Record<'name' | 'ba
       <span>{assetList.length}</span>
     </h2>
     <div className="md:my-3">
-      {assetList.map((asset, i) => (
-        <div key={asset.name} className="card-field" attr-last={`${i === assetList.length - 1}`}>
-          <span className="card-label uppercase">{asset.name}</span>
-          {formatBalance(asset.balance)}
-        </div>
-      ))}
+      {assetList.length
+        ? assetList.map((asset, i) => (
+            <div key={asset.name} className="card-field" attr-last={`${i === assetList.length - 1}`}>
+              <span className="card-label uppercase">{asset.name}</span>
+              {formatBalance(asset.balance)}
+            </div>
+          ))
+        : t('emptyAssetList')}
     </div>
   </div>
 )

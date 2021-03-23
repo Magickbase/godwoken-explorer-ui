@@ -26,5 +26,6 @@
   "l2Supply": "L2 Supply",
   "holders": "holders",
   "running": "running",
-  "halting": "halting"
+  "halting": "halting",
+  "emptyAssetList": "No assets found"
 }

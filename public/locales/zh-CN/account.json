@@ -26,5 +26,6 @@
   "l2Supply": "L2 供应总量",
   "holders": "持有者",
   "running": "运行",
-  "halting": "停机"
+  "halting": "停机",
+  "emptyAssetList": "没有自定义资产"
 }
