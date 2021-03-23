@@ -1,9 +1,10 @@
 /// <reference types="cypress" />
 
 context('Smart Contract Account Page', () => {
-  const id = 5
   before(() => {
-    cy.visit(`/en-US/account/${id}`)
+    cy.fixture('accountIds').then(ids => {
+      cy.visit(`/en-US/account/${ids.smartContract}`)
+    })
   })
 
   describe('smart contract info', () => {

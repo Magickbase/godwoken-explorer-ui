@@ -1,9 +1,10 @@
 /// <reference types="cypress" />
 
 context('MetaContract Account Page', () => {
-  const id = 0
   before(() => {
-    cy.visit(`/en-US/account/${id}`)
+    cy.fixture('accountIds').then(ids => {
+      cy.visit(`/en-US/account/${ids.metaContract}`)
+    })
   })
 
   describe('meta contract info', () => {

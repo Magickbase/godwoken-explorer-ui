@@ -1,9 +1,10 @@
 /// <reference types="cypress" />
 
 context('SUDT Account Page', () => {
-  const id = 1
   before(() => {
-    cy.visit(`/en-US/account/${id}`)
+    cy.fixture('accountIds').then(ids => {
+      cy.visit(`/en-US/account/${ids.sudt}`)
+    })
   })
 
   describe('sudt info', () => {
