@@ -84,8 +84,8 @@ export namespace API {
       Partial<{
         meta_contract: {
           status: 'running' | 'halting'
-          account_merkle_state: any
-          block_merkle_state: any
+          account_merkle_state: Record<'account_count' | 'account_merkle_root', string>
+          block_merkle_state: Record<'block_count' | 'block_merkle_root', string>
           last_finalized_block_number: string
           reverted_block_root: string
         }
@@ -110,8 +110,8 @@ export namespace API {
       Partial<{
         metaContract: {
           status: 'running' | 'halting'
-          accountMerkleState: any
-          blockMerkleState: any
+          accountMerkleState: Record<'accountCount' | 'accountMerkleRoot', string>
+          blockMerkleState: Record<'blockCount' | 'blockMerkleRoot', string>
           lastFinalizedBlockNumber: string
           revertedBlockRoot: string
         }
@@ -225,8 +225,14 @@ export const fetchTx = (hash: string): Promise<API.Tx.Parsed> =>
 
 const getMetaContract = (metaContract: API.Account.Raw['meta_contract']): API.Account.Parsed['metaContract'] => ({
   status: metaContract.status,
-  accountMerkleState: metaContract.account_merkle_state,
-  blockMerkleState: metaContract.block_merkle_state,
+  accountMerkleState: {
+    accountCount: metaContract.account_merkle_state.account_count,
+    accountMerkleRoot: metaContract.account_merkle_state.account_merkle_root,
+  },
+  blockMerkleState: {
+    blockCount: metaContract.block_merkle_state.block_count,
+    blockMerkleRoot: metaContract.block_merkle_state.block_merkle_root,
+  },
   lastFinalizedBlockNumber: metaContract.last_finalized_block_number,
   revertedBlockRoot: metaContract.reverted_block_root,
 })
