@@ -1,9 +1,13 @@
 /// <reference types="cypress" />
 
 context('Account Page', () => {
-  const id = 0
+  let id: number
+
   before(() => {
-    cy.visit(`/en-US/account/${id}`)
+    cy.fixture('accountIds').then(ids => {
+      id = ids.metaContract
+      cy.visit(`/en-US/account/${id}`)
+    })
   })
 
   describe('general sets', () => {

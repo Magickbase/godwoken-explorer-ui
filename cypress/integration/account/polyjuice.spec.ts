@@ -1,9 +1,10 @@
 /// <reference types="cypress" />
 
 context('Polyjuice Account Page', () => {
-  const id = 4
   before(() => {
-    cy.visit(`/en-US/account/${id}`)
+    cy.fixture('accountIds').then(ids => {
+      cy.visit(`/en-US/account/${ids.polyjuice}`)
+    })
   })
 
   describe('polyjuice info', () => {

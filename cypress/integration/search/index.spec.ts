@@ -149,7 +149,7 @@ context('Search', () => {
     })
   })
 
-  describe.only('redirection', () => {
+  describe('redirection', () => {
     beforeEach(() => {
       cy.visit('/en-US')
     })

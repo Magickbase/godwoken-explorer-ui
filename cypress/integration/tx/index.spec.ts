@@ -1,9 +1,12 @@
 /// <reference types="cypress" />
 
 context('Transaction Page', () => {
-  const hash = '0x56991b77b565ccd444573222bf0e24912f305ac1c1348241346fc48971768a63'
+  let hash: string
   before(() => {
-    cy.visit(`/en-US/tx/${hash}`)
+    cy.fixture('tx').then(tx => {
+      hash = tx.hash
+      cy.visit(`/en-US/tx/${hash}`)
+    })
   })
 
   describe('general sets', () => {

@@ -1,9 +1,10 @@
 /// <reference types="cypress" />
 
 context('User Account Page', () => {
-  const id = 2
   before(() => {
-    cy.visit(`/en-US/account/${id}`)
+    cy.fixture('accountIds').then(ids => {
+      cy.visit(`/en-US/account/${ids.user}`)
+    })
   })
 
   describe('user info', () => {

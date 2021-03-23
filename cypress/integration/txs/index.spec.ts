@@ -2,9 +2,12 @@
 
 context('Transaction List Page', () => {
   describe('general sets', () => {
-    const id = '1'
+    let id: number
     before(() => {
-      cy.visit(`/en-US/txs?account_id=${id}`)
+      cy.fixture('accountIds').then(ids => {
+        id = ids.user
+        cy.visit(`/en-US/txs?account_id=${id}`)
+      })
     })
 
     it('cy.title() - get the title', () => {
@@ -12,7 +15,7 @@ context('Transaction List Page', () => {
     })
   })
 
-  describe('empty list', () => {
+  describe.skip('empty list', () => {
     const id = '1'
     before(() => {
       cy.visit(`/en-US/txs?account_id=${id}`)
@@ -35,9 +38,12 @@ context('Transaction List Page', () => {
   })
 
   describe('shoud have a list with required information', () => {
-    const id = 2
+    let id: number
     before(() => {
-      cy.visit(`/en-US/txs?account_id=${id}`)
+      cy.fixture('accountIds').then(ids => {
+        id = ids.user
+        cy.visit(`/en-US/txs?account_id=${id}`)
+      })
     })
     it('should have a list with 10 records at most', () => {
       cy.get('.list-container>div').children().should('have.length.lte', 10)
@@ -89,7 +95,7 @@ context('Transaction List Page', () => {
     })
   })
 
-  describe('should change url on paging', () => {
+  describe.skip('should change url on paging', () => {
     const id = 2
     let TOTAL_PAGE = 4 // TODO: should fetch from fixture
     const ROOT_SELECTOR = '.pager'

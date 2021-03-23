@@ -1,6 +1,5 @@
 import { useTranslation } from 'next-i18next'
 import { API } from 'utils'
-import CardFieldsetList, { CardFieldsetListProps } from 'components/CardFieldsetList'
 
 type State = API.Account.Parsed['metaContract']
 
@@ -12,7 +11,7 @@ const MetaContract = ({
   lastFinalizedBlockNumber,
 }: State) => {
   const [t] = useTranslation('account')
-  const fieldsetList: CardFieldsetListProps['fieldsetList'] = [
+  const fieldsetList: Array<Array<{ label: string; value: React.ReactNode }>> = [
     [
       {
         label: t('status'),
@@ -23,27 +22,37 @@ const MetaContract = ({
         ),
       },
       {
-        label: t('accountMerkleState'),
+        label: t('accountCount'),
         value: (
-          <span title={t('accountMerkleState')}>
-            {Object.keys(accountMerkleState)
-              .map(field => `${field}: ${accountMerkleState[field]}`)
-              .join(', ')}
+          <span title={t('accountCount')} className="capitalize">
+            {t(BigInt(accountMerkleState.accountCount).toLocaleString('en'))}
           </span>
         ),
       },
       {
-        label: t('blockMerkleState'),
+        label: t('accountMerkleRoot'),
         value: (
-          <span title={t('blockMerkleState')}>
-            {Object.keys(blockMerkleState)
-              .map(field => `${field}: ${blockMerkleState[field]}`)
-              .join(', ')}
+          <span title={t('accountMerkleRoot')} className="capitalize">
+            {t(accountMerkleState.accountMerkleRoot)}
           </span>
         ),
       },
-    ],
-    [
+      {
+        label: t('blockCount'),
+        value: (
+          <span title={t('blockCount')} className="capitalize">
+            {t(BigInt(blockMerkleState.blockCount).toLocaleString('en'))}
+          </span>
+        ),
+      },
+      {
+        label: t('blockMerkleRoot'),
+        value: (
+          <span title={t('blockMerkleRoot')} className="capitalize">
+            {t(blockMerkleState.blockMerkleRoot)}
+          </span>
+        ),
+      },
       { label: t('revertedBlockRoot'), value: <span title={t('revertedBlockRoot')}>{revertedBlockRoot}</span> },
       {
         label: t('lastFinalizedBlockNumber'),
@@ -59,7 +68,24 @@ const MetaContract = ({
         {`${t('type')}:`}
         <span>Meta Contract</span>
       </h2>
-      <CardFieldsetList fieldsetList={fieldsetList} t={t} />
+      <div className="md:flex divide-x divide-light-grey md:my-3">
+        {fieldsetList.map((fieldset, fidx) => (
+          <div key={fieldset.map(i => i?.label ?? '').join()} className="card-fieldset w-full md:odd:pr-0">
+            {fieldset
+              .filter(i => i)
+              .map((i, idx) => (
+                <div
+                  key={i.label}
+                  className="card-field md:justify-start md:border-b"
+                  attr-last={`${fidx === fieldsetList.length - 1 && idx === fieldset.length - 1}`}
+                >
+                  <span className="card-label w-52">{t(i.label)}</span>
+                  {i.value}
+                </div>
+              ))}
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
