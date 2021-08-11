@@ -31,8 +31,8 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 or:
 
-[![Edit on CodeSandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/Keith-CY/agera/)
+[![Edit on CodeSandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/nervina-labs/godwoken-explorer-ui/)
 
 ## Deploy on Vercel
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https://github.com/Keith-CY/agera&project-name=Agera&repository-name=agera)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https://github.com/nervina-labs/godwoken-explorer-ui&project-name=Godwoken-Explorer&repository-name=godwoken-explorer-ui)
