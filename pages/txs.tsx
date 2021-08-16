@@ -34,7 +34,7 @@ const List = ({ list }: { list: State['txList'] }) => {
                 <Image src={`${IMG_URL}blocks.svg`} width="15" height="15" layout="fixed" loading="lazy" />
                 <Link href={`/block/${tx.blockNumber}`}>
                   <a title={t('blockNumber')} className="ml-1">
-                    {tx.blockNumber}
+                    {(+tx.blockNumber).toLocaleString('en')}
                   </a>
                 </Link>
               </div>

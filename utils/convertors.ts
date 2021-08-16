@@ -15,7 +15,7 @@ import { IS_MAINNET } from './constants'
 dayjs.extend(relativeTime)
 dayjs.extend(customParseFormat)
 export const formatDatetime = (datetime: number) => {
-  return dayjs(datetime).format('YYYY/MM/DD hh:mm:ss')
+  return dayjs(datetime).format('YYYY/MM/DD HH:mm:ss')
 }
 
 export const timeDistance = (time: number, locale?: 'zh-CN' | 'en-US' | string) => {

@@ -96,7 +96,7 @@ const Tx = (initState: State) => {
   ]
   return (
     <div className="card-container mt-8">
-      <h2 className="card-header">
+      <h2 className="card-header whitespace-nowrap overflow-hidden overflow-ellipsis">
         {`${t('hash')}`}
         <span>{`#${tx.hash}`}</span>
       </h2>
