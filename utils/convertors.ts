@@ -9,6 +9,7 @@ import {
   fullPayloadToAddress,
   AddressPrefix,
   AddressType,
+  scriptToHash,
 } from '@nervosnetwork/ckb-sdk-utils'
 import { IS_MAINNET } from './constants'
 
@@ -50,3 +51,5 @@ export const formatBalance = (balance: string) => {
   const formattedInt = BigInt(int).toLocaleString('en')
   return dec ? [formattedInt, dec].join('.') : formattedInt
 }
+
+export { scriptToHash }

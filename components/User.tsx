@@ -1,5 +1,5 @@
 import { useTranslation } from 'next-i18next'
-import { useIsHidden, scriptToCkbAddress, API } from 'utils'
+import { useIsHidden, scriptToCkbAddress, scriptToHash, API } from 'utils'
 import AssetList from 'components/AssetList'
 
 type State = API.Account.Parsed['user']
@@ -18,6 +18,12 @@ const User = ({ ethAddr, nonce, udtList, ckbLockScript }: State) => {
     { label: t('nonce'), value: <span title={t('nonce')}>{BigInt(nonce).toLocaleString('en')}</span> },
     { label: t('ckbAddr'), value: <span title={t('ckbAddr')}>{ckbAddr}</span> },
   ]
+  if (ckbLockScript) {
+    infoList.push({
+      label: t('ckbLockHash'),
+      value: <span title={t('ckbLockHash')}>{scriptToHash(ckbLockScript as CKBComponents.Script)}</span>,
+    })
+  }
 
   return (
     <div className="md:flex">

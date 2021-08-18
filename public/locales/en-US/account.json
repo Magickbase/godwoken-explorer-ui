@@ -8,6 +8,7 @@
   "userDefinedAssets": "User Defined Asset(s)",
   "ethAddr": "ethereum address",
   "ckbAddr": "CKB address",
+  "ckbLockHash": "CKB lock hash",
   "ckbLockScript": "CKB lock script",
   "unknownScript": "unknown script",
   "status": "status",
