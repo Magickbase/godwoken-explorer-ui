@@ -115,7 +115,7 @@ context('Search', () => {
 
   describe('account page', () => {
     before(() => {
-      cy.visit('/en-US/account/1')
+      cy.visit('/en-US/account/2')
     })
     describe('desktop', () => {
       it('should be placed in the header', () => {
@@ -181,7 +181,7 @@ context('Search', () => {
     })
 
     it(`should redirect to account page when keyword is a account id`, () => {
-      const ACCOUNT_ID = '1'
+      const ACCOUNT_ID = '2'
       cy.get(`${ROOT_SELECTOR} input`).type(ACCOUNT_ID)
       cy.get(ROOT_SELECTOR).submit()
       cy.location('pathname').should('to.eq', `/account/${ACCOUNT_ID}`)

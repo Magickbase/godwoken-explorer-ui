@@ -63,5 +63,12 @@ context('SUDT Account Page', () => {
           expect(+holders.querySelector(`[title='holders']`).textContent.replace(/,/g, '')).to.be.a('number')
         })
     })
+
+    it('should have l1 type hash', () => {
+      cy.get(`div[data-role="type-hash"]>span:first`).should('have.text', 'l1 type hash')
+      cy.get(`div[data-role="type-hash"]>span:last`).should(elm => {
+        expect(elm.text()).to.have.length(66)
+      })
+    })
   })
 })

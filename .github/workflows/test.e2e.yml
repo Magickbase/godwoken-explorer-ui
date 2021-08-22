@@ -49,6 +49,10 @@ jobs:
 
       - name: Test
         run: npm run test:e2e
+        env:
+          NEXT_PUBLIC_SERVER_URL: ${{ secrets.NEXT_PUBLIC_SERVER_URL }}
+          NEXT_PUBLIC_WS_URL: ${{ secrets.NEXT_PUBLIC_WS_URL }}
+          NEXT_PUBLIC_CHAIN_TYPE: ${{ secrets.NEXT_PUBLIC_CHAIN_TYPE }}
 
       - name: Upload screenshots
         uses: actions/upload-artifact@master

@@ -241,7 +241,7 @@ const getScript = (script: API.Account.RawScript): API.Account.ParsedScript => (
   args: script.args,
   codeHash: script.code_hash,
   hashType: script.hash_type,
-  name: script.name,
+  name: script.name || null,
 })
 
 const getSUDT = (sudt: API.Account.Raw['sudt']): API.Account.Parsed['sudt'] => ({

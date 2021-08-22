@@ -16,12 +16,13 @@ const User = ({ ethAddr, nonce, udtList, ckbLockScript }: State) => {
   const infoList = [
     { label: t('ethAddr'), value: <span title={t('ethAddr')}>{ethAddr || '-'} </span> },
     { label: t('nonce'), value: <span title={t('nonce')}>{BigInt(nonce).toLocaleString('en')}</span> },
-    { label: t('ckbAddr'), value: <span title={t('ckbAddr')}>{ckbAddr}</span> },
+    { label: t('depositorCkbAddr'), value: <span title={t('depositorCkbAddr')}>{ckbAddr}</span> },
   ]
+
   if (ckbLockScript) {
     infoList.push({
-      label: t('ckbLockHash'),
-      value: <span title={t('ckbLockHash')}>{scriptToHash(ckbLockScript as CKBComponents.Script)}</span>,
+      label: t('depositorCkbLockHash'),
+      value: <span title={t('depositorCkbLockHash')}>{scriptToHash(ckbLockScript as CKBComponents.Script)}</span>,
     })
   }
 
@@ -41,7 +42,7 @@ const User = ({ ethAddr, nonce, udtList, ckbLockScript }: State) => {
           ))}
           <div className="card-field" attr-last="true">
             <span className="card-label">
-              {t('ckbLockScript')}
+              {t('depositorCkbLockScript')}
               <HiddenIcon />
             </span>
             <span className="script-type-badge">{ckbLockScript?.name || t('unknownScript')}</span>

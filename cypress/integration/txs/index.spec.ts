@@ -74,7 +74,9 @@ context('Transaction List Page', () => {
       it('should have block number which is a link', () => {
         cy.get(`${ROOT_SELECTOR} a[title='block number']`).should(link => {
           const number = link.text()
-          expect(link).to.have.attr('href').to.eq(`/block/${number}`)
+          expect(link)
+            .to.have.attr('href')
+            .to.eq(`/block/${number.replace(/,/g, '')}`)
         })
       })
       it('should have from account which is a link', () => {
