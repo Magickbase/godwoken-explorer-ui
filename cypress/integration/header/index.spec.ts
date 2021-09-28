@@ -1,9 +1,7 @@
 /// <reference types="cypress" />
 
 context('Header', () => {
-  before(() => {
-    cy.visit('/en-US')
-  })
+  before(() => cy.visit('/en-US'))
 
   it('should have a logo', () => {
     cy.get(`header img[alt='logo']`).should('to.exist')

@@ -2,9 +2,7 @@
 
 context('User Account Page', () => {
   before(() => {
-    cy.fixture('accountIds').then(ids => {
-      cy.visit(`/en-US/account/${ids.user}`)
-    })
+    cy.fixture('accountIds').then(ids => cy.visit(`/en-US/account/${ids.user}`))
   })
 
   describe('user info', () => {

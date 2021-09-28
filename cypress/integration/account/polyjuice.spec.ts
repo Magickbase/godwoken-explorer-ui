@@ -2,9 +2,7 @@
 
 context('Polyjuice Account Page', () => {
   before(() => {
-    cy.fixture('accountIds').then(ids => {
-      cy.visit(`/en-US/account/${ids.polyjuice}`)
-    })
+    cy.fixture('accountIds').then(ids => cy.visit(`/en-US/account/${ids.polyjuice}`))
   })
 
   describe('polyjuice info', () => {

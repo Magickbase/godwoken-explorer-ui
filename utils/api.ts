@@ -103,6 +103,7 @@ export namespace API {
         }
         smart_contract: {
           tx_hash: string
+          eth_addr: string
           udt_list: Array<UDT>
         }
       }>
@@ -127,6 +128,7 @@ export namespace API {
         polyjuice: { script: ParsedScript }
         smartContract: {
           txHash: string
+          ethAddr: string
           udtList: Array<UDT>
         }
       }>
@@ -267,6 +269,7 @@ const getPolyjuice = (polyjuice: API.Account.Raw['polyjuice']): API.Account.Pars
 
 const getSmartContract = (smartContract: API.Account.Raw['smart_contract']): API.Account.Parsed['smartContract'] => ({
   txHash: smartContract.tx_hash,
+  ethAddr: smartContract.eth_addr,
   udtList: smartContract.udt_list || [],
 })
 

@@ -2,9 +2,7 @@
 
 context('MetaContract Account Page', () => {
   before(() => {
-    cy.fixture('accountIds').then(ids => {
-      cy.visit(`/en-US/account/${ids.metaContract}`)
-    })
+    cy.fixture('accountIds').then(ids => cy.visit(`/en-US/account/${ids.metaContract}`))
   })
 
   describe('meta contract info', () => {
