@@ -1,9 +1,7 @@
 /// <reference types="cypress" />
 
 context('Home Page', () => {
-  before(() => {
-    cy.visit('/en-US')
-  })
+  before(() => cy.visit('/en-US'))
 
   describe('general sets', () => {
     it('cy.title() - get the title', () => {

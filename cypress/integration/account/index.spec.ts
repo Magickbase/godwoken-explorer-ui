@@ -6,11 +6,11 @@ context('Account Page', () => {
   before(() => {
     cy.fixture('accountIds').then(ids => {
       id = ids.metaContract
-      cy.visit(`/en-US/account/${id}`)
+      return cy.visit(`/en-US/account/${id}`)
     })
   })
 
-  describe('general sets', () => {
+  describe.skip('general sets', () => {
     it('cy.title() - get the title', () => {
       cy.title().should('include', 'Godwoken Explorer')
     })

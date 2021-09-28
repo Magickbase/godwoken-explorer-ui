@@ -2,9 +2,7 @@
 
 context('Block Page', () => {
   const number = '1'
-  before(() => {
-    cy.visit(`/en-US/block/${number}`)
-  })
+  before(() => cy.visit(`/en-US/block/${number}`))
 
   describe('general sets', () => {
     it('cy.title() - get the title', () => {

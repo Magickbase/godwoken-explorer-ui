@@ -2,9 +2,7 @@
 
 context('SUDT Account Page', () => {
   before(() => {
-    cy.fixture('accountIds').then(ids => {
-      cy.visit(`/en-US/account/${ids.sudt}`)
-    })
+    cy.fixture('accountIds').then(ids => cy.visit(`/en-US/account/${ids.sudt}`))
   })
 
   describe('sudt info', () => {

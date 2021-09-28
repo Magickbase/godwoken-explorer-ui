@@ -1,9 +1,7 @@
 /// <reference types="cypress" />
 
 context('Footer', () => {
-  before(() => {
-    cy.visit('/en-US')
-  })
+  before(() => cy.visit('/en-US'))
 
   it('should have three links', () => {
     cy.get(`footer div[class^=footer_links]`).children().should('have.length', 3)

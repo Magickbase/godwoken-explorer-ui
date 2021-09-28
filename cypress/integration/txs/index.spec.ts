@@ -6,7 +6,7 @@ context('Transaction List Page', () => {
     before(() => {
       cy.fixture('accountIds').then(ids => {
         id = ids.user
-        cy.visit(`/en-US/txs?account_id=${id}`)
+        return cy.visit(`/en-US/txs?account_id=${id}`)
       })
     })
 
@@ -17,9 +17,7 @@ context('Transaction List Page', () => {
 
   describe.skip('empty list', () => {
     const id = '1'
-    before(() => {
-      cy.visit(`/en-US/txs?account_id=${id}`)
-    })
+    before(() => cy.visit(`/en-US/txs?account_id=${id}`))
 
     it('should have title with account id where id is a link', () => {
       cy.get('h2').should('have.text', `Transactions related to account${id}`)
@@ -42,7 +40,7 @@ context('Transaction List Page', () => {
     before(() => {
       cy.fixture('accountIds').then(ids => {
         id = ids.user
-        cy.visit(`/en-US/txs?account_id=${id}`)
+        return cy.visit(`/en-US/txs?account_id=${id}`)
       })
     })
     it('should have a list with 10 records at most', () => {
@@ -110,9 +108,7 @@ context('Transaction List Page', () => {
     })
 
     describe('default to 1', () => {
-      before(() => {
-        cy.visit(`/en-US/txs?account_id=${id}`)
-      })
+      before(() => cy.visit(`/en-US/txs?account_id=${id}`))
 
       it('should indicate page 1', () => {
         cy.get(`${ROOT_SELECTOR} input`).should(input => {
@@ -146,9 +142,7 @@ context('Transaction List Page', () => {
     })
 
     describe('visit page 2', () => {
-      before(() => {
-        cy.visit(`/en-US/txs?account_id=${id}&page=2`)
-      })
+      before(() => cy.visit(`/en-US/txs?account_id=${id}&page=2`))
       it(`should indicate page 2`, () => {
         cy.get(`${ROOT_SELECTOR} input`).should(input => {
           expect(input).to.have.attr('placeholder').to.eq('2')
@@ -192,9 +186,7 @@ context('Transaction List Page', () => {
     })
 
     describe('visit last page', () => {
-      before(() => {
-        cy.visit(`/en-US/txs?account_id=${id}&page=${TOTAL_PAGE}`)
-      })
+      before(() => cy.visit(`/en-US/txs?account_id=${id}&page=${TOTAL_PAGE}`))
 
       it(`should indicate page ${TOTAL_PAGE}`, () => {
         cy.get(`${ROOT_SELECTOR} input`).should(input => {
@@ -226,9 +218,7 @@ context('Transaction List Page', () => {
     })
 
     describe('change page by submitting page number', () => {
-      beforeEach(() => {
-        cy.visit(`/en-US/txs?account_id=${id}`)
-      })
+      beforeEach(() => cy.visit(`/en-US/txs?account_id=${id}`))
       it('should change url by submitting a valid page number', () => {
         cy.get(`${ROOT_SELECTOR} input`).type('3')
         cy.get(`${ROOT_SELECTOR} button[type=submit]`).click()
