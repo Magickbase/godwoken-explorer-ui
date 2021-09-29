@@ -89,7 +89,7 @@ export namespace API {
           last_finalized_block_number: string
           reverted_block_root: string
         }
-        sudt: Record<'decimal' | 'holders' | 'name' | 'supply' | 'symbol' | 'icon', string> & {
+        sudt: Record<'decimal' | 'holders' | 'name' | 'supply' | 'symbol' | 'icon' | 'script_hash', string> & {
           type_script: RawScript | null
         }
         user: {
@@ -100,6 +100,7 @@ export namespace API {
         }
         polyjuice: {
           script: RawScript
+          script_hash: string
         }
         smart_contract: {
           tx_hash: string
@@ -116,7 +117,7 @@ export namespace API {
           lastFinalizedBlockNumber: string
           revertedBlockRoot: string
         }
-        sudt: Record<'decimal' | 'holders' | 'name' | 'supply' | 'symbol' | 'icon', string> & {
+        sudt: Record<'decimal' | 'holders' | 'name' | 'supply' | 'symbol' | 'icon' | 'scriptHash', string> & {
           typeScript: ParsedScript | null
         }
         user: {
@@ -125,7 +126,7 @@ export namespace API {
           nonce: string
           udtList: Array<UDT>
         }
-        polyjuice: { script: ParsedScript }
+        polyjuice: { script: ParsedScript; scriptHash: string }
         smartContract: {
           txHash: string
           ethAddr: string
@@ -254,6 +255,7 @@ const getSUDT = (sudt: API.Account.Raw['sudt']): API.Account.Parsed['sudt'] => (
   symbol: sudt.symbol,
   icon: sudt.icon || null,
   typeScript: sudt.type_script ? getScript(sudt.type_script) : null,
+  scriptHash: sudt.script_hash,
 })
 
 const getUser = (user: API.Account.Raw['user']): API.Account.Parsed['user'] => ({
@@ -265,6 +267,7 @@ const getUser = (user: API.Account.Raw['user']): API.Account.Parsed['user'] => (
 
 const getPolyjuice = (polyjuice: API.Account.Raw['polyjuice']): API.Account.Parsed['polyjuice'] => ({
   script: getScript(polyjuice.script),
+  scriptHash: polyjuice.script_hash,
 })
 
 const getSmartContract = (smartContract: API.Account.Raw['smart_contract']): API.Account.Parsed['smartContract'] => ({
