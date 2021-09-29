@@ -11,6 +11,12 @@ context('Polyjuice Account Page', () => {
       cy.get(ROOT_SELECTOR).should('have.text', 'account type:Polyjuice')
     })
 
+    it('should have l2 script hash', () => {
+      cy.get('div[data-role="script-hash"]>span:last').should(elm => {
+        expect(elm.text()).to.have.length(66)
+      })
+    })
+
     describe('script', () => {
       it('should be hidden by default', () => {
         cy.get('pre').should('have.class', 'hidden')

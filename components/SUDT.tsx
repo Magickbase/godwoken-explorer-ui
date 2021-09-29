@@ -5,7 +5,7 @@ import CardFieldsetList, { CardFieldsetListProps } from 'components/CardFieldset
 
 type State = API.Account.Parsed['sudt']
 
-const SUDT = ({ name, symbol, decimal, supply, holders, icon, typeScript }: State) => {
+const SUDT = ({ name, symbol, decimal, supply, holders, icon, typeScript, scriptHash }: State) => {
   const [t] = useTranslation('account')
   const [isHidden, HiddenIcon] = useIsHidden()
 
@@ -22,6 +22,7 @@ const SUDT = ({ name, symbol, decimal, supply, holders, icon, typeScript }: Stat
         ),
       },
       { label: t('decimal'), value: <span title={t('decimal')}>{decimal}</span> },
+      { label: t('l2ScriptHash'), value: <span title={t('l2ScriptHash')}>{scriptHash}</span> },
     ],
     [
       { label: t('l2Supply'), value: <span title={t('l2Supply')}>{BigInt(supply).toLocaleString('en')}</span> },

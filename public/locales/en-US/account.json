@@ -32,5 +32,6 @@
   "holders": "holders",
   "running": "running",
   "halting": "halting",
-  "emptyAssetList": "No assets found"
+  "emptyAssetList": "No assets found",
+  "l2ScriptHash": "l2 script hash"
 }

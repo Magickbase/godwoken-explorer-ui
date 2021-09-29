@@ -32,5 +32,6 @@
   "holders": "持有者",
   "running": "运行",
   "halting": "停机",
-  "emptyAssetList": "没有自定义资产"
+  "emptyAssetList": "没有自定义资产",
+  "l2ScriptHash": "l2 script hash"
 }
