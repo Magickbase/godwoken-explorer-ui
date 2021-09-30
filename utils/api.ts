@@ -80,7 +80,7 @@ export namespace API {
     type UDT = Record<'name' | 'balance' | 'icon', string>
     export type RawScript = Record<'args' | 'code_hash' | 'hash_type' | 'name', string>
     export type ParsedScript = Record<'args' | 'codeHash' | 'hashType' | 'name', string>
-    export type Raw = Record<'id' | 'type' | 'ckb' | 'tx_count', string> &
+    export type Raw = Record<'id' | 'type' | 'ckb' | 'eth' | 'tx_count', string> &
       Partial<{
         meta_contract: {
           status: 'running' | 'halting'
@@ -108,7 +108,7 @@ export namespace API {
           udt_list: Array<UDT>
         }
       }>
-    export type Parsed = Record<'id' | 'type' | 'ckb' | 'txCount', string> &
+    export type Parsed = Record<'id' | 'type' | 'ckb' | 'eth' | 'txCount', string> &
       Partial<{
         metaContract: {
           status: 'running' | 'halting'
@@ -280,6 +280,7 @@ export const getAccountRes = (account: API.Account.Raw): API.Account.Parsed => (
   id: account.id,
   type: account.type,
   ckb: account.ckb,
+  eth: account.eth,
   txCount: account.tx_count,
   metaContract: account.meta_contract ? getMetaContract(account.meta_contract) : null,
   sudt: account.sudt ? getSUDT(account.sudt) : null,
