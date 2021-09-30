@@ -4,6 +4,7 @@
   "nonce": "nonce",
   "type": "账户类型",
   "ckb": "CKB",
+  "eth": "ETH",
   "txCount": "交易总数",
   "userDefinedAssets": "用户自定义资产",
   "ethAddr": "以太坊地址",

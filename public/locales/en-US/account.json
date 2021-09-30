@@ -4,6 +4,7 @@
   "nonce": "nonce",
   "type": "account type",
   "ckb": "CKB",
+  "eth": "ETH",
   "txCount": "transaction count",
   "userDefinedAssets": "User Defined Asset(s)",
   "ethAddr": "ethereum address",
