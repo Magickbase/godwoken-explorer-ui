@@ -4,6 +4,5 @@
   "search": "搜索",
   "back": "返回",
   "notFoundMessage": "未能找到任何与 \"{{search}}\" 有关的记录。\n\n请确认您的输入属于以下一项:",
-  "pageNotFound": "404 | 找不到此页",
-  "mainnet_not_ready": "主网版本尚未上线, 即将跳转到测试网版本"
+  "pageNotFound": "404 | 找不到此页"
 }
