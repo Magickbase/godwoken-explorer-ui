@@ -2,9 +2,7 @@
 
 context('SUDT Account Page', () => {
   before(() => {
-    cy.fixture('accountIds').then(ids => {
-      cy.visit(`/en-US/account/${ids.sudt}`)
-    })
+    cy.fixture('accountIds').then(ids => cy.visit(`/en-US/account/${ids.sudt}`))
   })
 
   describe('sudt info', () => {
@@ -44,11 +42,21 @@ context('SUDT Account Page', () => {
         })
     })
 
+    it('should have l2 script hash', () => {
+      cy.get(`${ROOT_SELECTOR}+div`)
+        .find('.card-field')
+        .should(fields => {
+          const hash = fields[3]
+          expect(hash.querySelector('.card-label').textContent).to.eq('l2 script hash')
+          // TODO: test content
+        })
+    })
+
     it('should have l2 supply', () => {
       cy.get(`${ROOT_SELECTOR}+div`)
         .find('.card-field')
         .should(fields => {
-          const supply = fields[3]
+          const supply = fields[4]
           expect(supply.querySelector('.card-label').textContent).to.eq('L2 Supply')
           expect(+supply.querySelector(`[title='L2 Supply']`).textContent.replace(/,/g, '')).to.be.a('number')
         })
@@ -58,10 +66,17 @@ context('SUDT Account Page', () => {
       cy.get(`${ROOT_SELECTOR}+div`)
         .find('.card-field')
         .should(fields => {
-          const holders = fields[4]
+          const holders = fields[5]
           expect(holders.querySelector('.card-label').textContent).to.eq('holders')
           expect(+holders.querySelector(`[title='holders']`).textContent.replace(/,/g, '')).to.be.a('number')
         })
+    })
+
+    it('should have l1 type hash', () => {
+      cy.get(`div[data-role="type-hash"]>span:first`).should('have.text', 'l1 type hash')
+      cy.get(`div[data-role="type-hash"]>span:last`).should(elm => {
+        expect(elm.text()).to.have.length(66)
+      })
     })
   })
 })

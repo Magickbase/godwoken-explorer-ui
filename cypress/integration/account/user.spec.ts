@@ -2,9 +2,7 @@
 
 context('User Account Page', () => {
   before(() => {
-    cy.fixture('accountIds').then(ids => {
-      cy.visit(`/en-US/account/${ids.user}`)
-    })
+    cy.fixture('accountIds').then(ids => cy.visit(`/en-US/account/${ids.user}`))
   })
 
   describe('user info', () => {
@@ -34,14 +32,24 @@ context('User Account Page', () => {
         })
     })
 
-    it('should have ckb address', () => {
+    it('should have depositor ckb address', () => {
       cy.get(`${ROOT_SELECTOR}+div`)
         .find('.card-field')
         .should(fields => {
           const ckbAddr = fields[2]
-          expect(ckbAddr.querySelector('.card-label').textContent).to.eq('CKB address')
-          expect(ckbAddr.querySelector(`[title='CKB address']`).textContent).to.match(/^ckt/)
+          expect(ckbAddr.querySelector('.card-label').textContent).to.eq('depositor CKB address')
+          expect(ckbAddr.querySelector(`[title='depositor CKB address']`).textContent).to.match(/^ckt/)
           // TODO: test content
+        })
+    })
+
+    it('should have ckb lock hash', () => {
+      cy.get(`${ROOT_SELECTOR}+div`)
+        .find('.card-field')
+        .should(fields => {
+          const ckbLockHash = fields[3]
+          expect(ckbLockHash.querySelector('.card-label').textContent).to.eq('depositor CKB lock hash')
+          expect(ckbLockHash.querySelector(`[title='depositor CKB lock hash']`).textContent).to.have.length(66)
         })
     })
 

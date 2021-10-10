@@ -5,7 +5,7 @@ context('Transaction Page', () => {
   before(() => {
     cy.fixture('tx').then(tx => {
       hash = tx.hash
-      cy.visit(`/en-US/tx/${hash}`)
+      return cy.visit(`/en-US/tx/${hash}`)
     })
   })
 

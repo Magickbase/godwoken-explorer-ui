@@ -1,5 +1,5 @@
 import { useTranslation } from 'next-i18next'
-import { useIsHidden, scriptToCkbAddress, API } from 'utils'
+import { useIsHidden, scriptToCkbAddress, scriptToHash, API } from 'utils'
 import AssetList from 'components/AssetList'
 
 type State = API.Account.Parsed['user']
@@ -16,8 +16,15 @@ const User = ({ ethAddr, nonce, udtList, ckbLockScript }: State) => {
   const infoList = [
     { label: t('ethAddr'), value: <span title={t('ethAddr')}>{ethAddr || '-'} </span> },
     { label: t('nonce'), value: <span title={t('nonce')}>{BigInt(nonce).toLocaleString('en')}</span> },
-    { label: t('ckbAddr'), value: <span title={t('ckbAddr')}>{ckbAddr}</span> },
+    { label: t('depositorCkbAddr'), value: <span title={t('depositorCkbAddr')}>{ckbAddr}</span> },
   ]
+
+  if (ckbLockScript) {
+    infoList.push({
+      label: t('depositorCkbLockHash'),
+      value: <span title={t('depositorCkbLockHash')}>{scriptToHash(ckbLockScript as CKBComponents.Script)}</span>,
+    })
+  }
 
   return (
     <div className="md:flex">
@@ -35,7 +42,7 @@ const User = ({ ethAddr, nonce, udtList, ckbLockScript }: State) => {
           ))}
           <div className="card-field" attr-last="true">
             <span className="card-label">
-              {t('ckbLockScript')}
+              {t('depositorCkbLockScript')}
               <HiddenIcon />
             </span>
             <span className="script-type-badge">{ckbLockScript?.name || t('unknownScript')}</span>

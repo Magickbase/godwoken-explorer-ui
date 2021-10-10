@@ -80,7 +80,7 @@ export namespace API {
     type UDT = Record<'name' | 'balance' | 'icon', string>
     export type RawScript = Record<'args' | 'code_hash' | 'hash_type' | 'name', string>
     export type ParsedScript = Record<'args' | 'codeHash' | 'hashType' | 'name', string>
-    export type Raw = Record<'id' | 'type' | 'ckb' | 'tx_count', string> &
+    export type Raw = Record<'id' | 'type' | 'ckb' | 'eth' | 'tx_count', string> &
       Partial<{
         meta_contract: {
           status: 'running' | 'halting'
@@ -89,7 +89,7 @@ export namespace API {
           last_finalized_block_number: string
           reverted_block_root: string
         }
-        sudt: Record<'decimal' | 'holders' | 'name' | 'supply' | 'symbol' | 'icon', string> & {
+        sudt: Record<'decimal' | 'holders' | 'name' | 'supply' | 'symbol' | 'icon' | 'script_hash', string> & {
           type_script: RawScript | null
         }
         user: {
@@ -100,13 +100,15 @@ export namespace API {
         }
         polyjuice: {
           script: RawScript
+          script_hash: string
         }
         smart_contract: {
           tx_hash: string
+          eth_addr: string
           udt_list: Array<UDT>
         }
       }>
-    export type Parsed = Record<'id' | 'type' | 'ckb' | 'txCount', string> &
+    export type Parsed = Record<'id' | 'type' | 'ckb' | 'eth' | 'txCount', string> &
       Partial<{
         metaContract: {
           status: 'running' | 'halting'
@@ -115,7 +117,7 @@ export namespace API {
           lastFinalizedBlockNumber: string
           revertedBlockRoot: string
         }
-        sudt: Record<'decimal' | 'holders' | 'name' | 'supply' | 'symbol' | 'icon', string> & {
+        sudt: Record<'decimal' | 'holders' | 'name' | 'supply' | 'symbol' | 'icon' | 'scriptHash', string> & {
           typeScript: ParsedScript | null
         }
         user: {
@@ -124,9 +126,10 @@ export namespace API {
           nonce: string
           udtList: Array<UDT>
         }
-        polyjuice: { script: ParsedScript }
+        polyjuice: { script: ParsedScript; scriptHash: string }
         smartContract: {
           txHash: string
+          ethAddr: string
           udtList: Array<UDT>
         }
       }>
@@ -241,7 +244,7 @@ const getScript = (script: API.Account.RawScript): API.Account.ParsedScript => (
   args: script.args,
   codeHash: script.code_hash,
   hashType: script.hash_type,
-  name: script.name,
+  name: script.name || null,
 })
 
 const getSUDT = (sudt: API.Account.Raw['sudt']): API.Account.Parsed['sudt'] => ({
@@ -252,6 +255,7 @@ const getSUDT = (sudt: API.Account.Raw['sudt']): API.Account.Parsed['sudt'] => (
   symbol: sudt.symbol,
   icon: sudt.icon || null,
   typeScript: sudt.type_script ? getScript(sudt.type_script) : null,
+  scriptHash: sudt.script_hash,
 })
 
 const getUser = (user: API.Account.Raw['user']): API.Account.Parsed['user'] => ({
@@ -263,10 +267,12 @@ const getUser = (user: API.Account.Raw['user']): API.Account.Parsed['user'] => (
 
 const getPolyjuice = (polyjuice: API.Account.Raw['polyjuice']): API.Account.Parsed['polyjuice'] => ({
   script: getScript(polyjuice.script),
+  scriptHash: polyjuice.script_hash,
 })
 
 const getSmartContract = (smartContract: API.Account.Raw['smart_contract']): API.Account.Parsed['smartContract'] => ({
   txHash: smartContract.tx_hash,
+  ethAddr: smartContract.eth_addr,
   udtList: smartContract.udt_list || [],
 })
 
@@ -274,6 +280,7 @@ export const getAccountRes = (account: API.Account.Raw): API.Account.Parsed => (
   id: account.id,
   type: account.type,
   ckb: account.ckb,
+  eth: account.eth,
   txCount: account.tx_count,
   metaContract: account.meta_contract ? getMetaContract(account.meta_contract) : null,
   sudt: account.sudt ? getSUDT(account.sudt) : null,

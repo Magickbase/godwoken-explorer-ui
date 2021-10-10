@@ -34,22 +34,27 @@ const List = ({ list }: { list: State['txList'] }) => {
                 <Image src={`${IMG_URL}blocks.svg`} width="15" height="15" layout="fixed" loading="lazy" />
                 <Link href={`/block/${tx.blockNumber}`}>
                   <a title={t('blockNumber')} className="ml-1">
-                    {tx.blockNumber}
+                    {(+tx.blockNumber).toLocaleString('en')}
                   </a>
                 </Link>
               </div>
             </div>
-            <div className="flex items-center capitalize">
+            <div className="flex items-center capitalize whitespace-nowrap">
               {t('from')}
               <Link href={`/account/${tx.from}`}>
-                <a title={t('from')} className="ml-0.5 mr-1">
+                <a title={t('from')} className="ml-0.5 mr-1 overflow-hidden overflow-ellipsis" style={{ width: '30%' }}>
                   {tx.from}
                 </a>
               </Link>
-              <Image src={`${IMG_URL}arrow-down-rounded.svg`} width="14" height="14" className="transform -rotate-90" />
+              <Image
+                src={`${IMG_URL}arrow-down-rounded.svg`}
+                width="14"
+                height="14"
+                className="transform -rotate-90 flex-shrink-0"
+              />
               <span className="ml-1 mr-0.5">{t('to')}</span>
               <Link href={`/account/${tx.to}`}>
-                <a title={t('to')} className="mx-0.5">
+                <a title={t('to')} className="mx-0.5 overflow-hidden overflow-ellipsis" style={{ width: '30%' }}>
                   {tx.to}
                 </a>
               </Link>

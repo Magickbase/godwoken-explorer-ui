@@ -4,9 +4,7 @@ context('Search', () => {
   const ROOT_SELECTOR = `form[class^=search_container]`
   const MOBILE_VIEWPORT = 'iphone-6'
   describe('home page', () => {
-    before(() => {
-      cy.visit('/en-US')
-    })
+    before(() => cy.visit('/en-US'))
     describe('desktop', () => {
       describe('by default', () => {
         it('should be placed beneath the header', () => {
@@ -78,9 +76,7 @@ context('Search', () => {
   })
 
   describe('block page', () => {
-    before(() => {
-      cy.visit('/en-US/block/1')
-    })
+    before(() => cy.visit('/en-US/block/1'))
     describe('desktop', () => {
       it('should be placed in the header', () => {
         cy.get(ROOT_SELECTOR).should(form => {
@@ -114,9 +110,7 @@ context('Search', () => {
   })
 
   describe('account page', () => {
-    before(() => {
-      cy.visit('/en-US/account/1')
-    })
+    before(() => cy.visit('/en-US/account/2'))
     describe('desktop', () => {
       it('should be placed in the header', () => {
         cy.get(ROOT_SELECTOR).should(form => {
@@ -150,9 +144,7 @@ context('Search', () => {
   })
 
   describe('redirection', () => {
-    beforeEach(() => {
-      cy.visit('/en-US')
-    })
+    beforeEach(() => cy.visit('/en-US'))
 
     it('should redirect to block page when keyword is a block hash', () => {
       cy.get(`a[title='block number']:first`)
@@ -181,7 +173,7 @@ context('Search', () => {
     })
 
     it(`should redirect to account page when keyword is a account id`, () => {
-      const ACCOUNT_ID = '1'
+      const ACCOUNT_ID = '2'
       cy.get(`${ROOT_SELECTOR} input`).type(ACCOUNT_ID)
       cy.get(ROOT_SELECTOR).submit()
       cy.location('pathname').should('to.eq', `/account/${ACCOUNT_ID}`)

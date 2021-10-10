@@ -5,7 +5,7 @@ import AssetList from 'components/AssetList'
 
 type State = API.Account.Parsed['smartContract']
 
-const SmartContract = ({ txHash, udtList }: State) => {
+const SmartContract = ({ txHash, ethAddr, udtList }: State) => {
   const [t] = useTranslation('account')
   const infoList = [
     // TODO: enable this later
@@ -17,11 +17,15 @@ const SmartContract = ({ txHash, udtList }: State) => {
     //     </Link>
     //   ),
     // },
+    {
+      label: t(`ethAddr`),
+      value: <span title={t(`ethAddr`)}>{ethAddr}</span>,
+    },
   ]
 
   return (
     <div className="md:flex">
-      <div className="card-container md:mr-2 md:w-1/2 self-start">
+      <div className="card-container md:mr-2 md:w-1/2 self-start" data-role="info">
         <h2 className="card-subheader" aria-label="smart contract">
           {`${t('type')}:`}
           <span>Smart Contract</span>

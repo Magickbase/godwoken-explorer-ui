@@ -1,10 +1,9 @@
 import Link from 'next/link'
 
-import { CKB_EXPLORER_URL, NERVINA_GITHUB_URL, NERVINA_WEBSITE_URL, NERVOS_FOUNDATION_URL } from 'utils'
+import { CKB_EXPLORER_URL, NERVINA_GITHUB_URL, NERVOS_FOUNDATION_URL } from 'utils'
 import styles from './footer.module.css'
 
 const links = [
-  { label: 'Nervina Labs', url: NERVINA_WEBSITE_URL },
   { label: 'Nervos Foundation', url: NERVOS_FOUNDATION_URL },
   { label: 'GitHub', url: NERVINA_GITHUB_URL },
   { label: 'CKB Explorer', url: CKB_EXPLORER_URL },

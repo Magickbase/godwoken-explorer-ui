@@ -4,11 +4,16 @@
   "nonce": "nonce",
   "type": "账户类型",
   "ckb": "CKB",
+  "eth": "ETH",
   "txCount": "交易总数",
   "userDefinedAssets": "用户自定义资产",
   "ethAddr": "以太坊地址",
   "ckbAddr": "CKB 地址",
+  "ckbLockHash": "CKB lock hash",
   "ckbLockScript": "CKB lock script",
+  "depositorCkbAddr": "创建者 CKB 地址",
+  "depositorCkbLockHash": "创建者 CKB lock hash",
+  "depositorCkbLockScript": "创建者 CKB lock script",
   "unknownScript": "未知脚本",
   "status": "状态",
   "accountCount": "账户总数",
@@ -20,6 +25,7 @@
   "deployTx": "部署交易",
   "script": "脚本",
   "l1TypeScript": "l1 type script",
+  "l1TypeHash": "l1 type hash",
   "name": "名称",
   "symbol": "符号",
   "decimal": "小数位",
@@ -27,5 +33,6 @@
   "holders": "持有者",
   "running": "运行",
   "halting": "停机",
-  "emptyAssetList": "没有自定义资产"
+  "emptyAssetList": "没有自定义资产",
+  "l2ScriptHash": "l2 script hash"
 }

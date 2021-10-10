@@ -4,11 +4,16 @@
   "nonce": "nonce",
   "type": "account type",
   "ckb": "CKB",
+  "eth": "ETH",
   "txCount": "transaction count",
   "userDefinedAssets": "User Defined Asset(s)",
   "ethAddr": "ethereum address",
   "ckbAddr": "CKB address",
+  "ckbLockHash": "CKB lock hash",
   "ckbLockScript": "CKB lock script",
+  "depositorCkbAddr": "depositor CKB address",
+  "depositorCkbLockHash": "depositor CKB lock hash",
+  "depositorCkbLockScript": "depositor CKB lock script",
   "unknownScript": "unknown script",
   "status": "status",
   "accountCount": "account count",
@@ -20,6 +25,7 @@
   "deployTx": "deploy transaction",
   "script": "script",
   "l1TypeScript": "l1 type script",
+  "l1TypeHash": "l1 type hash",
   "name": "name",
   "symbol": "symbol",
   "decimal": "decimal",
@@ -27,5 +33,6 @@
   "holders": "holders",
   "running": "running",
   "halting": "halting",
-  "emptyAssetList": "No assets found"
+  "emptyAssetList": "No assets found",
+  "l2ScriptHash": "l2 script hash"
 }

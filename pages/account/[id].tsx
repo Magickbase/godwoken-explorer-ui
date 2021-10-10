@@ -44,6 +44,12 @@ const Account = (initState: State) => {
             </span>
             <span className="overflow-hidden overflow-ellipsis">{formatBalance(account.ckb)}</span>
           </div>
+          <div className="flex justify-between py-3 md:py-0">
+            <span className="card-label" aria-label={t('eth')}>
+              {t('eth')}
+            </span>
+            <span className="overflow-hidden overflow-ellipsis">{formatBalance(account.eth)}</span>
+          </div>
           <div className="flex justify-between pt-3 pb-2 md:pb-0">
             <span className="card-label" aria-label={t('txCount')}>
               {t('txCount')}
