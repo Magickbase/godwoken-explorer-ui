@@ -1,13 +1,15 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import Layout from 'components/Layout'
-import { appWithTranslation } from 'next-i18next'
+import { appWithTranslation, useTranslation } from 'next-i18next'
 import { AppProps } from 'next/app'
 import ErrorBoundary from 'components/ErrorBoundary'
+import { MAINNET_HOSTNAME, TESTNET_HOSTNAME } from 'utils'
 import '../styles/globals.css'
 
 const Agera = ({ Component, pageProps }: AppProps) => {
   const router = useRouter()
+  const [t, { language }] = useTranslation('common')
 
   useEffect(() => {
     const handleChangeStart = () => {
@@ -23,6 +25,13 @@ const Agera = ({ Component, pageProps }: AppProps) => {
       router.events.off('routeChangeComplete', handleChangeComplete)
     }
   }, [])
+
+  useEffect(() => {
+    if (window.location.hostname.replace(/^www\./, '') === MAINNET_HOSTNAME) {
+      window.alert(t('mainnet_not_ready'))
+      window.location.href = `${TESTNET_HOSTNAME}/${language}`
+    }
+  }, [t, language])
 
   return (
     <Layout>
