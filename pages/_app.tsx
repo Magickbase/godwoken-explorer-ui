@@ -28,8 +28,12 @@ const Agera = ({ Component, pageProps }: AppProps) => {
 
   useEffect(() => {
     if (window.location.hostname.replace(/^www\./, '') === MAINNET_HOSTNAME) {
-      window.alert(t('mainnet_not_ready'))
-      window.location.href = `${TESTNET_HOSTNAME}/${language}`
+      window.alert(
+        language === 'zh-US'
+          ? '主网版本尚未上线, 即将跳转到测试网版本'
+          : 'Mainnet is not ready yet, redirect to testnet',
+      )
+      window.location.href = `//${TESTNET_HOSTNAME}/${language}`
     }
   }, [t, language])
 
