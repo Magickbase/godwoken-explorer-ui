@@ -8,6 +8,13 @@ import { timeDistance, fetchHome, API, handleApiError, IMG_URL, useWS, CHANNEL, 
 
 type State = API.Home.Parsed
 
+const formatAddress = (addr: string) => {
+  if (addr.length > 13) {
+    return `${addr.substr(0, 7)}...${addr.slice(-5)}`
+  }
+  return addr
+}
+
 const statisticGroups = [
   [
     { key: 'blockCount', icon: 'blocks' },
@@ -64,7 +71,7 @@ const Statistic = (statistic: State['statistic']) => {
 const BlockList = ({ list }: { list: State['blockList'] }) => {
   const [t, { language }] = useTranslation('block')
   return (
-    <div className="list-container z-10 my-4 md:w-1/2 md:mr-2" aria-label="">
+    <div className="list-container z-10 my-4 lg:w-1/2 lg:mr-2" aria-label="">
       <h2 className="list-header" aria-label={t('latestBlocks')}>
         <Image
           loading="lazy"
@@ -79,7 +86,7 @@ const BlockList = ({ list }: { list: State['blockList'] }) => {
       <div className="divide-y divide-light-grey">
         {list.map(block => (
           <div key={block.hash} className="list-item-container">
-            <div className="flex justify-between mb-4 md:mb-3">
+            <div className="flex justify-between mb-4 lg:mb-3">
               <Link href={`/block/${block.hash}`}>
                 <a title={t('number')} className="hashLink flex-1">
                   {BigInt(block.number).toLocaleString('en')}
@@ -91,7 +98,7 @@ const BlockList = ({ list }: { list: State['blockList'] }) => {
             </div>
             <time
               dateTime={new Date(+block.timestamp).toISOString()}
-              className="flex justify-end list-datetime md:h-6"
+              className="flex justify-end list-datetime lg:h-6"
               title={t('timestamp')}
             >
               {timeDistance(block.timestamp, language)}
@@ -106,7 +113,7 @@ const BlockList = ({ list }: { list: State['blockList'] }) => {
 const TxList = ({ list }: { list: State['txList'] }) => {
   const [t, { language }] = useTranslation('tx')
   return (
-    <div className="list-container z-10 my-4 md:w-1/2 md:ml-2">
+    <div className="list-container z-10 my-4 lg:w-1/2 lg:ml-2">
       <h2 className="list-header" aria-label={t('latestTxs')}>
         <Image loading="lazy" src={`${IMG_URL}txs.svg`} height="17" width="17" layout="fixed" alt={t('latestBlocks')} />
         <span>{t('latestTxs')}</span>
@@ -128,8 +135,13 @@ const TxList = ({ list }: { list: State['txList'] }) => {
             <div className="flex items-center capitalize whitespace-nowrap">
               {t('from')}
               <Link href={`/account/${tx.from}`}>
-                <a title={t('from')} className="ml-0.5 mr-1 overflow-hidden overflow-ellipsis" style={{ width: '30%' }}>
-                  {tx.from}
+                <a
+                  title={t('from')}
+                  className="ml-0.5 mr-1 overflow-hidden overflow-ellipsis select-none"
+                  style={{ width: '30%' }}
+                  data-addr={tx.from}
+                >
+                  {formatAddress(tx.from)}
                 </a>
               </Link>
               <Image
@@ -140,13 +152,18 @@ const TxList = ({ list }: { list: State['txList'] }) => {
               />
               <span className="ml-1 mr-0.5">{t('to')}</span>
               <Link href={`/account/${tx.to}`}>
-                <a title={t('to')} className="mx-0.5 overflow-hidden overflow-ellipsis" style={{ width: '30%' }}>
-                  {tx.to}
+                <a
+                  title={t('to')}
+                  className="mx-0.5 overflow-hidden overflow-ellipsis select-none"
+                  style={{ width: '30%' }}
+                  data-addr={tx.to}
+                >
+                  {formatAddress(tx.to)}
                 </a>
               </Link>
               <time
                 dateTime={new Date(+tx.timestamp).toISOString()}
-                className="flex flex-1 justify-end items-end list-datetime md:h-6 "
+                className="flex flex-1 justify-end items-end list-datetime lg:h-6 "
                 title={t('timestamp')}
               >
                 {timeDistance(tx.timestamp, language)}
@@ -181,7 +198,7 @@ const Home = (initState: State) => {
     <>
       <div className="home-bg"></div>
       <Statistic {...home.statistic} />
-      <div className="md:flex">
+      <div className="lg:flex">
         <BlockList list={home.blockList} />
         <TxList list={home.txList} />
       </div>
