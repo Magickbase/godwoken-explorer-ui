@@ -27,8 +27,8 @@ const User = ({ ethAddr, nonce, udtList, ckbLockScript }: State) => {
   }
 
   return (
-    <div className="md:flex">
-      <div className="card-container md:mr-2 md:w-1/2 self-start">
+    <>
+      <div className="card-container">
         <h2 className="card-subheader" aria-label="user">
           {`${t('type')}:`}
           <span>User</span>
@@ -53,7 +53,7 @@ const User = ({ ethAddr, nonce, udtList, ckbLockScript }: State) => {
         }",\n\t"args": "${ckbLockScript?.args ?? ''}",\n\t"hash_type": "${ckbLockScript?.hashType ?? ''}"\n}`}</pre>
       </div>
       <AssetList assetList={udtList} t={t} />
-    </div>
+    </>
   )
 }
 
