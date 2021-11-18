@@ -24,8 +24,8 @@ const SmartContract = ({ txHash, ethAddr, udtList }: State) => {
   ]
 
   return (
-    <div className="md:flex">
-      <div className="card-container md:mr-2 md:w-1/2 self-start" data-role="info">
+    <>
+      <div className="card-container" data-role="info">
         <h2 className="card-subheader" aria-label="smart contract">
           {`${t('type')}:`}
           <span>Smart Contract</span>
@@ -40,7 +40,7 @@ const SmartContract = ({ txHash, ethAddr, udtList }: State) => {
         </div>
       </div>
       <AssetList assetList={udtList} t={t} />
-    </div>
+    </>
   )
 }
 

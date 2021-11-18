@@ -22,7 +22,6 @@ const SUDT = ({ name, symbol, decimal, supply, holders, icon, typeScript, script
         ),
       },
       { label: t('decimal'), value: <span title={t('decimal')}>{decimal}</span> },
-      { label: t('l2ScriptHash'), value: <span title={t('l2ScriptHash')}>{scriptHash}</span> },
     ],
     [
       { label: t('l2Supply'), value: <span title={t('l2Supply')}>{BigInt(supply).toLocaleString('en')}</span> },
@@ -45,7 +44,7 @@ const SUDT = ({ name, symbol, decimal, supply, holders, icon, typeScript, script
       {typeScript ? (
         <>
           <div className="md:my-3 border-t border-dashed border-light-grey md:border-t-0">
-            <div className="card-field" attr-last="true" data-role="type-hash">
+            <div className="card-field" attr-last="true" data-role="l1-type-hash">
               <span className="card-label">{t('l1TypeHash')}</span>
               <span title={t('l1TypeHash')}>{scriptToHash(typeScript as CKBComponents.Script)}</span>
             </div>
@@ -64,6 +63,14 @@ const SUDT = ({ name, symbol, decimal, supply, holders, icon, typeScript, script
             className={isHidden ? 'hidden' : 'script-code mb-3'}
           >{`{\n\t"code_hash": "${typeScript.codeHash}",\n\t"args": "${typeScript.args}",\n\t"hash_type": "${typeScript.hashType}"\n}`}</pre>
         </>
+      ) : null}
+      {scriptHash ? (
+        <div className="md:my-3 border-t border-dashed border-light-grey md:border-t-0">
+          <div className="card-field" attr-last="true" data-role="l2-script-hash">
+            <span className="card-label">{t('l2ScriptHash')}</span>
+            <span title={t('l2ScriptHash')}>{scriptHash}</span>
+          </div>
+        </div>
       ) : null}
     </div>
   )
