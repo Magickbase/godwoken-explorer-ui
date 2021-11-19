@@ -132,38 +132,34 @@ const TxList = ({ list }: { list: State['txList'] }) => {
               </span>
               {tx.success ? SuccessIcon : FailureIcon}
             </div>
-            <div className="flex items-center capitalize whitespace-nowrap">
-              {t('from')}
-              <Link href={`/account/${tx.from}`}>
-                <a
-                  title={t('from')}
-                  className="ml-0.5 mr-1 overflow-hidden overflow-ellipsis select-none"
-                  style={{ width: '30%' }}
-                  data-addr={tx.from}
-                >
-                  {formatAddress(tx.from)}
-                </a>
-              </Link>
-              <Image
-                src={`${IMG_URL}arrow-down-rounded.svg`}
-                width="14"
-                height="14"
-                className="transform -rotate-90 flex-shrink-0 "
-              />
-              <span className="ml-1 mr-0.5">{t('to')}</span>
-              <Link href={`/account/${tx.to}`}>
-                <a
-                  title={t('to')}
-                  className="mx-0.5 overflow-hidden overflow-ellipsis select-none"
-                  style={{ width: '30%' }}
-                  data-addr={tx.to}
-                >
-                  {formatAddress(tx.to)}
-                </a>
-              </Link>
+            <div className="text-xs sm:text-sm flex flex-wrap justify-between items-center whitespace-nowrap">
+              <div className="flex-1 flex items-center sm:justify-between mr-8">
+                <div>
+                  {t('from')}
+                  <Link href={`/account/${tx.from}`}>
+                    <a title={t('from')} className="ml-0.5 mr-1 select-none" data-addr={tx.from}>
+                      {formatAddress(tx.from)}
+                    </a>
+                  </Link>
+                </div>
+                <Image
+                  src={`${IMG_URL}arrow-down-rounded.svg`}
+                  width="14"
+                  height="14"
+                  className="transform -rotate-90 flex-shrink-0"
+                />
+                <div>
+                  <span className="ml-1 mr-0.5">{t('to')}</span>
+                  <Link href={`/account/${tx.to}`}>
+                    <a title={t('to')} className="mx-0.5 select-none" data-addr={tx.to}>
+                      {formatAddress(tx.to)}
+                    </a>
+                  </Link>
+                </div>
+              </div>
               <time
                 dateTime={new Date(+tx.timestamp).toISOString()}
-                className="flex flex-1 justify-end items-end list-datetime lg:h-6 "
+                className="flex justify-end items-center list-datetime ml-auto lg:h-6"
                 title={t('timestamp')}
               >
                 {timeDistance(tx.timestamp, language)}
