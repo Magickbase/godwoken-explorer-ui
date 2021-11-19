@@ -135,7 +135,7 @@ const TxList = ({ list }: { list: State['txList'] }) => {
             <div className="text-xs sm:text-sm flex flex-wrap justify-between items-center whitespace-nowrap">
               <div className="flex-1 flex items-center sm:justify-between mr-8">
                 <div>
-                  {t('from')}
+                  <span className="capitalize">{t('from')}</span>
                   <Link href={`/account/${tx.from}`}>
                     <a title={t('from')} className="ml-0.5 mr-1 select-none" data-addr={tx.from}>
                       {formatAddress(tx.from)}
@@ -149,7 +149,7 @@ const TxList = ({ list }: { list: State['txList'] }) => {
                   className="transform -rotate-90 flex-shrink-0"
                 />
                 <div>
-                  <span className="ml-1 mr-0.5">{t('to')}</span>
+                  <span className="ml-1 mr-0.5 capitalize">{t('to')}</span>
                   <Link href={`/account/${tx.to}`}>
                     <a title={t('to')} className="mx-0.5 select-none" data-addr={tx.to}>
                       {formatAddress(tx.to)}
