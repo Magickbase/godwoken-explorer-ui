@@ -85,7 +85,7 @@ const Search = () => {
     if (!search) {
       return
     }
-    fetchSearch(search)
+    fetchSearch(search.toLowerCase())
       .then(push)
       .catch(err => window.alert(err.message))
   }

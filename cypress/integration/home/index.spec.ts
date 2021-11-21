@@ -98,7 +98,7 @@ context('Home Page', () => {
           .first()
           .find(`a[title=from]`)
           .should(link => {
-            const id = link.text()
+            const id = link.data('addr')
             expect(link).to.has.attr('href').to.eq(`/account/${id}`)
           })
       })
@@ -108,7 +108,7 @@ context('Home Page', () => {
           .first()
           .find(`a[title=to]`)
           .should(link => {
-            const id = link.text()
+            const id = link.data('addr')
             expect(link).to.has.attr('href').to.eq(`/account/${id}`)
           })
       })
