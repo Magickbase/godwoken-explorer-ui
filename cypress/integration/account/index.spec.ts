@@ -14,7 +14,7 @@ context('Account Page', () => {
   })
 
   describe('general sets', () => {
-    it('cy.title() - get the title', () => {
+    it.skip('cy.title() - get the title', () => {
       cy.title().should('include', 'Godwoken Explorer')
     })
   })

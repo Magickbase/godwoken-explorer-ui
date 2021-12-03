@@ -1,5 +1,5 @@
 {
-  "blockCount": "blocks",
+  "blockHeight": "blocks",
   "txCount": "transactions",
   "tps": "TPS",
   "accountCount": "account count"

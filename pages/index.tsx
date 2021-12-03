@@ -17,7 +17,7 @@ const formatAddress = (addr: string) => {
 
 const statisticGroups = [
   [
-    { key: 'blockCount', icon: 'blocks' },
+    { key: 'blockHeight', icon: 'blocks', prefix: '# ' },
     { key: 'txCount', icon: 'txs' },
   ],
   [
@@ -29,8 +29,14 @@ const statisticGroups = [
 const SuccessIcon = <Image src={`${IMG_URL}success.svg`} alt="success" width="15" height="15" layout="fixed" />
 const FailureIcon = <Image src={`${IMG_URL}failure.svg`} alt="failure" width="15" height="15" layout="fixed" />
 
-const Statistic = (statistic: State['statistic']) => {
+const Statistic = ({ blockCount, txCount, tps, accountCount }: State['statistic']) => {
   const [t] = useTranslation('statistic')
+  const stats = {
+    blockHeight: +blockCount ? (+blockCount - 1).toLocaleString('en') : '-',
+    txCount: (+txCount).toLocaleString('en'),
+    tps: (+tps).toLocaleString('en'),
+    accountCount: (+accountCount).toLocaleString('en'),
+  }
 
   return (
     <div className="statistic-container">
@@ -57,7 +63,8 @@ const Statistic = (statistic: State['statistic']) => {
                 <span className="ml-1">{t(field.key)}</span>
               </div>
               <span className="block text-xl font-bold overflow-hidden overflow-ellipsis pr-2">
-                {Number(statistic[field.key]).toLocaleString('en')}
+                {field.prefix ? <span className="normal-case pl-1">{field.prefix}</span> : undefined}
+                {stats[field.key]}
                 {field.unit ? <span className="normal-case pl-1">{field.unit}</span> : undefined}
               </span>
             </div>
