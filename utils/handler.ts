@@ -1,10 +1,14 @@
 import { ServerResponse } from 'http'
 import { NotFoundException } from './exceptions'
 
-export const handleApiError = (err: Error, res: ServerResponse): { notFound: true } => {
+export const handleApiError = (err: Error, res: ServerResponse, locale: string, query?: string) => {
   if (err instanceof NotFoundException) {
+    res.statusCode = 404
     return {
-      notFound: true,
+      redirect: {
+        destination: `/${locale}/404${query ? '?query=' + query : ''}`,
+        permanent: false,
+      },
     }
   }
   console.warn(err.message)
