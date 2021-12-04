@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'next-i18next'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
@@ -6,10 +7,16 @@ import { IMG_URL, SEARCH_FIELDS } from 'utils'
 
 const Custom404 = () => {
   const [t] = useTranslation('common')
-  const {
-    query: { search },
-    back,
-  } = useRouter()
+  const [search, setSearch] = useState('')
+  const { back } = useRouter()
+
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search)
+    const s = q.get('query') || q.get('search')
+    if (s) {
+      setSearch(s)
+    }
+  }, [setSearch])
   return (
     <div className="notFound">
       {search ? (
