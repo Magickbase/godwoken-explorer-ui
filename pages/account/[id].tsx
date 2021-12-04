@@ -76,7 +76,7 @@ export const getServerSideProps: GetServerSideProps<State, { id: string }> = asy
     const lng = await serverSideTranslations(locale, ['account'])
     return { props: { ...account, ...lng } }
   } catch (err) {
-    return handleApiError(err, res)
+    return handleApiError(err, res, locale, id)
   }
 }
 export default Account

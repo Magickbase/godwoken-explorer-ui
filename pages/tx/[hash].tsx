@@ -128,22 +128,11 @@ export const getServerSideProps: GetServerSideProps<State, { hash: string }> = a
   const { hash } = params
 
   try {
-    await serverSideTranslations(locale, ['tx'])
-  } catch {
-    return {
-      redirect: {
-        destination: `/en-US/tx/${hash}`,
-        permanent: false,
-      },
-    }
-  }
-
-  try {
     const tx = await fetchTx(hash)
     const lng = await serverSideTranslations(locale, ['tx'])
     return { props: { ...tx, ...lng } }
   } catch (err) {
-    return handleApiError(err, res)
+    return handleApiError(err, res, locale, hash)
   }
 }
 export default Tx
