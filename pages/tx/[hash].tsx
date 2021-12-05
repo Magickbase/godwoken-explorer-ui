@@ -48,14 +48,21 @@ const Tx = (initState: State) => {
     [
       {
         label: 'timestamp',
-        value: <time dateTime={new Date(tx.timestamp).toISOString()}>{formatDatetime(tx.timestamp)}</time>,
+        value:
+          tx.timestamp >= 0 ? (
+            <time dateTime={new Date(tx.timestamp).toISOString()}>{formatDatetime(tx.timestamp)}</time>
+          ) : (
+            t('pending')
+          ),
       },
       {
         label: 'l2Block',
-        value: (
+        value: tx.l2Block ? (
           <Link href={`/block/${tx.l2Block}`}>
             <a title={t('l2Block')}>{BigInt(tx.l2Block).toLocaleString('en')}</a>
           </Link>
+        ) : (
+          t('pending')
         ),
       },
       {

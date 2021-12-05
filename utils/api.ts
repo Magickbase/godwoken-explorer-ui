@@ -209,7 +209,7 @@ export const fetchBlock = (id: string): Promise<API.Block.Parsed> =>
 
 export const getTxRes = (tx: API.Tx.Raw): API.Tx.Parsed => ({
   hash: tx.hash,
-  timestamp: tx.timestamp * 1000,
+  timestamp: tx.timestamp ? tx.timestamp * 1000 : -1,
   finalizeState: tx.finalize_state,
   l2Block: tx.l2_block,
   l1Block: tx.l1_block,
