@@ -20,5 +20,6 @@
   "txListTitle": "交易列表关联账户",
   "committed": "已提交",
   "finalized": "已确认",
-  "emptyTxList": "没有交易"
+  "emptyTxList": "没有交易",
+  "pending": "等待中"
 }

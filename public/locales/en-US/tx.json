@@ -20,5 +20,6 @@
   "txListTitle": "Transactions related to account",
   "committed": "committed",
   "finalized": "finalized",
-  "emptyTxList": "No transactions found"
+  "emptyTxList": "No transactions found",
+  "pending": "Pending"
 }
