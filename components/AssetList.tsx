@@ -15,7 +15,7 @@ const AssetList = ({ assetList = [], t }: { assetList: Array<API.Account.UDT>; t
               <img src={asset.icon} className="w-10 h-10 rounded-full mr-2" />
             ) : (
               <div className="flex justify-center items-center w-10 h-10 rounded-full mr-2 bg-gray-100 text-lg">
-                {asset.name[0]}
+                {asset.name?.[0] ?? '?'}
               </div>
             )}
             <span className="card-label uppercase">{asset.name}</span>
