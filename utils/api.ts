@@ -77,7 +77,7 @@ export namespace API {
   }
 
   export namespace Account {
-    type UDT = Record<'name' | 'balance' | 'icon', string>
+    export type UDT = { name: string; balance: string; icon: string | null; decimal: number }
     export type RawScript = Record<'args' | 'code_hash' | 'hash_type' | 'name', string>
     export type ParsedScript = Record<'args' | 'codeHash' | 'hashType' | 'name', string>
     export type Raw = Record<'id' | 'type' | 'ckb' | 'eth' | 'tx_count', string> &
