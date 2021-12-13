@@ -173,8 +173,7 @@ const TxList = (initState: State) => {
 
 export const getServerSideProps: GetServerSideProps<State> = async ({ locale, res, query }) => {
   try {
-    const q = new URLSearchParams(query as Record<string, string>)
-    const txList = await fetchTxList(`${q}`)
+    const txList = await fetchTxList(query)
     const lng = await serverSideTranslations(locale, ['common', 'tx'])
     return { props: { query: query as Record<string, string>, txList, ...lng } }
   } catch (err) {

@@ -1,6 +1,6 @@
 module.exports = {
-  purge: ['./pages/**/*.{js,ts,jsx,tsx}', './components/**/*.{js,ts,jsx,tsx}'],
-  darkMode: false,
+  content: ['./pages/**/*.{js,ts,jsx,tsx}', './components/**/*.{js,ts,jsx,tsx}'],
+  mode: 'jit',
   theme: {
     extend: {
       colors: {
@@ -38,13 +38,5 @@ module.exports = {
       },
     },
   },
-  variants: {
-    extend: {
-      backgroundColor: ['odd', 'even', 'hover', 'focus'],
-      borderColor: ['hover', 'focus'],
-      padding: ['odd', 'even', 'first', 'last'],
-      borderWidth: ['last'],
-    },
-  },
-  plugins: [],
+  plugins: [require('postcss-import'), require('tailwindcss/nesting'), require('tailwindcss'), require('autoprefixer')],
 }

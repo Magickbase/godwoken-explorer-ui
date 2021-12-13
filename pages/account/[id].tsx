@@ -73,7 +73,7 @@ export const getServerSideProps: GetServerSideProps<State, { id: string }> = asy
   const { id } = params
   try {
     const account = await fetchAccount(id)
-    const lng = await serverSideTranslations(locale, ['account'])
+    const lng = await serverSideTranslations(locale, ['common', 'account'])
     return { props: { ...account, ...lng } }
   } catch (err) {
     return handleApiError(err, res, locale, id)
