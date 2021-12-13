@@ -28,8 +28,8 @@ const TokenList = ({ meta, tokens, type }: State) => {
   }
 
   return (
-    <div>
-      <div className="flex mt-10 mb-2 justify-between">
+    <div className="bg-white rounded-md shadow-md px-4 mt-10 pb-2">
+      <div className="flex py-4 justify-between">
         <span>{t(`${type}-udt-list`)}</span>
         <span>{t(`total-count-of-udt`, { total: (meta.total - 1) * 10 + tokens.length })}</span>
       </div>
@@ -45,7 +45,7 @@ const TokenList = ({ meta, tokens, type }: State) => {
         </thead>
         <tbody className="align-baseline">
           {tokens.map(token => (
-            <tr key={token.id.toString()} className="text-sm leading-6 border-t border-gray-300 hover:bg-gray-200">
+            <tr key={token.id.toString()} className="text-sm leading-6 border-t border-gray-300 hover:bg-hover-bg">
               <td className="p-2">
                 {token.icon ? (
                   <img src={token.icon} className="inline-block w-10 h-10 rounded-full mr-2" />
@@ -71,7 +71,7 @@ const TokenList = ({ meta, tokens, type }: State) => {
         {meta.current === 1 ? null : (
           <Link href={`/tokens/${type}?page=${meta.current - 1}`}>{t(`prev`, { ns: 'common' })}</Link>
         )}
-        <select className="mx-2" onChange={handlePageChange} value={meta.current}>
+        <select className="mx-2 bg-gray-100" onChange={handlePageChange} value={meta.current}>
           {Array.from({ length: meta.total }).map((_, idx) => (
             <option key={idx} defaultValue={idx}>
               {idx + 1}
