@@ -37,7 +37,11 @@ const TokenList = ({ meta, tokens, type }: State) => {
         <thead>
           <tr>
             {headers.map(h => (
-              <th key={h.key} title={t(h.label ?? h.key)} className="px-2 py-4">
+              <th
+                key={h.key}
+                title={t(h.label ?? h.key)}
+                className={h.key === 'address' ? 'px-2 py-4 hidden sm:table-cell' : 'px-2 py-4'}
+              >
                 {t(h.label ?? h.key)}
               </th>
             ))}
@@ -58,7 +62,7 @@ const TokenList = ({ meta, tokens, type }: State) => {
                   token.symbol ? '(' + token.symbol + ')' : ''
                 }`}</Link>
               </td>
-              <td className="font-mono overflow-hidden overflow-ellipsis text-secondary max-w-0 md:max-w-min">
+              <td className="font-mono overflow-hidden overflow-ellipsis text-secondary max-w-0 hidden sm:table-cell md:max-w-min">
                 <Link href={`/token/${token.id}`}>{token.shortAddress}</Link>
               </td>
               <td className="p-2">{formatBigInt(token.supply) ?? '-'}</td>
