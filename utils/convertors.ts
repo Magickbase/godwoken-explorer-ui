@@ -52,4 +52,18 @@ export const formatBalance = (balance: string) => {
   return dec ? [formattedInt, dec].join('.') : formattedInt
 }
 
+export const formatBigInt = (int: string) => {
+  return (
+    int
+      .split('')
+      .reverse()
+      .join('')
+      .match(/\d{1,3}/g) || [0]
+  )
+    .join(',')
+    .split('')
+    .reverse()
+    .join('')
+}
+
 export { scriptToHash }

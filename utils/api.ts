@@ -158,6 +158,57 @@ export namespace API {
       >
     }
   }
+
+  export namespace Tokens {
+    export type TokenType = 'bridge' | 'native'
+    interface RawToken {
+      attributes: {
+        icon: string | null
+        decimal: number
+        description: string | null
+        holder_count: number
+        id: number
+        name: string
+        official_site: string | null
+        script_hash: string
+        short_address: string
+        supply: string | null
+        symbol: string
+        transfer_count: number
+        type: TokenType
+        type_script: null
+        value: null
+      }
+      id: string
+      type: 'udt'
+    }
+
+    interface ParsedToken {
+      icon: string | null
+      decimal: number
+      description: string | null
+      holderCount: number
+      id: number
+      name: string
+      officialSite: string | null
+      scriptHash: string
+      shortAddress: string
+      supply: string | null
+      symbol: string
+      transferCount: number
+      type: TokenType
+      typeScript: null
+      value: null
+    }
+    export interface Raw {
+      meta: Record<'current_page' | 'total_page', number>
+      data: Array<RawToken>
+    }
+    export interface Parsed {
+      meta: Record<'current' | 'total', number>
+      tokens: Array<ParsedToken>
+    }
+  }
 }
 
 const pretreat = async <T>(res: Response) => {
@@ -312,6 +363,30 @@ export const fetchTxList = (query: string): Promise<API.Txs.Parsed> =>
   fetch(`${SERVER_URL}/txs?${query}`)
     .then(res => pretreat<API.Txs.Raw>(res))
     .then(getTxListRes)
+
+const getTokenListRes = (tokenListRes: API.Tokens.Raw): API.Tokens.Parsed => ({
+  meta: {
+    current: tokenListRes.meta.current_page,
+    total: tokenListRes.meta.total_page,
+  },
+  tokens: tokenListRes.data.map(
+    ({
+      attributes: { official_site, script_hash, type_script, transfer_count, short_address, holder_count, ...attrs },
+    }) => ({
+      officialSite: official_site,
+      scriptHash: script_hash,
+      transferCount: transfer_count,
+      shortAddress: short_address,
+      holderCount: holder_count,
+      typeScript: type_script,
+      ...attrs,
+    }),
+  ),
+})
+export const fetchTokenList = (query: Partial<Record<'page' | 'type', string>>): Promise<API.Tokens.Parsed> =>
+  fetch(`${SERVER_URL}/udts?${new URLSearchParams(query)}`)
+    .then(res => pretreat<API.Tokens.Raw>(res))
+    .then(getTokenListRes)
 
 export const fetchSearch = (search: string) => {
   let query = search

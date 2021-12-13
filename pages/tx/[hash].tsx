@@ -136,7 +136,7 @@ export const getServerSideProps: GetServerSideProps<State, { hash: string }> = a
 
   try {
     const tx = await fetchTx(hash)
-    const lng = await serverSideTranslations(locale, ['tx'])
+    const lng = await serverSideTranslations(locale, ['common', 'tx'])
     return { props: { ...tx, ...lng } }
   } catch (err) {
     return handleApiError(err, res, locale, hash)
