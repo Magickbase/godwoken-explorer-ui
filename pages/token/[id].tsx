@@ -21,12 +21,20 @@ const Token = ({ token, txList }: Props) => {
     { label: 'decimal', value: token.decimal ?? '-' },
     { label: 'type', value: t(token.type) },
     {
-      label: 'contract_address',
+      label: 'contract',
       value:
         (
-          <Link href={`/account/${token.shortAddress}`}>
-            <a className="font-mono">{token.shortAddress}</a>
-          </Link>
+          <>
+            <Link href={`/account/${token.shortAddress}`}>
+              <a className="font-mono hidden sm:inline">{token.shortAddress}</a>
+            </Link>
+            <Link href={`/account/${token.shortAddress}`}>
+              <a className="font-mono select-none sm:hidden">{`${token.shortAddress.slice(
+                0,
+                8,
+              )}...${token.shortAddress.slice(-8)}`}</a>
+            </Link>
+          </>
         ) ?? '-',
     },
     // {
@@ -60,6 +68,7 @@ const Token = ({ token, txList }: Props) => {
     { key: 'hash' },
     { key: 'from', label: 'from' },
     { key: 'to', label: 'to' },
+    { key: 'transfer' },
     { key: 'value' },
     { key: 'age' },
   ]
@@ -84,7 +93,7 @@ const Token = ({ token, txList }: Props) => {
         <div>{`${token.name ?? '-'}${token.symbol ? '(' + token.symbol + ')' : ''}`}</div>
       </div>
       <div className="flex flex-col lg:flex-row">
-        <div className="bg-white rounded-md shadow-md px-4 lg:w-1/2 lg:mr-2">
+        <div className="bg-white rounded-md shadow-md px-4 w-full lg:w-1/2 lg:mr-2">
           <table className="border-collapse w-full overflow-hidden text-left whitespace-nowrap border-gray-400">
             <thead>
               <tr>
@@ -96,14 +105,14 @@ const Token = ({ token, txList }: Props) => {
             <tbody>
               {tokenInfo.map(field => (
                 <tr key={field.label} className="text-sm leading-6 border-t border-gray-300 hover:bg-hover-bg">
-                  <td className="pr-4 h-14 select-none">{`${t(field.label)}:`}</td>
+                  <td className="pr-2 h-14 select-none">{`${t(field.label)}:`}</td>
                   <td className="w-full">{field.value}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        <div className="bg-white rounded-md shadow-md self-start px-4 mt-10 lg:mt-0 lg:w-1/2 lg:ml-2">
+        <div className="bg-white rounded-md shadow-md self-start px-4 mt-10 w-full lg:mt-0 lg:w-1/2 lg:ml-2">
           <table className="border-collapse w-full text-left whitespace-nowrap border-gray-400">
             <thead>
               <tr>
@@ -115,7 +124,7 @@ const Token = ({ token, txList }: Props) => {
             <tbody>
               {tokenData.map(field => (
                 <tr key={field.label} className="text-sm leading-6 border-t border-gray-300 hover:bg-hover-bg">
-                  <td className="pr-4 h-14 select-none">{`${t(field.label)}:`}</td>
+                  <td className="pr-2 h-14 select-none">{`${t(field.label)}:`}</td>
                   <td className="w-full">{field.value}</td>
                 </tr>
               ))}
@@ -125,11 +134,24 @@ const Token = ({ token, txList }: Props) => {
       </div>
 
       <div className="bg-white rounded-md shadow-md px-4 mt-10 py-4">
-        <table className="table-auto border-collapse w-full text-left whitespace-nowrap border-t border-b border-gray-400">
+        <div className="flex py-4 justify-between">{t(`transfer_records`)}</div>
+        <table className="table table-auto border-collapse w-full text-left whitespace-nowrap border-t border-b border-gray-400">
           <thead>
             <tr>
               {headers.map(h => (
-                <th key={h.key} title={t(h.label ?? h.key)} className="px-2 py-4">
+                <th
+                  key={h.key}
+                  title={t(h.label ?? h.key)}
+                  className={
+                    h.key === 'transfer'
+                      ? 'table-cell px-2 py-4 lg:hidden'
+                      : ['from', 'to'].includes(h.key)
+                      ? 'hidden px-2 py-4 lg:table-cell'
+                      : h.key === 'age'
+                      ? 'px-2 py-4 hidden sm:table-cell'
+                      : 'px-2 py-4'
+                  }
+                >
                   {t(h.label ?? h.key)}
                 </th>
               ))}
@@ -140,27 +162,56 @@ const Token = ({ token, txList }: Props) => {
               <tr key={tx.hash} className="text-sm leading-6 border-t border-gray-300 hover:bg-hover-bg">
                 <td className="p-2">
                   <Link href={`/tx/${tx.hash}`}>
-                    <a title={tx.hash} className="hashLink font-mono flex-1 select-none">
+                    <a title={tx.hash} className="hidden font-mono flex-1 select-none font-light lg:inline">
                       {`${tx.hash.slice(0, 8)}...${tx.hash.slice(-8)}`}
                     </a>
                   </Link>
+                  <Link href={`/tx/${tx.hash}`}>
+                    <a title={tx.hash} className="inline font-mono flex-1 select-none font-light text-xs lg:hidden">
+                      {`${tx.hash.slice(0, 5)}...${tx.hash.slice(-5)}`}
+                    </a>
+                  </Link>
                 </td>
-                <td className="font-mono overflow-hidden overflow-ellipsis text-secondary max-w-0 md:max-w-min">
+                <td data-role="from" className="hidden font-mono  text-secondary max-w-0 md:max-w-min lg:table-cell">
                   <Link href={`/account/${tx.from}`}>
                     <a title={tx.from} className="font-mono select-none">
                       {tx.from.startsWith('0x') ? `${tx.from.slice(0, 8)}...${tx.from.slice(-8)}` : tx.from}
                     </a>
                   </Link>
                 </td>
-                <td className="font-mono overflow-hidden overflow-ellipsis text-secondary max-w-0 md:max-w-min">
+                <td data-role="to" className="hidden font-mono  text-secondary max-w-0 md:max-w-min lg:table-cell">
                   <Link href={`/account/${tx.to}`}>
                     <a title={tx.to} className="font-mono select-none">
                       {tx.to.startsWith('0x') ? `${tx.to.slice(0, 8)}...${tx.to.slice(-8)}` : tx.to}
                     </a>
                   </Link>
                 </td>
-                <td className="p-2">{formatBigInt(tx.value ?? '0')}</td>
-                <td>
+                <td data-role="transfer" className="font-mono lg:hidden">
+                  <div className="table">
+                    <div className="table-row">
+                      <div className="table-cell">{`${t(`from`)}:`}</div>
+                      <div className="table-cell">
+                        <Link href={`/account/${tx.from}`}>
+                          <a title={tx.from} className="font-mono select-none text-xs">
+                            {tx.from.startsWith('0x') ? `${tx.from.slice(0, 5)}...${tx.from.slice(-5)}` : tx.from}
+                          </a>
+                        </Link>
+                      </div>
+                    </div>
+                    <div className="table-row">
+                      <div className="table-cell">{`${t(`to`)}:`}</div>
+                      <div className="table-cell">
+                        <Link href={`/account/${tx.to}`}>
+                          <a title={tx.to} className="font-mono select-none text-xs">
+                            {tx.to.startsWith('0x') ? `${tx.to.slice(0, 5)}...${tx.to.slice(-5)}` : tx.to}
+                          </a>
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td className="p-2 max-w-0 overflow-hidden text-ellipsis">{formatBigInt(tx.value ?? '0')}</td>
+                <td className="hidden sm:table-cell">
                   <time
                     dateTime={new Date(+tx.timestamp).toISOString()}
                     className="flex justify-start items-center list-datetime"
