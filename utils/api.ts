@@ -497,6 +497,9 @@ export const fetchSearch = (search: string) => {
         case 'account': {
           return `/account/${found.id}`
         }
+        case 'udt': {
+          return `/token/${found.id}`
+        }
         default: {
           return `/404`
         }
