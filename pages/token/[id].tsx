@@ -18,24 +18,25 @@ const Token = ({ token, txList }: Props) => {
   const [t, { language }] = useTranslation('tokens')
   const { push } = useRouter()
   const tokenInfo = [
-    { label: 'decimal', value: token.decimal ?? '-' },
+    { label: 'decimal', value: token.decimal || '-' },
     { label: 'type', value: t(token.type) },
     {
       label: 'contract',
-      value:
-        (
-          <>
-            <Link href={`/account/${token.shortAddress}`}>
-              <a className="font-mono hidden sm:inline">{token.shortAddress}</a>
-            </Link>
-            <Link href={`/account/${token.shortAddress}`}>
-              <a className="font-mono select-none sm:hidden">{`${token.shortAddress.slice(
-                0,
-                8,
-              )}...${token.shortAddress.slice(-8)}`}</a>
-            </Link>
-          </>
-        ) ?? '-',
+      value: token.shortAddress ? (
+        <>
+          <Link href={`/account/${token.shortAddress}`}>
+            <a className="font-mono hidden sm:inline">{token.shortAddress}</a>
+          </Link>
+          <Link href={`/account/${token.shortAddress}`}>
+            <a className="font-mono select-none sm:hidden">{`${token.shortAddress.slice(
+              0,
+              8,
+            )}...${token.shortAddress.slice(-8)}`}</a>
+          </Link>
+        </>
+      ) : (
+        '-'
+      ),
     },
     // {
     //   label: 'layer1Lock',
@@ -55,13 +56,13 @@ const Token = ({ token, txList }: Props) => {
         '-'
       ),
     },
-    { label: 'description', value: <div className="whitespace-pre">{token.description ?? '-'}</div> },
+    { label: 'description', value: <div className="whitespace-pre">{token.description || '-'}</div> },
   ]
   const tokenData = [
-    { label: 'totalSupply', value: token.supply ?? '-' },
+    { label: 'totalSupply', value: token.supply || '-' },
     // {label: 'value', value: token.supply ?? '-'},
-    { label: 'holderCount', value: token.holderCount ?? '-' },
-    { label: 'transferCount', value: token.transferCount ?? '-' },
+    { label: 'holderCount', value: token.holderCount || '-' },
+    { label: 'transferCount', value: token.transferCount || '-' },
   ]
 
   const headers = [
@@ -90,7 +91,7 @@ const Token = ({ token, txList }: Props) => {
             {token.name?.[0] ?? '?'}
           </div>
         )}
-        <div>{`${token.name ?? '-'}${token.symbol ? '(' + token.symbol + ')' : ''}`}</div>
+        <div>{`${token.name || '-'}${token.symbol ? '(' + token.symbol + ')' : ''}`}</div>
       </div>
       <div className="flex flex-col lg:flex-row">
         <div className="bg-white rounded-md shadow-md px-4 w-full lg:w-1/2 lg:mr-2">
@@ -211,7 +212,7 @@ const Token = ({ token, txList }: Props) => {
                       </div>
                     </div>
                   </td>
-                  <td className="p-2 max-w-0 overflow-hidden text-ellipsis">{formatBigInt(tx.value ?? '0')}</td>
+                  <td className="p-2 max-w-0 overflow-hidden text-ellipsis">{formatBigInt(tx.value || '0')}</td>
                   <td className="hidden sm:table-cell">
                     <time
                       dateTime={new Date(+tx.timestamp).toISOString()}

@@ -59,15 +59,15 @@ const TokenList = ({ meta, tokens, type }: State) => {
                       {token.name?.[0] ?? '?'}
                     </div>
                   )}
-                  <Link href={`/token/${token.id}`}>{`${token.name ?? '-'}${
+                  <Link href={`/token/${token.id}`}>{`${token.name || '-'}${
                     token.symbol ? '(' + token.symbol + ')' : ''
                   }`}</Link>
                 </td>
                 <td className="font-mono overflow-hidden overflow-ellipsis text-secondary max-w-0 hidden sm:table-cell md:max-w-min">
                   <Link href={`/token/${token.id}`}>{token.shortAddress}</Link>
                 </td>
-                <td className="p-2">{formatBigInt(token.supply) ?? '-'}</td>
-                <td className="p-2">{token.holderCount ?? '0'}</td>
+                <td className="p-2">{formatBigInt(token.supply) || '-'}</td>
+                <td className="p-2">{token.holderCount || '0'}</td>
               </tr>
             ))
           ) : (
