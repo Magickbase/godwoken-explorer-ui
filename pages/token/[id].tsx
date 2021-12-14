@@ -158,87 +158,97 @@ const Token = ({ token, txList }: Props) => {
             </tr>
           </thead>
           <tbody className="align-baseline">
-            {txList.txs.map(tx => (
-              <tr key={tx.hash} className="text-sm leading-6 border-t border-gray-300 hover:bg-hover-bg">
-                <td className="p-2">
-                  <Link href={`/tx/${tx.hash}`}>
-                    <a title={tx.hash} className="hidden font-mono flex-1 select-none font-light lg:inline">
-                      {`${tx.hash.slice(0, 8)}...${tx.hash.slice(-8)}`}
-                    </a>
-                  </Link>
-                  <Link href={`/tx/${tx.hash}`}>
-                    <a title={tx.hash} className="inline font-mono flex-1 select-none font-light text-xs lg:hidden">
-                      {`${tx.hash.slice(0, 5)}...${tx.hash.slice(-5)}`}
-                    </a>
-                  </Link>
-                </td>
-                <td data-role="from" className="hidden font-mono  text-secondary max-w-0 md:max-w-min lg:table-cell">
-                  <Link href={`/account/${tx.from}`}>
-                    <a title={tx.from} className="font-mono select-none">
-                      {tx.from.startsWith('0x') ? `${tx.from.slice(0, 8)}...${tx.from.slice(-8)}` : tx.from}
-                    </a>
-                  </Link>
-                </td>
-                <td data-role="to" className="hidden font-mono  text-secondary max-w-0 md:max-w-min lg:table-cell">
-                  <Link href={`/account/${tx.to}`}>
-                    <a title={tx.to} className="font-mono select-none">
-                      {tx.to.startsWith('0x') ? `${tx.to.slice(0, 8)}...${tx.to.slice(-8)}` : tx.to}
-                    </a>
-                  </Link>
-                </td>
-                <td data-role="transfer" className="font-mono lg:hidden">
-                  <div className="table">
-                    <div className="table-row">
-                      <div className="table-cell">{`${t(`from`)}:`}</div>
-                      <div className="table-cell">
-                        <Link href={`/account/${tx.from}`}>
-                          <a title={tx.from} className="font-mono select-none text-xs">
-                            {tx.from.startsWith('0x') ? `${tx.from.slice(0, 5)}...${tx.from.slice(-5)}` : tx.from}
-                          </a>
-                        </Link>
+            {txList.meta.total ? (
+              txList.txs.map(tx => (
+                <tr key={tx.hash} className="text-sm leading-6 border-t border-gray-300 hover:bg-hover-bg">
+                  <td className="p-2">
+                    <Link href={`/tx/${tx.hash}`}>
+                      <a title={tx.hash} className="hidden font-mono flex-1 select-none font-light lg:inline">
+                        {`${tx.hash.slice(0, 8)}...${tx.hash.slice(-8)}`}
+                      </a>
+                    </Link>
+                    <Link href={`/tx/${tx.hash}`}>
+                      <a title={tx.hash} className="inline font-mono flex-1 select-none font-light text-xs lg:hidden">
+                        {`${tx.hash.slice(0, 5)}...${tx.hash.slice(-5)}`}
+                      </a>
+                    </Link>
+                  </td>
+                  <td data-role="from" className="hidden font-mono  text-secondary max-w-0 md:max-w-min lg:table-cell">
+                    <Link href={`/account/${tx.from}`}>
+                      <a title={tx.from} className="font-mono select-none">
+                        {tx.from.startsWith('0x') ? `${tx.from.slice(0, 8)}...${tx.from.slice(-8)}` : tx.from}
+                      </a>
+                    </Link>
+                  </td>
+                  <td data-role="to" className="hidden font-mono  text-secondary max-w-0 md:max-w-min lg:table-cell">
+                    <Link href={`/account/${tx.to}`}>
+                      <a title={tx.to} className="font-mono select-none">
+                        {tx.to.startsWith('0x') ? `${tx.to.slice(0, 8)}...${tx.to.slice(-8)}` : tx.to}
+                      </a>
+                    </Link>
+                  </td>
+                  <td data-role="transfer" className="text-xs font-mono lg:hidden">
+                    <div className="table">
+                      <div className="table-row">
+                        <div className="table-cell">{`${t(`from`)}:`}</div>
+                        <div className="table-cell">
+                          <Link href={`/account/${tx.from}`}>
+                            <a title={tx.from} className="font-mono select-none text-xs">
+                              {tx.from.startsWith('0x') ? `${tx.from.slice(0, 5)}...${tx.from.slice(-5)}` : tx.from}
+                            </a>
+                          </Link>
+                        </div>
+                      </div>
+                      <div className="table-row">
+                        <div className="table-cell">{`${t(`to`)}:`}</div>
+                        <div className="table-cell">
+                          <Link href={`/account/${tx.to}`}>
+                            <a title={tx.to} className="font-mono select-none text-xs">
+                              {tx.to.startsWith('0x') ? `${tx.to.slice(0, 5)}...${tx.to.slice(-5)}` : tx.to}
+                            </a>
+                          </Link>
+                        </div>
                       </div>
                     </div>
-                    <div className="table-row">
-                      <div className="table-cell">{`${t(`to`)}:`}</div>
-                      <div className="table-cell">
-                        <Link href={`/account/${tx.to}`}>
-                          <a title={tx.to} className="font-mono select-none text-xs">
-                            {tx.to.startsWith('0x') ? `${tx.to.slice(0, 5)}...${tx.to.slice(-5)}` : tx.to}
-                          </a>
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-                <td className="p-2 max-w-0 overflow-hidden text-ellipsis">{formatBigInt(tx.value ?? '0')}</td>
-                <td className="hidden sm:table-cell">
-                  <time
-                    dateTime={new Date(+tx.timestamp).toISOString()}
-                    className="flex justify-start items-center list-datetime"
-                    title={t('timestamp')}
-                  >
-                    {timeDistance(tx.timestamp, language)}
-                  </time>
+                  </td>
+                  <td className="p-2 max-w-0 overflow-hidden text-ellipsis">{formatBigInt(tx.value ?? '0')}</td>
+                  <td className="hidden sm:table-cell">
+                    <time
+                      dateTime={new Date(+tx.timestamp).toISOString()}
+                      className="flex justify-start items-center list-datetime"
+                      title={t('timestamp')}
+                    >
+                      {timeDistance(tx.timestamp, language)}
+                    </time>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={5} className="text-center py-4 text-gray-400">
+                  {t(`no_records`)}
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
-        <div className="flex justify-end items-center mt-2">
-          {txList.meta.current === 1 ? null : (
-            <Link href={`/token/${token.id}?page=${txList.meta.current - 1}`}>{t(`prev`, { ns: 'common' })}</Link>
-          )}
-          <select className="mx-2 bg-gray-100" onChange={handlePageChange} value={txList.meta.current}>
-            {Array.from({ length: txList.meta.total }).map((_, idx) => (
-              <option key={idx} defaultValue={idx}>
-                {idx + 1}
-              </option>
-            ))}
-          </select>
-          {txList.meta.total > txList.meta.current ? (
-            <Link href={`/token/${token.id}?page=${txList.meta.current + 1}`}>{t(`next`, { ns: 'common' })}</Link>
-          ) : null}
-        </div>
+        {txList.meta.total ? (
+          <div className="flex justify-end items-center mt-2">
+            {txList.meta.current === 1 ? null : (
+              <Link href={`/token/${token.id}?page=${txList.meta.current - 1}`}>{t(`prev`, { ns: 'common' })}</Link>
+            )}
+            <select className="mx-2 bg-gray-100" onChange={handlePageChange} value={txList.meta.current}>
+              {Array.from({ length: txList.meta.total }).map((_, idx) => (
+                <option key={idx} defaultValue={idx}>
+                  {idx + 1}
+                </option>
+              ))}
+            </select>
+            {txList.meta.total > txList.meta.current ? (
+              <Link href={`/token/${token.id}?page=${txList.meta.current + 1}`}>{t(`next`, { ns: 'common' })}</Link>
+            ) : null}
+          </div>
+        ) : null}
       </div>
     </div>
   )

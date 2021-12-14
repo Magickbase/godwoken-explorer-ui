@@ -48,44 +48,54 @@ const TokenList = ({ meta, tokens, type }: State) => {
           </tr>
         </thead>
         <tbody className="align-baseline">
-          {tokens.map(token => (
-            <tr key={token.id.toString()} className="text-sm leading-6 border-t border-gray-300 hover:bg-hover-bg">
-              <td className="p-2">
-                {token.icon ? (
-                  <img src={token.icon} className="inline-block w-10 h-10 rounded-full mr-2" />
-                ) : (
-                  <div className="inline-flex justify-center items-center w-10 h-10 rounded-full mr-2 bg-gray-100 text-lg">
-                    {token.name?.[0] ?? '?'}
-                  </div>
-                )}
-                <Link href={`/token/${token.id}`}>{`${token.name ?? '-'}${
-                  token.symbol ? '(' + token.symbol + ')' : ''
-                }`}</Link>
+          {tokens.length ? (
+            tokens.map(token => (
+              <tr key={token.id.toString()} className="text-sm leading-6 border-t border-gray-300 hover:bg-hover-bg">
+                <td className="p-2">
+                  {token.icon ? (
+                    <img src={token.icon} className="inline-block w-10 h-10 rounded-full mr-2" />
+                  ) : (
+                    <div className="inline-flex justify-center items-center w-10 h-10 rounded-full mr-2 bg-gray-100 text-lg">
+                      {token.name?.[0] ?? '?'}
+                    </div>
+                  )}
+                  <Link href={`/token/${token.id}`}>{`${token.name ?? '-'}${
+                    token.symbol ? '(' + token.symbol + ')' : ''
+                  }`}</Link>
+                </td>
+                <td className="font-mono overflow-hidden overflow-ellipsis text-secondary max-w-0 hidden sm:table-cell md:max-w-min">
+                  <Link href={`/token/${token.id}`}>{token.shortAddress}</Link>
+                </td>
+                <td className="p-2">{formatBigInt(token.supply) ?? '-'}</td>
+                <td className="p-2">{token.holderCount ?? '0'}</td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan={headers.length} className="text-center py-4 text-gray-400">
+                {t(`no_records`)}
               </td>
-              <td className="font-mono overflow-hidden overflow-ellipsis text-secondary max-w-0 hidden sm:table-cell md:max-w-min">
-                <Link href={`/token/${token.id}`}>{token.shortAddress}</Link>
-              </td>
-              <td className="p-2">{formatBigInt(token.supply) ?? '-'}</td>
-              <td className="p-2">{token.holderCount ?? '0'}</td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
-      <div className="flex justify-end items-center mt-2">
-        {meta.current === 1 ? null : (
-          <Link href={`/tokens/${type}?page=${meta.current - 1}`}>{t(`prev`, { ns: 'common' })}</Link>
-        )}
-        <select className="mx-2 bg-gray-100" onChange={handlePageChange} value={meta.current}>
-          {Array.from({ length: meta.total }).map((_, idx) => (
-            <option key={idx} defaultValue={idx}>
-              {idx + 1}
-            </option>
-          ))}
-        </select>
-        {meta.total > meta.current ? (
-          <Link href={`/tokens/${type}?page=${meta.current + 1}`}>{t(`next`, { ns: 'common' })}</Link>
-        ) : null}
-      </div>
+      {meta.total ? (
+        <div className="flex justify-end items-center mt-2">
+          {meta.current === 1 ? null : (
+            <Link href={`/tokens/${type}?page=${meta.current - 1}`}>{t(`prev`, { ns: 'common' })}</Link>
+          )}
+          <select className="mx-2 bg-gray-100" onChange={handlePageChange} value={meta.current}>
+            {Array.from({ length: meta.total }).map((_, idx) => (
+              <option key={idx} defaultValue={idx}>
+                {idx + 1}
+              </option>
+            ))}
+          </select>
+          {meta.total > meta.current ? (
+            <Link href={`/tokens/${type}?page=${meta.current + 1}`}>{t(`next`, { ns: 'common' })}</Link>
+          ) : null}
+        </div>
+      ) : null}
     </div>
   )
 }
