@@ -108,7 +108,7 @@ export const getServerSideProps: GetServerSideProps<State> = async ({ locale, re
   const { id } = params
   try {
     const block = await fetchBlock(id as string)
-    const lng = await serverSideTranslations(locale, ['block'])
+    const lng = await serverSideTranslations(locale, ['common', 'block'])
     return { props: { ...block, ...lng } }
   } catch (err) {
     return handleApiError(err, res, locale, id.toString())

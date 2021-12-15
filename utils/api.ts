@@ -1,4 +1,5 @@
 import { addressToScript } from '@nervosnetwork/ckb-sdk-utils'
+import { type } from 'os'
 import { SERVER_URL } from './constants'
 import { NotFoundException } from './exceptions'
 
@@ -143,6 +144,7 @@ export namespace API {
         Record<'hash' | 'block_number' | 'from' | 'to' | 'type', string> & {
           success: boolean
           timestamp: Timestamp
+          value?: string
         }
       >
     }
@@ -154,8 +156,110 @@ export namespace API {
         Record<'hash' | 'blockNumber' | 'from' | 'to' | 'type', string> & {
           success: boolean
           timestamp: Timestamp
+          value: string
         }
       >
+    }
+  }
+
+  export namespace Tokens {
+    export type TokenType = 'bridge' | 'native'
+    interface RawToken {
+      attributes: {
+        icon: string | null
+        decimal: number
+        description: string | null
+        holder_count: number
+        id: number
+        name: string
+        official_site: string | null
+        script_hash: string
+        short_address: string
+        supply: string | null
+        symbol: string
+        transfer_count: number
+        type: TokenType
+        type_script: null
+        value: null
+      }
+      id: string
+      type: 'udt'
+    }
+
+    interface ParsedToken {
+      icon: string | null
+      decimal: number
+      description: string | null
+      holderCount: number
+      id: number
+      name: string
+      officialSite: string | null
+      scriptHash: string
+      shortAddress: string
+      supply: string | null
+      symbol: string
+      transferCount: number
+      type: TokenType
+      typeScript: null
+      value: null
+    }
+    export interface Raw {
+      meta: Record<'current_page' | 'total_page', number>
+      data: Array<RawToken>
+    }
+    export interface Parsed {
+      meta: Record<'current' | 'total', number>
+      tokens: Array<ParsedToken>
+    }
+  }
+  export namespace Token {
+    export interface Raw {
+      data: {
+        attributes: {
+          decimal: number
+          description: string | null
+          holder_count: number
+          icon: string | null
+          id: number
+          name: string
+          official_site: string | null
+          script_hash: string
+          short_address: string | null
+          supply: string | null
+          symbol: string
+          transfer_count: number
+          type: 'bridge' | 'native'
+          type_script: {
+            args: string
+            code_hash: string
+            hash_type: 'data' | 'type'
+          }
+          value: string | null
+        }
+        id: string
+        type: 'udt'
+      }
+    }
+    export interface Parsed {
+      decimal: number
+      description: string | null
+      holderCount: number
+      icon: string | null
+      id: number
+      name: string
+      officialSite: string | null
+      scriptHash: string
+      shortAddress: string | null
+      supply: string | null
+      symbol: string
+      transferCount: number
+      type: 'bridge' | 'native'
+      typeScript: {
+        args: string
+        codeHash: string
+        hashType: 'data' | 'type'
+      }
+      value: string | null
     }
   }
 }
@@ -210,17 +314,18 @@ export const fetchBlock = (id: string): Promise<API.Block.Parsed> =>
 export const getTxRes = (tx: API.Tx.Raw): API.Tx.Parsed => ({
   hash: tx.hash,
   timestamp: tx.timestamp ? tx.timestamp * 1000 : -1,
-  finalizeState: tx.finalize_state,
-  l2Block: tx.l2_block,
-  l1Block: tx.l1_block,
+  finalizeState: tx.finalize_state ?? '',
+  l2Block: tx.l2_block ?? '',
+  l1Block: tx.l1_block ?? '',
   from: tx.from,
   to: tx.to,
   nonce: tx.nonce,
   args: tx.args,
   type: tx.type,
   gasPrice: tx.gas_price,
-  fee: tx.fee,
+  fee: tx.fee ?? '',
 })
+
 export const fetchTx = (hash: string): Promise<API.Tx.Parsed> =>
   fetch(`${SERVER_URL}/txs/${hash}`)
     .then(res => pretreat<API.Tx.Raw>(res))
@@ -306,12 +411,61 @@ export const getTxListRes = (txListRes: API.Txs.Raw): API.Txs.Parsed => ({
       timestamp: tx.timestamp * 1000,
       type: tx.type,
       success: tx.success ?? true,
+      value: tx.value ?? '0',
     })) ?? [],
 })
-export const fetchTxList = (query: string): Promise<API.Txs.Parsed> =>
-  fetch(`${SERVER_URL}/txs?${query}`)
+export const fetchTxList = (query: Partial<Record<'page' | 'type' | 'account_id', string>>): Promise<API.Txs.Parsed> =>
+  fetch(`${SERVER_URL}/txs?${new URLSearchParams(query)}`)
     .then(res => pretreat<API.Txs.Raw>(res))
     .then(getTxListRes)
+
+const getTokenListRes = (tokenListRes: API.Tokens.Raw): API.Tokens.Parsed => ({
+  meta: {
+    current: tokenListRes.meta.current_page,
+    total: tokenListRes.meta.total_page,
+  },
+  tokens: tokenListRes.data.map(
+    ({
+      attributes: { official_site, script_hash, type_script, transfer_count, short_address, holder_count, ...attrs },
+    }) => ({
+      officialSite: official_site,
+      scriptHash: script_hash,
+      transferCount: transfer_count,
+      shortAddress: short_address,
+      holderCount: holder_count,
+      typeScript: type_script,
+      ...attrs,
+    }),
+  ),
+})
+export const fetchTokenList = (
+  query: Partial<Record<'page' | 'type' | 'account_id', string>>,
+): Promise<API.Tokens.Parsed> =>
+  fetch(`${SERVER_URL}/udts?${new URLSearchParams(query)}`)
+    .then(res => pretreat<API.Tokens.Raw>(res))
+    .then(getTokenListRes)
+
+const getTokenRes = ({
+  data: {
+    attributes: { official_site, holder_count, transfer_count, short_address, type_script, script_hash, ...rest },
+  },
+}: API.Token.Raw): API.Token.Parsed => ({
+  officialSite: official_site,
+  holderCount: holder_count,
+  transferCount: transfer_count,
+  shortAddress: short_address,
+  scriptHash: script_hash,
+  typeScript: {
+    args: type_script.args,
+    codeHash: type_script.code_hash,
+    hashType: type_script.hash_type,
+  },
+  ...rest,
+})
+export const fetchToken = (id: string) =>
+  fetch(`${SERVER_URL}/udts/${id}`)
+    .then(res => pretreat<API.Token.Raw>(res))
+    .then(getTokenRes)
 
 export const fetchSearch = (search: string) => {
   let query = search
@@ -342,6 +496,9 @@ export const fetchSearch = (search: string) => {
         }
         case 'account': {
           return `/account/${found.id}`
+        }
+        case 'udt': {
+          return `/token/${found.id}`
         }
         default: {
           return `/404`

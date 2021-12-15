@@ -212,7 +212,7 @@ const Home = (initState: State) => {
 export const getServerSideProps: GetServerSideProps<State> = async ({ res, locale }) => {
   try {
     const home = await fetchHome()
-    const lng = await serverSideTranslations(locale, ['block', 'tx', 'statistic'])
+    const lng = await serverSideTranslations(locale, ['common', 'block', 'tx', 'statistic'])
     return { props: { ...home, ...lng } }
   } catch (err) {
     return handleApiError(err, res, locale)
