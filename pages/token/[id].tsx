@@ -70,7 +70,7 @@ const Token = ({ token, txList }: Props) => {
     { key: 'from', label: 'from' },
     { key: 'to', label: 'to' },
     { key: 'transfer' },
-    { key: 'value' },
+    { key: 'transferCount', label: 'value' },
     { key: 'age' },
   ]
   const handlePageChange = (e: React.SyntheticEvent<HTMLSelectElement>) => {

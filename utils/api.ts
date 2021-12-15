@@ -145,6 +145,7 @@ export namespace API {
           success: boolean
           timestamp: Timestamp
           value?: string
+          transfer_count?: string
         }
       >
     }
@@ -157,6 +158,7 @@ export namespace API {
           success: boolean
           timestamp: Timestamp
           value: string
+          transferCount: string
         }
       >
     }
@@ -412,6 +414,7 @@ export const getTxListRes = (txListRes: API.Txs.Raw): API.Txs.Parsed => ({
       type: tx.type,
       success: tx.success ?? true,
       value: tx.value ?? '0',
+      transferCount: tx.transfer_count ?? '0',
     })) ?? [],
 })
 export const fetchTxList = (query: Partial<Record<'page' | 'type' | 'account_id', string>>): Promise<API.Txs.Parsed> =>
