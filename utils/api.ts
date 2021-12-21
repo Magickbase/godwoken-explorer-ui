@@ -284,7 +284,7 @@ export const getHomeRes = (home: API.Home.Raw): API.Home.Parsed => ({
     txCount: tx_count,
     timestamp: timestamp * 1000,
   })),
-  txList: home.tx_list.map(tx => ({ ...tx, timestamp: tx.timestamp * 1000 })),
+  txList: home.tx_list.map(tx => ({ ...tx, timestamp: tx.timestamp * 1000, success: tx.success ?? true })),
   statistic: {
     blockCount: home.statistic.block_count,
     txCount: home.statistic.tx_count,
