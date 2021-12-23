@@ -3,7 +3,7 @@ import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { API, handleApiError, fetchToken, fetchTxList, formatBigInt, timeDistance } from 'utils'
+import { API, handleApiError, fetchToken, fetchTxList, timeDistance, formatBalance } from 'utils'
 import { PageNonPositiveException, PageOverflowException } from 'utils/exceptions'
 
 type Props = {
@@ -212,7 +212,9 @@ const Token = ({ token, txList }: Props) => {
                       </div>
                     </div>
                   </td>
-                  <td className="p-2 max-w-0 overflow-hidden text-ellipsis">{formatBigInt(tx.value || '0')}</td>
+                  <td className="p-2 max-w-0 min-w-[120px] overflow-hidden text-ellipsis">
+                    {formatBalance(tx.transferCount || '0')}
+                  </td>
                   <td className="hidden sm:table-cell">
                     <time
                       dateTime={new Date(+tx.timestamp).toISOString()}
