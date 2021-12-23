@@ -417,7 +417,9 @@ export const getTxListRes = (txListRes: API.Txs.Raw): API.Txs.Parsed => ({
       transferCount: tx.transfer_count ?? '0',
     })) ?? [],
 })
-export const fetchTxList = (query: Partial<Record<'page' | 'type' | 'account_id', string>>): Promise<API.Txs.Parsed> =>
+export const fetchTxList = (
+  query: Partial<Record<'page' | 'type' | 'tx_type' | 'account_id', string>>,
+): Promise<API.Txs.Parsed> =>
   fetch(`${SERVER_URL}/txs?${new URLSearchParams(query)}`)
     .then(res => pretreat<API.Txs.Raw>(res))
     .then(getTxListRes)

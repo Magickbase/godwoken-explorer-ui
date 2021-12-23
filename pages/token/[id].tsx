@@ -263,7 +263,7 @@ export const getServerSideProps: GetServerSideProps<Props, { id: string }> = asy
     if (+page < 1) {
       throw new PageNonPositiveException()
     }
-    const q = { account_id: id }
+    const q = { account_id: id, tx_type: 'transfer' }
     if (typeof page === 'string' && !Number.isNaN(+page)) {
       q['page'] = page
     }
