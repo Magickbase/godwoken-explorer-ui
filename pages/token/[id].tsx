@@ -135,7 +135,7 @@ const Token = ({ token, txList }: Props) => {
       </div>
 
       <div className="bg-white rounded-md shadow-md px-4 mt-10 py-4">
-        <div className="flex py-4 justify-between">{t(`transfer_records`)}</div>
+        <div className="flex py-4 justify-between">{t(`transfer-records`)}</div>
         <table className="table table-auto border-collapse w-full text-left whitespace-nowrap border-t border-b border-gray-400">
           <thead>
             <tr>

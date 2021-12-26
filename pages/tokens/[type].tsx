@@ -3,10 +3,17 @@ import { useTranslation } from 'next-i18next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { IconButton, Tooltip } from '@mui/material'
+import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined'
 import { fetchTokenList, handleApiError, API, formatBigInt } from 'utils'
 import { PageNonPositiveException, PageOverflowException, TypeNotFoundException } from 'utils/exceptions'
 
 type State = API.Tokens.Parsed & { type: 'native' | 'bridge' }
+
+const BRIDGED_TOKEN_TEMPLATE_URL =
+  'https://github.com/nervina-labs/godwoken_explorer/issues/new?assignees=Keith-CY&labels=Token+Registration&template=register-a-new-bridged-token.yml&title=%5BBridged+Token%5D+%2A%2AToken+Name%2A%2A'
+const NATIVE_TOKEN_TEMPLATE_URL =
+  'https://github.com/nervina-labs/godwoken_explorer/issues/new?assignees=Keith-CY&labels=Token+Registration&template=register-a-new-bridged-token.yml&title=%5BBridged+Token%5D+%2A%2AToken+Name%2A%2A'
 
 const TokenList = ({ meta, tokens, type }: State) => {
   const [t] = useTranslation(['tokens', 'common'])
@@ -29,9 +36,22 @@ const TokenList = ({ meta, tokens, type }: State) => {
 
   return (
     <div className="bg-white rounded-md shadow-md px-4 mt-10 pb-2">
-      <div className="flex py-4 justify-between">
+      <div className="flex py-4 items-center justify-between text-sm sm:text-base">
         <span>{t(`${type}-udt-list`)}</span>
-        <span>{t(`total-count-of-udt`, { total: (meta.total - 1) * 10 + tokens.length })}</span>
+        <div className="flex items-center">
+          <span className="mr-2">{t(`total-count-of-udt`, { total: (meta.total - 1) * 10 + tokens.length })}</span>
+          <Tooltip title={t(type === 'bridge' ? 'add-bridged-token' : 'add-native-erc20-token')} placement="top">
+            <a
+              href={type === 'bridge' ? BRIDGED_TOKEN_TEMPLATE_URL : NATIVE_TOKEN_TEMPLATE_URL}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              <IconButton>
+                <AddBoxOutlinedIcon className="pointer-events-none" />
+              </IconButton>
+            </a>
+          </Tooltip>
+        </div>
       </div>
       <table className="table-auto border-collapse w-full text-left whitespace-nowrap border-t border-b border-gray-400">
         <thead>
