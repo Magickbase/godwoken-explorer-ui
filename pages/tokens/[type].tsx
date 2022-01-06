@@ -1,11 +1,29 @@
 import type { GetServerSideProps } from 'next'
 import { useTranslation } from 'next-i18next'
-import Link from 'next/link'
+import NextLink from 'next/link'
 import { useRouter } from 'next/router'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { IconButton, Tooltip } from '@mui/material'
+import {
+  Avatar,
+  Box,
+  Container,
+  Paper,
+  IconButton,
+  Stack,
+  Link,
+  Divider,
+  Tooltip,
+  TableContainer,
+  Table,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+  Typography,
+} from '@mui/material'
 import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined'
-import { fetchTokenList, handleApiError, API, formatBigInt } from 'utils'
+import Pagination from 'components/Pagination'
+import { fetchTokenList, handleApiError, API, formatInt, nameToColor } from 'utils'
 import { PageNonPositiveException, PageOverflowException, TypeNotFoundException } from 'utils/exceptions'
 
 type State = API.Tokens.Parsed & { type: 'native' | 'bridge' }
@@ -21,7 +39,7 @@ const TokenList = ({ meta, tokens, type }: State) => {
   const { push } = useRouter()
   const headers = [
     { key: 'token' },
-    { key: 'address', label: 'id/address' },
+    { key: 'address', label: 'address' },
     { key: 'totalSupply' },
     { key: 'holderCount' },
   ]
@@ -35,88 +53,109 @@ const TokenList = ({ meta, tokens, type }: State) => {
   }
 
   return (
-    <div className="bg-white rounded-md shadow-md px-4 mt-10 pb-2">
-      <div className="flex py-4 items-center justify-between text-sm sm:text-base">
-        <span>{t(`${type}-udt-list`)}</span>
-        <div className="flex items-center">
-          <span className="mr-2">{t(`total-count-of-udt`, { total: (meta.total - 1) * 10 + tokens.length })}</span>
-          <Tooltip title={t(type === 'bridge' ? 'add-bridged-token' : 'add-native-erc20-token')} placement="top">
-            <a
-              href={type === 'bridge' ? BRIDGED_TOKEN_TEMPLATE_URL : NATIVE_TOKEN_TEMPLATE_URL}
-              target="_blank"
-              rel="noreferrer noopener"
-            >
-              <IconButton>
-                <AddBoxOutlinedIcon className="pointer-events-none" />
-              </IconButton>
-            </a>
-          </Tooltip>
-        </div>
-      </div>
-      <table className="table-auto border-collapse w-full text-left whitespace-nowrap border-t border-b border-gray-400">
-        <thead>
-          <tr>
-            {headers.map(h => (
-              <th
-                key={h.key}
-                title={t(h.label ?? h.key)}
-                className={h.key === 'address' ? 'px-2 py-4 hidden sm:table-cell' : 'px-2 py-4'}
+    <Container sx={{ py: 6 }}>
+      <Paper sx={{ p: 2 }}>
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <Typography fontWeight={600}>{t(`${type}-udt-list`)}</Typography>
+          <Stack direction="row" alignItems="center">
+            <Typography>{t(`total-count-of-udt`, { total: (meta.total - 1) * 10 + tokens.length })}</Typography>
+            <Tooltip title={t(type === 'bridge' ? 'add-bridged-token' : 'add-native-erc20-token')} placement="top">
+              <Link
+                href={type === 'bridge' ? BRIDGED_TOKEN_TEMPLATE_URL : NATIVE_TOKEN_TEMPLATE_URL}
+                target="_blank"
+                rel="noreferrer noopener"
               >
-                {t(h.label ?? h.key)}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody className="align-baseline">
-          {tokens.length ? (
-            tokens.map(token => (
-              <tr key={token.id.toString()} className="text-sm leading-6 border-t border-gray-300 hover:bg-hover-bg">
-                <td className="p-2">
-                  {token.icon ? (
-                    <img src={token.icon} className="inline-block w-10 h-10 rounded-full mr-2" />
-                  ) : (
-                    <div className="inline-flex justify-center items-center w-10 h-10 rounded-full mr-2 bg-gray-100 text-lg">
-                      {token.name?.[0] ?? '?'}
-                    </div>
-                  )}
-                  <Link href={`/token/${token.id}`}>{`${token.name || '-'}${
-                    token.symbol ? '(' + token.symbol + ')' : ''
-                  }`}</Link>
-                </td>
-                <td className="font-mono overflow-hidden overflow-ellipsis text-secondary max-w-0 hidden sm:table-cell md:max-w-min">
-                  <Link href={`/token/${token.id}`}>{token.shortAddress}</Link>
-                </td>
-                <td className="p-2">{formatBigInt(token.supply) || '-'}</td>
-                <td className="p-2">{token.holderCount || '0'}</td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan={headers.length} className="text-center py-4 text-gray-400">
-                {t(`no_records`)}
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-      {meta.total ? (
-        <div className="flex justify-end items-center mt-2">
-          {meta.current === 1 ? null : (
-            <Link href={`/tokens/${type}?page=${meta.current - 1}`}>{t(`prev`, { ns: 'common' })}</Link>
-          )}
-          <select className="mx-2 bg-gray-100" onChange={handlePageChange} value={meta.current}>
-            {Array.from({ length: meta.total }).map((_, idx) => (
-              <option key={idx} defaultValue={idx}>
-                {idx + 1}
-              </option>
-            ))}
-          </select>
-          {meta.total > meta.current ? (
-            <Link href={`/tokens/${type}?page=${meta.current + 1}`}>{t(`next`, { ns: 'common' })}</Link>
-          ) : null}
-        </div>
-      ) : null}
-    </div>
+                <IconButton>
+                  <AddBoxOutlinedIcon className="pointer-events-none" />
+                </IconButton>
+              </Link>
+            </Tooltip>
+          </Stack>
+        </Stack>
+        <TableContainer sx={{ width: '100%' }}>
+          <Table size="small">
+            <TableHead sx={{ textTransform: 'capitalize' }}>
+              <TableRow>
+                {headers.map((h, idx) => (
+                  <TableCell
+                    component="th"
+                    key={h.key}
+                    title={t(h.label ?? h.key)}
+                    sx={{ whiteSpace: 'nowrap', display: idx === 1 ? { xs: 'none', sm: 'table-cell' } : 'table-cell' }}
+                  >
+                    {t(h.label ?? h.key)}
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {tokens.length ? (
+                tokens.map(token => (
+                  <TableRow key={token.id.toString()}>
+                    <TableCell>
+                      <Stack direction="row" alignItems="center">
+                        <Avatar src={token.icon ?? null} sx={{ bgcolor: nameToColor(token.name ?? '') }}>
+                          {token.name?.[0] ?? '?'}
+                        </Avatar>
+                        <NextLink href={`/token/${token.id}`}>
+                          <Link href={`/token/${token.id}`} underline="none" color="secondary" ml={2}>
+                            {`${token.name || '-'}${token.symbol ? '(' + token.symbol + ')' : ''}`}
+                          </Link>
+                        </NextLink>
+                      </Stack>
+                    </TableCell>
+                    <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
+                      <NextLink href={`/token/${token.id}`}>
+                        <Link
+                          href={`/token/${token.id}`}
+                          display="flex"
+                          alignItems="center"
+                          underline="none"
+                          color="secondary"
+                          className="mono-font"
+                        >
+                          <Typography
+                            fontSize="inherit"
+                            fontFamily="inherit"
+                            sx={{
+                              display: {
+                                xs: 'none',
+                                md: 'flex',
+                              },
+                            }}
+                          >
+                            {token.shortAddress}
+                          </Typography>
+                          <Typography
+                            fontSize="inherit"
+                            fontFamily="inherit"
+                            sx={{
+                              display: {
+                                xs: 'flex',
+                                md: 'none',
+                              },
+                            }}
+                          >
+                            {`${token.shortAddress.slice(0, 8)}...${token.shortAddress.slice(-8)}`}
+                          </Typography>
+                        </Link>
+                      </NextLink>
+                    </TableCell>
+                    <TableCell>{formatInt(token.supply) || '-'}</TableCell>
+                    <TableCell>{token.holderCount || '0'}</TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={headers.length}>{t(`no_records`)}</TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <Pagination {...meta} onChange={handlePageChange} url={`/tokens/${type}`} />
+      </Paper>
+    </Container>
   )
 }
 

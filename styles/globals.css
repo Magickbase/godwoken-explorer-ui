@@ -1,42 +1,34 @@
-@import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
-@import './tailwind.presets.css';
-@import './components.css';
-
 :root {
-  --footer-mt: 60px;
+  --header-height: 64px;
   --footer-height: 156px;
-  --footer-height-md: 127px;
+  --bg-color: #f5f5f544;
 }
 
 html,
 body {
-  background-color: #ededed;
-  @apply font-sans font-normal overflow-visible;
   font-size: 16px;
+  background: var(--bg-color) !important;
 }
+
 body.loading * {
   cursor: progress !important;
 }
-main {
-  @apply main-container;
-  min-height: calc(100vh - var(--footer-height) - var(--footer-mt));
-  padding-top: 56px;
-  line-height: 1.2;
+main,
+.full-height {
+  min-height: calc(100vh - var(--footer-height) - var(--header-height));
 }
-* {
-  @apply tracking-wide box-border outline-none cursor-default;
-}
-
 a {
-  @apply no-underline cursor-pointer text-secondary;
+  text-decoration: none;
+  cursor: pointer;
 }
 
-input:placeholder-shown {
-  text-overflow: ellipsis;
+.mono-font {
+  font-family: 'Roboto Mono', monospace, 'Courier New' !important;
 }
 
-@media screen and (min-width: 768px) {
-  main {
-    min-height: calc(100vh - var(--footer-height-md) - var(--footer-mt));
+@media screen and (max-width: 600px) {
+  :root {
+    --header-height: 56px;
+    --footer-height: 127px;
   }
 }

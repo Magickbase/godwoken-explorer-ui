@@ -1,4 +1,7 @@
 {
+  "txInfo": "交易信息",
+  "overview": "概览",
+  "basicInfo": "基本信息",
   "latestTxs": "最新交易",
   "hash": "交易哈希",
   "blockHash": "区块哈希",

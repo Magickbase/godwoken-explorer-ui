@@ -78,16 +78,23 @@ export namespace API {
   }
 
   export namespace Account {
-    export type UDT = { name: string; balance: string; icon: string | null; decimal: number }
+    export type UDT = {
+      name: string
+      balance: string
+      icon: string | null
+      decimal: number
+      type: 'native' | 'bridge'
+      id: number
+    }
     export type RawScript = Record<'args' | 'code_hash' | 'hash_type' | 'name', string>
     export type ParsedScript = Record<'args' | 'codeHash' | 'hashType' | 'name', string>
     export type Raw = Record<'id' | 'type' | 'ckb' | 'eth' | 'tx_count', string> &
       Partial<{
         meta_contract: {
           status: 'running' | 'halting'
-          account_merkle_state: Record<'account_count' | 'account_merkle_root', string>
-          block_merkle_state: Record<'block_count' | 'block_merkle_root', string>
-          last_finalized_block_number: string
+          account_merkle_state: Record<'account_count' | 'account_merkle_root', number>
+          block_merkle_state: Record<'block_count' | 'block_merkle_root', number>
+          last_finalized_block_number: number
           reverted_block_root: string
         }
         sudt: Record<'decimal' | 'holders' | 'name' | 'supply' | 'symbol' | 'icon' | 'script_hash', string> & {
@@ -336,14 +343,14 @@ export const fetchTx = (hash: string): Promise<API.Tx.Parsed> =>
 const getMetaContract = (metaContract: API.Account.Raw['meta_contract']): API.Account.Parsed['metaContract'] => ({
   status: metaContract.status,
   accountMerkleState: {
-    accountCount: metaContract.account_merkle_state.account_count,
-    accountMerkleRoot: metaContract.account_merkle_state.account_merkle_root,
+    accountCount: metaContract.account_merkle_state.account_count.toString(),
+    accountMerkleRoot: metaContract.account_merkle_state.account_merkle_root.toString(),
   },
   blockMerkleState: {
-    blockCount: metaContract.block_merkle_state.block_count,
-    blockMerkleRoot: metaContract.block_merkle_state.block_merkle_root,
+    blockCount: metaContract.block_merkle_state.block_count.toString(),
+    blockMerkleRoot: metaContract.block_merkle_state.block_merkle_root.toString(),
   },
-  lastFinalizedBlockNumber: metaContract.last_finalized_block_number,
+  lastFinalizedBlockNumber: metaContract.last_finalized_block_number.toString(),
   revertedBlockRoot: metaContract.reverted_block_root,
 })
 

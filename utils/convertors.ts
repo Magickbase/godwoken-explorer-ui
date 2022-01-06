@@ -46,13 +46,7 @@ export const scriptToCkbAddress = (lockScript: CKBComponents.Script) => {
   })
 }
 
-export const formatBalance = (balance: string) => {
-  const [int, dec] = balance.split('.')
-  const formattedInt = BigInt(int).toLocaleString('en')
-  return dec ? [formattedInt, dec].join('.') : formattedInt
-}
-
-export const formatBigInt = (int: string) => {
+export const formatInt = (int: string) => {
   return (
     int
       .split('')
@@ -65,5 +59,12 @@ export const formatBigInt = (int: string) => {
     .reverse()
     .join('')
 }
+export const formatBalance = (balance: string) => {
+  const [int, dec] = balance.split('.')
+  const formattedInt = formatInt(int)
+  return dec ? [formattedInt, dec].join('.') : formattedInt
+}
 
 export { scriptToHash }
+
+export const nameToColor = (name: string = '') => '#' + 2 * (name[0] ?? '?').charCodeAt(0)
