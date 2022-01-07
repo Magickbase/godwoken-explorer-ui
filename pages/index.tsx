@@ -86,6 +86,7 @@ const BlockList = ({ list }: { list: State['blockList'] }) => {
           {t(`latestBlocks`)}
         </ListSubheader>
       }
+      dense
     >
       {list.map((block, idx) => (
         <Box key={block.hash}>
@@ -148,6 +149,7 @@ const TxList = ({ list }: { list: State['txList'] }) => {
           {t(`latestTxs`)}
         </ListSubheader>
       }
+      dense
     >
       {list.map((tx, idx) => (
         <Box key={tx.hash}>

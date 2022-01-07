@@ -9,14 +9,14 @@ const AddressInHalfPanel = ({ address }: { address: string }) => (
         underline="none"
         className="mono-font"
         color="secondary"
-        sx={{ display: address.length >= 32 ? { xs: 'none', sm: 'flex' } : null }}
+        sx={{ display: address.length >= 32 ? { xs: 'none', sm: 'flex' } : 'flex' }}
       >
         {address}
       </Link>
     </NextLink>
     <Address
       address={address}
-      sx={{ display: address.length >= 32 ? { xs: 'inline', sm: 'none' } : null }}
+      sx={{ display: address.length >= 32 ? { xs: 'inline', sm: 'none' } : 'none' }}
       size="normal"
       leading={15}
     />
