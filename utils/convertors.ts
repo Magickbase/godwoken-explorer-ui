@@ -46,9 +46,10 @@ export const scriptToCkbAddress = (lockScript: CKBComponents.Script) => {
   })
 }
 
-export const formatInt = (int: string) => {
+export const formatInt = (int: string | number) => {
+  const i = typeof int === 'string' ? int : int.toString()
   return (
-    int
+    i
       .split('')
       .reverse()
       .join('')
