@@ -326,12 +326,12 @@ export const getTxRes = (tx: API.Tx.Raw): API.Tx.Parsed => ({
   finalizeState: tx.finalize_state ?? '',
   l2Block: tx.l2_block ?? '',
   l1Block: tx.l1_block ?? '',
-  from: tx.from,
-  to: tx.to,
-  nonce: tx.nonce,
-  args: tx.args,
-  type: tx.type,
-  gasPrice: tx.gas_price,
+  from: tx.from ?? '',
+  to: tx.to ?? '',
+  nonce: tx.nonce ?? '',
+  args: tx.args ?? '',
+  type: tx.type ?? '',
+  gasPrice: tx.gas_price ?? '',
   fee: tx.fee ?? '',
 })
 

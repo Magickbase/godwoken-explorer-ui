@@ -4,6 +4,7 @@ import NextLink from 'next/link'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import {
+  Alert,
   Accordion,
   AccordionSummary,
   AccordionDetails,
@@ -18,10 +19,12 @@ import {
   Link,
   Grid,
   ListSubheader,
-  Box,
+  Stack,
   Tooltip,
+  IconButton,
+  Snackbar,
 } from '@mui/material'
-import OpenInNewIcon from '@mui/icons-material/OpenInNew'
+import { OpenInNew as OpenInNewIcon, ContentCopyOutlined as CopyIcon } from '@mui/icons-material'
 import { ExpandMore } from '@mui/icons-material'
 import PageTitle from 'components/PageTitle'
 import Address from 'components/AddressInHalfPanel'
@@ -35,11 +38,13 @@ import {
   CKB_EXPLORER_URL,
   CHANNEL,
   formatInt,
+  handleCopy,
 } from 'utils'
 type State = API.Tx.Parsed
 
 const Tx = (initState: State) => {
   const [tx, setTx] = useState(initState)
+  const [isCopied, setIsCopied] = useState(false)
   const [t] = useTranslation('tx')
 
   useEffect(() => {
@@ -49,7 +54,9 @@ const Tx = (initState: State) => {
   useWS(
     `${CHANNEL.TX_INFO}${tx.hash}`,
     (init: API.Tx.Raw) => {
-      setTx(getTxRes(init))
+      if (init) {
+        setTx(getTxRes(init))
+      }
     },
     ({ l1_block, finalize_state }: Partial<Pick<API.Tx.Raw, 'l1_block' | 'finalize_state'>>) => {
       const update: Partial<Pick<API.Tx.Parsed, 'l1Block' | 'finalizeState'>> = {}
@@ -64,16 +71,24 @@ const Tx = (initState: State) => {
     [setTx, tx.hash],
   )
 
+  const handleTxHashCopy = async () => {
+    await handleCopy(tx.hash)
+    setIsCopied(true)
+  }
+
   const overview = [
     {
       label: 'hash',
       value: (
         <Tooltip title={tx.hash} placement="top">
-          <Box>
+          <Stack direction="row" alignItems="center">
             <Typography variant="body2" className="mono-font" overflow="hidden" textOverflow="ellipsis" color="primary">
               {tx.hash}
             </Typography>
-          </Box>
+            <IconButton aria-label="copy" size="small" onClick={handleTxHashCopy}>
+              <CopyIcon fontSize="inherit" />
+            </IconButton>
+          </Stack>
         </Tooltip>
       ),
     },
@@ -200,6 +215,20 @@ const Tx = (initState: State) => {
           </Grid>
         </Grid>
       </Paper>
+      <Snackbar
+        open={isCopied}
+        onClose={() => setIsCopied(false)}
+        anchorOrigin={{
+          horizontal: 'center',
+          vertical: 'top',
+        }}
+        autoHideDuration={3000}
+        color="secondary"
+      >
+        <Alert severity="success" variant="filled">
+          {t(`txHashCopied`)}
+        </Alert>
+      </Snackbar>
     </Container>
   )
 }

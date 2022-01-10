@@ -32,3 +32,21 @@ export const handleSearchKeyPress = async (e: React.KeyboardEvent<HTMLInputEleme
     window.alert(err.message)
   }
 }
+
+export const handleCopy = async (value: string) => {
+  try {
+    await navigator.clipboard.writeText(value)
+  } catch {
+    const input = document.createElement('input')
+    input.readOnly = true
+    input.value = value
+    input.style.position = 'absolute'
+    input.style.width = '100px'
+    input.style.left = '-10000px'
+    document.body.appendChild(input)
+    input.select()
+    input.setSelectionRange(0, input.value.length)
+    document.execCommand('copy')
+    document.body.removeChild(input)
+  }
+}

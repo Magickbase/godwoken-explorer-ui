@@ -24,5 +24,6 @@
   "committed": "已提交",
   "finalized": "已确认",
   "emptyTxList": "没有交易",
-  "pending": "等待中"
+  "pending": "等待中",
+  "txHashCopied": "交易哈希已复制"
 }
