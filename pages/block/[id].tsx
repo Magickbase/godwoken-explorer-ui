@@ -1,10 +1,21 @@
 import { useEffect, useState } from 'react'
 import { GetServerSideProps } from 'next'
-import Link from 'next/link'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { fetchBlock, handleApiError, API, formatDatetime, useWS, getBlockRes, CKB_EXPLORER_URL, CHANNEL } from 'utils'
-import CardFieldsetList from 'components/CardFieldsetList'
+import { Container, List, ListItem, ListItemText, Typography, Paper, Link } from '@mui/material'
+import OpenInNewIcon from '@mui/icons-material/OpenInNew'
+import PageTitle from 'components/PageTitle'
+import {
+  fetchBlock,
+  handleApiError,
+  API,
+  formatDatetime,
+  useWS,
+  getBlockRes,
+  CKB_EXPLORER_URL,
+  CHANNEL,
+  formatInt,
+} from 'utils'
 
 type State = API.Block.Parsed
 
@@ -41,66 +52,95 @@ const Block = (initState: State) => {
     [setBlock, block.number],
   )
 
-  const fieldsetList: Array<Array<{ label: Exclude<keyof State, 'number'>; value: React.ReactNode }>> = [
-    [
-      {
-        label: 'timestamp',
-        value: (
+  const fields = [
+    {
+      label: 'timestamp',
+      value: (
+        <Typography variant="body2">
           <time dateTime={new Date(block.timestamp).toISOString()} title={t('timestamp')}>
             {formatDatetime(block.timestamp)}
           </time>
-        ),
-      },
-      {
-        label: 'l1Block',
-        value: block.l1Block ? (
-          <Link href={`${CKB_EXPLORER_URL}/block/${block.l1Block}`}>
-            <a title={t('l1Block')} className="hashLink">
-              {BigInt(block.l1Block).toLocaleString('en')}
-            </a>
-          </Link>
-        ) : (
-          t('pending')
-        ),
-      },
-      {
-        label: 'txHash',
-        value: block.txHash ? (
-          <Link href={`${CKB_EXPLORER_URL}/transaction/${block.txHash}`}>
-            <a title={t('txHash')}>{block.txHash}</a>
-          </Link>
-        ) : (
-          t('pending')
-        ),
-      },
-    ],
-    [
-      {
-        label: 'finalizeState',
-        value: (
-          <span className="capitalize" title={t('finalizeState')}>
-            {t(block.finalizeState)}
-          </span>
-        ),
-      },
-      {
-        label: 'txCount',
-        value: <span title={t('txCount')}>{BigInt(block.txCount).toLocaleString('en')}</span>,
-      },
-      {
-        label: 'aggregator',
-        value: <span title={t('aggregator')}>{block.aggregator}</span>,
-      },
-    ],
+        </Typography>
+      ),
+    },
+    {
+      label: 'l1Block',
+      value: (
+        <Typography variant="body2">
+          {block.l1Block ? (
+            <Link
+              href={`${CKB_EXPLORER_URL}/block/${block.l1Block}`}
+              underline="none"
+              target="_blank"
+              rel="noopener noreferrer"
+              display="flex"
+              alignItems="center"
+              color="secondary"
+            >
+              {formatInt(block.l1Block)}
+              <OpenInNewIcon sx={{ fontSize: 16, ml: 0.5 }} />
+            </Link>
+          ) : (
+            t('pending')
+          )}
+        </Typography>
+      ),
+    },
+    {
+      label: 'l1TxHash',
+      value: (
+        <Typography variant="body2">
+          {block.txHash ? (
+            <Link
+              href={`${CKB_EXPLORER_URL}/transaction/${block.txHash}`}
+              underline="none"
+              target="_blank"
+              rel="noopener noreferrer"
+              display="flex"
+              alignItems="center"
+              color="secondary"
+            >
+              <Typography variant="body2" overflow="hidden" textOverflow="ellipsis" className="mono-font">
+                {block.txHash}
+              </Typography>
+              <OpenInNewIcon sx={{ fontSize: 16, ml: 0.5 }} />
+            </Link>
+          ) : (
+            t('pending')
+          )}
+        </Typography>
+      ),
+    },
+    {
+      label: 'finalizeState',
+      value: (
+        <Typography variant="body2" sx={{ textTransform: 'capitalize' }}>
+          {t(block.finalizeState)}
+        </Typography>
+      ),
+    },
+    {
+      label: 'txCount',
+      value: <Typography variant="body2">{formatInt(block.txCount)}</Typography>,
+    },
+    {
+      label: 'aggregator',
+      value: <Typography variant="body2">{block.aggregator}</Typography>,
+    },
   ]
   return (
-    <div className="card-container mt-8">
-      <h2 className="card-header">
-        {t('block')}
-        <span>{`#${BigInt(block.number).toLocaleString('en')}`}</span>
-      </h2>
-      <CardFieldsetList fieldsetList={fieldsetList} t={t} />
-    </div>
+    <Container sx={{ py: 6 }}>
+      <PageTitle>{`${t('block')} # ${formatInt(block.number)}`}</PageTitle>
+      <Paper>
+        <List sx={{ textTransform: 'capitalize' }}>
+          {fields.map(field => (
+            <ListItem key={field.label}>
+              <ListItemText primary={t(field.label)} secondary={field.value} />
+            </ListItem>
+          ))}
+        </List>
+      </Paper>
+    </Container>
   )
 }
 

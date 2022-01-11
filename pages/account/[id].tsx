@@ -1,14 +1,31 @@
 import { useEffect, useState } from 'react'
 import { GetServerSideProps } from 'next'
-import Link from 'next/link'
+import NextLink from 'next/link'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { fetchAccount, API, useWS, getAccountRes, handleApiError, formatBalance, CHANNEL } from 'utils'
+import {
+  Stack,
+  Container,
+  Paper,
+  List,
+  ListItem,
+  ListItemText,
+  Divider,
+  Grid,
+  ListSubheader,
+  Link,
+  Tabs,
+  Tab,
+  Typography,
+} from '@mui/material'
 import User from 'components/User'
 import MetaContract from 'components/MetaContract'
 import SmartContract from 'components/SmartContract'
 import Polyjuice from 'components/Polyjuice'
 import SUDT from 'components/SUDT'
+import UdtList from 'components/UdtList'
+import { fetchAccount, API, useWS, getAccountRes, handleApiError, formatBalance, CHANNEL, formatInt } from 'utils'
+import PageTitle from 'components/PageTitle'
 
 type State = API.Account.Parsed
 const Account = (initState: State) => {
@@ -29,43 +46,72 @@ const Account = (initState: State) => {
     },
     [setAccount, account.id],
   )
+  const udtList = account.user?.udtList ?? (account.smartContract?.udtList || [])
 
   return (
-    <>
-      <div className="flex flex-col card-container mt-8 md:flex-row md:pb-3">
-        <h2 className="card-header md:w-1/2 md:border-b-0 md:border-r md:pb-0" aria-label={t('account')}>
-          {`${t('account')}`}
-          <span>{account.id}</span>
-        </h2>
-        <div className="divide-y divide-light-grey divide-dashed text-sm md:divide-y-0 md:w-1/2 md:pl-3">
-          <div className="flex justify-between py-3 md:py-0">
-            <span className="card-label" aria-label={t('ckb')}>
-              {t('ckb')}
-            </span>
-            <span className="overflow-hidden overflow-ellipsis">{formatBalance(account.ckb)}</span>
-          </div>
-          <div className="flex justify-between py-3 md:py-0">
-            <span className="card-label" aria-label={t('eth')}>
-              {t('eth')}
-            </span>
-            <span className="overflow-hidden overflow-ellipsis">{formatBalance(account.eth)}</span>
-          </div>
-          <div className="flex justify-between pt-3 md:pt-0 pb-2 md:pb-0">
-            <span className="card-label" aria-label={t('txCount')}>
-              {t('txCount')}
-            </span>
-            <Link href={`/txs?account_id=${account.id}&page=1`}>
-              <a>{BigInt(account.txCount).toLocaleString('en')}</a>
-            </Link>
-          </div>
-        </div>
-      </div>
-      {account.metaContract ? <MetaContract {...account.metaContract} /> : null}
-      {account.user ? <User {...account.user} /> : null}
-      {account.smartContract ? <SmartContract {...account.smartContract} /> : null}
-      {account.polyjuice ? <Polyjuice {...account.polyjuice} /> : null}
-      {account.sudt ? <SUDT {...account.sudt} /> : null}
-    </>
+    <Container sx={{ py: 6 }}>
+      <PageTitle>{`${t('account')} ${account.id}`}</PageTitle>
+      <Stack spacing={2}>
+        <Paper>
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={6}>
+              <List
+                subheader={
+                  <ListSubheader component="div" sx={{ textTransform: 'capitalize', bgcolor: 'transparent' }}>
+                    {t(`overview`)}
+                  </ListSubheader>
+                }
+                sx={{ textTransform: 'capitalize' }}
+              >
+                <Divider variant="middle" />
+                <ListItem>
+                  <ListItemText
+                    primary={t(`ckbBalance`)}
+                    secondary={<Typography variant="body2">{formatBalance(account.ckb) + ' CKB'}</Typography>}
+                  />
+                </ListItem>
+                <ListItem>
+                  <ListItemText
+                    primary={t(`ethBalance`)}
+                    secondary={<Typography variant="body2">{formatBalance(account.eth) + ' Ether'}</Typography>}
+                  />
+                </ListItem>
+                <ListItem>
+                  <ListItemText
+                    primary={t(`txCount`)}
+                    secondary={
+                      <NextLink href={`/txs?account_id=${account.id}&page=1`}>
+                        <Link
+                          href={`/txs?account_id=${account.id}&page=1`}
+                          underline="none"
+                          sx={{ color: 'secondary.main' }}
+                        >
+                          <Typography variant="body2">{formatInt(account.txCount)}</Typography>
+                        </Link>
+                      </NextLink>
+                    }
+                  />
+                </ListItem>
+              </List>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              {account.metaContract ? <MetaContract {...account.metaContract} /> : null}
+              {account.user ? <User {...account.user} /> : null}
+              {account.smartContract ? <SmartContract {...account.smartContract} /> : null}
+              {account.polyjuice ? <Polyjuice {...account.polyjuice} /> : null}
+              {account.sudt ? <SUDT {...account.sudt} /> : null}
+            </Grid>
+          </Grid>
+        </Paper>
+        <Paper>
+          <Tabs value={0}>
+            <Tab label={`${t('userDefinedAssets')} (${udtList.length})`} />
+          </Tabs>
+          <Divider />
+          <UdtList list={udtList} />
+        </Paper>
+      </Stack>
+    </Container>
   )
 }
 

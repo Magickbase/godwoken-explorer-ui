@@ -1,10 +1,14 @@
 {
+  "overview": "概览",
+  "basicInfo": "基本信息",
   "account": "账户",
   "id": "账户 id",
   "nonce": "nonce",
   "type": "账户类型",
   "ckb": "CKB",
   "eth": "ETH",
+  "ckbBalance": "CKB 余额",
+  "ethBalance": "ETH 余额",
   "txCount": "交易总数",
   "userDefinedAssets": "用户自定义资产",
   "ethAddr": "以太坊地址",
@@ -34,5 +38,10 @@
   "running": "运行",
   "halting": "停机",
   "emptyAssetList": "没有自定义资产",
-  "l2ScriptHash": "l2 script hash"
+  "l2ScriptHash": "l2 script hash",
+  "asset": "资产",
+  "assetType": "类型",
+  "balance": "余额",
+  "native": "原生",
+  "bridged": "桥接"
 }
