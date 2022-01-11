@@ -3,18 +3,22 @@ import NextLink from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
-import InputBase from '@mui/material/InputBase'
-import { styled, alpha } from '@mui/material/styles'
-import AppBar from '@mui/material/AppBar'
-import Toolbar from '@mui/material/Toolbar'
-import Link from '@mui/material/Link'
-import Typography from '@mui/material/Typography'
-import Button from '@mui/material/Button'
-import SearchIcon from '@mui/icons-material/Search'
-import Menu from '@mui/material/Menu'
-import MenuItem from '@mui/material/MenuItem'
-import Container from '@mui/material/Container'
-import { EXPLORER_TITLE, fetchSearch, IMG_URL, SEARCH_FIELDS, handleSearchKeyPress } from 'utils'
+import {
+  Container,
+  AppBar,
+  Toolbar,
+  Link,
+  Button,
+  Menu,
+  MenuItem,
+  Typography,
+  InputBase,
+  styled,
+  alpha,
+  IconButton,
+} from '@mui/material'
+import { Search as SearchIcon, Translate as TranslateIcon } from '@mui/icons-material'
+import { EXPLORER_TITLE, IMG_URL, SEARCH_FIELDS, handleSearchKeyPress } from 'utils'
 
 const Search = styled('div')(({ theme }) => ({
   'position': 'relative',
@@ -71,9 +75,11 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 export default () => {
   const [t] = useTranslation('common')
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
+  const anchorElLabel = anchorEl?.getAttribute('aria-label')
   const {
     push,
     query: { search: searchInQuery },
+    asPath,
   } = useRouter()
   const searchRef = useRef<HTMLInputElement | null>(null)
 
@@ -143,9 +149,10 @@ export default () => {
             />
           </Search>
           <Button
-            aria-controls={anchorEl ? 'token-list' : undefined}
+            aria-label="token-list"
             aria-haspopup="true"
-            aria-expanded={anchorEl ? 'true' : undefined}
+            aria-expanded={anchorElLabel === 'token-list' ? 'true' : undefined}
+            aria-controls={anchorElLabel === 'token-list' ? 'token-list' : undefined}
             onClick={handleTokenListOpen}
             color="inherit"
             disableRipple
@@ -155,7 +162,7 @@ export default () => {
           <Menu
             id="token-list"
             anchorEl={anchorEl}
-            open={!!anchorEl}
+            open={anchorElLabel === 'token-list'}
             onClose={handleTokenListClose}
             MenuListProps={{ 'aria-labelledby': 'token-item' }}
           >
@@ -169,6 +176,34 @@ export default () => {
                     sx={{ width: '100%', padding: '6px 16px' }}
                   >
                     {t(`${type}-udt`)}
+                  </Link>
+                </NextLink>
+              </MenuItem>
+            ))}
+          </Menu>
+          <IconButton
+            aria-label="i18n"
+            aria-haspopup="true"
+            aria-expanded={anchorElLabel === 'i18n' ? 'true' : undefined}
+            aria-controls={anchorElLabel === 'i18n' ? 'i18n' : undefined}
+            onClick={handleTokenListOpen}
+            color="inherit"
+            disableRipple
+          >
+            <TranslateIcon fontSize="small" />
+          </IconButton>
+          <Menu
+            id="i18n"
+            anchorEl={anchorEl}
+            open={anchorElLabel === 'i18n'}
+            onClose={handleTokenListClose}
+            MenuListProps={{ 'aria-labelledby': 'locale' }}
+          >
+            {['zh-CN', 'en-US'].map(locale => (
+              <MenuItem key={locale} onClick={handleTokenListClose} sx={{ p: 0 }}>
+                <NextLink href={asPath} locale={locale} passHref>
+                  <Link title={t(locale)} underline="none" sx={{ width: '100%', padding: '6px 16px' }}>
+                    {t(locale)}
                   </Link>
                 </NextLink>
               </MenuItem>
