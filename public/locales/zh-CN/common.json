@@ -12,5 +12,7 @@
   "native-udt": "二层原生代币",
   "testnetAnnotation": "当前为测试网浏览器, 主网数据请访问:",
   "en-US": "English",
-  "zh-CN": "中文"
+  "zh-CN": "中文",
+  "mainnet": "主网",
+  "testnet": "测试网"
 }

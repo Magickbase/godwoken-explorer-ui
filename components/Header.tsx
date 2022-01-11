@@ -73,7 +73,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }))
 
 export default () => {
-  const [t] = useTranslation('common')
+  const [t, { language }] = useTranslation('common')
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
   const anchorElLabel = anchorEl?.getAttribute('aria-label')
   const {
@@ -180,6 +180,41 @@ export default () => {
                 </NextLink>
               </MenuItem>
             ))}
+          </Menu>
+          <Button
+            aria-label="chain-type"
+            aria-haspopup="true"
+            aria-expanded={anchorElLabel === 'chain-type' ? 'true' : undefined}
+            aria-controls={anchorElLabel === 'chain-type' ? 'chain-type' : undefined}
+            onClick={handleTokenListOpen}
+            color="inherit"
+            disableRipple
+          >
+            {t(process.env.NEXT_PUBLIC_CHAIN_TYPE || 'testnet')}
+          </Button>
+          <Menu
+            id="chain-type"
+            anchorEl={anchorEl}
+            open={anchorElLabel === 'chain-type'}
+            onClose={handleTokenListClose}
+            MenuListProps={{ 'aria-labelledby': 'chain-type' }}
+          >
+            {['mainnet', 'testnet'].map(chain => {
+              const url = `https://${
+                chain === 'mainnet'
+                  ? process.env.NEXT_PUBLIC_MAINNET_EXPLORER_HOSTNAME
+                  : process.env.NEXT_PUBLIC_TESTNET_EXPLORER_HOSTNAME
+              }/${language}`
+              return (
+                <MenuItem key={chain} onClick={handleTokenListClose} sx={{ p: 0 }}>
+                  <NextLink href={url}>
+                    <Link href={url} title={t(chain)} underline="none" sx={{ width: '100%', padding: '6px 16px' }}>
+                      {t(chain)}
+                    </Link>
+                  </NextLink>
+                </MenuItem>
+              )
+            })}
           </Menu>
           <IconButton
             aria-label="i18n"

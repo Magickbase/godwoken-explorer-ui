@@ -12,5 +12,7 @@
   "native-udt": "Layer 2 Native Token",
   "testnetAnnotation": "This is for testnet, and mainnet data ara available on",
   "en-US": "English",
-  "zh-CN": "中文"
+  "zh-CN": "中文",
+  "mainnet": "Mainnet",
+  "testnet": "Testnet"
 }
