@@ -4,20 +4,24 @@ import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import {
-  Container,
   AppBar,
+  Box,
+  Container,
   Toolbar,
   Link,
   Button,
   Menu,
+  MenuList,
   MenuItem,
   Typography,
   InputBase,
+  IconButton,
+  Divider,
+  ListSubheader,
   styled,
   alpha,
-  IconButton,
 } from '@mui/material'
-import { Search as SearchIcon, Translate as TranslateIcon } from '@mui/icons-material'
+import { Search as SearchIcon, Translate as TranslateIcon, MoreVert as MoreIcon } from '@mui/icons-material'
 import { EXPLORER_TITLE, IMG_URL, SEARCH_FIELDS, handleSearchKeyPress } from 'utils'
 
 const Search = styled('div')(({ theme }) => ({
@@ -72,6 +76,10 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }))
 
+const TOKEN_TYPE_LIST = ['bridge', 'native']
+const CHAIN_TYPE_LIST = ['mainnet', 'testnet']
+const LOCALE_LIST = ['zh-CN', 'en-US']
+
 export default () => {
   const [t, { language }] = useTranslation('common')
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
@@ -103,10 +111,64 @@ export default () => {
     }
   }, [searchInQuery, searchRef])
 
+  const tokenMenuItems = (
+    <>
+      {TOKEN_TYPE_LIST.map(type => (
+        <MenuItem key={type} onClick={handleTokenListClose} sx={{ p: 0 }}>
+          <NextLink href={`/tokens/${type}`}>
+            <Link
+              href={`/tokens/${type}`}
+              title={t(`${type}-udt`)}
+              underline="none"
+              sx={{ width: '100%', padding: '6px 16px' }}
+            >
+              {t(`${type}-udt`)}
+            </Link>
+          </NextLink>
+        </MenuItem>
+      ))}
+    </>
+  )
+
+  const chainMenuItems = (
+    <>
+      {CHAIN_TYPE_LIST.map(chain => {
+        const url = `https://${
+          chain === 'mainnet'
+            ? process.env.NEXT_PUBLIC_MAINNET_EXPLORER_HOSTNAME
+            : process.env.NEXT_PUBLIC_TESTNET_EXPLORER_HOSTNAME
+        }/${language}`
+        return (
+          <MenuItem key={chain} onClick={handleTokenListClose} sx={{ p: 0 }}>
+            <NextLink href={url}>
+              <Link href={url} title={t(chain)} underline="none" sx={{ width: '100%', padding: '6px 16px' }}>
+                {t(chain)}
+              </Link>
+            </NextLink>
+          </MenuItem>
+        )
+      })}
+    </>
+  )
+
+  const localeMenuItems = (
+    <>
+      {LOCALE_LIST.map(locale => (
+        <MenuItem key={locale} onClick={handleTokenListClose} sx={{ p: 0 }}>
+          <NextLink href={asPath} locale={locale} passHref>
+            <Link title={t(locale)} underline="none" sx={{ width: '100%', padding: '6px 16px' }}>
+              {t(locale)}
+            </Link>
+          </NextLink>
+        </MenuItem>
+      ))}
+    </>
+  )
+
   return (
     <AppBar position="sticky" sx={{ bgcolor: 'primary.dark' }}>
       <Container>
-        <Toolbar sx={{ flexGrow: 1 }}>
+        <Toolbar sx={{ flexGrow: 1 }} disableGutters>
           <NextLink href="/">
             <Link
               href="/"
@@ -125,11 +187,7 @@ export default () => {
                 layout="fixed"
                 alt="logo"
               />
-              <Typography
-                sx={{ mx: 2, display: { xs: 'none', sm: 'flex' }, fontSize: { sm: 16, md: 24 } }}
-                variant="h5"
-                noWrap
-              >
+              <Typography sx={{ mx: 2, display: { xs: 'none', sm: 'flex' } }} variant="h5" noWrap>
                 {EXPLORER_TITLE}
               </Typography>
             </Link>
@@ -148,102 +206,107 @@ export default () => {
               inputRef={searchRef}
             />
           </Search>
-          <Button
-            aria-label="token-list"
-            aria-haspopup="true"
-            aria-expanded={anchorElLabel === 'token-list' ? 'true' : undefined}
-            aria-controls={anchorElLabel === 'token-list' ? 'token-list' : undefined}
-            onClick={handleTokenListOpen}
-            color="inherit"
-            disableRipple
-          >
-            {t(`token`)}
-          </Button>
-          <Menu
-            id="token-list"
-            anchorEl={anchorEl}
-            open={anchorElLabel === 'token-list'}
-            onClose={handleTokenListClose}
-            MenuListProps={{ 'aria-labelledby': 'token-item' }}
-          >
-            {['bridge', 'native'].map(type => (
-              <MenuItem key={type} onClick={handleTokenListClose} sx={{ p: 0 }}>
-                <NextLink href={`/tokens/${type}`}>
-                  <Link
-                    href={`/tokens/${type}`}
-                    title={t(`${type}-udt`)}
-                    underline="none"
-                    sx={{ width: '100%', padding: '6px 16px' }}
-                  >
-                    {t(`${type}-udt`)}
-                  </Link>
-                </NextLink>
-              </MenuItem>
-            ))}
-          </Menu>
-          <Button
-            aria-label="chain-type"
-            aria-haspopup="true"
-            aria-expanded={anchorElLabel === 'chain-type' ? 'true' : undefined}
-            aria-controls={anchorElLabel === 'chain-type' ? 'chain-type' : undefined}
-            onClick={handleTokenListOpen}
-            color="inherit"
-            disableRipple
-          >
-            {t(process.env.NEXT_PUBLIC_CHAIN_TYPE || 'testnet')}
-          </Button>
-          <Menu
-            id="chain-type"
-            anchorEl={anchorEl}
-            open={anchorElLabel === 'chain-type'}
-            onClose={handleTokenListClose}
-            MenuListProps={{ 'aria-labelledby': 'chain-type' }}
-          >
-            {['mainnet', 'testnet'].map(chain => {
-              const url = `https://${
-                chain === 'mainnet'
-                  ? process.env.NEXT_PUBLIC_MAINNET_EXPLORER_HOSTNAME
-                  : process.env.NEXT_PUBLIC_TESTNET_EXPLORER_HOSTNAME
-              }/${language}`
-              return (
-                <MenuItem key={chain} onClick={handleTokenListClose} sx={{ p: 0 }}>
-                  <NextLink href={url}>
-                    <Link href={url} title={t(chain)} underline="none" sx={{ width: '100%', padding: '6px 16px' }}>
-                      {t(chain)}
-                    </Link>
-                  </NextLink>
-                </MenuItem>
-              )
-            })}
-          </Menu>
-          <IconButton
-            aria-label="i18n"
-            aria-haspopup="true"
-            aria-expanded={anchorElLabel === 'i18n' ? 'true' : undefined}
-            aria-controls={anchorElLabel === 'i18n' ? 'i18n' : undefined}
-            onClick={handleTokenListOpen}
-            color="inherit"
-            disableRipple
-          >
-            <TranslateIcon fontSize="small" />
-          </IconButton>
-          <Menu
-            id="i18n"
-            anchorEl={anchorEl}
-            open={anchorElLabel === 'i18n'}
-            onClose={handleTokenListClose}
-            MenuListProps={{ 'aria-labelledby': 'locale' }}
-          >
-            {['zh-CN', 'en-US'].map(locale => (
-              <MenuItem key={locale} onClick={handleTokenListClose} sx={{ p: 0 }}>
-                <NextLink href={asPath} locale={locale} passHref>
-                  <Link title={t(locale)} underline="none" sx={{ width: '100%', padding: '6px 16px' }}>
-                    {t(locale)}
-                  </Link>
-                </NextLink>
-              </MenuItem>
-            ))}
-          </Menu>
+          <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+            <Button
+              aria-label="token-list"
+              aria-haspopup="true"
+              aria-expanded={anchorElLabel === 'token-list' ? 'true' : undefined}
+              aria-controls={anchorElLabel === 'token-list' ? 'token-list' : undefined}
+              onClick={handleTokenListOpen}
+              color="inherit"
+              disableRipple
+            >
+              {t(`token`)}
+            </Button>
+            <Menu
+              id="token-list"
+              anchorEl={anchorEl}
+              open={anchorElLabel === 'token-list'}
+              onClose={handleTokenListClose}
+              MenuListProps={{ 'aria-labelledby': 'token-item' }}
+              sx={{ display: { xs: 'none', md: 'block' } }}
+            >
+              {tokenMenuItems}
+            </Menu>
+            <Button
+              aria-label="chain-type"
+              aria-haspopup="true"
+              aria-expanded={anchorElLabel === 'chain-type' ? 'true' : undefined}
+              aria-controls={anchorElLabel === 'chain-type' ? 'chain-type' : undefined}
+              onClick={handleTokenListOpen}
+              color="inherit"
+              disableRipple
+            >
+              {t(process.env.NEXT_PUBLIC_CHAIN_TYPE || CHAIN_TYPE_LIST[1])}
+            </Button>
+            <Menu
+              id="chain-type"
+              anchorEl={anchorEl}
+              open={anchorElLabel === 'chain-type'}
+              onClose={handleTokenListClose}
+              MenuListProps={{ 'aria-labelledby': 'chain-type' }}
+              sx={{ display: { xs: 'none', md: 'block' } }}
+            >
+              {chainMenuItems}
+            </Menu>
+            <IconButton
+              aria-label="i18n"
+              aria-haspopup="true"
+              aria-expanded={anchorElLabel === 'i18n' ? 'true' : undefined}
+              aria-controls={anchorElLabel === 'i18n' ? 'i18n' : undefined}
+              onClick={handleTokenListOpen}
+              color="inherit"
+              disableRipple
+            >
+              <TranslateIcon fontSize="small" />
+            </IconButton>
+            <Menu
+              id="i18n"
+              anchorEl={anchorEl}
+              open={anchorElLabel === 'i18n'}
+              onClose={handleTokenListClose}
+              MenuListProps={{ 'aria-labelledby': 'locale' }}
+              sx={{ display: { xs: 'none', md: 'block' } }}
+            >
+              {localeMenuItems}
+            </Menu>
+          </Box>
+          <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+            <IconButton
+              aria-label="mobile-menu"
+              size="large"
+              aria-haspopup="true"
+              onClick={handleTokenListOpen}
+              color="inherit"
+            >
+              <MoreIcon />
+            </IconButton>
+            <Menu
+              id="mobile-menu"
+              anchorEl={anchorEl}
+              open={anchorElLabel === 'mobile-menu'}
+              onClose={handleTokenListClose}
+              MenuListProps={{ 'aria-labelledby': 'mobile-menu' }}
+              sx={{ textTransform: 'capitalize', display: { xs: 'block', md: 'none' } }}
+            >
+              <MenuList dense>
+                <Typography variant="subtitle2" textAlign="center">
+                  {t(`token`)}
+                </Typography>
+                {tokenMenuItems}
+                <Divider />
+                <Typography variant="subtitle2" textAlign="center">
+                  {t(`chainType`)}
+                </Typography>
+                {chainMenuItems}
+                <Divider />
+                <Typography variant="subtitle2" textAlign="center">
+                  {t(`language`)}
+                </Typography>
+                {localeMenuItems}
+              </MenuList>
+            </Menu>
+          </Box>
         </Toolbar>
       </Container>
     </AppBar>

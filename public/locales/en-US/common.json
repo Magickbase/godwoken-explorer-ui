@@ -14,5 +14,7 @@
   "en-US": "English",
   "zh-CN": "中文",
   "mainnet": "Mainnet",
-  "testnet": "Testnet"
+  "testnet": "Testnet",
+  "chainType": "Chain Type",
+  "language": "Language"
 }

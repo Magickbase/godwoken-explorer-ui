@@ -14,5 +14,7 @@
   "en-US": "English",
   "zh-CN": "中文",
   "mainnet": "主网",
-  "testnet": "测试网"
+  "testnet": "测试网",
+  "chainType": "主/测试网",
+  "language": "语言"
 }
