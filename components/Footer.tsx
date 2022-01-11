@@ -24,7 +24,15 @@ const Footer = () => (
     <Box component="div" textAlign="center">
       {links.map(link => (
         <NextLink href={link.url} key={link.label}>
-          <Button href={link.url} title={link.label} color="inherit" component={Link} sx={{ textTransform: 'none' }}>
+          <Button
+            href={link.url}
+            title={link.label}
+            color="inherit"
+            component={Link}
+            sx={{ textTransform: 'none' }}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             {link.label}
           </Button>
         </NextLink>
