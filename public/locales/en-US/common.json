@@ -10,5 +10,11 @@
   "token": "Token",
   "bridge-udt": "Bridged Token",
   "native-udt": "Layer 2 Native Token",
-  "testnetAnnotation": "This is for testnet, and mainnet data ara available on"
+  "testnetAnnotation": "This is for testnet, and mainnet data ara available on",
+  "en-US": "English",
+  "zh-CN": "中文",
+  "mainnet": "Mainnet",
+  "testnet": "Testnet",
+  "chainType": "Chain Type",
+  "language": "Language"
 }
