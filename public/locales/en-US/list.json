@@ -1,0 +1,12 @@
+{
+  "hash": "Hash",
+  "from": "From",
+  "to": "To",
+  "value": "Value",
+  "age": "Age",
+  "transfer": "Transfer",
+  "no_records": "No Records",
+  "txHash": "Txn Hash",
+  "block": "Block",
+  "type": "Type"
+}

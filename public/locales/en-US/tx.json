@@ -1,6 +1,9 @@
 {
+  "txInfo": "Transaction info",
+  "overview": "Overview",
+  "basicInfo": "Basic Info",
   "latestTxs": "latest transactions",
-  "hash": "tx hash",
+  "hash": "txn hash",
   "blockHash": "block hash",
   "blockNumber": "block number",
   "type": "type",
@@ -21,5 +24,6 @@
   "committed": "committed",
   "finalized": "finalized",
   "emptyTxList": "No transactions found",
-  "pending": "Pending"
+  "pending": "Pending",
+  "txHashCopied": "Transaction hash copied to clipboard"
 }

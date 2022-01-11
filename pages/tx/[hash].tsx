@@ -1,9 +1,33 @@
 import { useEffect, useState } from 'react'
 import { GetServerSideProps } from 'next'
-import Image from 'next/image'
-import Link from 'next/link'
+import NextLink from 'next/link'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import {
+  Alert,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  colors,
+  Paper,
+  Container,
+  List,
+  ListItem,
+  ListItemText,
+  Typography,
+  Divider,
+  Link,
+  Grid,
+  ListSubheader,
+  Stack,
+  Tooltip,
+  IconButton,
+  Snackbar,
+} from '@mui/material'
+import { OpenInNew as OpenInNewIcon, ContentCopyOutlined as CopyIcon } from '@mui/icons-material'
+import { ExpandMore } from '@mui/icons-material'
+import PageTitle from 'components/PageTitle'
+import Address from 'components/AddressInHalfPanel'
 import {
   formatDatetime,
   fetchTx,
@@ -12,14 +36,15 @@ import {
   useWS,
   getTxRes,
   CKB_EXPLORER_URL,
-  IMG_URL,
   CHANNEL,
+  formatInt,
+  handleCopy,
 } from 'utils'
-import CardFieldsetList from 'components/CardFieldsetList'
 type State = API.Tx.Parsed
 
 const Tx = (initState: State) => {
   const [tx, setTx] = useState(initState)
+  const [isCopied, setIsCopied] = useState(false)
   const [t] = useTranslation('tx')
 
   useEffect(() => {
@@ -29,7 +54,9 @@ const Tx = (initState: State) => {
   useWS(
     `${CHANNEL.TX_INFO}${tx.hash}`,
     (init: API.Tx.Raw) => {
-      setTx(getTxRes(init))
+      if (init) {
+        setTx(getTxRes(init))
+      }
     },
     ({ l1_block, finalize_state }: Partial<Pick<API.Tx.Raw, 'l1_block' | 'finalize_state'>>) => {
       const update: Partial<Pick<API.Tx.Parsed, 'l1Block' | 'finalizeState'>> = {}
@@ -44,90 +71,165 @@ const Tx = (initState: State) => {
     [setTx, tx.hash],
   )
 
-  const fieldsetList = [
-    [
-      {
-        label: 'timestamp',
-        value:
-          tx.timestamp >= 0 ? (
+  const handleTxHashCopy = async () => {
+    await handleCopy(tx.hash)
+    setIsCopied(true)
+  }
+
+  const overview = [
+    {
+      label: 'hash',
+      value: (
+        <Tooltip title={tx.hash} placement="top">
+          <Stack direction="row" alignItems="center">
+            <Typography variant="body2" className="mono-font" overflow="hidden" textOverflow="ellipsis" color="primary">
+              {tx.hash}
+            </Typography>
+            <IconButton aria-label="copy" size="small" onClick={handleTxHashCopy}>
+              <CopyIcon fontSize="inherit" />
+            </IconButton>
+          </Stack>
+        </Tooltip>
+      ),
+    },
+    {
+      label: 'from',
+      value: <Address address={tx.from} />,
+    },
+    {
+      label: 'to',
+      value: <Address address={tx.to} />,
+    },
+  ]
+  const basicInfo = [
+    { label: 'finalizeState', value: <Typography variant="body2">{t(tx.finalizeState)}</Typography> },
+    { label: 'type', value: <Typography variant="body2">{tx.type}</Typography> },
+    {
+      label: 'l1Block',
+      value: tx.l1Block ? (
+        <Link
+          href={`${CKB_EXPLORER_URL}/block/${tx.l1Block}`}
+          underline="none"
+          target="_blank"
+          rel="noopener noreferrer"
+          display="flex"
+          alignItems="center"
+          color="secondary"
+        >
+          {formatInt(tx.l1Block)}
+          <OpenInNewIcon sx={{ fontSize: 16, ml: 0.5 }} />
+        </Link>
+      ) : (
+        <Typography variant="body2">{t('pending')}</Typography>
+      ),
+    },
+    {
+      label: 'l2Block',
+      value: tx.l2Block ? (
+        <Typography variant="body2">
+          <NextLink href={`/block/${tx.l2Block}`}>
+            <Link href={`/block/${tx.l2Block}`} underline="none" color="secondary">
+              {formatInt(tx.l2Block)}
+            </Link>
+          </NextLink>
+        </Typography>
+      ) : (
+        t('pending')
+      ),
+    },
+    { label: 'nonce', value: <Typography variant="body2">{Number(tx.nonce).toLocaleString('en')}</Typography> },
+
+    tx.gasPrice
+      ? {
+          label: 'gasPrice',
+          value: <Typography variant="body2">{Number(tx.gasPrice).toLocaleString('en') + ' shannon'}</Typography>,
+        }
+      : null,
+    { label: 'fee', value: <Typography variant="body2">{Number(tx.fee).toLocaleString('en')}</Typography> },
+    {
+      label: 'timestamp',
+      value: (
+        <Typography variant="body2">
+          {tx.timestamp >= 0 ? (
             <time dateTime={new Date(tx.timestamp).toISOString()}>{formatDatetime(tx.timestamp)}</time>
           ) : (
             t('pending')
-          ),
-      },
-      {
-        label: 'l2Block',
-        value: tx.l2Block ? (
-          <Link href={`/block/${tx.l2Block}`}>
-            <a title={t('l2Block')}>{BigInt(tx.l2Block).toLocaleString('en')}</a>
-          </Link>
-        ) : (
-          t('pending')
-        ),
-      },
-      {
-        label: 'l1Block',
-        value: tx.l1Block ? (
-          <Link href={`${CKB_EXPLORER_URL}/block/${tx.l1Block}`}>
-            <a title={t('l1Block')}>{BigInt(tx.l1Block).toLocaleString('en')}</a>
-          </Link>
-        ) : (
-          t('pending')
-        ),
-      },
-      {
-        label: 'type',
-        value: (
-          <span className="tx-type-badge" title={t('type')}>
-            {tx.type}
-          </span>
-        ),
-      },
-      {
-        label: 'finalizeState',
-        value: (
-          <span className="capitalize" title={t('finalizeState')}>
-            {t(tx.finalizeState)}
-          </span>
-        ),
-      },
-    ],
-    [
-      { label: 'nonce', value: <span title={t('nonce')}>{Number(tx.nonce).toLocaleString('en')}</span> },
-      { label: 'args', value: <span title={t('args')}>{tx.args}</span> },
-      tx.gasPrice
-        ? { label: 'gasPrice', value: <span title={t('gasPrice')}>{Number(tx.gasPrice).toLocaleString('en')}</span> }
-        : null,
-      { label: 'fee', value: <span title={t('fee')}>{Number(tx.fee).toLocaleString('en')}</span> },
-    ],
+          )}
+        </Typography>
+      ),
+    },
   ]
+
   return (
-    <div className="card-container mt-8">
-      <h2 className="card-header whitespace-nowrap overflow-hidden overflow-ellipsis">
-        {`${t('hash')}`}
-        <span>{`#${tx.hash}`}</span>
-      </h2>
-      <div className="flex justify-center items-center border-b border-light-grey py-3 capitalize">
-        <span className="flex-1 mr-2 overflow-hidden overflow-ellipsis text-right">
-          {t('from')}
-          <Link href={`/account/${tx.from}`}>
-            <a className="ml-1" title={t('from')} aria-label={t('from')}>
-              {tx.from}
-            </a>
-          </Link>
-        </span>
-        <Image src={`${IMG_URL}arrow-down-rounded.svg`} width="14" height="14" className="transform -rotate-90" />
-        <span className="flex-1 ml-2 overflow-hidden overflow-ellipsis">
-          {t('to')}
-          <Link href={`/account/${tx.to}`}>
-            <a className="ml-1" title={t('to')} aria-label={t('to')}>
-              {tx.to}
-            </a>
-          </Link>
-        </span>
-      </div>
-      <CardFieldsetList fieldsetList={fieldsetList} t={t} />
-    </div>
+    <Container sx={{ pb: 6 }}>
+      <PageTitle>{t('txInfo')}</PageTitle>
+      <Paper>
+        <Grid container>
+          <Grid item xs={12} md={6}>
+            <List
+              subheader={<ListSubheader sx={{ bgcolor: 'transparent' }}>{t('overview')}</ListSubheader>}
+              sx={{ textTransform: 'capitalize' }}
+            >
+              <Divider variant="middle" />
+              {overview.map(field => (
+                <ListItem key={field.label}>
+                  <ListItemText primary={t(field.label)} secondary={field.value} />
+                </ListItem>
+              ))}
+              {tx.args ? (
+                <Accordion sx={{ boxShadow: 'none', width: '100%' }}>
+                  <AccordionSummary sx={{ textTransform: 'capitalize' }} expandIcon={<ExpandMore />}>
+                    {t(`args`)}
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Typography
+                      variant="body2"
+                      component="pre"
+                      sx={{ wordBreak: 'break-all', whiteSpace: 'pre-wrap', maxHeight: '51ch', overflow: 'auto' }}
+                      p={2}
+                      border="1px solid"
+                      borderColor="primary.light"
+                      borderRadius={1}
+                      bgcolor={colors.grey[50]}
+                      className="mono-font"
+                    >
+                      {tx.args}
+                    </Typography>
+                  </AccordionDetails>
+                </Accordion>
+              ) : null}
+            </List>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <List
+              subheader={<ListSubheader sx={{ bgcolor: 'transparent' }}>{t('basicInfo')}</ListSubheader>}
+              sx={{ textTransform: 'capitalize' }}
+            >
+              <Divider variant="middle" />
+              {basicInfo.map(field => (
+                <ListItem key={field.label}>
+                  <ListItemText primary={t(field.label)} secondary={field.value} />
+                </ListItem>
+              ))}
+            </List>
+          </Grid>
+        </Grid>
+      </Paper>
+      <Snackbar
+        open={isCopied}
+        onClose={() => setIsCopied(false)}
+        anchorOrigin={{
+          horizontal: 'center',
+          vertical: 'top',
+        }}
+        autoHideDuration={3000}
+        color="secondary"
+      >
+        <Alert severity="success" variant="filled">
+          {t(`txHashCopied`)}
+        </Alert>
+      </Snackbar>
+    </Container>
   )
 }
 

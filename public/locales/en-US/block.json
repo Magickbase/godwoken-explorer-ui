@@ -8,7 +8,7 @@
   "l1Block": "l1 block",
   "finalizeState": "finalize state",
   "aggregator": "aggregator",
-  "txHash": "tx hash",
+  "l1TxHash": "l1 txn hash",
   "pending": "pending",
   "committed": "committed",
   "finalized": "finalized"

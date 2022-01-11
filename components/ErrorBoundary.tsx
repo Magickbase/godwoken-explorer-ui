@@ -18,7 +18,7 @@ class ErrorBoundary extends React.Component<{}, { hasError: boolean; message: st
 
   componentDidCatch = (error, info) => {
     console.warn(error, info)
-    window.location.href = `/error?message=${error.message}`
+    // window.location.href = `/error?message=${error.message}`
   }
 
   render = () => {
