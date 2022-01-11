@@ -206,11 +206,13 @@ const Tx = (initState: State) => {
               sx={{ textTransform: 'capitalize' }}
             >
               <Divider variant="middle" />
-              {basicInfo.map(field => (
-                <ListItem key={field.label}>
-                  <ListItemText primary={t(field.label)} secondary={field.value} />
-                </ListItem>
-              ))}
+              {basicInfo.map(field =>
+                field ? (
+                  <ListItem key={field.label}>
+                    <ListItemText primary={t(field.label)} secondary={field.value} />
+                  </ListItem>
+                ) : null,
+              )}
             </List>
           </Grid>
         </Grid>
