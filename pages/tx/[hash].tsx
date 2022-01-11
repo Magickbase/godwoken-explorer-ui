@@ -134,7 +134,7 @@ const Tx = (initState: State) => {
           </NextLink>
         </Typography>
       ) : (
-        t('pending')
+        <Typography variant="body2">{t('pending')}</Typography>
       ),
     },
     { label: 'nonce', value: <Typography variant="body2">{Number(tx.nonce).toLocaleString('en')}</Typography> },
