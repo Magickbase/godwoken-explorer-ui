@@ -1,10 +1,14 @@
 {
+  "overview": "Overview",
+  "basicInfo": "Basic Info",
   "account": "account",
   "id": "account id",
   "nonce": "nonce",
   "type": "account type",
   "ckb": "CKB",
   "eth": "ETH",
+  "ckbBalance": "CKB Balance",
+  "ethBalance": "ETH Balance",
   "txCount": "transaction count",
   "userDefinedAssets": "User Defined Asset(s)",
   "ethAddr": "ethereum address",
@@ -34,5 +38,10 @@
   "running": "running",
   "halting": "halting",
   "emptyAssetList": "No assets found",
-  "l2ScriptHash": "l2 script hash"
+  "l2ScriptHash": "l2 script hash",
+  "asset": "asset",
+  "assetType": "asset type",
+  "balance": "balance",
+  "native": "native",
+  "bridged": "bridged"
 }

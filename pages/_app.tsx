@@ -1,9 +1,12 @@
 import { useEffect } from 'react'
+import CssBaseLine from '@mui/material/CssBaseline'
+import { ThemeProvider } from '@mui/material/styles'
 import { useRouter } from 'next/router'
 import Layout from 'components/Layout'
 import { appWithTranslation } from 'next-i18next'
 import { AppProps } from 'next/app'
 import ErrorBoundary from 'components/ErrorBoundary'
+import { theme } from '../utils'
 import '../styles/globals.css'
 
 const Agera = ({ Component, pageProps }: AppProps) => {
@@ -25,11 +28,15 @@ const Agera = ({ Component, pageProps }: AppProps) => {
   }, [])
 
   return (
-    <Layout>
-      <ErrorBoundary>
-        <Component {...pageProps} />
-      </ErrorBoundary>
-    </Layout>
+    <ThemeProvider theme={theme}>
+      <CssBaseLine />
+
+      <Layout>
+        <ErrorBoundary>
+          <Component {...pageProps} />
+        </ErrorBoundary>
+      </Layout>
+    </ThemeProvider>
   )
 }
 

@@ -1,78 +1,80 @@
 import { useTranslation } from 'next-i18next'
-import Image from 'next/image'
-import { useIsHidden, scriptToHash, IMG_URL, API } from 'utils'
-import CardFieldsetList, { CardFieldsetListProps } from 'components/CardFieldsetList'
+import { List, ListItem, ListItemText, ListSubheader, Divider, Typography, Avatar } from '@mui/material'
+import { scriptToHash, API, nameToColor, formatInt } from 'utils'
+import CollapsableScript from './CollapsableScript'
 
 type State = API.Account.Parsed['sudt']
 
 const SUDT = ({ name, symbol, decimal, supply, holders, icon, typeScript, scriptHash }: State) => {
   const [t] = useTranslation('account')
-  const [isHidden, HiddenIcon] = useIsHidden()
 
-  const fieldsetList: CardFieldsetListProps['fieldsetList'] = [
-    [
-      { label: t('name'), value: <span title={t('name')}>{name}</span> },
-      {
-        label: t('symbol'),
-        value: (
-          <div className="flex items-center gap-1" title={t('symbol')}>
-            <Image src={icon || `${IMG_URL}unknown-token.svg`} width="15" height="15" loading="lazy" layout="fixed" />
-            {symbol}
-          </div>
-        ),
-      },
-      { label: t('decimal'), value: <span title={t('decimal')}>{decimal}</span> },
-    ],
-    [
-      { label: t('l2Supply'), value: <span title={t('l2Supply')}>{BigInt(supply).toLocaleString('en')}</span> },
-      {
-        label: t('holders'),
-        value: <span title={t('holders')}>{BigInt(holders).toLocaleString('en')}</span>,
-      },
-    ],
+  const fields = [
+    { label: t(`type`), value: <Typography variant="body2">{`sUDT`}</Typography> },
+    { label: t('name'), value: <Typography variant="body2">{name}</Typography> },
+    {
+      label: t('symbol'),
+      value: (
+        <div className="flex items-center gap-1" title={t('symbol')}>
+          <Avatar src={icon ?? null} sx={{ bgcolor: nameToColor(name) }}>
+            {name[0] ?? '?'}
+          </Avatar>
+          <Typography variant="body2">{symbol}</Typography>
+        </div>
+      ),
+    },
+    { label: t('decimal'), value: <Typography variant="body2">{decimal}</Typography> },
+    { label: t('l2Supply'), value: <Typography variant="body2">{formatInt(supply)}</Typography> },
+    {
+      label: t('holders'),
+      value: <Typography variant="body2">{formatInt(holders)}</Typography>,
+    },
   ]
 
   return (
-    <div className="card-container">
-      <h2 className="card-subheader" aria-label="sudt">
-        {`${t('type')}:`}
-        <span className="normal-case">sUDT</span>
-      </h2>
-
-      <CardFieldsetList fieldsetList={fieldsetList} t={t} />
-
+    <List
+      subheader={
+        <ListSubheader component="div" sx={{ textTransform: 'capitalize', bgcolor: 'transparent' }}>
+          {t('basicInfo')}
+        </ListSubheader>
+      }
+      sx={{ textTransform: 'capitalize' }}
+    >
+      <Divider variant="middle" />
+      {fields.map(field => (
+        <ListItem key={field.label}>
+          <ListItemText primary={field.label} secondary={field.value} />
+        </ListItem>
+      ))}
       {typeScript ? (
         <>
-          <div className="md:my-3 border-t border-dashed border-light-grey md:border-t-0">
-            <div className="card-field" attr-last="true" data-role="l1-type-hash">
-              <span className="card-label">{t('l1TypeHash')}</span>
-              <span title={t('l1TypeHash')}>{scriptToHash(typeScript as CKBComponents.Script)}</span>
-            </div>
-          </div>
-
-          <div className="md:my-3 border-t border-dashed border-light-grey md:border-t-0">
-            <div className="card-field" attr-last="true">
-              <span className="card-label">
-                {t('l1TypeScript')}
-                <HiddenIcon />
-              </span>
-              <span className="script-type-badge">{typeScript.name || t('unknownScript')}</span>
-            </div>
-          </div>
-          <pre
-            className={isHidden ? 'hidden' : 'script-code mb-3'}
-          >{`{\n\t"code_hash": "${typeScript.codeHash}",\n\t"args": "${typeScript.args}",\n\t"hash_type": "${typeScript.hashType}"\n}`}</pre>
+          <ListItem>
+            <ListItemText
+              primary={t(`l1TypeHash`)}
+              secondary={
+                <Typography variant="body2" overflow="hidden" textOverflow="ellipsis" className="mono-font">
+                  {scriptToHash(typeScript as CKBComponents.Script)}
+                </Typography>
+              }
+            />
+          </ListItem>
+          <ListItem>
+            <CollapsableScript script={typeScript} name={t(`l1TypeScript`)} />
+          </ListItem>
         </>
       ) : null}
       {scriptHash ? (
-        <div className="md:my-3 border-t border-dashed border-light-grey md:border-t-0">
-          <div className="card-field" attr-last="true" data-role="l2-script-hash">
-            <span className="card-label">{t('l2ScriptHash')}</span>
-            <span title={t('l2ScriptHash')}>{scriptHash}</span>
-          </div>
-        </div>
+        <ListItem>
+          <ListItemText
+            primary={t(`l2ScriptHash`)}
+            secondary={
+              <Typography variant="body2" overflow="hidden" textOverflow="ellipsis" className="mono-font">
+                {scriptHash}
+              </Typography>
+            }
+          />
+        </ListItem>
       ) : null}
-    </div>
+    </List>
   )
 }
 

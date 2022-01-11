@@ -9,5 +9,6 @@
   "next": "Next",
   "token": "Token",
   "bridge-udt": "Bridged Token",
-  "native-udt": "Layer 2 Native Token"
+  "native-udt": "Layer 2 Native Token",
+  "testnetAnnotation": "This is for testnet, and mainnet data ara available on"
 }

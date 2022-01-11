@@ -1,13 +1,14 @@
 import Link from 'next/link'
 import { useTranslation } from 'next-i18next'
+import { List, ListItem, ListItemText, ListSubheader, Divider, Typography } from '@mui/material'
 import { API } from 'utils'
-import AssetList from 'components/AssetList'
+import UdtList from 'components/UdtList'
 
 type State = API.Account.Parsed['smartContract']
 
 const SmartContract = ({ txHash, ethAddr, udtList }: State) => {
   const [t] = useTranslation('account')
-  const infoList = [
+  const fields = [
     // TODO: enable this later
     // {
     //   label: t('deployTx'),
@@ -18,29 +19,35 @@ const SmartContract = ({ txHash, ethAddr, udtList }: State) => {
     //   ),
     // },
     {
+      label: t('type'),
+      value: <Typography variant="body2">{'Smart Contract'}</Typography>,
+    },
+    {
       label: t(`ethAddr`),
-      value: <span title={t(`ethAddr`)}>{ethAddr}</span>,
+      value: (
+        <Typography variant="body2" overflow="hidden" textOverflow="ellipsis" className="mono-font">
+          {ethAddr}
+        </Typography>
+      ),
     },
   ]
 
   return (
-    <>
-      <div className="card-container" data-role="info">
-        <h2 className="card-subheader" aria-label="smart contract">
-          {`${t('type')}:`}
-          <span>Smart Contract</span>
-        </h2>
-        <div className="md:my-3">
-          {infoList.map(i => (
-            <div key={i.label} className="card-field border-b-0">
-              <span className="card-label">{i.label}</span>
-              {i.value}
-            </div>
-          ))}
-        </div>
-      </div>
-      <AssetList assetList={udtList} t={t} />
-    </>
+    <List
+      subheader={
+        <ListSubheader component="div" sx={{ textTransform: 'capitalize', bgcolor: 'transparent' }}>
+          {t(`basicInfo`)}
+        </ListSubheader>
+      }
+      sx={{ textTransform: 'capitalize' }}
+    >
+      <Divider variant="middle" />
+      {fields.map(field => (
+        <ListItem key={field.label}>
+          <ListItemText primary={field.label} secondary={field.value} />
+        </ListItem>
+      ))}
+    </List>
   )
 }
 

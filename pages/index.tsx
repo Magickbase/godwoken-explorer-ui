@@ -1,10 +1,35 @@
 import { useState } from 'react'
 import { GetServerSideProps } from 'next'
-import Image from 'next/image'
-import Link from 'next/link'
+import NextLink from 'next/link'
+import {
+  Avatar,
+  Link,
+  Grid,
+  Container,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  ListSubheader,
+  Box,
+  Stack,
+  Button,
+  Tooltip,
+  Chip,
+  Divider,
+  Paper,
+} from '@mui/material'
+import {
+  LineWeightOutlined as BlockHeightIcon,
+  AccountBoxOutlined as AccountCountIcon,
+  SpeedOutlined as TpsIcon,
+  FormatListNumberedOutlined as TxCountIcon,
+  ErrorOutlineOutlined as ErrorIcon,
+} from '@mui/icons-material'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { timeDistance, fetchHome, API, handleApiError, IMG_URL, useWS, CHANNEL, getHomeRes } from 'utils'
+import { timeDistance, fetchHome, API, handleApiError, useWS, CHANNEL, getHomeRes, formatInt } from 'utils'
+import { Typography } from '@mui/material'
 
 type State = API.Home.Parsed
 
@@ -16,18 +41,11 @@ const formatAddress = (addr: string) => {
 }
 
 const statisticGroups = [
-  [
-    { key: 'blockHeight', icon: 'blocks', prefix: '# ' },
-    { key: 'txCount', icon: 'txs' },
-  ],
-  [
-    { key: 'tps', icon: 'dashboard', unit: 'tx/s' },
-    { key: 'accountCount', icon: 'account' },
-  ],
+  { key: 'blockHeight', icon: <BlockHeightIcon />, prefix: '# ' },
+  { key: 'txCount', icon: <TxCountIcon /> },
+  { key: 'tps', icon: <TpsIcon />, suffix: 'tx/s' },
+  { key: 'accountCount', icon: <AccountCountIcon /> },
 ]
-
-const SuccessIcon = <Image src={`${IMG_URL}success.svg`} alt="success" width="15" height="15" layout="fixed" />
-const FailureIcon = <Image src={`${IMG_URL}failure.svg`} alt="failure" width="15" height="15" layout="fixed" />
 
 const Statistic = ({ blockCount, txCount, tps, accountCount }: State['statistic']) => {
   const [t] = useTranslation('statistic')
@@ -39,143 +57,196 @@ const Statistic = ({ blockCount, txCount, tps, accountCount }: State['statistic'
   }
 
   return (
-    <div className="statistic-container">
-      {statisticGroups.map(group => (
-        <div
-          key={group.map(g => g.key).join()}
-          className="flex w-full py-4 divide-x divide-white divide-opacity-20 md:w-1/2 md:flex-col md:divide-x-0 md:divide-y md:py-0 md:px-4 xl:divide-y-0 xl:divide-x xl:flex-row xl:px-0"
-        >
-          {group.map(field => (
-            <div
-              key={field.key}
-              className="w-1/2 whitespace-pre capitalize text-sm even:pl-4 md:w-full md:even:pl-0 md:odd:pb-4 md:even:pt-4 xl:w-1/2 xl:odd:pb-0 xl:even:p-0 xl:odd:pl-4 xl:even:pl-4"
-            >
-              <div className="flex items-center leading-default" aria-label={t(field.key)}>
-                <Image
-                  loading="lazy"
-                  className="inverted-icon"
-                  src={`${IMG_URL}${field.icon}.svg`}
-                  height="17"
-                  width="17"
-                  layout="fixed"
-                  alt={t(field.key)}
-                />
-                <span className="ml-1">{t(field.key)}</span>
-              </div>
-              <span className="block text-xl font-bold overflow-hidden overflow-ellipsis pr-2">
-                {field.prefix ? <span className="normal-case pl-1">{field.prefix}</span> : undefined}
-                {stats[field.key]}
-                {field.unit ? <span className="normal-case pl-1">{field.unit}</span> : undefined}
-              </span>
-            </div>
-          ))}
-        </div>
+    <Grid container spacing={2}>
+      {statisticGroups.map(field => (
+        <Grid item key={field.key} xs={6} md={3}>
+          <Paper sx={{ bgcolor: 'primary.light', color: 'white', p: 5, textAlign: 'center' }}>
+            <Stack direction="row" display="flex" alignItems="center" justifyContent="center">
+              {field.icon}
+              <Typography variant="body2" noWrap sx={{ textTransform: 'capitalize', pl: 1 }}>
+                {t(field.key)}
+              </Typography>
+            </Stack>
+            <Typography variant="body1" noWrap>
+              {`${field.prefix || ''}${stats[field.key]}${field.suffix || ''}`}
+            </Typography>
+          </Paper>
+        </Grid>
       ))}
-    </div>
+    </Grid>
   )
 }
 
 const BlockList = ({ list }: { list: State['blockList'] }) => {
   const [t, { language }] = useTranslation('block')
   return (
-    <div className="list-container z-10 my-4 lg:w-1/2 lg:mr-2" aria-label="">
-      <h2 className="list-header" aria-label={t('latestBlocks')}>
-        <Image
-          loading="lazy"
-          src={`${IMG_URL}blocks.svg`}
-          height="17"
-          width="17"
-          layout="fixed"
-          alt={t('latestBlocks')}
-        />
-        <span>{t('latestBlocks')}</span>
-      </h2>
-      <div className="divide-y divide-light-grey">
-        {list.map(block => (
-          <div key={block.hash} className="list-item-container">
-            <div className="flex justify-between mb-4 lg:mb-3">
-              <Link href={`/block/${block.hash}`}>
-                <a title={t('number')} className="hashLink flex-1">
-                  {BigInt(block.number).toLocaleString('en')}
-                </a>
-              </Link>
-              <span className="text-right" title={t('txCount')}>
-                {BigInt(block.txCount).toLocaleString('en')} TXs
-              </span>
-            </div>
-            <time
-              dateTime={new Date(+block.timestamp).toISOString()}
-              className="flex justify-end list-datetime lg:h-6"
-              title={t('timestamp')}
-            >
-              {timeDistance(block.timestamp, language)}
-            </time>
-          </div>
-        ))}
-      </div>
-    </div>
+    <List
+      subheader={
+        <ListSubheader component="div" sx={{ textTransform: 'capitalize', bgcolor: 'transparent' }}>
+          {t(`latestBlocks`)}
+        </ListSubheader>
+      }
+      dense
+    >
+      {list.map((block, idx) => (
+        <Box key={block.hash}>
+          <Divider variant={idx ? 'middle' : 'fullWidth'} />
+          <ListItem>
+            <ListItemIcon>
+              <Avatar sx={{ bgcolor: '#cfd8dc' }}>Bk</Avatar>
+            </ListItemIcon>
+            <ListItemText
+              primary={
+                <Stack minHeight={73}>
+                  <Stack direction="row" justifyContent="space-between">
+                    <Box>
+                      <NextLink href={`/block/${block.hash}`}>
+                        <Button color="secondary" href={`/block/${block.hash}`} component={Link}>
+                          {`# ${formatInt(block.number)}`}
+                        </Button>
+                      </NextLink>
+                    </Box>
+                    <Typography variant="body2" display="flex" alignItems="center">
+                      {formatInt(block.txCount)} TXs
+                    </Typography>
+                  </Stack>
+                  <Stack direction="row" justifyContent="space-between">
+                    <Tooltip placement="top" title={block.hash} hidden>
+                      <Box
+                        component="span"
+                        sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}
+                        className="mono-font"
+                        px={1}
+                      >
+                        {block.hash}
+                      </Box>
+                    </Tooltip>
+                    <Box alignItems="bottom" fontWeight={400} fontSize="0.875rem" pt={1} ml={1} color="rgba(0,0,0,0.6)">
+                      <time
+                        dateTime={new Date(+block.timestamp).toISOString()}
+                        title={new Date(+block.timestamp).toISOString()}
+                      >
+                        {timeDistance(block.timestamp, language)}
+                      </time>
+                    </Box>
+                  </Stack>
+                </Stack>
+              }
+            />
+          </ListItem>
+        </Box>
+      ))}
+    </List>
   )
 }
 
 const TxList = ({ list }: { list: State['txList'] }) => {
   const [t, { language }] = useTranslation('tx')
   return (
-    <div className="list-container z-10 my-4 lg:w-1/2 lg:ml-2">
-      <h2 className="list-header" aria-label={t('latestTxs')}>
-        <Image loading="lazy" src={`${IMG_URL}txs.svg`} height="17" width="17" layout="fixed" alt={t('latestBlocks')} />
-        <span>{t('latestTxs')}</span>
-      </h2>
-      <div className="divide-y divide-light-grey">
-        {list.map(tx => (
-          <div key={tx.hash} className="list-item-container">
-            <div className="flex items-center mb-3">
-              <Link href={`/tx/${tx.hash}`}>
-                <a title={t('hash')} className="hashLink flex-1">
-                  {tx.hash}
-                </a>
-              </Link>
-              <span className="tx-type-badge h-full mx-2" title={t('type')}>
-                {tx.type}
-              </span>
-              {tx.success ? SuccessIcon : FailureIcon}
-            </div>
-            <div className="text-xs sm:text-sm flex flex-wrap justify-between items-center whitespace-nowrap">
-              <div className="flex-1 flex items-center sm:justify-between mr-8">
-                <div>
-                  <span className="capitalize">{t('from')}</span>
-                  <Link href={`/account/${tx.from}`}>
-                    <a title={t('from')} className="ml-0.5 mr-1 select-none" data-addr={tx.from}>
-                      {formatAddress(tx.from)}
-                    </a>
-                  </Link>
-                </div>
-                <Image
-                  src={`${IMG_URL}arrow-down-rounded.svg`}
-                  width="14"
-                  height="14"
-                  className="transform -rotate-90 flex-shrink-0"
-                />
-                <div>
-                  <span className="ml-1 mr-0.5 capitalize">{t('to')}</span>
-                  <Link href={`/account/${tx.to}`}>
-                    <a title={t('to')} className="mx-0.5 select-none" data-addr={tx.to}>
-                      {formatAddress(tx.to)}
-                    </a>
-                  </Link>
-                </div>
-              </div>
-              <time
-                dateTime={new Date(+tx.timestamp).toISOString()}
-                className="flex justify-end items-center list-datetime ml-auto lg:h-6"
-                title={t('timestamp')}
-              >
-                {timeDistance(tx.timestamp, language)}
-              </time>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+    <List
+      subheader={
+        <ListSubheader component="div" sx={{ textTransform: 'capitalize', bgcolor: 'transparent' }}>
+          {t(`latestTxs`)}
+        </ListSubheader>
+      }
+      dense
+    >
+      {list.map((tx, idx) => (
+        <Box key={tx.hash}>
+          <Divider variant={idx ? 'middle' : 'fullWidth'} />
+          <ListItem>
+            <ListItemIcon>
+              <Avatar sx={{ bgcolor: '#cfd8dc' }}>Tx</Avatar>
+            </ListItemIcon>
+            <ListItemText
+              primary={
+                <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" minHeight={73}>
+                  <Stack>
+                    <Tooltip placement="top" title={tx.hash}>
+                      <Box>
+                        <NextLink href={`/tx/${tx.hash}`}>
+                          <Button
+                            color="secondary"
+                            href={`/tx/${tx.hash}`}
+                            component={Link}
+                            className="mono-font"
+                            sx={{
+                              textTransform: 'lowercase',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >{`${tx.hash.slice(0, 8)}...${tx.hash.slice(-8)}`}</Button>
+                        </NextLink>
+                      </Box>
+                    </Tooltip>
+                    <Box alignItems="bottom" fontWeight={400} fontSize="0.875rem" pt={1} ml={1} color="rgba(0,0,0,0.6)">
+                      <time dateTime={new Date(+tx.timestamp).toISOString()} title={t('timestamp')}>
+                        {timeDistance(tx.timestamp, language)}
+                      </time>
+                    </Box>
+                  </Stack>
+                  <Stack sx={{ pl: { xs: 1, sm: 0 } }}>
+                    <Stack direction="row" justifyContent="space-between" alignItems="center">
+                      <Typography variant="body2" sx={{ textTransform: 'capitalize' }} noWrap>
+                        {`${t('from')}:`}
+                      </Typography>
+                      <Tooltip placement="top" title={tx.from}>
+                        <Box>
+                          <NextLink href={`/account/${tx.from}`}>
+                            <Button
+                              color="secondary"
+                              href={`/account/${tx.from}`}
+                              component={Link}
+                              className="mono-font"
+                              sx={{ textTransform: 'lowercase' }}
+                            >
+                              {formatAddress(tx.from)}
+                            </Button>
+                          </NextLink>
+                        </Box>
+                      </Tooltip>
+                    </Stack>
+                    <Stack direction="row" justifyContent="space-between" alignItems="center">
+                      <Typography variant="body2" sx={{ textTransform: 'capitalize' }} noWrap>
+                        {`${t('to')}:`}
+                      </Typography>
+                      <Tooltip placement="top" title={tx.to}>
+                        <Box>
+                          <NextLink href={`/account/${tx.to}`}>
+                            <Button
+                              color="secondary"
+                              href={`/account/${tx.to}`}
+                              component={Link}
+                              className="mono-font"
+                              sx={{ textTransform: 'lowercase' }}
+                            >
+                              {formatAddress(tx.to)}
+                            </Button>
+                          </NextLink>
+                        </Box>
+                      </Tooltip>
+                    </Stack>
+                  </Stack>
+                  <Stack
+                    direction={{ xs: 'row', sm: 'column' }}
+                    justifyContent={{ xs: 'space-between', sm: tx.success ? 'start' : 'space-between' }}
+                    alignItems="end"
+                  >
+                    <Chip
+                      label={tx.type}
+                      color="primary"
+                      variant="outlined"
+                      size="small"
+                      sx={{ textTransform: 'capitalize' }}
+                    />
+                    {tx.success ? null : <ErrorIcon color="warning" sx={{ mb: { sx: 0, sm: 1 } }} />}
+                  </Stack>
+                </Stack>
+              }
+            />
+          </ListItem>
+        </Box>
+      ))}
+    </List>
   )
 }
 
@@ -198,14 +269,17 @@ const Home = (initState: State) => {
   )
 
   return (
-    <>
-      <div className="home-bg"></div>
+    <Container sx={{ py: 6 }}>
       <Statistic {...home.statistic} />
-      <div className="lg:flex">
-        <BlockList list={home.blockList} />
-        <TxList list={home.txList} />
-      </div>
-    </>
+      <Stack direction={{ xs: 'column', sm: 'column', md: 'column', lg: 'row' }} spacing={2} sx={{ pt: 6 }}>
+        <Paper sx={{ width: '100%', lg: { width: '50%', mr: 2 } }}>
+          <BlockList list={home.blockList} />
+        </Paper>
+        <Paper sx={{ width: '100%', lg: { width: '50%', ml: 2 } }}>
+          <TxList list={home.txList} />
+        </Paper>
+      </Stack>
+    </Container>
   )
 }
 

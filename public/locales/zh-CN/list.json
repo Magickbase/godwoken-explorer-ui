@@ -1,0 +1,12 @@
+{
+  "hash": "哈希",
+  "from": "发送账户",
+  "to": "接收账户",
+  "value": "金额",
+  "age": "时间",
+  "transfer": "转移",
+  "no_records": "暂无记录",
+  "txHash": "交易哈希",
+  "block": "区块",
+  "type": "类型"
+}
