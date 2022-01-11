@@ -17,7 +17,6 @@ import {
   InputBase,
   IconButton,
   Divider,
-  ListSubheader,
   styled,
   alpha,
 } from '@mui/material'
@@ -112,7 +111,14 @@ export default () => {
   }, [searchInQuery, searchRef])
 
   const tokenMenuItems = (
-    <>
+    <MenuList dense>
+      <Typography
+        variant="subtitle2"
+        textAlign="center"
+        sx={{ display: { xs: 'block', md: 'none', pointerEvents: 'none' } }}
+      >
+        {t(`token`)}
+      </Typography>
       {TOKEN_TYPE_LIST.map(type => (
         <MenuItem key={type} onClick={handleTokenListClose} sx={{ p: 0 }}>
           <NextLink href={`/tokens/${type}`}>
@@ -127,11 +133,18 @@ export default () => {
           </NextLink>
         </MenuItem>
       ))}
-    </>
+    </MenuList>
   )
 
   const chainMenuItems = (
-    <>
+    <MenuList dense>
+      <Typography
+        variant="subtitle2"
+        textAlign="center"
+        sx={{ display: { xs: 'block', md: 'none', pointerEvents: 'none' } }}
+      >
+        {t(`chainType`)}
+      </Typography>
       {CHAIN_TYPE_LIST.map(chain => {
         const url = `https://${
           chain === 'mainnet'
@@ -148,11 +161,18 @@ export default () => {
           </MenuItem>
         )
       })}
-    </>
+    </MenuList>
   )
 
   const localeMenuItems = (
-    <>
+    <MenuList dense>
+      <Typography
+        variant="subtitle2"
+        textAlign="center"
+        sx={{ display: { xs: 'block', md: 'none' }, pointerEvents: 'none' }}
+      >
+        {t(`language`)}
+      </Typography>
       {LOCALE_LIST.map(locale => (
         <MenuItem key={locale} onClick={handleTokenListClose} sx={{ p: 0 }}>
           <NextLink href={asPath} locale={locale} passHref>
@@ -162,7 +182,7 @@ export default () => {
           </NextLink>
         </MenuItem>
       ))}
-    </>
+    </MenuList>
   )
 
   return (
@@ -288,23 +308,13 @@ export default () => {
               onClose={handleTokenListClose}
               MenuListProps={{ 'aria-labelledby': 'mobile-menu' }}
               sx={{ textTransform: 'capitalize', display: { xs: 'block', md: 'none' } }}
+              autoFocus={false}
             >
-              <MenuList dense>
-                <Typography variant="subtitle2" textAlign="center">
-                  {t(`token`)}
-                </Typography>
-                {tokenMenuItems}
-                <Divider />
-                <Typography variant="subtitle2" textAlign="center">
-                  {t(`chainType`)}
-                </Typography>
-                {chainMenuItems}
-                <Divider />
-                <Typography variant="subtitle2" textAlign="center">
-                  {t(`language`)}
-                </Typography>
-                {localeMenuItems}
-              </MenuList>
+              {tokenMenuItems}
+              <Divider />
+              {chainMenuItems}
+              <Divider />
+              {localeMenuItems}
             </Menu>
           </Box>
         </Toolbar>
