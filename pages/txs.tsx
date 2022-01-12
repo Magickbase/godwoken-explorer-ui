@@ -20,6 +20,7 @@ import {
   Chip,
 } from '@mui/material'
 import ErrorIcon from '@mui/icons-material/ErrorOutlineOutlined'
+import BigNumber from 'bignumber.js'
 import PageTitle from 'components/PageTitle'
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/Pagination'
@@ -33,7 +34,7 @@ import {
   timeDistance,
   PAGE_SIZE,
   CHANNEL,
-  formatBalance,
+  CKB_DECIMAL,
 } from 'utils'
 
 type State = { query: Record<string, string>; txList: API.Txs.Parsed }
@@ -46,7 +47,7 @@ const TxList = (initState: State) => {
     },
     setTxList,
   ] = useState(initState)
-  const [t, { language }] = useTranslation('common')
+  const [t, { language }] = useTranslation('list')
   const [txT] = useTranslation('tx')
   const { push } = useRouter()
 
@@ -115,7 +116,7 @@ const TxList = (initState: State) => {
                 <TableCell sx={{ display: { xs: 'table-cell', md: 'none' } }} component="th">
                   {t('transfer')}
                 </TableCell>
-                <TableCell component="th">{t('value')}</TableCell>
+                <TableCell component="th">{`${t('value')} (CKB)`}</TableCell>
                 <TableCell component="th">{t('type')}</TableCell>
               </TableRow>
             </TableHead>
@@ -189,7 +190,7 @@ const TxList = (initState: State) => {
                       </Typography>
                     </Stack>
                   </TableCell>
-                  <TableCell>{formatBalance(item.value)}</TableCell>
+                  <TableCell>{`${new BigNumber(item.value).dividedBy(CKB_DECIMAL).toFormat()}`}</TableCell>
                   <TableCell>
                     <Chip label={item.type} size="small" variant="outlined" color="primary" />
                   </TableCell>

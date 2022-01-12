@@ -13,14 +13,7 @@ const SUDT = ({ name, symbol, decimal, supply, holders, icon, typeScript, script
     { label: t('name'), value: <Typography variant="body2">{name}</Typography> },
     {
       label: t('symbol'),
-      value: (
-        <div className="flex items-center gap-1" title={t('symbol')}>
-          <Avatar src={icon ?? null} sx={{ bgcolor: nameToColor(name) }}>
-            {name[0] ?? '?'}
-          </Avatar>
-          <Typography variant="body2">{symbol}</Typography>
-        </div>
-      ),
+      value: <Typography variant="body2">{symbol}</Typography>,
     },
     { label: t('decimal'), value: <Typography variant="body2">{decimal}</Typography> },
     { label: t('l2Supply'), value: <Typography variant="body2">{formatInt(supply)}</Typography> },

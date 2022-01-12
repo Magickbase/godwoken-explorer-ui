@@ -60,19 +60,41 @@ export namespace API {
     export type Raw = Record<
       | 'hash'
       | 'finalize_state'
-      | 'l2_block'
-      | 'l1_block'
       | 'from'
       | 'to'
       | 'nonce'
       | 'args'
       | 'type'
+      | 'value'
       | 'gas_price'
-      | 'fee',
+      | 'fee'
+      | 'gas_limit',
       string
-    > & { timestamp: Timestamp }
+    > & {
+      timestamp: Timestamp
+      gas_used: number
+      input?: string
+      l1_block: number
+      l2_block: number
+      status: 'committed' | 'finalized'
+    }
     export type Parsed = Record<
-      'hash' | 'finalizeState' | 'l2Block' | 'l1Block' | 'from' | 'to' | 'nonce' | 'args' | 'type' | 'gasPrice' | 'fee',
+      | 'hash'
+      | 'finalizeState'
+      | 'l2Block'
+      | 'l1Block'
+      | 'from'
+      | 'to'
+      | 'nonce'
+      | 'input'
+      | 'args'
+      | 'type'
+      | 'fee'
+      | 'status'
+      | 'gasLimit'
+      | 'gasUsed'
+      | 'gasPrice'
+      | 'value',
       string
     > & { timestamp: Timestamp }
   }
@@ -324,15 +346,20 @@ export const getTxRes = (tx: API.Tx.Raw): API.Tx.Parsed => ({
   hash: tx.hash,
   timestamp: tx.timestamp ? tx.timestamp * 1000 : -1,
   finalizeState: tx.finalize_state ?? '',
-  l2Block: tx.l2_block ?? '',
-  l1Block: tx.l1_block ?? '',
+  l2Block: tx.l2_block?.toString() ?? '',
+  l1Block: tx.l1_block?.toString() ?? '',
   from: tx.from ?? '',
   to: tx.to ?? '',
   nonce: tx.nonce ?? '',
+  input: tx.input ?? '',
   args: tx.args ?? '',
   type: tx.type ?? '',
   gasPrice: tx.gas_price ?? '',
+  gasUsed: tx.gas_used?.toString() ?? '',
+  gasLimit: tx.gas_limit?.toString() ?? '',
+  status: tx.status,
   fee: tx.fee ?? '',
+  value: tx.value ?? '',
 })
 
 export const fetchTx = (hash: string): Promise<API.Tx.Parsed> =>

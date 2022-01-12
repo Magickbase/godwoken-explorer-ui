@@ -26,6 +26,7 @@ import {
 } from '@mui/material'
 import { OpenInNew as OpenInNewIcon, ContentCopyOutlined as CopyIcon } from '@mui/icons-material'
 import { ExpandMore } from '@mui/icons-material'
+import BigNumber from 'bignumber.js'
 import PageTitle from 'components/PageTitle'
 import Address from 'components/AddressInHalfPanel'
 import {
@@ -39,7 +40,9 @@ import {
   CHANNEL,
   formatInt,
   handleCopy,
+  CKB_DECIMAL,
 } from 'utils'
+
 type State = API.Tx.Parsed
 
 const Tx = (initState: State) => {
@@ -60,8 +63,8 @@ const Tx = (initState: State) => {
     },
     ({ l1_block, finalize_state }: Partial<Pick<API.Tx.Raw, 'l1_block' | 'finalize_state'>>) => {
       const update: Partial<Pick<API.Tx.Parsed, 'l1Block' | 'finalizeState'>> = {}
-      if (l1_block) {
-        update.l1Block = l1_block
+      if (typeof l1_block === 'number') {
+        update.l1Block = l1_block?.toString()
       }
       if (finalize_state) {
         update.finalizeState = finalize_state
@@ -99,6 +102,12 @@ const Tx = (initState: State) => {
     {
       label: 'to',
       value: <Address address={tx.to} />,
+    },
+    {
+      label: 'value',
+      value: (
+        <Typography variant="body2">{`${new BigNumber(tx.value).dividedBy(CKB_DECIMAL).toString()} CKB`}</Typography>
+      ),
     },
   ]
   const basicInfo = [
@@ -142,10 +151,38 @@ const Tx = (initState: State) => {
     tx.gasPrice
       ? {
           label: 'gasPrice',
-          value: <Typography variant="body2">{Number(tx.gasPrice).toLocaleString('en') + ' shannon'}</Typography>,
+          value: (
+            <Typography variant="body2">
+              {new BigNumber(tx.gasPrice).dividedBy(new BigNumber(CKB_DECIMAL)).toFormat() + ' CKB'}
+            </Typography>
+          ),
         }
       : null,
-    { label: 'fee', value: <Typography variant="body2">{Number(tx.fee).toLocaleString('en')}</Typography> },
+    tx.gasUsed
+      ? {
+          label: 'gasUsed',
+          value: <Typography variant="body2">{Number(tx.gasUsed).toLocaleString('en')}</Typography>,
+        }
+      : null,
+    tx.gasLimit
+      ? {
+          label: 'gasLimit',
+          value: <Typography variant="body2">{Number(tx.gasLimit).toLocaleString('en')}</Typography>,
+        }
+      : null,
+    tx.gasUsed && tx.gasPrice
+      ? {
+          label: 'fee',
+          value: (
+            <Typography variant="body2">
+              {new BigNumber(tx.gasUsed)
+                .times(new BigNumber(tx.gasPrice))
+                .dividedBy(new BigNumber(CKB_DECIMAL))
+                .toFormat() + ' CKB'}
+            </Typography>
+          ),
+        }
+      : null,
     {
       label: 'timestamp',
       value: (
@@ -176,6 +213,28 @@ const Tx = (initState: State) => {
                   <ListItemText primary={t(field.label)} secondary={field.value} />
                 </ListItem>
               ))}
+              {/* {tx.input ? (
+                <Accordion sx={{ boxShadow: 'none', width: '100%' }}>
+                  <AccordionSummary sx={{ textTransform: 'capitalize' }} expandIcon={<ExpandMore />}>
+                    {t(`input`)}
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Typography
+                      variant="body2"
+                      component="pre"
+                      sx={{ wordBreak: 'break-all', whiteSpace: 'pre-wrap', maxHeight: '51ch', overflow: 'auto' }}
+                      p={2}
+                      border="1px solid"
+                      borderColor="primary.light"
+                      borderRadius={1}
+                      bgcolor={colors.grey[50]}
+                      className="mono-font"
+                    >
+                      {tx.input}
+                    </Typography>
+                  </AccordionDetails>
+                </Accordion>
+              ) : null} */}
               {tx.args ? (
                 <Accordion sx={{ boxShadow: 'none', width: '100%' }}>
                   <AccordionSummary sx={{ textTransform: 'capitalize' }} expandIcon={<ExpandMore />}>

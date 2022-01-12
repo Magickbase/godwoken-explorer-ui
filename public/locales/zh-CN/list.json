@@ -2,7 +2,7 @@
   "hash": "哈希",
   "from": "发送账户",
   "to": "接收账户",
-  "value": "金额",
+  "value": "价值",
   "age": "时间",
   "transfer": "转移",
   "no_records": "暂无记录",

@@ -1,8 +1,5 @@
 import NextLink from 'next/link'
 import Box from '@mui/material/Box'
-import Container from '@mui/material/Container'
-import Stack from '@mui/material/Stack'
-import Divider from '@mui/material/Divider'
 import Link from '@mui/material/Link'
 import Typography from '@mui/material/Typography'
 import { CKB_EXPLORER_URL, NERVINA_GITHUB_URL, NERVOS_FOUNDATION_URL } from 'utils'
