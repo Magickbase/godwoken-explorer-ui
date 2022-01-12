@@ -58,7 +58,7 @@ const Tx = (initState: State) => {
     `${CHANNEL.TX_INFO}${tx.hash}`,
     (init: API.Tx.Raw) => {
       if (init) {
-        setTx(getTxRes(init))
+        setTx(prev => ({ ...getTxRes(init), gasUsed: prev.gasUsed, gasLimit: prev.gasLimit }))
       }
     },
     ({ l1_block, finalize_state }: Partial<Pick<API.Tx.Raw, 'l1_block' | 'finalize_state'>>) => {
