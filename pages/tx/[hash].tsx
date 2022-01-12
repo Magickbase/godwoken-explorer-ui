@@ -106,7 +106,9 @@ const Tx = (initState: State) => {
     {
       label: 'value',
       value: (
-        <Typography variant="body2">{`${new BigNumber(tx.value).dividedBy(CKB_DECIMAL).toString()} CKB`}</Typography>
+        <Typography variant="body2">{`${new BigNumber(tx.value || '0')
+          .dividedBy(CKB_DECIMAL)
+          .toString()} CKB`}</Typography>
       ),
     },
   ]
