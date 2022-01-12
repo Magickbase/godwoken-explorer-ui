@@ -18,6 +18,7 @@ import {
   Tab,
   Typography,
 } from '@mui/material'
+import { ReadMore as ReadMoreIcon } from '@mui/icons-material'
 import User from 'components/User'
 import MetaContract from 'components/MetaContract'
 import SmartContract from 'components/SmartContract'
@@ -84,9 +85,10 @@ const Account = (initState: State) => {
                         <Link
                           href={`/txs?account_id=${account.id}&page=1`}
                           underline="none"
-                          sx={{ color: 'secondary.main' }}
+                          sx={{ color: 'secondary.main', display: 'flex', alignItems: 'center' }}
                         >
                           <Typography variant="body2">{formatInt(account.txCount)}</Typography>
+                          {+account.txCount ? <ReadMoreIcon sx={{ ml: 0.5 }} /> : null}
                         </Link>
                       </NextLink>
                     }
