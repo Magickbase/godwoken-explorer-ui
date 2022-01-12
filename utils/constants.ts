@@ -7,7 +7,7 @@ export const NERVOS_FOUNDATION_URL = process.env.NEXT_PUBLIC_NERVOS_FOUNDATION_U
 
 export const IMG_URL = '/icons/'
 export const PAGE_SIZE = 10
-export const CKB_DECIMAL = 10_000_000
+export const CKB_DECIMAL = 100_000_000
 export const SEARCH_FIELDS = 'block hash/txn hash/lockhash/ETH address/token name/token symbol'
 export const WS_ENDPOINT = process.env.NEXT_PUBLIC_WS_URL
 export const MAINNET_HOSTNAME = process.env.NEXT_PUBLIC_MAINNET_EXPLORER_HOSTNAME
