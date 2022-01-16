@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { GetServerSideProps } from 'next'
-import NextLink from 'next/link'
+import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import {
@@ -13,23 +13,38 @@ import {
   Divider,
   Grid,
   ListSubheader,
-  Link,
   Tabs,
   Tab,
   Typography,
 } from '@mui/material'
-import { ReadMore as ReadMoreIcon } from '@mui/icons-material'
 import User from 'components/User'
 import MetaContract from 'components/MetaContract'
 import SmartContract from 'components/SmartContract'
 import Polyjuice from 'components/Polyjuice'
 import SUDT from 'components/SUDT'
 import UdtList from 'components/UdtList'
-import { fetchAccount, API, useWS, getAccountRes, handleApiError, formatBalance, CHANNEL, formatInt } from 'utils'
+import TxList from 'components/TxList'
+import {
+  fetchAccount,
+  API,
+  useWS,
+  getAccountRes,
+  handleApiError,
+  formatBalance,
+  CHANNEL,
+  formatInt,
+  TabNotFoundException,
+  fetchTxList,
+} from 'utils'
 import PageTitle from 'components/PageTitle'
 
-type State = API.Account.Parsed
+type State = API.Account.Parsed & Partial<{ txList: API.Txs.Parsed }>
+const tabs = ['transactions', 'assets']
 const Account = (initState: State) => {
+  const {
+    push,
+    query: { tab = 'transactions' },
+  } = useRouter()
   const [account, setAccount] = useState(initState)
   const [t] = useTranslation('account')
 
@@ -40,10 +55,10 @@ const Account = (initState: State) => {
   useWS(
     `${CHANNEL.ACCOUNT_INFO}${account.id}`,
     (init: API.Account.Raw) => {
-      setAccount(getAccountRes(init))
+      setAccount(prev => ({ ...prev, ...getAccountRes(init) }))
     },
     (update: API.Account.Raw) => {
-      setAccount(getAccountRes(update))
+      setAccount(prev => ({ ...prev, ...getAccountRes(update) }))
     },
     [setAccount, account.id],
   )
@@ -80,18 +95,7 @@ const Account = (initState: State) => {
                 <ListItem>
                   <ListItemText
                     primary={t(`txCount`)}
-                    secondary={
-                      <NextLink href={`/txs?account_id=${account.id}&page=1`}>
-                        <Link
-                          href={`/txs?account_id=${account.id}&page=1`}
-                          underline="none"
-                          sx={{ color: 'secondary.main', display: 'flex', alignItems: 'center' }}
-                        >
-                          <Typography variant="body2">{formatInt(account.txCount)}</Typography>
-                          {+account.txCount ? <ReadMoreIcon sx={{ ml: 0.5 }} /> : null}
-                        </Link>
-                      </NextLink>
-                    }
+                    secondary={<Typography variant="body2">{formatInt(account.txCount)}</Typography>}
                   />
                 </ListItem>
               </List>
@@ -106,25 +110,58 @@ const Account = (initState: State) => {
           </Grid>
         </Paper>
         <Paper>
-          <Tabs value={0}>
-            <Tab label={`${t('userDefinedAssets')} (${udtList.length})`} />
+          <Tabs value={tabs.indexOf(tab as string)}>
+            {[`${t('transactions')}`, `${t('userDefinedAssets')} (${udtList.length})`].map((label, idx) => (
+              <Tab
+                key={label}
+                label={label}
+                onClick={e => {
+                  e.stopPropagation()
+                  e.preventDefault()
+                  push(`/account/${account.id}?tab=${tabs[idx]}`)
+                }}
+              />
+            ))}
           </Tabs>
           <Divider />
-          <UdtList list={udtList} />
+          {tab === 'transactions' && account.txList ? <TxList list={account.txList} /> : null}
+          {tab === 'assets' ? <UdtList list={udtList} /> : null}
         </Paper>
       </Stack>
     </Container>
   )
 }
 
-export const getServerSideProps: GetServerSideProps<State, { id: string }> = async ({ locale, res, params }) => {
+export const getServerSideProps: GetServerSideProps<State, { id: string }> = async ({ locale, res, params, query }) => {
   const { id } = params
+  const { tab = 'transactions' } = query
   try {
-    const account = await fetchAccount(id)
-    const lng = await serverSideTranslations(locale, ['common', 'account'])
-    return { props: { ...account, ...lng } }
+    if (typeof tab !== 'string' || !tabs.includes(tab)) {
+      throw new TabNotFoundException()
+    }
+
+    const [account, lng] = await Promise.all([
+      fetchAccount(id),
+      serverSideTranslations(locale, ['common', 'account', 'list']),
+      null,
+    ])
+    const txList =
+      tab === 'transactions' ? await fetchTxList({ account_id: account.id, page: query.page as string }) : null
+    return { props: { ...account, ...lng, txList } }
   } catch (err) {
-    return handleApiError(err, res, locale, id)
+    switch (true) {
+      case err instanceof TabNotFoundException: {
+        return {
+          redirect: {
+            destination: `/account/${id}?tab=transactions`,
+            permanent: false,
+          },
+        }
+      }
+      default: {
+        return handleApiError(err, res, locale, id)
+      }
+    }
   }
 }
 export default Account

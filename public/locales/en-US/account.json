@@ -43,5 +43,6 @@
   "assetType": "asset type",
   "balance": "balance",
   "native": "native",
-  "bridged": "bridged"
+  "bridged": "bridged",
+  "transactions": "Transactions"
 }

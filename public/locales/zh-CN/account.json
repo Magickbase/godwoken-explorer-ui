@@ -43,5 +43,6 @@
   "assetType": "类型",
   "balance": "余额",
   "native": "原生",
-  "bridged": "桥接"
+  "bridged": "桥接",
+  "transactions": "交易"
 }
