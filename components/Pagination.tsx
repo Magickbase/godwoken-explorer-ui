@@ -2,6 +2,7 @@ import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import { Box, Link } from '@mui/material'
 
+const PAGE_SIZE = 10
 const Pagination: React.FC<{ total: number; current: number; url: string; query?: object; onChange: any }> = ({
   total,
   current,
@@ -15,6 +16,7 @@ const Pagination: React.FC<{ total: number; current: number; url: string; query?
   }
   const prevPage = `${url}?${new URLSearchParams({ ...query, page: (current - 1).toString() })}`
   const nextPage = `${url}?${new URLSearchParams({ ...query, page: (current + 1).toString() })}`
+  const totalPage = Math.ceil(total / PAGE_SIZE)
   return (
     <Box my={1} mr={1} sx={{ textAlign: 'right' }}>
       {current === 1 ? null : (
@@ -29,13 +31,13 @@ const Pagination: React.FC<{ total: number; current: number; url: string; query?
         onChange={onChange}
         value={current}
       >
-        {Array.from({ length: total }).map((_, idx) => (
+        {Array.from({ length: totalPage }).map((_, idx) => (
           <option key={idx} defaultValue={idx}>
             {idx + 1}
           </option>
         ))}
       </select>
-      {total > current ? (
+      {totalPage > current ? (
         <NextLink href={nextPage}>
           <Link href={nextPage} underline="none" fontSize={14} color="secondary">
             {t(`next`)}
