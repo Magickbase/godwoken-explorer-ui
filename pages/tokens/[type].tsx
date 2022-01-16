@@ -44,14 +44,6 @@ const TokenList = ({ meta, tokens, type }: State) => {
     { key: 'holderCount' },
   ]
 
-  const handlePageChange = (e: React.SyntheticEvent<HTMLSelectElement>) => {
-    const p = +e.currentTarget.value
-    if (Number.isNaN(p) || p === meta.current) {
-      return
-    }
-    push(`/tokens/${type}?page=${p}`)
-  }
-
   return (
     <Container sx={{ py: 6 }}>
       <Paper sx={{ p: 2 }}>
@@ -153,7 +145,7 @@ const TokenList = ({ meta, tokens, type }: State) => {
             </TableBody>
           </Table>
         </TableContainer>
-        <Pagination {...meta} onChange={handlePageChange} url={`/tokens/${type}`} />
+        <Pagination current={meta.current} total={meta.total * 10} />
       </Paper>
     </Container>
   )

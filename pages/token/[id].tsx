@@ -89,14 +89,6 @@ const Token = ({ token, txList }: Props) => {
     { label: 'transferCount', value: <Typography variant="body2">{token.transferCount || '-'}</Typography> },
   ]
 
-  const handlePageChange = (e: React.SyntheticEvent<HTMLSelectElement>) => {
-    const p = +e.currentTarget.value
-    if (Number.isNaN(p) || p === txList.meta.current) {
-      return
-    }
-    push(`/token/${token.id}?page=${p}`)
-  }
-
   return (
     <Container sx={{ py: 6 }}>
       <PageTitle>
@@ -143,7 +135,7 @@ const Token = ({ token, txList }: Props) => {
           </Tabs>
           <Divider />
           <ERC20TransferList list={txList.txs} />
-          <Pagination {...txList.meta} onChange={handlePageChange} url={`/token/${token.id}`} />
+          <Pagination current={txList.meta.current} total={txList.meta.total * 10} />
         </Paper>
       </Stack>
     </Container>
