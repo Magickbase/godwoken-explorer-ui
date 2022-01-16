@@ -143,7 +143,12 @@ const Token = ({ token, txList }: Props) => {
           </Tabs>
           <Divider />
           <ERC20TransferList list={txList.txs} />
-          <Pagination {...txList.meta} onChange={handlePageChange} url={`/token/${token.id}`} />
+          <Pagination
+            current={txList.meta.current}
+            total={txList.meta.total * 10}
+            onChange={handlePageChange}
+            url={`/token/${token.id}`}
+          />
         </Paper>
       </Stack>
     </Container>
