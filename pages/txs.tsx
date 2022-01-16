@@ -8,7 +8,7 @@ import PageTitle from 'components/PageTitle'
 import TxListComp from 'components/TxList'
 import { fetchTxList, API, useWS, getTxListRes, handleApiError, PAGE_SIZE, CHANNEL } from 'utils'
 
-type State = { query: Record<string, string>; txList: API.Txs.Parsed }
+type State = { query: Record<string, string>; txList: ParsedTxList }
 
 const TxList = (initState: State) => {
   const [
@@ -26,10 +26,10 @@ const TxList = (initState: State) => {
 
   useWS(
     `${CHANNEL.ACCOUNT_TX_LIST}${id}`,
-    (init: API.Txs.Raw) => {
+    (init: RawTxList) => {
       setTxList(prev => (prev.txList.page === '1' ? { ...prev, txList: getTxListRes(init) } : prev))
     },
-    (update: API.Txs.Raw) => {
+    (update: RawTxList) => {
       setTxList(prev => {
         const totalCount = `${+prev.txList.totalCount + +update.total_count}`
         const txs =

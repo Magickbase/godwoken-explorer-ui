@@ -79,7 +79,7 @@ const TOKEN_TYPE_LIST = ['bridge', 'native']
 const CHAIN_TYPE_LIST = ['mainnet', 'testnet']
 const LOCALE_LIST = ['zh-CN', 'en-US']
 
-export default () => {
+const Header = () => {
   const [t, { language }] = useTranslation('common')
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
   const anchorElLabel = anchorEl?.getAttribute('aria-label')
@@ -322,3 +322,5 @@ export default () => {
     </AppBar>
   )
 }
+
+export default Header

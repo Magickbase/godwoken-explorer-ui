@@ -28,5 +28,9 @@
   "finalized": "已确认",
   "emptyTxList": "没有交易",
   "pending": "等待中",
-  "txHashCopied": "交易哈希已复制"
+  "txHashCopied": "交易哈希已复制",
+  "interactedContract": "与合约交互",
+  "erc20Receiver": "ERC20 接收账户",
+  "erc20Sender": "ERC20 发送账户",
+  "erc20Value": "ERC20 价值"
 }

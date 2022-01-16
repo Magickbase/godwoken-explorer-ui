@@ -32,7 +32,6 @@ import Address from 'components/AddressInHalfPanel'
 import {
   formatDatetime,
   fetchTx,
-  API,
   handleApiError,
   useWS,
   getTxRes,
@@ -43,7 +42,10 @@ import {
   CKB_DECIMAL,
 } from 'utils'
 
-type State = API.Tx.Parsed
+type RawTx = Parameters<typeof getTxRes>[0]
+type ParsedTx = ReturnType<typeof getTxRes>
+
+type State = ParsedTx
 
 const Tx = (initState: State) => {
   const [tx, setTx] = useState(initState)
@@ -56,20 +58,20 @@ const Tx = (initState: State) => {
 
   useWS(
     `${CHANNEL.TX_INFO}${tx.hash}`,
-    (init: API.Tx.Raw) => {
+    (init: RawTx) => {
       if (init) {
         setTx(prev => ({ ...getTxRes(init), gasUsed: prev.gasUsed, gasLimit: prev.gasLimit }))
       }
     },
-    ({ l1_block, finalize_state }: Partial<Pick<API.Tx.Raw, 'l1_block' | 'finalize_state'>>) => {
-      const update: Partial<Pick<API.Tx.Parsed, 'l1Block' | 'finalizeState'>> = {}
-      if (typeof l1_block === 'number') {
-        update.l1Block = l1_block?.toString()
-      }
-      if (finalize_state) {
-        update.finalizeState = finalize_state
-      }
-      setTx(prev => ({ ...prev, ...update }))
+    ({ status = 'pending' }: Partial<Pick<RawTx, 'status'>>) => {
+      // const update: Partial<Pick<ParsedTx, 'l1Block' | 'finalizeState'>> = {}
+      // if (typeof l1_block === 'number') {
+      //   update.l1Block = l1_block?.toString()
+      // }
+      // if (finalize_state) {
+      //   update.finalizeState = finalize_state
+      // }
+      setTx(prev => ({ ...prev, status }))
     },
     [setTx, tx.hash],
   )
@@ -100,8 +102,8 @@ const Tx = (initState: State) => {
       value: <Address address={tx.from} />,
     },
     {
-      label: 'to',
-      value: <Address address={tx.to} />,
+      label: tx.receiveEthAddress ? 'interactedContract' : 'to',
+      value: <Address address={tx.to} alias={tx.toAlias} />,
     },
     {
       label: 'value',
@@ -111,36 +113,54 @@ const Tx = (initState: State) => {
           .toString()} CKB`}</Typography>
       ),
     },
+    // tx.receiveEthAddress
+    //   ? {
+    //       label: 'erc20Receiver',
+    //       value: <Address address={tx.receiveEthAddress} />,
+    //     }
+    //   : null,
+    tx.receiveEthAddress
+      ? {
+          label: 'erc20Receiver',
+          value: <Address address={tx.receiveEthAddress} />,
+        }
+      : null,
+    tx.transferValue
+      ? {
+          label: 'erc20Value',
+          value: <Typography variant="body2">{`${new BigNumber(tx.transferValue || '0').toString()}`}</Typography>,
+        }
+      : null,
   ]
   const basicInfo = [
-    { label: 'finalizeState', value: <Typography variant="body2">{t(tx.finalizeState)}</Typography> },
-    { label: 'type', value: <Typography variant="body2">{tx.type}</Typography> },
-    {
-      label: 'l1Block',
-      value: tx.l1Block ? (
-        <Link
-          href={`${CKB_EXPLORER_URL}/block/${tx.l1Block}`}
-          underline="none"
-          target="_blank"
-          rel="noopener noreferrer"
-          display="flex"
-          alignItems="center"
-          color="secondary"
-        >
-          {formatInt(tx.l1Block)}
-          <OpenInNewIcon sx={{ fontSize: 16, ml: 0.5 }} />
-        </Link>
-      ) : (
-        <Typography variant="body2">{t('pending')}</Typography>
-      ),
-    },
+    { label: 'finalizeState', value: <Typography variant="body2">{t(tx.status)}</Typography> },
+    { label: 'type', value: <Typography variant="body2">{tx.type.replace(/_/g, ' ')}</Typography> },
+    // {
+    //   label: 'l1Block',
+    //   value: tx.l1Block ? (
+    //     <Link
+    //       href={`${CKB_EXPLORER_URL}/block/${tx.l1Block}`}
+    //       underline="none"
+    //       target="_blank"
+    //       rel="noopener noreferrer"
+    //       display="flex"
+    //       alignItems="center"
+    //       color="secondary"
+    //     >
+    //       {formatInt(tx.l1Block)}
+    //       <OpenInNewIcon sx={{ fontSize: 16, ml: 0.5 }} />
+    //     </Link>
+    //   ) : (
+    //     <Typography variant="body2">{t('pending')}</Typography>
+    //   ),
+    // },
     {
       label: 'l2Block',
-      value: tx.l2Block ? (
+      value: tx.blockNumber ? (
         <Typography variant="body2">
-          <NextLink href={`/block/${tx.l2Block}`}>
-            <Link href={`/block/${tx.l2Block}`} underline="none" color="secondary">
-              {formatInt(tx.l2Block)}
+          <NextLink href={`/block/${tx.blockNumber}`}>
+            <Link href={`/block/${tx.blockNumber}`} underline="none" color="secondary">
+              {formatInt(tx.blockNumber)}
             </Link>
           </NextLink>
         </Typography>
@@ -210,11 +230,13 @@ const Tx = (initState: State) => {
               sx={{ textTransform: 'capitalize' }}
             >
               <Divider variant="middle" />
-              {overview.map(field => (
-                <ListItem key={field.label}>
-                  <ListItemText primary={t(field.label)} secondary={field.value} />
-                </ListItem>
-              ))}
+              {overview.map(field =>
+                field ? (
+                  <ListItem key={field.label}>
+                    <ListItemText primary={t(field.label)} secondary={field.value} />
+                  </ListItem>
+                ) : null,
+              )}
               {/* {tx.input ? (
                 <Accordion sx={{ boxShadow: 'none', width: '100%' }}>
                   <AccordionSummary sx={{ textTransform: 'capitalize' }} expandIcon={<ExpandMore />}>
@@ -237,7 +259,7 @@ const Tx = (initState: State) => {
                   </AccordionDetails>
                 </Accordion>
               ) : null} */}
-              {tx.args ? (
+              {tx.scriptArgs ? (
                 <Accordion sx={{ boxShadow: 'none', width: '100%' }}>
                   <AccordionSummary sx={{ textTransform: 'capitalize' }} expandIcon={<ExpandMore />}>
                     {t(`args`)}
@@ -254,7 +276,7 @@ const Tx = (initState: State) => {
                       bgcolor={colors.grey[50]}
                       className="mono-font"
                     >
-                      {tx.args}
+                      {tx.scriptArgs}
                     </Typography>
                   </AccordionDetails>
                 </Accordion>
