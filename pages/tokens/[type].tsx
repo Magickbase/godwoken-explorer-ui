@@ -153,7 +153,12 @@ const TokenList = ({ meta, tokens, type }: State) => {
             </TableBody>
           </Table>
         </TableContainer>
-        <Pagination {...meta} onChange={handlePageChange} url={`/tokens/${type}`} />
+        <Pagination
+          current={meta.current}
+          total={meta.total * 10}
+          onChange={handlePageChange}
+          url={`/tokens/${type}`}
+        />
       </Paper>
     </Container>
   )
