@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { GetServerSideProps } from 'next'
 import NextLink from 'next/link'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import {
+  Avatar,
   Alert,
   Accordion,
   AccordionSummary,
@@ -23,9 +24,12 @@ import {
   Tooltip,
   IconButton,
   Snackbar,
+  Tabs,
+  Tab,
 } from '@mui/material'
 import { OpenInNew as OpenInNewIcon, ContentCopyOutlined as CopyIcon } from '@mui/icons-material'
 import { ExpandMore } from '@mui/icons-material'
+import { ethers } from 'ethers'
 import BigNumber from 'bignumber.js'
 import PageTitle from 'components/PageTitle'
 import Address from 'components/AddressInHalfPanel'
@@ -40,6 +44,7 @@ import {
   formatInt,
   handleCopy,
   CKB_DECIMAL,
+  nameToColor,
 } from 'utils'
 
 type RawTx = Parameters<typeof getTxRes>[0]
@@ -49,12 +54,43 @@ type State = ParsedTx
 
 const Tx = (initState: State) => {
   const [tx, setTx] = useState(initState)
+  const [inputMode, setInputMode] = useState<'raw' | 'decoded' | 'utf8'>('raw')
   const [isCopied, setIsCopied] = useState(false)
   const [t] = useTranslation('tx')
+
+  const decodedInput = useMemo(() => {
+    if (initState.contractAbi && initState.contractAbi.length && initState.input) {
+      try {
+        const i = new ethers.utils.Interface(initState.contractAbi)
+        return i.parseTransaction({ data: initState.input })
+      } catch (err) {
+        console.error(err)
+        return null
+      }
+    }
+    return null
+  }, [initState.contractAbi, initState.input])
+
+  const utf8Input = useMemo(() => {
+    if (initState.input) {
+      try {
+        return ethers.utils.toUtf8String(initState.input)
+      } catch {
+        return null
+      }
+    }
+    return null
+  }, [initState.input])
 
   useEffect(() => {
     setTx(initState)
   }, [setTx, initState])
+
+  useEffect(() => {
+    if (decodedInput) {
+      setInputMode('decoded')
+    }
+  }, [decodedInput, setInputMode])
 
   useWS(
     `${CHANNEL.TX_INFO}${tx.hash}`,
@@ -63,15 +99,8 @@ const Tx = (initState: State) => {
         setTx(prev => ({ ...getTxRes(init), gasUsed: prev.gasUsed, gasLimit: prev.gasLimit }))
       }
     },
-    ({ status = 'pending' }: Partial<Pick<RawTx, 'status'>>) => {
-      // const update: Partial<Pick<ParsedTx, 'l1Block' | 'finalizeState'>> = {}
-      // if (typeof l1_block === 'number') {
-      //   update.l1Block = l1_block?.toString()
-      // }
-      // if (finalize_state) {
-      //   update.finalizeState = finalize_state
-      // }
-      setTx(prev => ({ ...prev, status }))
+    ({ status = 'pending', l1_block_number }: Partial<Pick<RawTx, 'status' | 'l1_block_number'>>) => {
+      setTx(prev => ({ ...prev, status, l1BlockNumber: l1_block_number }))
     },
     [setTx, tx.hash],
   )
@@ -80,6 +109,19 @@ const Tx = (initState: State) => {
     await handleCopy(tx.hash)
     setIsCopied(true)
   }
+
+  const inputContents = [
+    { type: 'raw', text: tx.input },
+    decodedInput
+      ? {
+          type: 'decoded',
+          text: `Function: ${decodedInput.signature}\n\nMethodID: ${decodedInput.sighash}\n${decodedInput.args
+            .map((a, i) => '[' + i + ']: ' + a)
+            .join('\n')}`,
+        }
+      : null,
+    utf8Input ? { type: 'utf8', text: utf8Input } : null,
+  ].filter(v => v)
 
   const overview = [
     {
@@ -128,32 +170,44 @@ const Tx = (initState: State) => {
     tx.transferValue
       ? {
           label: 'erc20Value',
-          value: <Typography variant="body2">{`${new BigNumber(tx.transferValue || '0').toString()}`}</Typography>,
+          value: (
+            <Stack direction="row" alignItems="center" color="inherit">
+              <Avatar
+                src={tx.udtIcon ?? null}
+                sx={{ bgcolor: nameToColor(tx.udtSymbol), width: 20, height: 20, fontSize: 12, mr: 1 }}
+              >
+                {tx.udtSymbol?.[0] ?? '?'}
+              </Avatar>
+              <Typography variant="body2" color="#000000de">{`${new BigNumber(tx.transferValue || '0').toString()} ${
+                tx.udtSymbol
+              }`}</Typography>
+            </Stack>
+          ),
         }
       : null,
   ]
   const basicInfo = [
     { label: 'finalizeState', value: <Typography variant="body2">{t(tx.status)}</Typography> },
     { label: 'type', value: <Typography variant="body2">{tx.type.replace(/_/g, ' ')}</Typography> },
-    // {
-    //   label: 'l1Block',
-    //   value: tx.l1Block ? (
-    //     <Link
-    //       href={`${CKB_EXPLORER_URL}/block/${tx.l1Block}`}
-    //       underline="none"
-    //       target="_blank"
-    //       rel="noopener noreferrer"
-    //       display="flex"
-    //       alignItems="center"
-    //       color="secondary"
-    //     >
-    //       {formatInt(tx.l1Block)}
-    //       <OpenInNewIcon sx={{ fontSize: 16, ml: 0.5 }} />
-    //     </Link>
-    //   ) : (
-    //     <Typography variant="body2">{t('pending')}</Typography>
-    //   ),
-    // },
+    {
+      label: 'l1Block',
+      value: tx.l1BlockNumber ? (
+        <Link
+          href={`${CKB_EXPLORER_URL}/block/${tx.l1BlockNumber}`}
+          underline="none"
+          target="_blank"
+          rel="noopener noreferrer"
+          display="flex"
+          alignItems="center"
+          color="secondary"
+        >
+          {formatInt(tx.l1BlockNumber)}
+          <OpenInNewIcon sx={{ fontSize: 16, ml: 0.5 }} />
+        </Link>
+      ) : (
+        <Typography variant="body2">{t('pending')}</Typography>
+      ),
+    },
     {
       label: 'l2Block',
       value: tx.blockNumber ? (
@@ -237,28 +291,37 @@ const Tx = (initState: State) => {
                   </ListItem>
                 ) : null,
               )}
-              {/* {tx.input ? (
+              {tx.input ? (
                 <Accordion sx={{ boxShadow: 'none', width: '100%' }}>
                   <AccordionSummary sx={{ textTransform: 'capitalize' }} expandIcon={<ExpandMore />}>
                     {t(`input`)}
                   </AccordionSummary>
                   <AccordionDetails>
-                    <Typography
-                      variant="body2"
-                      component="pre"
-                      sx={{ wordBreak: 'break-all', whiteSpace: 'pre-wrap', maxHeight: '51ch', overflow: 'auto' }}
-                      p={2}
-                      border="1px solid"
-                      borderColor="primary.light"
-                      borderRadius={1}
-                      bgcolor={colors.grey[50]}
-                      className="mono-font"
-                    >
-                      {tx.input}
-                    </Typography>
+                    <Stack>
+                      <Tabs value={inputMode} onChange={(_, v) => setInputMode(v)}>
+                        {inputContents.map(({ type }) => (
+                          <Tab key={type} value={type} label={t(`${type}Input`)} disableRipple sx={{ fontSize: 12 }} />
+                        ))}
+                      </Tabs>
+                      <Divider />
+                      <Typography
+                        variant="body2"
+                        component="pre"
+                        sx={{ wordBreak: 'break-all', whiteSpace: 'pre-wrap', maxHeight: '51ch', overflow: 'auto' }}
+                        p={2}
+                        mt={1}
+                        border="1px solid"
+                        borderColor="primary.light"
+                        borderRadius={1}
+                        bgcolor={colors.grey[50]}
+                        className="mono-font"
+                      >
+                        {inputContents.find(c => c.type === inputMode)?.text}
+                      </Typography>
+                    </Stack>
                   </AccordionDetails>
                 </Accordion>
-              ) : null} */}
+              ) : null}
               {tx.scriptArgs ? (
                 <Accordion sx={{ boxShadow: 'none', width: '100%' }}>
                   <AccordionSummary sx={{ textTransform: 'capitalize' }} expandIcon={<ExpandMore />}>

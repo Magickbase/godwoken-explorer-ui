@@ -22,6 +22,10 @@ interface Raw {
   receive_eth_address: string | null
   type: TxType
   udt_id: number | null
+  udt_icon: string | null
+  udt_symbol: string | null
+  l1_block_number: number | null
+
   /* polyjuice creator */
   code_hash?: string
   fee_amount?: string
@@ -30,6 +34,7 @@ interface Raw {
   script_args?: string
   /* polyjuice */
   contract_abi?: []
+  input?: string
 }
 
 interface Parsed {
@@ -51,6 +56,9 @@ interface Parsed {
   receiveEthAddress: string | null
   type: TxType
   udtId: number | null
+  udtIcon: string | null
+  udtSymbol: string | null
+  l1BlockNumber: number | null
   /* polyjuice creator */
   codeHash: string | null
   feeAmount: string | null
@@ -59,6 +67,7 @@ interface Parsed {
   scriptArgs: string | null
   /* polyjuice */
   contractAbi: [] | null
+  input: string | null
 }
 
 export const getTxRes = (tx: Raw): Parsed => ({
@@ -80,12 +89,16 @@ export const getTxRes = (tx: Raw): Parsed => ({
   receiveEthAddress: tx.receive_eth_address ?? null,
   type: tx.type,
   udtId: tx.udt_id ?? null,
+  udtIcon: tx.udt_icon ?? null,
+  udtSymbol: tx.udt_symbol ?? null,
   codeHash: tx.code_hash ?? null,
   feeAmount: tx.fee_amount ?? null,
   feeUdt: tx.fee_udt ?? null,
   hashType: tx.hash_type ?? null,
   scriptArgs: tx.script_args ?? null,
   contractAbi: tx.contract_abi ?? null,
+  l1BlockNumber: tx.l1_block_number ?? null,
+  input: tx.input,
 })
 
 export const fetchTx = (hash: string): Promise<Parsed> =>

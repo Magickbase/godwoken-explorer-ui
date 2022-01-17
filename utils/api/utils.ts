@@ -118,7 +118,7 @@ export namespace API {
     }
     export type RawScript = Record<'args' | 'code_hash' | 'hash_type' | 'name', string>
     export type ParsedScript = Record<'args' | 'codeHash' | 'hashType' | 'name', string>
-    export type Raw = Record<'id' | 'type' | 'ckb' | 'eth' | 'tx_count', string> &
+    export type Raw = Record<'id' | 'type' | 'ckb' | 'eth' | 'tx_count' | 'eth_addr', string> &
       Partial<{
         meta_contract: {
           status: 'running' | 'halting'
@@ -131,7 +131,6 @@ export namespace API {
           type_script: RawScript | null
         }
         user: {
-          eth_addr: string | null
           ckb_lock_script: RawScript | null
           nonce: string
           udt_list: Array<UDT>
@@ -142,11 +141,10 @@ export namespace API {
         }
         smart_contract: {
           tx_hash: string
-          eth_addr: string
           udt_list: Array<UDT>
         }
       }>
-    export type Parsed = Record<'id' | 'type' | 'ckb' | 'eth' | 'txCount', string> &
+    export type Parsed = Record<'id' | 'type' | 'ckb' | 'eth' | 'txCount' | 'ethAddr', string> &
       Partial<{
         metaContract: {
           status: 'running' | 'halting'
@@ -159,7 +157,6 @@ export namespace API {
           typeScript: ParsedScript | null
         }
         user: {
-          ethAddr: string | null
           ckbLockScript: ParsedScript | null
           nonce: string
           udtList: Array<UDT>
@@ -167,7 +164,6 @@ export namespace API {
         polyjuice: { script: ParsedScript; scriptHash: string }
         smartContract: {
           txHash: string
-          ethAddr: string
           udtList: Array<UDT>
         }
       }>

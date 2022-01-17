@@ -11,5 +11,6 @@
   "l1TxHash": "l1 txn hash",
   "pending": "pending",
   "committed": "committed",
-  "finalized": "finalized"
+  "finalized": "finalized",
+  "transactionRecords": "Transactions"
 }

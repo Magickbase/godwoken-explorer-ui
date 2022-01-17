@@ -44,5 +44,6 @@
   "balance": "balance",
   "native": "native",
   "bridged": "bridged",
-  "transactions": "Transactions"
+  "transactionRecords": "Transactions",
+  "ERC20Records": "ERC 20 Txns"
 }

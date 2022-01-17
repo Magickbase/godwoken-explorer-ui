@@ -1,6 +1,5 @@
 import { GetServerSideProps } from 'next'
 import { useTranslation } from 'next-i18next'
-import { useRouter } from 'next/router'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import {
   Container,
@@ -21,22 +20,19 @@ import {
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import PageTitle from 'components/PageTitle'
 import ERC20TransferList from 'components/ERC20TransferList'
-import Pagination from 'components/Pagination'
 import Address from 'components/AddressInHalfPanel'
-import { API, handleApiError, fetchToken, fetchTxList, nameToColor } from 'utils'
+import { handleApiError, fetchToken, fetchERC20TransferList, nameToColor, getERC20TransferListRes } from 'utils'
 import { PageNonPositiveException, PageOverflowException } from 'utils/exceptions'
+import type { API } from 'utils/api/utils'
 
+type ParsedTransferList = ReturnType<typeof getERC20TransferListRes>
 type Props = {
   token: API.Token.Parsed
-  txList: {
-    txs: API.Txs.Parsed['txs']
-    meta: Record<'current' | 'total', number>
-  }
+  txList: ParsedTransferList
 }
 
 const Token = ({ token, txList }: Props) => {
   const [t] = useTranslation('tokens')
-  const { push } = useRouter()
   const tokenInfo = [
     { label: 'decimal', value: <Typography variant="body2">{token.decimal || '-'}</Typography> },
     { label: 'type', value: <Typography variant="body2">{t(token.type)}</Typography> },
@@ -134,8 +130,7 @@ const Token = ({ token, txList }: Props) => {
             <Tab label={t('transfer-records')} />
           </Tabs>
           <Divider />
-          <ERC20TransferList list={txList.txs} />
-          <Pagination current={txList.meta.current} total={txList.meta.total * 10} />
+          <ERC20TransferList list={txList} />
         </Paper>
       </Stack>
     </Container>
@@ -150,13 +145,13 @@ export const getServerSideProps: GetServerSideProps<Props, { id: string }> = asy
     if (+page < 1) {
       throw new PageNonPositiveException()
     }
-    const q = { account_id: id, tx_type: 'transfer' }
+
+    const token = await fetchToken(id)
+    const q = { udt_address: token.shortAddress }
     if (typeof page === 'string' && !Number.isNaN(+page)) {
       q['page'] = page
     }
-
-    const token = await fetchToken(id)
-    const txListRes = await fetchTxList(q)
+    const txListRes = await fetchERC20TransferList(q)
     const totalPage = Math.ceil(+txListRes.totalCount / 10)
     if (totalPage < +page) {
       throw new PageOverflowException(totalPage)
@@ -166,13 +161,7 @@ export const getServerSideProps: GetServerSideProps<Props, { id: string }> = asy
     return {
       props: {
         token,
-        txList: {
-          txs: txListRes.txs,
-          meta: {
-            current: +txListRes.page,
-            total: totalPage,
-          },
-        },
+        txList: txListRes,
         ...lng,
       },
     }

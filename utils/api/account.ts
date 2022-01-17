@@ -33,7 +33,6 @@ const getSUDT = (sudt: API.Account.Raw['sudt']): API.Account.Parsed['sudt'] => (
 })
 
 const getUser = (user: API.Account.Raw['user']): API.Account.Parsed['user'] => ({
-  ethAddr: user.eth_addr,
   ckbLockScript: user.ckb_lock_script ? getScript(user.ckb_lock_script) : null,
   nonce: user.nonce,
   udtList: user.udt_list || [],
@@ -46,7 +45,6 @@ const getPolyjuice = (polyjuice: API.Account.Raw['polyjuice']): API.Account.Pars
 
 const getSmartContract = (smartContract: API.Account.Raw['smart_contract']): API.Account.Parsed['smartContract'] => ({
   txHash: smartContract.tx_hash,
-  ethAddr: smartContract.eth_addr,
   udtList: smartContract.udt_list || [],
 })
 
@@ -56,6 +54,7 @@ export const getAccountRes = (account: API.Account.Raw): API.Account.Parsed => (
   ckb: account.ckb,
   eth: account.eth,
   txCount: account.tx_count,
+  ethAddr: account.eth_addr,
   metaContract: account.meta_contract ? getMetaContract(account.meta_contract) : null,
   sudt: account.sudt ? getSUDT(account.sudt) : null,
   user: account.user ? getUser(account.user) : null,

@@ -16,5 +16,9 @@
   "mainnet": "Mainnet",
   "testnet": "Testnet",
   "chainType": "Chain Type",
-  "language": "Language"
+  "language": "Language",
+  "pending": "Pending",
+  "committed": "Committed",
+  "finalized": "Finalized",
+  "addressCopied": "Address copied to clipboard"
 }

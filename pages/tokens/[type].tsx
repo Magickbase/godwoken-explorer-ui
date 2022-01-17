@@ -23,8 +23,9 @@ import {
 } from '@mui/material'
 import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined'
 import Pagination from 'components/Pagination'
-import { fetchTokenList, handleApiError, API, formatInt, nameToColor } from 'utils'
+import { fetchTokenList, handleApiError, formatInt, nameToColor } from 'utils'
 import { PageNonPositiveException, PageOverflowException, TypeNotFoundException } from 'utils/exceptions'
+import type { API } from 'utils/api/utils'
 
 type State = API.Tokens.Parsed & { type: 'native' | 'bridge' }
 
@@ -36,7 +37,6 @@ const NATIVE_TOKEN_TEMPLATE_URL =
 const TokenList = ({ meta, tokens, type }: State) => {
   const [t] = useTranslation(['tokens', 'common'])
 
-  const { push } = useRouter()
   const headers = [
     { key: 'token' },
     { key: 'address', label: 'address' },

@@ -24,13 +24,16 @@
   "finalizeState": "finalize state",
   "age": "age",
   "txListTitle": "Transactions related to account",
+  "pending": "Pending",
   "committed": "committed",
   "finalized": "finalized",
   "emptyTxList": "No transactions found",
-  "pending": "Pending",
   "txHashCopied": "Transaction hash copied to clipboard",
   "interactedContract": "Interact with Contract",
   "erc20Receiver": "ERC20 Transfer Receiver",
   "erc20Sender": "ERC20 Transfer Sender",
-  "erc20Value": "ERC20 Value"
+  "erc20Value": "ERC20 Value",
+  "rawInput": "Raw",
+  "decodedInput": "Decoded",
+  "utf8Input": "UTF8"
 }

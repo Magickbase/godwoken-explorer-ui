@@ -2,11 +2,12 @@ import { useTranslation } from 'next-i18next'
 import { List, ListItem, ListItemText, ListSubheader, Divider, Typography, Link } from '@mui/material'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import CollapsableScript from 'components/CollapsableScript'
-import { scriptToCkbAddress, scriptToHash, API, CKB_EXPLORER_URL, formatInt } from 'utils'
+import { scriptToCkbAddress, scriptToHash, CKB_EXPLORER_URL, formatInt } from 'utils'
+import type { API } from 'utils/api/utils'
 
 type State = Omit<API.Account.Parsed['user'], 'udtList'>
 
-const User = ({ ethAddr, nonce, ckbLockScript }: State) => {
+const User = ({ nonce, ckbLockScript }: State) => {
   const [t] = useTranslation('account')
   let ckbAddr = ''
   try {
@@ -21,14 +22,6 @@ const User = ({ ethAddr, nonce, ckbLockScript }: State) => {
     {
       label: t(`type`),
       value: <Typography variant="body2">User</Typography>,
-    },
-    {
-      label: t('ethAddr'),
-      value: (
-        <Typography variant="body2" className="mono-font" overflow="hidden" textOverflow="ellipsis">
-          {ethAddr || '-'}
-        </Typography>
-      ),
     },
     { label: t('nonce'), value: <Typography variant="body2">{formatInt(nonce)}</Typography> },
     {

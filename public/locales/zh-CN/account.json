@@ -44,5 +44,6 @@
   "balance": "余额",
   "native": "原生",
   "bridged": "桥接",
-  "transactions": "交易"
+  "transactionRecords": "交易记录",
+  "ERC20Records": "ERC20 交易记录"
 }

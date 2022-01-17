@@ -1,4 +1,4 @@
-import type { API } from 'utils'
+import type { API } from 'utils/api/utils'
 import { Chip, Typography, Accordion, AccordionSummary, AccordionDetails } from '@mui/material'
 import { ExpandMore } from '@mui/icons-material'
 import { useTranslation } from 'next-i18next'
