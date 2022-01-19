@@ -8,5 +8,6 @@
   "no_records": "No Records",
   "txHash": "Txn Hash",
   "block": "Block",
-  "type": "Type"
+  "type": "Type",
+  "method": "Method"
 }
