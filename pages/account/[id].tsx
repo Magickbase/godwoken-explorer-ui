@@ -82,12 +82,22 @@ const Account = (initState: State) => {
     setIsCopied(true)
   }
 
+  const accountType = account.user
+    ? 'user'
+    : account.smartContract
+    ? 'smartContract'
+    : account.sudt
+    ? 'sudt'
+    : account.polyjuice
+    ? 'polyjuice'
+    : 'metaContract'
+
   return (
     <Container sx={{ py: 6 }}>
       <PageTitle>
         <Stack direction="row" alignItems="center">
           <Typography variant="inherit" overflow="hidden" textOverflow="ellipsis" noWrap>
-            {`${t('account')} ${account.ethAddr}`}
+            {`${t('accountType.' + accountType)} ${account.ethAddr}`}
           </Typography>
 
           <IconButton aria-label="copy" onClick={handleAddressCopy}>
