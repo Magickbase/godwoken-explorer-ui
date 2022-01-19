@@ -17,6 +17,7 @@ import {
   Divider,
 } from '@mui/material'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
+import SubpageHead from 'components/SubpageHead'
 import TxList from 'components/TxList'
 import PageTitle from 'components/PageTitle'
 import {
@@ -145,28 +146,32 @@ const Block = (initState: State) => {
       value: <Typography variant="body2">{block.aggregator}</Typography>,
     },
   ]
+  const title = `${t('block')} # ${formatInt(block.number)}`
   return (
-    <Container sx={{ py: 6 }}>
-      <PageTitle>{`${t('block')} # ${formatInt(block.number)}`}</PageTitle>
-      <Stack spacing={2}>
-        <Paper>
-          <List sx={{ textTransform: 'capitalize' }}>
-            {fields.map(field => (
-              <ListItem key={field.label}>
-                <ListItemText primary={t(field.label)} secondary={field.value} />
-              </ListItem>
-            ))}
-          </List>
-        </Paper>
-        <Paper>
-          <Tabs value={0}>
-            <Tab label={t(`transactionRecords`)} />
-          </Tabs>
-          <Divider />
-          {block.txList ? <TxList list={block.txList} /> : null}
-        </Paper>
-      </Stack>
-    </Container>
+    <>
+      <SubpageHead subtitle={title} />
+      <Container sx={{ py: 6 }}>
+        <PageTitle>{title}</PageTitle>
+        <Stack spacing={2}>
+          <Paper>
+            <List sx={{ textTransform: 'capitalize' }}>
+              {fields.map(field => (
+                <ListItem key={field.label}>
+                  <ListItemText primary={t(field.label)} secondary={field.value} />
+                </ListItem>
+              ))}
+            </List>
+          </Paper>
+          <Paper>
+            <Tabs value={0}>
+              <Tab label={t(`transactionRecords`)} />
+            </Tabs>
+            <Divider />
+            {block.txList ? <TxList list={block.txList} /> : null}
+          </Paper>
+        </Stack>
+      </Container>
+    </>
   )
 }
 

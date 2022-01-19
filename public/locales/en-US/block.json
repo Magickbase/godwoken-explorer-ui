@@ -1,6 +1,6 @@
 {
   "latestBlocks": "latest blocks",
-  "block": "block",
+  "block": "Block",
   "hash": "block hash",
   "number": "block number",
   "txCount": "transactions",

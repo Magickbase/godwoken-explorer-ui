@@ -3,11 +3,11 @@
   "basicInfo": "Basic Info",
   "account": "account",
   "accountType": {
-    "user": "user account",
-    "smartContract": "contract account",
-    "sudt": "bridged token account",
-    "polyjuice": "polyjuice account",
-    "metaContract": "Meta contract account"
+    "user": "User Account",
+    "smartContract": "Contract Account",
+    "sudt": "Bridged Token Account",
+    "polyjuice": "Polyjuice Account",
+    "metaContract": "Meta Contract Account"
   },
   "id": "account id",
   "nonce": "nonce",

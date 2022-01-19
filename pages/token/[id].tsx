@@ -18,6 +18,7 @@ import {
   Link,
 } from '@mui/material'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
+import SubpageHead from 'components/SubpageHead'
 import PageTitle from 'components/PageTitle'
 import ERC20TransferList from 'components/ERC20TransferList'
 import Address from 'components/AddressInHalfPanel'
@@ -86,54 +87,61 @@ const Token = ({ token, txList }: Props) => {
   ]
 
   return (
-    <Container sx={{ py: 6 }}>
-      <PageTitle>
-        <Stack direction="row" alignItems="center">
-          <Avatar src={token.icon ?? null} sx={{ bgcolor: nameToColor(token.name ?? ''), mr: 2 }}>
-            {token.name?.[0] ?? '?'}
-          </Avatar>
-          <Typography variant="h5" fontWeight="inherit">
-            {token.name || '-'}
-          </Typography>
-          {token.symbol ? (
-            <Typography fontWeight="inherit" color="primary.light" whiteSpace="pre">{` (${token.symbol})`}</Typography>
-          ) : null}
+    <>
+      <SubpageHead subtitle={`${t('token')} ${token.name || token.symbol || '-'}`} />
+      <Container sx={{ py: 6 }}>
+        <PageTitle>
+          <Stack direction="row" alignItems="center">
+            <Avatar src={token.icon ?? null} sx={{ bgcolor: nameToColor(token.name ?? ''), mr: 2 }}>
+              {token.name?.[0] ?? '?'}
+            </Avatar>
+            <Typography variant="h5" fontWeight="inherit">
+              {token.name || '-'}
+            </Typography>
+            {token.symbol ? (
+              <Typography
+                fontWeight="inherit"
+                color="primary.light"
+                whiteSpace="pre"
+              >{` (${token.symbol})`}</Typography>
+            ) : null}
+          </Stack>
+        </PageTitle>
+        <Stack spacing={2}>
+          <Paper>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
+                <List subheader={<ListSubheader sx={{ bgcolor: 'transparent' }}>{t('tokenInfo')}</ListSubheader>}>
+                  <Divider variant="middle" />
+                  {tokenInfo.map(field => (
+                    <ListItem key={field.label}>
+                      <ListItemText primary={t(field.label)} secondary={field.value} />
+                    </ListItem>
+                  ))}
+                </List>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <List subheader={<ListSubheader sx={{ bgcolor: 'transparent' }}>{t('tokenData')}</ListSubheader>}>
+                  <Divider variant="middle" />
+                  {tokenData.map(field => (
+                    <ListItem key={field.label}>
+                      <ListItemText primary={t(field.label)} secondary={field.value} />
+                    </ListItem>
+                  ))}
+                </List>
+              </Grid>
+            </Grid>
+          </Paper>
+          <Paper>
+            <Tabs value={0}>
+              <Tab label={t('transfer-records')} />
+            </Tabs>
+            <Divider />
+            <ERC20TransferList list={txList} />
+          </Paper>
         </Stack>
-      </PageTitle>
-      <Stack spacing={2}>
-        <Paper>
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={6}>
-              <List subheader={<ListSubheader sx={{ bgcolor: 'transparent' }}>{t('tokenInfo')}</ListSubheader>}>
-                <Divider variant="middle" />
-                {tokenInfo.map(field => (
-                  <ListItem key={field.label}>
-                    <ListItemText primary={t(field.label)} secondary={field.value} />
-                  </ListItem>
-                ))}
-              </List>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <List subheader={<ListSubheader sx={{ bgcolor: 'transparent' }}>{t('tokenData')}</ListSubheader>}>
-                <Divider variant="middle" />
-                {tokenData.map(field => (
-                  <ListItem key={field.label}>
-                    <ListItemText primary={t(field.label)} secondary={field.value} />
-                  </ListItem>
-                ))}
-              </List>
-            </Grid>
-          </Grid>
-        </Paper>
-        <Paper>
-          <Tabs value={0}>
-            <Tab label={t('transfer-records')} />
-          </Tabs>
-          <Divider />
-          <ERC20TransferList list={txList} />
-        </Paper>
-      </Stack>
-    </Container>
+      </Container>
+    </>
   )
 }
 

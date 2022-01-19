@@ -31,6 +31,7 @@ import { OpenInNew as OpenInNewIcon, ContentCopyOutlined as CopyIcon } from '@mu
 import { ExpandMore } from '@mui/icons-material'
 import { ethers } from 'ethers'
 import BigNumber from 'bignumber.js'
+import SubpageHead from 'components/SubpageHead'
 import PageTitle from 'components/PageTitle'
 import Address from 'components/AddressInHalfPanel'
 import {
@@ -273,111 +274,122 @@ const Tx = (initState: State) => {
     },
   ]
 
+  const title = t('txInfo')
+
   return (
-    <Container sx={{ pb: 6 }}>
-      <PageTitle>{t('txInfo')}</PageTitle>
-      <Paper>
-        <Grid container>
-          <Grid item xs={12} md={6}>
-            <List
-              subheader={<ListSubheader sx={{ bgcolor: 'transparent' }}>{t('overview')}</ListSubheader>}
-              sx={{ textTransform: 'capitalize' }}
-            >
-              <Divider variant="middle" />
-              {overview.map(field =>
-                field ? (
-                  <ListItem key={field.label}>
-                    <ListItemText primary={t(field.label)} secondary={field.value} />
-                  </ListItem>
-                ) : null,
-              )}
-              {tx.input ? (
-                <Accordion sx={{ boxShadow: 'none', width: '100%' }}>
-                  <AccordionSummary sx={{ textTransform: 'capitalize' }} expandIcon={<ExpandMore />}>
-                    {t(`input`)}
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <Stack>
-                      <Tabs value={inputMode} onChange={(_, v) => setInputMode(v)}>
-                        {inputContents.map(({ type }) => (
-                          <Tab key={type} value={type} label={t(`${type}Input`)} disableRipple sx={{ fontSize: 12 }} />
-                        ))}
-                      </Tabs>
-                      <Divider />
+    <>
+      <SubpageHead subtitle={`${title} ${tx.hash}`} />
+      <Container sx={{ pb: 6 }}>
+        <PageTitle>{title}</PageTitle>
+        <Paper>
+          <Grid container>
+            <Grid item xs={12} md={6}>
+              <List
+                subheader={<ListSubheader sx={{ bgcolor: 'transparent' }}>{t('overview')}</ListSubheader>}
+                sx={{ textTransform: 'capitalize' }}
+              >
+                <Divider variant="middle" />
+                {overview.map(field =>
+                  field ? (
+                    <ListItem key={field.label}>
+                      <ListItemText primary={t(field.label)} secondary={field.value} />
+                    </ListItem>
+                  ) : null,
+                )}
+                {tx.input ? (
+                  <Accordion sx={{ boxShadow: 'none', width: '100%' }}>
+                    <AccordionSummary sx={{ textTransform: 'capitalize' }} expandIcon={<ExpandMore />}>
+                      {t(`input`)}
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Stack>
+                        <Tabs value={inputMode} onChange={(_, v) => setInputMode(v)}>
+                          {inputContents.map(({ type }) => (
+                            <Tab
+                              key={type}
+                              value={type}
+                              label={t(`${type}Input`)}
+                              disableRipple
+                              sx={{ fontSize: 12 }}
+                            />
+                          ))}
+                        </Tabs>
+                        <Divider />
+                        <Typography
+                          variant="body2"
+                          component="pre"
+                          sx={{ wordBreak: 'break-all', whiteSpace: 'pre-wrap', maxHeight: '51ch', overflow: 'auto' }}
+                          p={2}
+                          mt={1}
+                          border="1px solid"
+                          borderColor="primary.light"
+                          borderRadius={1}
+                          bgcolor={colors.grey[50]}
+                          className="mono-font"
+                        >
+                          {inputContents.find(c => c.type === inputMode)?.text}
+                        </Typography>
+                      </Stack>
+                    </AccordionDetails>
+                  </Accordion>
+                ) : null}
+                {tx.scriptArgs ? (
+                  <Accordion sx={{ boxShadow: 'none', width: '100%' }}>
+                    <AccordionSummary sx={{ textTransform: 'capitalize' }} expandIcon={<ExpandMore />}>
+                      {t(`args`)}
+                    </AccordionSummary>
+                    <AccordionDetails>
                       <Typography
                         variant="body2"
                         component="pre"
                         sx={{ wordBreak: 'break-all', whiteSpace: 'pre-wrap', maxHeight: '51ch', overflow: 'auto' }}
                         p={2}
-                        mt={1}
                         border="1px solid"
                         borderColor="primary.light"
                         borderRadius={1}
                         bgcolor={colors.grey[50]}
                         className="mono-font"
                       >
-                        {inputContents.find(c => c.type === inputMode)?.text}
+                        {tx.scriptArgs}
                       </Typography>
-                    </Stack>
-                  </AccordionDetails>
-                </Accordion>
-              ) : null}
-              {tx.scriptArgs ? (
-                <Accordion sx={{ boxShadow: 'none', width: '100%' }}>
-                  <AccordionSummary sx={{ textTransform: 'capitalize' }} expandIcon={<ExpandMore />}>
-                    {t(`args`)}
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <Typography
-                      variant="body2"
-                      component="pre"
-                      sx={{ wordBreak: 'break-all', whiteSpace: 'pre-wrap', maxHeight: '51ch', overflow: 'auto' }}
-                      p={2}
-                      border="1px solid"
-                      borderColor="primary.light"
-                      borderRadius={1}
-                      bgcolor={colors.grey[50]}
-                      className="mono-font"
-                    >
-                      {tx.scriptArgs}
-                    </Typography>
-                  </AccordionDetails>
-                </Accordion>
-              ) : null}
-            </List>
+                    </AccordionDetails>
+                  </Accordion>
+                ) : null}
+              </List>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <List
+                subheader={<ListSubheader sx={{ bgcolor: 'transparent' }}>{t('basicInfo')}</ListSubheader>}
+                sx={{ textTransform: 'capitalize' }}
+              >
+                <Divider variant="middle" />
+                {basicInfo.map(field =>
+                  field ? (
+                    <ListItem key={field.label}>
+                      <ListItemText primary={t(field.label)} secondary={field.value} />
+                    </ListItem>
+                  ) : null,
+                )}
+              </List>
+            </Grid>
           </Grid>
-          <Grid item xs={12} md={6}>
-            <List
-              subheader={<ListSubheader sx={{ bgcolor: 'transparent' }}>{t('basicInfo')}</ListSubheader>}
-              sx={{ textTransform: 'capitalize' }}
-            >
-              <Divider variant="middle" />
-              {basicInfo.map(field =>
-                field ? (
-                  <ListItem key={field.label}>
-                    <ListItemText primary={t(field.label)} secondary={field.value} />
-                  </ListItem>
-                ) : null,
-              )}
-            </List>
-          </Grid>
-        </Grid>
-      </Paper>
-      <Snackbar
-        open={isCopied}
-        onClose={() => setIsCopied(false)}
-        anchorOrigin={{
-          horizontal: 'center',
-          vertical: 'top',
-        }}
-        autoHideDuration={3000}
-        color="secondary"
-      >
-        <Alert severity="success" variant="filled">
-          {t(`txHashCopied`)}
-        </Alert>
-      </Snackbar>
-    </Container>
+        </Paper>
+        <Snackbar
+          open={isCopied}
+          onClose={() => setIsCopied(false)}
+          anchorOrigin={{
+            horizontal: 'center',
+            vertical: 'top',
+          }}
+          autoHideDuration={3000}
+          color="secondary"
+        >
+          <Alert severity="success" variant="filled">
+            {t(`txHashCopied`)}
+          </Alert>
+        </Snackbar>
+      </Container>
+    </>
   )
 }
 

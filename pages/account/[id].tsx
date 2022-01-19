@@ -22,6 +22,7 @@ import {
   Snackbar,
 } from '@mui/material'
 import { ContentCopyOutlined as CopyIcon } from '@mui/icons-material'
+import SubpageHead from 'components/SubpageHead'
 import User from 'components/User'
 import MetaContract from 'components/MetaContract'
 import SmartContract from 'components/SmartContract'
@@ -92,98 +93,103 @@ const Account = (initState: State) => {
     ? 'polyjuice'
     : 'metaContract'
 
-  return (
-    <Container sx={{ py: 6 }}>
-      <PageTitle>
-        <Stack direction="row" alignItems="center">
-          <Typography variant="inherit" overflow="hidden" textOverflow="ellipsis" noWrap>
-            {`${t('accountType.' + accountType)} ${account.ethAddr}`}
-          </Typography>
+  const title = `${t('accountType.' + accountType)} ${account.ethAddr}`
 
-          <IconButton aria-label="copy" onClick={handleAddressCopy}>
-            <CopyIcon fontSize="inherit" />
-          </IconButton>
+  return (
+    <>
+      <SubpageHead subtitle={title} />
+      <Container sx={{ py: 6 }}>
+        <PageTitle>
+          <Stack direction="row" alignItems="center">
+            <Typography variant="inherit" overflow="hidden" textOverflow="ellipsis" noWrap>
+              {title}
+            </Typography>
+
+            <IconButton aria-label="copy" onClick={handleAddressCopy}>
+              <CopyIcon fontSize="inherit" />
+            </IconButton>
+          </Stack>
+        </PageTitle>
+        <Stack spacing={2}>
+          <Paper>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
+                <List
+                  subheader={
+                    <ListSubheader component="div" sx={{ textTransform: 'capitalize', bgcolor: 'transparent' }}>
+                      {t(`overview`)}
+                    </ListSubheader>
+                  }
+                  sx={{ textTransform: 'capitalize' }}
+                >
+                  <Divider variant="middle" />
+                  <ListItem>
+                    <ListItemText
+                      primary={t(`ckbBalance`)}
+                      secondary={<Typography variant="body2">{formatBalance(account.ckb) + ' CKB'}</Typography>}
+                    />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemText
+                      primary={t(`ethBalance`)}
+                      secondary={<Typography variant="body2">{formatBalance(account.eth) + ' Ether'}</Typography>}
+                    />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemText
+                      primary={t(`txCount`)}
+                      secondary={<Typography variant="body2">{formatInt(account.txCount)}</Typography>}
+                    />
+                  </ListItem>
+                </List>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                {account.metaContract ? <MetaContract {...account.metaContract} /> : null}
+                {account.user ? <User {...account.user} /> : null}
+                {account.smartContract ? <SmartContract /> : null}
+                {account.polyjuice ? <Polyjuice {...account.polyjuice} /> : null}
+                {account.sudt ? <SUDT {...account.sudt} /> : null}
+              </Grid>
+            </Grid>
+          </Paper>
+          <Paper>
+            <Tabs value={tabs.indexOf(tab as string)}>
+              {[t('transactionRecords'), t(`ERC20Records`), `${t('userDefinedAssets')} (${udtList.length})`].map(
+                (label, idx) => (
+                  <Tab
+                    key={label}
+                    label={label}
+                    onClick={e => {
+                      e.stopPropagation()
+                      e.preventDefault()
+                      push(`/account/${account.ethAddr}?tab=${tabs[idx]}`)
+                    }}
+                  />
+                ),
+              )}
+            </Tabs>
+            <Divider />
+            {tab === 'transactions' && account.txList ? <TxList list={account.txList} /> : null}
+            {tab === 'erc20' && account.transferList ? <ERC20TransferList list={account.transferList} /> : null}
+            {tab === 'assets' ? <UdtList list={udtList} /> : null}
+          </Paper>
         </Stack>
-      </PageTitle>
-      <Stack spacing={2}>
-        <Paper>
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={6}>
-              <List
-                subheader={
-                  <ListSubheader component="div" sx={{ textTransform: 'capitalize', bgcolor: 'transparent' }}>
-                    {t(`overview`)}
-                  </ListSubheader>
-                }
-                sx={{ textTransform: 'capitalize' }}
-              >
-                <Divider variant="middle" />
-                <ListItem>
-                  <ListItemText
-                    primary={t(`ckbBalance`)}
-                    secondary={<Typography variant="body2">{formatBalance(account.ckb) + ' CKB'}</Typography>}
-                  />
-                </ListItem>
-                <ListItem>
-                  <ListItemText
-                    primary={t(`ethBalance`)}
-                    secondary={<Typography variant="body2">{formatBalance(account.eth) + ' Ether'}</Typography>}
-                  />
-                </ListItem>
-                <ListItem>
-                  <ListItemText
-                    primary={t(`txCount`)}
-                    secondary={<Typography variant="body2">{formatInt(account.txCount)}</Typography>}
-                  />
-                </ListItem>
-              </List>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              {account.metaContract ? <MetaContract {...account.metaContract} /> : null}
-              {account.user ? <User {...account.user} /> : null}
-              {account.smartContract ? <SmartContract /> : null}
-              {account.polyjuice ? <Polyjuice {...account.polyjuice} /> : null}
-              {account.sudt ? <SUDT {...account.sudt} /> : null}
-            </Grid>
-          </Grid>
-        </Paper>
-        <Paper>
-          <Tabs value={tabs.indexOf(tab as string)}>
-            {[t('transactionRecords'), t(`ERC20Records`), `${t('userDefinedAssets')} (${udtList.length})`].map(
-              (label, idx) => (
-                <Tab
-                  key={label}
-                  label={label}
-                  onClick={e => {
-                    e.stopPropagation()
-                    e.preventDefault()
-                    push(`/account/${account.ethAddr}?tab=${tabs[idx]}`)
-                  }}
-                />
-              ),
-            )}
-          </Tabs>
-          <Divider />
-          {tab === 'transactions' && account.txList ? <TxList list={account.txList} /> : null}
-          {tab === 'erc20' && account.transferList ? <ERC20TransferList list={account.transferList} /> : null}
-          {tab === 'assets' ? <UdtList list={udtList} /> : null}
-        </Paper>
-      </Stack>
-      <Snackbar
-        open={isCopied}
-        onClose={() => setIsCopied(false)}
-        anchorOrigin={{
-          horizontal: 'center',
-          vertical: 'top',
-        }}
-        autoHideDuration={3000}
-        color="secondary"
-      >
-        <Alert severity="success" variant="filled">
-          {t(`addressCopied`, { ns: 'common' })}
-        </Alert>
-      </Snackbar>
-    </Container>
+        <Snackbar
+          open={isCopied}
+          onClose={() => setIsCopied(false)}
+          anchorOrigin={{
+            horizontal: 'center',
+            vertical: 'top',
+          }}
+          autoHideDuration={3000}
+          color="secondary"
+        >
+          <Alert severity="success" variant="filled">
+            {t(`addressCopied`, { ns: 'common' })}
+          </Alert>
+        </Snackbar>
+      </Container>
+    </>
   )
 }
 
