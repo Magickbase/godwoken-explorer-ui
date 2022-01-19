@@ -44,7 +44,7 @@ const formatAddress = (addr: string) => {
 const statisticGroups = [
   { key: 'blockHeight', icon: <BlockHeightIcon />, prefix: '# ' },
   { key: 'txCount', icon: <TxCountIcon /> },
-  { key: 'tps', icon: <TpsIcon />, suffix: 'tx/s' },
+  { key: 'tps', icon: <TpsIcon />, suffix: ' txs/s' },
   { key: 'accountCount', icon: <AccountCountIcon /> },
 ]
 
