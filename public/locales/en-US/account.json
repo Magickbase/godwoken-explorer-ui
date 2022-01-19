@@ -52,5 +52,5 @@
   "native": "native",
   "bridged": "bridged",
   "transactionRecords": "Transactions",
-  "ERC20Records": "ERC 20 Txns"
+  "ERC20Records": "ERC 20 Transfers"
 }
