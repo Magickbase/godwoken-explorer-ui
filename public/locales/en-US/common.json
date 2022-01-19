@@ -20,5 +20,7 @@
   "pending": "Pending",
   "committed": "Committed",
   "finalized": "Finalized",
-  "addressCopied": "Address copied to clipboard"
+  "addressCopied": "Address copied to clipboard",
+  "blockHashCopied": "Block hash copied to clipboard",
+  "txHashCopied": "Transaction hash copied to clipboard"
 }

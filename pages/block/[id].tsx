@@ -4,6 +4,7 @@ import { GetServerSideProps } from 'next'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import {
+  Alert,
   Container,
   Stack,
   List,
@@ -14,9 +15,12 @@ import {
   Link,
   Tabs,
   Tab,
+  Tooltip,
   Divider,
+  IconButton,
+  Snackbar,
 } from '@mui/material'
-import OpenInNewIcon from '@mui/icons-material/OpenInNew'
+import { OpenInNew as OpenInNewIcon, ContentCopyOutlined as CopyIcon } from '@mui/icons-material'
 import SubpageHead from 'components/SubpageHead'
 import TxList from 'components/TxList'
 import PageTitle from 'components/PageTitle'
@@ -31,6 +35,7 @@ import {
   formatInt,
   fetchTxList,
   getTxListRes,
+  handleCopy,
 } from 'utils'
 
 type ParsedTxList = ReturnType<typeof getTxListRes>
@@ -39,6 +44,7 @@ type State = API.Block.Parsed & { txList?: ParsedTxList }
 
 const Block = (initState: State) => {
   const [block, setBlock] = useState(initState)
+  const [isCopied, setIsCopied] = useState(false)
   const [t] = useTranslation('block')
 
   useEffect(() => {
@@ -70,7 +76,33 @@ const Block = (initState: State) => {
     [setBlock, block.number],
   )
 
+  const handleHashCopy = async () => {
+    await handleCopy(block.hash)
+    setIsCopied(true)
+  }
+
   const fields = [
+    {
+      label: 'hash',
+      value: (
+        <Stack direction="row" alignItems="center">
+          <Tooltip title={block.hash} placement="top">
+            <Typography
+              variant="body2"
+              className="mono-font"
+              overflow="hidden"
+              textOverflow="ellipsis"
+              color="#000000de"
+            >
+              {block.hash}
+            </Typography>
+          </Tooltip>
+          <IconButton aria-label="copy" size="small" onClick={handleHashCopy}>
+            <CopyIcon fontSize="inherit" />
+          </IconButton>
+        </Stack>
+      ),
+    },
     {
       label: 'timestamp',
       value: (
@@ -170,6 +202,20 @@ const Block = (initState: State) => {
             {block.txList ? <TxList list={block.txList} /> : null}
           </Paper>
         </Stack>
+        <Snackbar
+          open={isCopied}
+          onClose={() => setIsCopied(false)}
+          anchorOrigin={{
+            horizontal: 'center',
+            vertical: 'top',
+          }}
+          autoHideDuration={3000}
+          color="secondary"
+        >
+          <Alert severity="success" variant="filled">
+            {t(`blockHashCopied`, { ns: 'common' })}
+          </Alert>
+        </Snackbar>
       </Container>
     </>
   )
