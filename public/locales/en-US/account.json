@@ -2,6 +2,13 @@
   "overview": "Overview",
   "basicInfo": "Basic Info",
   "account": "account",
+  "accountType": {
+    "user": "User Account",
+    "smartContract": "Contract Account",
+    "sudt": "Bridged Token Account",
+    "polyjuice": "Polyjuice Account",
+    "metaContract": "Meta Contract Account"
+  },
   "id": "account id",
   "nonce": "nonce",
   "type": "account type",
@@ -44,5 +51,6 @@
   "balance": "balance",
   "native": "native",
   "bridged": "bridged",
-  "transactions": "Transactions"
+  "transactionRecords": "Transactions",
+  "ERC20Records": "ERC 20 Transfers"
 }

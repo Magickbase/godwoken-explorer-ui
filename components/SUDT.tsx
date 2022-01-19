@@ -1,7 +1,8 @@
 import { useTranslation } from 'next-i18next'
 import { List, ListItem, ListItemText, ListSubheader, Divider, Typography, Avatar } from '@mui/material'
-import { scriptToHash, API, nameToColor, formatInt } from 'utils'
+import { scriptToHash, formatInt } from 'utils'
 import CollapsableScript from './CollapsableScript'
+import type { API } from 'utils/api/utils'
 
 type State = API.Account.Parsed['sudt']
 

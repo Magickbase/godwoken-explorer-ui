@@ -1,4 +1,4 @@
-import type { API } from 'utils'
+import type { API } from 'utils/api/utils'
 import { useTranslation } from 'next-i18next'
 import { List, ListSubheader, ListItem, ListItemText, Divider, Typography } from '@mui/material'
 import CollapsableScript from 'components/CollapsableScript'

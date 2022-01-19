@@ -1,107 +1,140 @@
+import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import {
-  TableContainer,
-  Table,
-  TableHead,
-  TableRow,
-  TableBody,
-  TableCell,
   Stack,
   Box,
+  Table,
+  TableContainer,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  Typography,
   Link,
   Tooltip,
-  Typography,
+  Chip,
 } from '@mui/material'
+import BigNumber from 'bignumber.js'
+import TxStatusIcon from './TxStatusIcon'
 import Address from 'components/TruncatedAddress'
-import { useTranslation } from 'next-i18next'
-import { API, timeDistance, formatBalance } from 'utils'
+import Pagination from 'components/Pagination'
+import { timeDistance, CKB_DECIMAL, getERC20TransferListRes } from 'utils'
 
-const ERC20TransferList: React.FC<{ list: API.Txs.Parsed['txs'] }> = ({ list }) => {
+type ParsedTransferList = ReturnType<typeof getERC20TransferListRes>
+
+const TxList: React.FC<{
+  list: ParsedTransferList
+}> = ({ list }) => {
   const [t, { language }] = useTranslation('list')
   return (
-    <TableContainer sx={{ px: 1, pt: 2 }}>
-      <Table size="small">
-        <TableHead sx={{ textTransform: 'capitalize' }}>
-          <TableRow>
-            <TableCell component="th">{t(`hash`)}</TableCell>
-            <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }} component="th">
-              {t(`from`)}
-            </TableCell>
-            <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }} component="th">
-              {t(`to`)}
-            </TableCell>
-            <TableCell sx={{ display: { xs: 'table-cell', md: 'none' } }} component="th">
-              {t(`transfer`)}
-            </TableCell>
-            <TableCell component="th">{t(`value`)}</TableCell>
-            <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>{t(`age`)}</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {list.map(item => (
-            <TableRow key={item.hash}>
-              <TableCell>
-                {
-                  <Tooltip title={item.hash} placement="top">
-                    <Box sx={{ fontSize: { xs: 12, sm: 14 } }}>
-                      <NextLink href={`/tx/${item.hash}`}>
-                        <Link
-                          href={`/tx/${item.hash}`}
-                          underline="none"
-                          color="secondary"
-                          className="mono-font"
-                          fontSize={12}
-                        >{`${item.hash.slice(0, 8)}...${item.hash.slice(-8)}`}</Link>
-                      </NextLink>
-                    </Box>
-                  </Tooltip>
-                }
+    <Box sx={{ px: 1, py: 2 }}>
+      <TableContainer>
+        <Table size="small">
+          <TableHead sx={{ textTransform: 'capitalize' }}>
+            <TableRow>
+              <TableCell component="th">{t('txHash')}</TableCell>
+              <TableCell component="th">{t('block')} </TableCell>
+              <TableCell component="th">{t('age')} </TableCell>
+              <TableCell component="th">{t('method')} </TableCell>
+              <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }} component="th">
+                {t('from')}
               </TableCell>
-              <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                <Address address={item.from} />
+              <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }} component="th">
+                {t('to')}
               </TableCell>
-              <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                <Address address={item.to} />
+              <TableCell sx={{ display: { xs: 'table-cell', md: 'none' } }} component="th">
+                {t('transfer')}
               </TableCell>
-              <TableCell sx={{ display: { xs: 'table-cell', md: 'none' } }}>
-                <Stack>
-                  <Typography
-                    variant="inherit"
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    noWrap
-                  >
-                    <Typography fontSize={12} sx={{ textTransform: 'capitalize', mr: 1 }}>{`${t('from')}:`}</Typography>
-                    <Address leading={5} address={item.from} />
-                  </Typography>
-                  <Typography
-                    variant="inherit"
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    noWrap
-                  >
-                    <Typography fontSize={12} sx={{ textTransform: 'capitalize', mr: 1 }}>{`${t('to')}:`}</Typography>
-                    <Address leading={5} address={item.to} />
-                  </Typography>
-                </Stack>
-              </TableCell>
-              <TableCell>
-                <Typography variant="inherit" overflow="hidden" textOverflow="ellipsis">
-                  {formatBalance(item.transferCount)}
-                </Typography>
-              </TableCell>
-              <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
-                <Typography variant="inherit" noWrap>
-                  {timeDistance(item.timestamp, language)}
-                </Typography>
-              </TableCell>
+              <TableCell component="th">{`${t('value')}`}</TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </TableHead>
+          <TableBody>
+            {+list.totalCount ? (
+              list.txs.map(item => (
+                <TableRow key={item.hash}>
+                  <TableCell>
+                    <Stack direction="row" alignItems="center">
+                      <TxStatusIcon status={item.status} />
+                      <Tooltip title={item.hash} placement="top">
+                        <Box>
+                          <NextLink href={`/tx/${item.hash}`}>
+                            <Link href={`/tx/${item.hash}`} underline="none" color="secondary">
+                              <Typography
+                                className="mono-font"
+                                overflow="hidden"
+                                sx={{ userSelect: 'none', fontSize: { xs: 12, md: 14 } }}
+                              >
+                                {`${item.hash.slice(0, 8)}...${item.hash.slice(-8)}`}
+                              </Typography>
+                            </Link>
+                          </NextLink>
+                        </Box>
+                      </Tooltip>
+                    </Stack>
+                  </TableCell>
+                  <TableCell>
+                    <NextLink href={`/block/${item.blockNumber}`}>
+                      <Link
+                        href={`/block/${item.blockNumber}`}
+                        underline="none"
+                        color="secondary"
+                        sx={{
+                          fontSize: {
+                            xs: 12,
+                            md: 14,
+                          },
+                        }}
+                      >
+                        {(+item.blockNumber).toLocaleString('en')}
+                      </Link>
+                    </NextLink>
+                  </TableCell>
+                  <TableCell sx={{ whiteSpace: 'nowrap', fontSize: { xs: 12, md: 14 } }}>
+                    <time dateTime={new Date(+item.timestamp).toISOString()}>
+                      {timeDistance(item.timestamp, language)}
+                    </time>
+                  </TableCell>
+                  <TableCell sx={{ whiteSpace: 'nowrap', fontSize: { xs: 12, md: 14 } }}>{item.method}</TableCell>
+                  <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
+                    <Address address={item.from} size="normal" />
+                  </TableCell>
+                  <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
+                    {item.receiveEthAddress ? <Address address={item.receiveEthAddress} size="normal" /> : null}
+                  </TableCell>
+                  <TableCell sx={{ display: { xs: 'table-cell', md: 'none' } }}>
+                    <Stack>
+                      <Stack direction="row" justifyContent="space-between">
+                        <Typography fontSize={12} sx={{ textTransform: 'capitalize', mr: 1 }}>{`${t(
+                          'from',
+                        )}:`}</Typography>
+                        <Address leading={5} address={item.from} />
+                      </Stack>
+
+                      <Stack direction="row" justifyContent="space-between">
+                        <Typography fontSize={12} sx={{ textTransform: 'capitalize', mr: 1 }}>{`${t(
+                          'to',
+                        )}:`}</Typography>
+                        {item.receiveEthAddress ? <Address address={item.receiveEthAddress} leading={5} /> : null}
+                      </Stack>
+                    </Stack>
+                  </TableCell>
+                  <TableCell sx={{ fontSize: { xs: 12, md: 14 } }}>
+                    {item.transferValue ? `${new BigNumber(item.transferValue).toFormat()} ${item.udtSymbol}` : null}
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={7} align="center">
+                  {t(`no_records`)}
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <Pagination total={+list.totalCount} current={+list.page} />
+    </Box>
   )
 }
-export default ERC20TransferList
+export default TxList

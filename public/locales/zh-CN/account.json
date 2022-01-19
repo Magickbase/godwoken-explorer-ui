@@ -2,6 +2,13 @@
   "overview": "概览",
   "basicInfo": "基本信息",
   "account": "账户",
+  "accountType": {
+    "user": "用户账户",
+    "smartContract": "合约账户",
+    "sudt": "桥接资产账户",
+    "polyjuice": "Polyjuice 账户",
+    "metaContract": "Meta 合约账户"
+  },
   "id": "账户 id",
   "nonce": "nonce",
   "type": "账户类型",
@@ -44,5 +51,6 @@
   "balance": "余额",
   "native": "原生",
   "bridged": "桥接",
-  "transactions": "交易"
+  "transactionRecords": "交易记录",
+  "ERC20Records": "ERC20 交易记录"
 }
