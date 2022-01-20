@@ -117,7 +117,7 @@ const TxList: React.FC<{
                       </Stack>
                     </Stack>
                   </TableCell>
-                  <TableCell sx={{ fontSize: { xs: 12, md: 14 } }}>{`${new BigNumber(item.value)
+                  <TableCell sx={{ fontSize: { xs: 12, md: 14 }, whiteSpace: 'nowrap' }}>{`${new BigNumber(item.value)
                     .dividedBy(CKB_DECIMAL)
                     .toFormat()}`}</TableCell>
                   <TableCell>

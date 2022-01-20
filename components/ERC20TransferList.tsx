@@ -118,7 +118,7 @@ const TxList: React.FC<{
                       </Stack>
                     </Stack>
                   </TableCell>
-                  <TableCell sx={{ fontSize: { xs: 12, md: 14 } }}>
+                  <TableCell sx={{ fontSize: { xs: 12, md: 14 }, whiteSpace: 'nowrap' }}>
                     {item.transferValue ? `${new BigNumber(item.transferValue).toFormat()} ${item.udtSymbol}` : null}
                   </TableCell>
                 </TableRow>
