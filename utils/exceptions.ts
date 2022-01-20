@@ -21,3 +21,9 @@ export class PageNonPositiveException extends Error {
     super()
   }
 }
+
+export class TabNotFoundException extends Error {
+  constructor() {
+    super()
+  }
+}

@@ -1,12 +1,9 @@
-import Link from 'next/link'
 import { useTranslation } from 'next-i18next'
 import { List, ListItem, ListItemText, ListSubheader, Divider, Typography } from '@mui/material'
-import { API } from 'utils'
-import UdtList from 'components/UdtList'
 
-type State = API.Account.Parsed['smartContract']
+// type State = API.Account.Parsed['smartContract']
 
-const SmartContract = ({ txHash, ethAddr, udtList }: State) => {
+const SmartContract = () => {
   const [t] = useTranslation('account')
   const fields = [
     // TODO: enable this later
@@ -21,14 +18,6 @@ const SmartContract = ({ txHash, ethAddr, udtList }: State) => {
     {
       label: t('type'),
       value: <Typography variant="body2">{'Smart Contract'}</Typography>,
-    },
-    {
-      label: t(`ethAddr`),
-      value: (
-        <Typography variant="body2" overflow="hidden" textOverflow="ellipsis" className="mono-font">
-          {ethAddr}
-        </Typography>
-      ),
     },
   ]
 

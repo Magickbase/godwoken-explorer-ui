@@ -1,6 +1,7 @@
 import { useTranslation } from 'next-i18next'
 import { List, ListItem, ListItemText, ListSubheader, Divider, Typography, Tooltip } from '@mui/material'
-import { API, formatInt } from 'utils'
+import { formatInt } from 'utils'
+import { API } from 'utils/api/utils'
 
 type State = API.Account.Parsed['metaContract']
 

@@ -1,6 +1,6 @@
 {
   "latestBlocks": "latest blocks",
-  "block": "block",
+  "block": "Block",
   "hash": "block hash",
   "number": "block number",
   "txCount": "transactions",
@@ -11,5 +11,6 @@
   "l1TxHash": "l1 txn hash",
   "pending": "pending",
   "committed": "committed",
-  "finalized": "finalized"
+  "finalized": "finalized",
+  "transactionRecords": "Transactions"
 }

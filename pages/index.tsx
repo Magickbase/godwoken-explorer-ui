@@ -1,3 +1,4 @@
+import type { API } from 'utils/api/utils'
 import { useState } from 'react'
 import { GetServerSideProps } from 'next'
 import NextLink from 'next/link'
@@ -28,7 +29,7 @@ import {
 } from '@mui/icons-material'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { timeDistance, fetchHome, API, handleApiError, useWS, CHANNEL, getHomeRes, formatInt } from 'utils'
+import { timeDistance, fetchHome, handleApiError, useWS, CHANNEL, getHomeRes, formatInt } from 'utils'
 import { Typography } from '@mui/material'
 
 type State = API.Home.Parsed
@@ -43,7 +44,7 @@ const formatAddress = (addr: string) => {
 const statisticGroups = [
   { key: 'blockHeight', icon: <BlockHeightIcon />, prefix: '# ' },
   { key: 'txCount', icon: <TxCountIcon /> },
-  { key: 'tps', icon: <TpsIcon />, suffix: 'tx/s' },
+  { key: 'tps', icon: <TpsIcon />, suffix: ' txs/s' },
   { key: 'accountCount', icon: <AccountCountIcon /> },
 ]
 

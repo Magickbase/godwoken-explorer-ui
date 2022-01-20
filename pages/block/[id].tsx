@@ -1,26 +1,50 @@
+import type { API } from 'utils/api/utils'
 import { useEffect, useState } from 'react'
 import { GetServerSideProps } from 'next'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { Container, List, ListItem, ListItemText, Typography, Paper, Link } from '@mui/material'
-import OpenInNewIcon from '@mui/icons-material/OpenInNew'
+import {
+  Alert,
+  Container,
+  Stack,
+  List,
+  ListItem,
+  ListItemText,
+  Typography,
+  Paper,
+  Link,
+  Tabs,
+  Tab,
+  Tooltip,
+  Divider,
+  IconButton,
+  Snackbar,
+} from '@mui/material'
+import { OpenInNew as OpenInNewIcon, ContentCopyOutlined as CopyIcon } from '@mui/icons-material'
+import SubpageHead from 'components/SubpageHead'
+import TxList from 'components/TxList'
 import PageTitle from 'components/PageTitle'
 import {
   fetchBlock,
   handleApiError,
-  API,
   formatDatetime,
   useWS,
   getBlockRes,
   CKB_EXPLORER_URL,
   CHANNEL,
   formatInt,
+  fetchTxList,
+  getTxListRes,
+  handleCopy,
 } from 'utils'
 
-type State = API.Block.Parsed
+type ParsedTxList = ReturnType<typeof getTxListRes>
+
+type State = API.Block.Parsed & { txList?: ParsedTxList }
 
 const Block = (initState: State) => {
   const [block, setBlock] = useState(initState)
+  const [isCopied, setIsCopied] = useState(false)
   const [t] = useTranslation('block')
 
   useEffect(() => {
@@ -30,7 +54,7 @@ const Block = (initState: State) => {
   useWS(
     `${CHANNEL.BLOCK_INFO}${block.number}`,
     (init: API.Block.Raw) => {
-      setBlock(getBlockRes(init))
+      setBlock(prev => ({ ...prev, ...getBlockRes(init) }))
     },
     ({
       l1_block,
@@ -52,7 +76,33 @@ const Block = (initState: State) => {
     [setBlock, block.number],
   )
 
+  const handleHashCopy = async () => {
+    await handleCopy(block.hash)
+    setIsCopied(true)
+  }
+
   const fields = [
+    {
+      label: 'hash',
+      value: (
+        <Stack direction="row" alignItems="center">
+          <Tooltip title={block.hash} placement="top">
+            <Typography
+              variant="body2"
+              className="mono-font"
+              overflow="hidden"
+              textOverflow="ellipsis"
+              color="#000000de"
+            >
+              {block.hash}
+            </Typography>
+          </Tooltip>
+          <IconButton aria-label="copy" size="small" onClick={handleHashCopy}>
+            <CopyIcon fontSize="inherit" />
+          </IconButton>
+        </Stack>
+      ),
+    },
     {
       label: 'timestamp',
       value: (
@@ -128,28 +178,57 @@ const Block = (initState: State) => {
       value: <Typography variant="body2">{block.aggregator}</Typography>,
     },
   ]
+  const title = `${t('block')} # ${formatInt(block.number)}`
   return (
-    <Container sx={{ py: 6 }}>
-      <PageTitle>{`${t('block')} # ${formatInt(block.number)}`}</PageTitle>
-      <Paper>
-        <List sx={{ textTransform: 'capitalize' }}>
-          {fields.map(field => (
-            <ListItem key={field.label}>
-              <ListItemText primary={t(field.label)} secondary={field.value} />
-            </ListItem>
-          ))}
-        </List>
-      </Paper>
-    </Container>
+    <>
+      <SubpageHead subtitle={title} />
+      <Container sx={{ py: 6 }}>
+        <PageTitle>{title}</PageTitle>
+        <Stack spacing={2}>
+          <Paper>
+            <List sx={{ textTransform: 'capitalize' }}>
+              {fields.map(field => (
+                <ListItem key={field.label}>
+                  <ListItemText primary={t(field.label)} secondary={field.value} />
+                </ListItem>
+              ))}
+            </List>
+          </Paper>
+          <Paper>
+            <Tabs value={0}>
+              <Tab label={t(`transactionRecords`)} />
+            </Tabs>
+            <Divider />
+            {block.txList ? <TxList list={block.txList} /> : null}
+          </Paper>
+        </Stack>
+        <Snackbar
+          open={isCopied}
+          onClose={() => setIsCopied(false)}
+          anchorOrigin={{
+            horizontal: 'center',
+            vertical: 'top',
+          }}
+          autoHideDuration={3000}
+          color="secondary"
+        >
+          <Alert severity="success" variant="filled">
+            {t(`blockHashCopied`, { ns: 'common' })}
+          </Alert>
+        </Snackbar>
+      </Container>
+    </>
   )
 }
 
-export const getServerSideProps: GetServerSideProps<State> = async ({ locale, res, params }) => {
+export const getServerSideProps: GetServerSideProps<State> = async ({ locale, res, params, query }) => {
   const { id } = params
   try {
     const block = await fetchBlock(id as string)
-    const lng = await serverSideTranslations(locale, ['common', 'block'])
-    return { props: { ...block, ...lng } }
+    const lng = await serverSideTranslations(locale, ['common', 'block', 'list'])
+
+    const txList = block.hash ? await fetchTxList({ block_hash: block.hash, page: query.page as string }) : null
+    return { props: { ...block, ...lng, txList } }
   } catch (err) {
     return handleApiError(err, res, locale, id.toString())
   }
