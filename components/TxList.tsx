@@ -18,12 +18,12 @@ import BigNumber from 'bignumber.js'
 import TxStatusIcon from './TxStatusIcon'
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/Pagination'
-import { timeDistance, CKB_DECIMAL, getERC20TransferListRes } from 'utils'
+import { timeDistance, CKB_DECIMAL, getTxListRes } from 'utils'
 
-type ParsedTransferList = ReturnType<typeof getERC20TransferListRes>
+type ParsedTxList = ReturnType<typeof getTxListRes>
 
 const TxList: React.FC<{
-  list: ParsedTransferList
+  list: ParsedTxList
 }> = ({ list }) => {
   const [t, { language }] = useTranslation('list')
   return (
@@ -35,7 +35,6 @@ const TxList: React.FC<{
               <TableCell component="th">{t('txHash')}</TableCell>
               <TableCell component="th">{t('block')} </TableCell>
               <TableCell component="th">{t('age')} </TableCell>
-              <TableCell component="th">{t('method')} </TableCell>
               <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }} component="th">
                 {t('from')}
               </TableCell>
@@ -45,7 +44,8 @@ const TxList: React.FC<{
               <TableCell sx={{ display: { xs: 'table-cell', md: 'none' } }} component="th">
                 {t('transfer')}
               </TableCell>
-              <TableCell component="th">{`${t('value')}`}</TableCell>
+              <TableCell component="th">{`${t('value')} (CKB)`}</TableCell>
+              <TableCell component="th">{t('type')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -94,32 +94,34 @@ const TxList: React.FC<{
                       {timeDistance(item.timestamp, language)}
                     </time>
                   </TableCell>
-                  <TableCell sx={{ whiteSpace: 'nowrap', fontSize: { xs: 12, md: 14 } }}>{item.method}</TableCell>
                   <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                     <Address address={item.from} size="normal" />
                   </TableCell>
                   <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                    {item.receiveEthAddress ? <Address address={item.receiveEthAddress} size="normal" /> : null}
+                    <Address address={item.to} size="normal" />
                   </TableCell>
                   <TableCell sx={{ display: { xs: 'table-cell', md: 'none' } }}>
                     <Stack>
                       <Stack direction="row" justifyContent="space-between">
-                        <Typography fontSize={12} sx={{ textTransform: 'capitalize', mr: 1 }}>{`${t(
+                        <Typography fontSize={12} sx={{ textTransform: 'capitalize', mr: 1 }} noWrap>{`${t(
                           'from',
                         )}:`}</Typography>
                         <Address leading={5} address={item.from} />
                       </Stack>
 
                       <Stack direction="row" justifyContent="space-between">
-                        <Typography fontSize={12} sx={{ textTransform: 'capitalize', mr: 1 }}>{`${t(
+                        <Typography fontSize={12} sx={{ textTransform: 'capitalize', mr: 1 }} noWrap>{`${t(
                           'to',
                         )}:`}</Typography>
-                        {item.receiveEthAddress ? <Address address={item.receiveEthAddress} leading={5} /> : null}
+                        <Address leading={5} address={item.to} />
                       </Stack>
                     </Stack>
                   </TableCell>
-                  <TableCell sx={{ fontSize: { xs: 12, md: 14 } }}>
-                    {item.transferValue ? `${new BigNumber(item.transferValue).toFormat()} ${item.udtSymbol}` : null}
+                  <TableCell sx={{ fontSize: { xs: 12, md: 14 } }}>{`${new BigNumber(item.value)
+                    .dividedBy(CKB_DECIMAL)
+                    .toFormat()}`}</TableCell>
+                  <TableCell>
+                    <Chip label={item.type} size="small" variant="outlined" color="primary" />
                   </TableCell>
                 </TableRow>
               ))

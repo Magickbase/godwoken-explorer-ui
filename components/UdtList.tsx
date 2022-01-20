@@ -11,7 +11,8 @@ import {
   TableRow,
   Typography,
 } from '@mui/material'
-import { API, formatBalance, nameToColor } from 'utils'
+import { formatBalance, nameToColor } from 'utils'
+import type { API } from 'utils/api/utils'
 
 // balance, decimal, icon, id, name, type
 const AssetList = ({ list = [] }: { list: Array<API.Account.UDT> }) => {
