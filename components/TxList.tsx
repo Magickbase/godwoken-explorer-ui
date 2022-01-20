@@ -73,9 +73,9 @@ const TxList: React.FC<{
                     </Stack>
                   </TableCell>
                   <TableCell>
-                    <NextLink href={`/block/${item.blockNumber}`}>
+                    <NextLink href={`/block/${item.blockHash}`}>
                       <Link
-                        href={`/block/${item.blockNumber}`}
+                        href={`/block/${item.blockHash}`}
                         underline="none"
                         color="secondary"
                         sx={{

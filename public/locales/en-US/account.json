@@ -52,5 +52,6 @@
   "native": "native",
   "bridged": "bridged",
   "transactionRecords": "Transactions",
-  "ERC20Records": "ERC20 Transfers"
+  "ERC20Records": "ERC20 Transfers",
+  "bridgedRecords": "Bridged Transfers"
 }

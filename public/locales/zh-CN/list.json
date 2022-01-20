@@ -9,5 +9,10 @@
   "txHash": "交易哈希",
   "block": "区块",
   "type": "类型",
-  "method": "方法"
+  "method": "方法",
+  "deposit": "存入",
+  "withdrawal": "提取",
+  "layer1Txn": "CKB 交易",
+  "pending": "待确认",
+  "account": "账户"
 }

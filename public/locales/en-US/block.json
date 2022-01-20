@@ -12,5 +12,6 @@
   "pending": "pending",
   "committed": "committed",
   "finalized": "finalized",
-  "transactionRecords": "Transactions"
+  "transactionRecords": "Transactions",
+  "bridgedRecords": "Bridged Transfers"
 }
