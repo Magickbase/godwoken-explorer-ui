@@ -5,7 +5,7 @@ import Header from 'components/Header'
 import Footer from 'components/Footer'
 
 const Layout = ({ children }) => {
-  const [t] = useTranslation('common')
+  const [t, { language }] = useTranslation('common')
   return (
     <>
       <Head />
@@ -15,7 +15,7 @@ const Layout = ({ children }) => {
           <Alert severity="info" sx={{ display: 'flex', justifyContent: 'center', borderRadius: 0 }}>
             {t(`testnetAnnotation`)}
             <Link
-              href={`https://${process.env.NEXT_PUBLIC_MAINNET_EXPLORER_HOSTNAME}`}
+              href={`https://${process.env.NEXT_PUBLIC_MAINNET_EXPLORER_HOSTNAME}/${language}`}
               target="_blank"
               rel="noopener noreferrer"
               ml={1}
@@ -26,6 +26,19 @@ const Layout = ({ children }) => {
             </Link>
           </Alert>
         ) : null}
+        <Alert severity="info" sx={{ display: 'flex', justifyContent: 'center', borderRadius: 0 }}>
+          {t(`notifications.domainMigrationPrefix`)}
+          <Link
+            href={`https://www.gwscan.com/${language}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            color="secondary"
+            sx={{ fontWeight: 700 }}
+          >
+            GwScan
+          </Link>
+          {t(`notifications.domainMigrationSuffix`)}
+        </Alert>
         {children}
       </main>
       <Footer />
