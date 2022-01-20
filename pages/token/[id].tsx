@@ -165,7 +165,7 @@ export const getServerSideProps: GetServerSideProps<Props, { id: string }> = asy
       throw new PageOverflowException(totalPage)
     }
 
-    const lng = await serverSideTranslations(locale, ['common', 'tokens'])
+    const lng = await serverSideTranslations(locale, ['common', 'tokens', 'list'])
     return {
       props: {
         token,
