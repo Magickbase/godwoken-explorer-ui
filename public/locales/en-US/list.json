@@ -9,5 +9,10 @@
   "txHash": "Txn Hash",
   "block": "Block",
   "type": "Type",
-  "method": "Method"
+  "method": "Method",
+  "deposit": "Deposit",
+  "withdrawal": "Withdrawal",
+  "layer1Txn": "CKB Txn",
+  "pending": "Pending",
+  "account": "Account"
 }

@@ -1,6 +1,7 @@
 import { GetServerSideProps } from 'next'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { useRouter } from 'next/router'
 import {
   Container,
   Stack,
@@ -21,19 +22,37 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import SubpageHead from 'components/SubpageHead'
 import PageTitle from 'components/PageTitle'
 import ERC20TransferList from 'components/ERC20TransferList'
+import BridgedRecordList from 'components/BridgedRecordList'
 import Address from 'components/AddressInHalfPanel'
-import { handleApiError, fetchToken, fetchERC20TransferList, nameToColor, getERC20TransferListRes } from 'utils'
-import { PageNonPositiveException, PageOverflowException } from 'utils/exceptions'
+import {
+  handleApiError,
+  fetchToken,
+  fetchERC20TransferList,
+  nameToColor,
+  getERC20TransferListRes,
+  getBridgedRecordListRes,
+  fetchBridgedRecordList,
+} from 'utils'
+import { PageNonPositiveException, PageOverflowException, TabNotFoundException } from 'utils/exceptions'
 import type { API } from 'utils/api/utils'
 
 type ParsedTransferList = ReturnType<typeof getERC20TransferListRes>
+type ParsedbridgedRecordList = ReturnType<typeof getBridgedRecordListRes>
+
+const tabs = ['transfers', 'bridged']
+
 type Props = {
   token: API.Token.Parsed
-  txList: ParsedTransferList
+  transferList?: ParsedTransferList
+  bridgedRecordList?: ParsedbridgedRecordList
 }
 
-const Token = ({ token, txList }: Props) => {
+const Token = ({ token, transferList, bridgedRecordList }: Props) => {
   const [t] = useTranslation('tokens')
+  const {
+    push,
+    query: { tab = 'transfers' },
+  } = useRouter()
   const tokenInfo = [
     { label: 'decimal', value: <Typography variant="body2">{token.decimal || '-'}</Typography> },
     { label: 'type', value: <Typography variant="body2">{t(token.type)}</Typography> },
@@ -133,11 +152,22 @@ const Token = ({ token, txList }: Props) => {
             </Grid>
           </Paper>
           <Paper>
-            <Tabs value={0}>
-              <Tab label={t('transfer-records')} />
+            <Tabs value={tabs.indexOf(tab as string)} variant="scrollable" scrollButtons="auto">
+              {[t('transferRecords'), t(`bridgedRecords`)].map((label, idx) => (
+                <Tab
+                  key={label}
+                  label={label}
+                  onClick={e => {
+                    e.stopPropagation()
+                    e.preventDefault()
+                    push(`/token/${token.id}?tab=${tabs[idx]}`)
+                  }}
+                />
+              ))}
             </Tabs>
             <Divider />
-            <ERC20TransferList list={txList} />
+            {tab === 'transfers' && transferList ? <ERC20TransferList list={transferList} /> : null}
+            {tab === 'bridged' && bridgedRecordList ? <BridgedRecordList list={bridgedRecordList} showUser /> : null}
           </Paper>
         </Stack>
       </Container>
@@ -147,29 +177,44 @@ const Token = ({ token, txList }: Props) => {
 
 export const getServerSideProps: GetServerSideProps<Props, { id: string }> = async ({ locale, res, params, query }) => {
   const { id } = params
-  const { page } = query
+  const { page, tab = tabs[0] } = query
 
   try {
-    if (+page < 1) {
-      throw new PageNonPositiveException()
+    if (typeof tab !== 'string' || !tabs.includes(tab)) {
+      throw new TabNotFoundException()
     }
 
-    const token = await fetchToken(id)
-    const q = { udt_address: token.shortAddress }
-    if (typeof page === 'string' && !Number.isNaN(+page)) {
-      q['page'] = page
-    }
-    const txListRes = await fetchERC20TransferList(q)
-    const totalPage = Math.ceil(+txListRes.totalCount / 10)
-    if (totalPage < +page) {
-      throw new PageOverflowException(totalPage)
-    }
+    // if (+page < 1) {
+    //   throw new PageNonPositiveException()
+    // }
 
-    const lng = await serverSideTranslations(locale, ['common', 'tokens', 'list'])
+    const [token, lng] = await Promise.all([
+      fetchToken(id),
+      serverSideTranslations(locale, ['common', 'tokens', 'list']),
+    ])
+    // const q = { udt_address: token.shortAddress, }
+    // if (typeof page === 'string' && !Number.isNaN(+page)) {
+    //   q['page'] = page
+    // }
+    const transferList =
+      tab === 'transfers' && token.shortAddress
+        ? await fetchERC20TransferList({ udt_address: token.shortAddress, page: page as string })
+        : null
+
+    const bridgedRecordList =
+      tab === 'bridged' && token.id
+        ? await fetchBridgedRecordList({ udt_id: token.id.toString(), page: page as string })
+        : null
+    // const totalPage = Math.ceil(+transferListRes.totalCount / 10)
+    // if (totalPage < +page) {
+    //   throw new PageOverflowException(totalPage)
+    // }
+
     return {
       props: {
         token,
-        txList: txListRes,
+        transferList,
+        bridgedRecordList,
         ...lng,
       },
     }

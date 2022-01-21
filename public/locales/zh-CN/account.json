@@ -52,5 +52,6 @@
   "native": "原生",
   "bridged": "桥接",
   "transactionRecords": "交易记录",
-  "ERC20Records": "ERC20 交易记录"
+  "ERC20Records": "ERC20 交易记录",
+  "bridgedRecords": "桥接交易记录"
 }
