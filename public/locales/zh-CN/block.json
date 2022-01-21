@@ -12,5 +12,6 @@
   "pending": "待确认",
   "committed": "已提交",
   "finalized": "已确认",
-  "transactionRecords": "交易记录"
+  "transactionRecords": "交易记录",
+  "bridgedRecords": "桥接交易记录"
 }

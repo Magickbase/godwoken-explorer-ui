@@ -73,9 +73,9 @@ const TxList: React.FC<{
                     </Stack>
                   </TableCell>
                   <TableCell>
-                    <NextLink href={`/block/${item.blockNumber}`}>
+                    <NextLink href={`/block/${item.blockHash}`}>
                       <Link
-                        href={`/block/${item.blockNumber}`}
+                        href={`/block/${item.blockHash}`}
                         underline="none"
                         color="secondary"
                         sx={{
@@ -117,7 +117,7 @@ const TxList: React.FC<{
                       </Stack>
                     </Stack>
                   </TableCell>
-                  <TableCell sx={{ fontSize: { xs: 12, md: 14 } }}>{`${new BigNumber(item.value)
+                  <TableCell sx={{ fontSize: { xs: 12, md: 14 }, whiteSpace: 'nowrap' }}>{`${new BigNumber(item.value)
                     .dividedBy(CKB_DECIMAL)
                     .toFormat()}`}</TableCell>
                   <TableCell>

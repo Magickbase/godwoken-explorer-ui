@@ -124,7 +124,7 @@ export const getTxListRes = (txListRes: {
 export const fetchTxList = (
   query: Partial<Record<'page' | 'type' | 'tx_type' | 'eth_address' | 'block_hash', string>>,
 ): Promise<{ txs: Array<Parsed>; page: string; totalCount: string }> =>
-  fetch(`${SERVER_URL}/txs?${new URLSearchParams(query)}`)
+  fetch(`${SERVER_URL}/txs?${new URLSearchParams({ ...query, page: query.page || '1' })}`)
     .then(res => pretreat<{ txs: Array<Raw>; page: string; total_count: string }>(res))
     .then(getTxListRes)
 
@@ -162,6 +162,6 @@ export const getERC20TransferListRes = (list: {
 export const fetchERC20TransferList = (
   query: Partial<Record<'page' | 'udt_address' | 'eth_address', string>>,
 ): Promise<{ txs: Array<Erc20Parsed>; page: string; totalCount: string }> =>
-  fetch(`${SERVER_URL}/transfers?${new URLSearchParams(query)}`)
+  fetch(`${SERVER_URL}/transfers?${new URLSearchParams({ ...query, page: query.page || '1' })}`)
     .then(res => pretreat<{ txs: Array<Erc20Raw>; page: string; total_count: string }>(res))
     .then(getERC20TransferListRes)

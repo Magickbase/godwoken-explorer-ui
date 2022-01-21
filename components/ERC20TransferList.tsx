@@ -12,13 +12,12 @@ import {
   Typography,
   Link,
   Tooltip,
-  Chip,
 } from '@mui/material'
 import BigNumber from 'bignumber.js'
 import TxStatusIcon from './TxStatusIcon'
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/Pagination'
-import { timeDistance, CKB_DECIMAL, getERC20TransferListRes } from 'utils'
+import { timeDistance, getERC20TransferListRes } from 'utils'
 
 type ParsedTransferList = ReturnType<typeof getERC20TransferListRes>
 
@@ -118,7 +117,7 @@ const TxList: React.FC<{
                       </Stack>
                     </Stack>
                   </TableCell>
-                  <TableCell sx={{ fontSize: { xs: 12, md: 14 } }}>
+                  <TableCell sx={{ fontSize: { xs: 12, md: 14 }, whiteSpace: 'nowrap' }}>
                     {item.transferValue ? `${new BigNumber(item.transferValue).toFormat()} ${item.udtSymbol}` : null}
                   </TableCell>
                 </TableRow>

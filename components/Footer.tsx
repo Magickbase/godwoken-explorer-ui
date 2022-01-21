@@ -36,7 +36,7 @@ const Footer = () => (
       ))}
     </Box>
     <Typography variant="body2" marginX="auto">
-      Copyright &copy; 2021 Nervina Labs All Rights Reserved.
+      Copyright &copy; 2022 Nervina Labs All Rights Reserved.
     </Typography>
   </Box>
 )
