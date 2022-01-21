@@ -1,6 +1,7 @@
 import type { API } from 'utils/api/utils'
 import { useEffect, useState } from 'react'
 import { GetServerSideProps } from 'next'
+import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import {
@@ -23,6 +24,7 @@ import {
 import { OpenInNew as OpenInNewIcon, ContentCopyOutlined as CopyIcon } from '@mui/icons-material'
 import SubpageHead from 'components/SubpageHead'
 import TxList from 'components/TxList'
+import BridgedRecordList from 'components/BridgedRecordList'
 import PageTitle from 'components/PageTitle'
 import {
   fetchBlock,
@@ -35,17 +37,27 @@ import {
   formatInt,
   fetchTxList,
   getTxListRes,
+  fetchBridgedRecordList,
+  getBridgedRecordListRes,
   handleCopy,
+  TabNotFoundException,
 } from 'utils'
 
 type ParsedTxList = ReturnType<typeof getTxListRes>
+type ParsedBridgedRecordList = ReturnType<typeof getBridgedRecordListRes>
 
-type State = API.Block.Parsed & { txList?: ParsedTxList }
+const tabs = ['transactions', 'bridged']
+
+type State = API.Block.Parsed & Partial<{ txList: ParsedTxList; bridgedRecordList: ParsedBridgedRecordList }>
 
 const Block = (initState: State) => {
   const [block, setBlock] = useState(initState)
   const [isCopied, setIsCopied] = useState(false)
   const [t] = useTranslation('block')
+  const {
+    push,
+    query: { tab = 'transactions' },
+  } = useRouter()
 
   useEffect(() => {
     setBlock(initState)
@@ -195,11 +207,24 @@ const Block = (initState: State) => {
             </List>
           </Paper>
           <Paper>
-            <Tabs value={0}>
-              <Tab label={t(`transactionRecords`)} />
+            <Tabs value={tabs.indexOf(tab as string)} variant="scrollable" scrollButtons="auto">
+              {[t('transactionRecords'), t(`bridgedRecords`)].map((label, idx) => (
+                <Tab
+                  key={label}
+                  label={label}
+                  onClick={e => {
+                    e.stopPropagation()
+                    e.preventDefault()
+                    push(`/block/${block.hash}?tab=${tabs[idx]}`)
+                  }}
+                />
+              ))}
             </Tabs>
             <Divider />
-            {block.txList ? <TxList list={block.txList} /> : null}
+            {tab === 'transactions' && block.txList ? <TxList list={block.txList} /> : null}
+            {tab === 'bridged' && block.bridgedRecordList ? (
+              <BridgedRecordList list={block.bridgedRecordList} showUser />
+            ) : null}
           </Paper>
         </Stack>
         <Snackbar
@@ -223,12 +248,28 @@ const Block = (initState: State) => {
 
 export const getServerSideProps: GetServerSideProps<State> = async ({ locale, res, params, query }) => {
   const { id } = params
+  const { tab = tabs[0] } = query
   try {
-    const block = await fetchBlock(id as string)
-    const lng = await serverSideTranslations(locale, ['common', 'block', 'list'])
+    if (typeof tab !== 'string' || !tabs.includes(tab)) {
+      throw new TabNotFoundException()
+    }
 
-    const txList = block.hash ? await fetchTxList({ block_hash: block.hash, page: query.page as string }) : null
-    return { props: { ...block, ...lng, txList } }
+    const [block, lng] = await Promise.all([
+      fetchBlock(id as string),
+      serverSideTranslations(locale, ['common', 'block', 'list']),
+    ])
+
+    const txList =
+      tab === 'transactions' && block.hash
+        ? await fetchTxList({ block_hash: block.hash, page: query.page as string })
+        : null
+
+    const bridgedRecordList =
+      tab === 'bridged' && block.hash
+        ? await fetchBridgedRecordList({ block_number: block.number, page: query.page as string })
+        : null
+
+    return { props: { ...block, ...lng, txList, bridgedRecordList } }
   } catch (err) {
     return handleApiError(err, res, locale, id.toString())
   }

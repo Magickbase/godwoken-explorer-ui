@@ -12,13 +12,12 @@ import {
   Typography,
   Link,
   Tooltip,
-  Chip,
 } from '@mui/material'
 import BigNumber from 'bignumber.js'
 import TxStatusIcon from './TxStatusIcon'
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/Pagination'
-import { timeDistance, CKB_DECIMAL, getERC20TransferListRes } from 'utils'
+import { timeDistance, getERC20TransferListRes } from 'utils'
 
 type ParsedTransferList = ReturnType<typeof getERC20TransferListRes>
 

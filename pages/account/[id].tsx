@@ -31,6 +31,7 @@ import SUDT from 'components/SUDT'
 import ERC20TransferList from 'components/ERC20TransferList'
 import UdtList from 'components/UdtList'
 import TxList from 'components/TxList'
+import BridgedRecordList from 'components/BridgedRecordList'
 import {
   handleCopy,
   fetchAccount,
@@ -45,14 +46,18 @@ import {
   getTxListRes,
   getERC20TransferListRes,
   fetchERC20TransferList,
+  getBridgedRecordListRes,
+  fetchBridgedRecordList,
 } from 'utils'
 import PageTitle from 'components/PageTitle'
 
 type ParsedTxList = ReturnType<typeof getTxListRes>
 type ParsedTransferList = ReturnType<typeof getERC20TransferListRes>
+type ParsedBridgedRecordList = ReturnType<typeof getBridgedRecordListRes>
 
-type State = API.Account.Parsed & Partial<{ txList: ParsedTxList; transferList: ParsedTransferList }>
-const tabs = ['transactions', 'erc20', 'assets']
+type State = API.Account.Parsed &
+  Partial<{ txList: ParsedTxList; transferList: ParsedTransferList; bridgedRecordList: ParsedBridgedRecordList }>
+const tabs = ['transactions', 'erc20', 'bridged', 'assets']
 const Account = (initState: State) => {
   const {
     push,
@@ -153,24 +158,30 @@ const Account = (initState: State) => {
             </Grid>
           </Paper>
           <Paper>
-            <Tabs value={tabs.indexOf(tab as string)}>
-              {[t('transactionRecords'), t(`ERC20Records`), `${t('userDefinedAssets')} (${udtList.length})`].map(
-                (label, idx) => (
-                  <Tab
-                    key={label}
-                    label={label}
-                    onClick={e => {
-                      e.stopPropagation()
-                      e.preventDefault()
-                      push(`/account/${account.ethAddr}?tab=${tabs[idx]}`)
-                    }}
-                  />
-                ),
-              )}
+            <Tabs value={tabs.indexOf(tab as string)} variant="scrollable" scrollButtons="auto">
+              {[
+                t('transactionRecords'),
+                t(`ERC20Records`),
+                t(`bridgedRecords`),
+                `${t('userDefinedAssets')} (${udtList.length})`,
+              ].map((label, idx) => (
+                <Tab
+                  key={label}
+                  label={label}
+                  onClick={e => {
+                    e.stopPropagation()
+                    e.preventDefault()
+                    push(`/account/${account.ethAddr}?tab=${tabs[idx]}`)
+                  }}
+                />
+              ))}
             </Tabs>
             <Divider />
             {tab === 'transactions' && account.txList ? <TxList list={account.txList} /> : null}
             {tab === 'erc20' && account.transferList ? <ERC20TransferList list={account.transferList} /> : null}
+            {tab === 'bridged' && account.bridgedRecordList ? (
+              <BridgedRecordList list={account.bridgedRecordList} />
+            ) : null}
             {tab === 'assets' ? <UdtList list={udtList} /> : null}
           </Paper>
         </Stack>
@@ -195,7 +206,7 @@ const Account = (initState: State) => {
 
 export const getServerSideProps: GetServerSideProps<State, { id: string }> = async ({ locale, res, params, query }) => {
   const { id } = params
-  const { tab = 'transactions' } = query
+  const { tab = tabs[0] } = query
   try {
     if (typeof tab !== 'string' || !tabs.includes(tab)) {
       throw new TabNotFoundException()
@@ -214,7 +225,12 @@ export const getServerSideProps: GetServerSideProps<State, { id: string }> = asy
       tab === 'erc20' && account.ethAddr
         ? await fetchERC20TransferList({ eth_address: account.ethAddr, page: query.page as string })
         : null
-    return { props: { ...account, ...lng, txList, transferList } }
+
+    const bridgedRecordList =
+      tab === 'bridged' && account.ethAddr
+        ? await fetchBridgedRecordList({ eth_address: account.ethAddr, page: query.page as string })
+        : null
+    return { props: { ...account, ...lng, txList, transferList, bridgedRecordList } }
   } catch (err) {
     switch (true) {
       case err instanceof TabNotFoundException: {
