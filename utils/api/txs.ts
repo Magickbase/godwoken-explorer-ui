@@ -124,7 +124,7 @@ export const getTxListRes = (txListRes: {
 export const fetchTxList = (
   query: Partial<Record<'page' | 'type' | 'tx_type' | 'eth_address' | 'block_hash', string>>,
 ): Promise<{ txs: Array<Parsed>; page: string; totalCount: string }> =>
-  fetch(`${SERVER_URL}/txs?${new URLSearchParams(query)}`)
+  fetch(`${SERVER_URL}/txs?${new URLSearchParams({ ...query, page: query.page || '1' })}`)
     .then(res => pretreat<{ txs: Array<Raw>; page: string; total_count: string }>(res))
     .then(getTxListRes)
 
