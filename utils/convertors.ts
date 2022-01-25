@@ -6,10 +6,9 @@ import 'dayjs/locale/en'
 import {
   systemScripts,
   bech32Address,
-  fullPayloadToAddress,
   AddressPrefix,
-  AddressType,
   scriptToHash,
+  scriptToAddress,
 } from '@nervosnetwork/ckb-sdk-utils'
 import { IS_MAINNET } from './constants'
 
@@ -38,12 +37,7 @@ export const scriptToCkbAddress = (lockScript: CKBComponents.Script) => {
     // short address
     return bech32Address(lockScript.args, { prefix, codeHashOrCodeHashIndex: `0x${shortIdx.toString(16)}` })
   }
-  return fullPayloadToAddress({
-    args: lockScript.args,
-    prefix,
-    type: lockScript.hashType === 'data' ? AddressType.DataCodeHash : AddressType.TypeCodeHash,
-    codeHash: lockScript.codeHash,
-  })
+  return scriptToAddress(lockScript, IS_MAINNET)
 }
 
 export const formatInt = (int: string | number) => {
