@@ -22,6 +22,8 @@
   "timestamp": "timestamp",
   "success": "success",
   "finalizeState": "finalize state",
+  "status": "status",
+  "failed": "failed",
   "age": "age",
   "txListTitle": "Transactions related to account",
   "pending": "Pending",

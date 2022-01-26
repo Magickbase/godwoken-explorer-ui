@@ -16,6 +16,7 @@ interface Raw {
   nonce: number
   receive_eth_address: string
   status: TxStatus
+  polyjuice_status: 'succeed' | 'failed'
   timestamp: number
   to: string
   to_alias: string
@@ -38,6 +39,7 @@ interface Parsed {
   method: Method
   nonce: number
   status: TxStatus
+  isSuccess: boolean
   timestamp: number
   to: string
   toAlias: string
@@ -60,6 +62,7 @@ interface Erc20Raw {
   nonce: number
   receive_eth_address: string
   status: TxStatus
+  polyjuice_status: 'succeed' | 'failed'
   timestamp: number
   to: string
   to_alias: string
@@ -84,6 +87,7 @@ interface Erc20Parsed {
   nonce: number
   receiveEthAddress: string
   status: TxStatus
+  isSuccess: boolean
   timestamp: number
   to: string
   toAlias: string
@@ -113,6 +117,7 @@ export const getTxListRes = (txListRes: {
     method: tx.method,
     nonce: tx.nonce,
     status: tx.status ?? 'pending',
+    isSuccess: tx.polyjuice_status === 'succeed',
     timestamp: tx.timestamp ? tx.timestamp * 1000 : -1,
     to: tx.to,
     type: tx.type,
@@ -149,6 +154,7 @@ export const getERC20TransferListRes = (list: {
     nonce: tx.nonce,
     receiveEthAddress: tx.receive_eth_address,
     status: tx.status,
+    isSuccess: tx.polyjuice_status === 'succeed',
     timestamp: tx.timestamp ? tx.timestamp * 1000 : -1,
     to: tx.to,
     toAlias: tx.to_alias,

@@ -22,6 +22,8 @@
   "timestamp": "时间",
   "success": "成功",
   "finalizeState": "确定性状态",
+  "status": "交易状态",
+  "failed": "失败",
   "age": "时间",
   "txListTitle": "交易列表关联账户",
   "pending": "等待中",
