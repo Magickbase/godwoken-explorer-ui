@@ -18,7 +18,7 @@ import BigNumber from 'bignumber.js'
 import TxStatusIcon from './TxStatusIcon'
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/Pagination'
-import { timeDistance, CKB_DECIMAL, getTxListRes } from 'utils'
+import { timeDistance, getTxListRes } from 'utils'
 
 type ParsedTxList = ReturnType<typeof getTxListRes>
 
@@ -117,9 +117,9 @@ const TxList: React.FC<{
                       </Stack>
                     </Stack>
                   </TableCell>
-                  <TableCell sx={{ fontSize: { xs: 12, md: 14 }, whiteSpace: 'nowrap' }}>{`${new BigNumber(item.value)
-                    .dividedBy(CKB_DECIMAL)
-                    .toFormat()}`}</TableCell>
+                  <TableCell sx={{ fontSize: { xs: 12, md: 14 }, whiteSpace: 'nowrap' }}>{`${new BigNumber(
+                    item.value,
+                  ).toFormat()}`}</TableCell>
                   <TableCell>
                     <Chip label={item.type} size="small" variant="outlined" color="primary" />
                   </TableCell>

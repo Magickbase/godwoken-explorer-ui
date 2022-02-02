@@ -155,11 +155,7 @@ const Tx = (initState: State) => {
     },
     {
       label: 'value',
-      value: (
-        <Typography variant="body2">{`${new BigNumber(tx.value || '0')
-          .dividedBy(CKB_DECIMAL)
-          .toString()} CKB`}</Typography>
-      ),
+      value: <Typography variant="body2">{`${new BigNumber(tx.value || '0').toFormat()} CKB`}</Typography>,
     },
     // tx.receiveEthAddress
     //   ? {
