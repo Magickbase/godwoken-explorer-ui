@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
+import NextLink from 'next/link'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import {
   Alert,
@@ -237,8 +238,17 @@ const Block = (initState: State) => {
       label: 'parentHash',
       value: (
         <Tooltip title={block.parentHash} placement="top">
-          <Typography variant="body2" className="mono-font" overflow="hidden" textOverflow="ellipsis" color="#000000de">
-            {block.parentHash}
+          <Typography
+            variant="body2"
+            overflow="hidden"
+            textOverflow="ellipsis"
+            sx={{ width: 'fit-content', maxWidth: '100%' }}
+          >
+            <NextLink href={`/block/${block.parentHash}`}>
+              <Link href={`/block/${block.parentHash}`} underline="none" color="secondary">
+                {block.parentHash}
+              </Link>
+            </NextLink>
           </Typography>
         </Tooltip>
       ),
