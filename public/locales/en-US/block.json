@@ -12,6 +12,11 @@
   "pending": "pending",
   "committed": "committed",
   "finalized": "finalized",
+  "size": "Size",
+  "gasUsed": "gas used",
+  "gasLimit": "gas limit",
+  "parentHash": "parent hash",
+  "layer1Info": "Layer1 Info",
   "transactionRecords": "Transactions",
   "bridgedRecords": "Bridged Transfers"
 }

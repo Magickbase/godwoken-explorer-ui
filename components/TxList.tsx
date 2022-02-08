@@ -54,7 +54,7 @@ const TxList: React.FC<{
                 <TableRow key={item.hash}>
                   <TableCell>
                     <Stack direction="row" alignItems="center">
-                      <TxStatusIcon status={item.status} />
+                      <TxStatusIcon status={item.status} isSuccess={item.isSuccess} />
                       <Tooltip title={item.hash} placement="top">
                         <Box>
                           <NextLink href={`/tx/${item.hash}`}>
