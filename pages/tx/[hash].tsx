@@ -9,6 +9,7 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
+  Chip,
   colors,
   Paper,
   Container,
@@ -27,7 +28,11 @@ import {
   Tabs,
   Tab,
 } from '@mui/material'
-import { OpenInNew as OpenInNewIcon, ContentCopyOutlined as CopyIcon } from '@mui/icons-material'
+import {
+  OpenInNew as OpenInNewIcon,
+  ContentCopyOutlined as CopyIcon,
+  ErrorOutlineOutlined as ErrorIcon,
+} from '@mui/icons-material'
 import { ExpandMore } from '@mui/icons-material'
 import { ethers } from 'ethers'
 import BigNumber from 'bignumber.js'
@@ -184,6 +189,12 @@ const Tx = (initState: State) => {
       : null,
   ]
   const basicInfo = [
+    tx.isSuccess
+      ? null
+      : {
+          label: 'status',
+          value: <Chip icon={<ErrorIcon />} label={t(`failed`)} color="warning" size="small" />,
+        },
     { label: 'finalizeState', value: <Typography variant="body2">{t(tx.status)}</Typography> },
     { label: 'type', value: <Typography variant="body2">{tx.type.replace(/_/g, ' ')}</Typography> },
     {
@@ -359,13 +370,15 @@ const Tx = (initState: State) => {
                 sx={{ textTransform: 'capitalize' }}
               >
                 <Divider variant="middle" />
-                {basicInfo.map(field =>
-                  field ? (
-                    <ListItem key={field.label}>
-                      <ListItemText primary={t(field.label)} secondary={field.value} />
-                    </ListItem>
-                  ) : null,
-                )}
+                {basicInfo
+                  .filter(v => v)
+                  .map(field =>
+                    field ? (
+                      <ListItem key={field.label}>
+                        <ListItemText primary={t(field.label)} secondary={field.value} />
+                      </ListItem>
+                    ) : null,
+                  )}
               </List>
             </Grid>
           </Grid>

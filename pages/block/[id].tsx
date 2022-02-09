@@ -1,8 +1,8 @@
-import type { API } from 'utils/api/utils'
 import { useEffect, useState } from 'react'
 import { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
+import NextLink from 'next/link'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import {
   Alert,
@@ -22,6 +22,7 @@ import {
   Snackbar,
 } from '@mui/material'
 import { OpenInNew as OpenInNewIcon, ContentCopyOutlined as CopyIcon } from '@mui/icons-material'
+import BigNumber from 'bignumber.js'
 import SubpageHead from 'components/SubpageHead'
 import TxList from 'components/TxList'
 import BridgedRecordList from 'components/BridgedRecordList'
@@ -43,17 +44,19 @@ import {
   TabNotFoundException,
 } from 'utils'
 
+type RawBlock = Parameters<typeof getBlockRes>[0]
+type ParsedBlock = ReturnType<typeof getBlockRes>
 type ParsedTxList = ReturnType<typeof getTxListRes>
 type ParsedBridgedRecordList = ReturnType<typeof getBridgedRecordListRes>
 
 const tabs = ['transactions', 'bridged']
 
-type State = API.Block.Parsed & Partial<{ txList: ParsedTxList; bridgedRecordList: ParsedBridgedRecordList }>
+type State = ParsedBlock & Partial<{ txList: ParsedTxList; bridgedRecordList: ParsedBridgedRecordList }>
 
 const Block = (initState: State) => {
   const [block, setBlock] = useState(initState)
   const [isCopied, setIsCopied] = useState(false)
-  const [t] = useTranslation('block')
+  const [t, { language }] = useTranslation('block')
   const {
     push,
     query: { tab = 'transactions' },
@@ -65,24 +68,11 @@ const Block = (initState: State) => {
 
   useWS(
     `${CHANNEL.BLOCK_INFO}${block.number}`,
-    (init: API.Block.Raw) => {
-      setBlock(prev => ({ ...prev, ...getBlockRes(init) }))
+    (init: RawBlock) => {
+      // setBlock(prev => ({ ...prev, ...getBlockRes(init) }))
     },
-    ({
-      l1_block,
-      tx_hash,
-      finalize_state,
-    }: Partial<Pick<API.Block.Raw, 'l1_block' | 'tx_hash' | 'finalize_state'>>) => {
-      let update: Partial<Pick<API.Block.Parsed, 'l1Block' | 'txHash' | 'finalizeState'>> = {}
-      if (l1_block) {
-        update.l1Block = l1_block
-      }
-      if (tx_hash) {
-        update.txHash = tx_hash
-      }
-      if (finalize_state) {
-        update.finalizeState = finalize_state
-      }
+    (rawUpdate: RawBlock) => {
+      const update = getBlockRes(rawUpdate)
       setBlock(prev => ({ ...prev, ...update }))
     },
     [setBlock, block.number],
@@ -119,29 +109,10 @@ const Block = (initState: State) => {
       label: 'timestamp',
       value: (
         <Typography variant="body2">
-          <time dateTime={new Date(block.timestamp).toISOString()} title={t('timestamp')}>
-            {formatDatetime(block.timestamp)}
-          </time>
-        </Typography>
-      ),
-    },
-    {
-      label: 'l1Block',
-      value: (
-        <Typography variant="body2">
-          {block.l1Block ? (
-            <Link
-              href={`${CKB_EXPLORER_URL}/block/${block.l1Block}`}
-              underline="none"
-              target="_blank"
-              rel="noopener noreferrer"
-              display="flex"
-              alignItems="center"
-              color="secondary"
-            >
-              {formatInt(block.l1Block)}
-              <OpenInNewIcon sx={{ fontSize: 16, ml: 0.5 }} />
-            </Link>
+          {block.timestamp > 0 ? (
+            <time dateTime={new Date(block.timestamp).toISOString()} title={t('timestamp')}>
+              {formatDatetime(block.timestamp)}
+            </time>
           ) : (
             t('pending')
           )}
@@ -149,28 +120,90 @@ const Block = (initState: State) => {
       ),
     },
     {
-      label: 'l1TxHash',
-      value: (
-        <Typography variant="body2">
-          {block.txHash ? (
-            <Link
-              href={`${CKB_EXPLORER_URL}/transaction/${block.txHash}`}
-              underline="none"
-              target="_blank"
-              rel="noopener noreferrer"
-              display="flex"
-              alignItems="center"
-              color="secondary"
-            >
-              <Typography variant="body2" overflow="hidden" textOverflow="ellipsis" className="mono-font">
-                {block.txHash}
-              </Typography>
-              <OpenInNewIcon sx={{ fontSize: 16, ml: 0.5 }} />
-            </Link>
+      label: 'layer1Info',
+      value: block.layer1 ? (
+        <Stack sx={{ whiteSpace: 'nowrap', flexDirection: { xs: 'column', md: 'row' } }} color="#000000de">
+          {language === 'zh-CN' ? (
+            <>
+              <Stack direction="row">
+                <Typography variant="body2">区块</Typography>
+                <Link
+                  href={`${CKB_EXPLORER_URL}/block/${block.layer1.block}`}
+                  underline="none"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  display="flex"
+                  alignItems="center"
+                  color="secondary"
+                  mx={1}
+                >
+                  {formatInt(block.layer1.block)}
+                  <OpenInNewIcon sx={{ fontSize: 16, ml: 0.5 }} />
+                </Link>
+                中的
+              </Stack>
+              <Stack direction="row">
+                交易
+                <Link
+                  href={`${CKB_EXPLORER_URL}/transaction/${block.layer1.txHash}`}
+                  underline="none"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  display="flex"
+                  alignItems="center"
+                  color="secondary"
+                  ml={1}
+                  width={{ xs: 'calc(100% - 40px)', md: 'unset' }}
+                >
+                  <Typography variant="body2" overflow="hidden" textOverflow="ellipsis" className="mono-font">
+                    {block.layer1.txHash}
+                  </Typography>
+                  <OpenInNewIcon sx={{ fontSize: 16, ml: 0.5 }} />
+                </Link>
+              </Stack>
+            </>
           ) : (
-            t('pending')
+            <>
+              <Stack direction="row" alignItems="center">
+                Transaction
+                <Link
+                  href={`${CKB_EXPLORER_URL}/transaction/${block.layer1.txHash}`}
+                  underline="none"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  display="flex"
+                  alignItems="center"
+                  color="secondary"
+                  mx={1}
+                  width={{ xs: 'calc(100% - 90px)', md: 'unset' }}
+                >
+                  <Typography variant="body2" overflow="hidden" textOverflow="ellipsis" className="mono-font">
+                    {block.layer1.txHash}
+                  </Typography>
+                  <OpenInNewIcon sx={{ fontSize: 16, ml: 0.5 }} />
+                </Link>
+              </Stack>
+              <Stack direction="row" alignItems="center">
+                in block
+                <Link
+                  href={`${CKB_EXPLORER_URL}/block/${block.layer1.block}`}
+                  underline="none"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  display="flex"
+                  alignItems="center"
+                  color="secondary"
+                  ml={1}
+                >
+                  {formatInt(block.layer1.block)}
+                  <OpenInNewIcon sx={{ fontSize: 16, ml: 0.5 }} />
+                </Link>
+              </Stack>
+            </>
           )}
-        </Typography>
+        </Stack>
+      ) : (
+        <Typography variant="body2">{t('pending')}</Typography>
       ),
     },
     {
@@ -187,7 +220,38 @@ const Block = (initState: State) => {
     },
     {
       label: 'aggregator',
-      value: <Typography variant="body2">{block.aggregator}</Typography>,
+      value: <Typography variant="body2">{block.miner.hash}</Typography>,
+    },
+    {
+      label: 'size',
+      value: <Typography variant="body2">{new BigNumber(block.size || '0').toFormat() + ' bytes'}</Typography>,
+    },
+    {
+      label: 'gasUsed',
+      value: <Typography variant="body2">{new BigNumber(block.gas.used).toFormat()}</Typography>,
+    },
+    {
+      label: 'gasLimit',
+      value: <Typography variant="body2">{new BigNumber(block.gas.limit).toFormat()}</Typography>,
+    },
+    {
+      label: 'parentHash',
+      value: (
+        <Tooltip title={block.parentHash} placement="top">
+          <Typography
+            variant="body2"
+            overflow="hidden"
+            textOverflow="ellipsis"
+            sx={{ width: 'fit-content', maxWidth: '100%' }}
+          >
+            <NextLink href={`/block/${block.parentHash}`}>
+              <Link href={`/block/${block.parentHash}`} underline="none" color="secondary">
+                {block.parentHash}
+              </Link>
+            </NextLink>
+          </Typography>
+        </Tooltip>
+      ),
     },
   ]
   const title = `${t('block')} # ${formatInt(block.number)}`
@@ -266,7 +330,7 @@ export const getServerSideProps: GetServerSideProps<State> = async ({ locale, re
 
     const bridgedRecordList =
       tab === 'bridged' && block.hash
-        ? await fetchBridgedRecordList({ block_number: block.number, page: query.page as string })
+        ? await fetchBridgedRecordList({ block_number: block.number.toString(), page: query.page as string })
         : null
 
     return { props: { ...block, ...lng, txList, bridgedRecordList } }
