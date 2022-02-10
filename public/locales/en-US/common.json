@@ -26,5 +26,10 @@
   "notifications": {
     "domainMigrationPrefix": "Godwoken Explorer will migrate from layerview.io to ",
     "domainMigrationSuffix": " since 2022-02-24 for clarity."
-  }
+  },
+  "page_size": {
+    "show": "Show",
+    "records": "records"
+  },
+  "view_all_blocks": "View all blocks"
 }

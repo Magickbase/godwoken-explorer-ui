@@ -19,6 +19,7 @@ import {
   Chip,
   Divider,
   Paper,
+  IconButton,
 } from '@mui/material'
 import {
   LineWeightOutlined as BlockHeightIcon,
@@ -26,6 +27,7 @@ import {
   SpeedOutlined as TpsIcon,
   FormatListNumberedOutlined as TxCountIcon,
   ErrorOutlineOutlined as ErrorIcon,
+  ReadMoreOutlined as ReadMoreIcon,
 } from '@mui/icons-material'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
@@ -79,12 +81,24 @@ const Statistic = ({ blockCount, txCount, tps, accountCount }: State['statistic'
 }
 
 const BlockList = ({ list }: { list: State['blockList'] }) => {
-  const [t, { language }] = useTranslation('block')
+  const [t, { language }] = useTranslation(['block', 'common'])
   return (
     <List
       subheader={
-        <ListSubheader component="div" sx={{ textTransform: 'capitalize', bgcolor: 'transparent' }}>
+        <ListSubheader
+          component="div"
+          sx={{ textTransform: 'capitalize', bgcolor: 'transparent', display: 'flex', justifyContent: 'space-between' }}
+        >
           {t(`latestBlocks`)}
+          <Tooltip placement="top" title={t(`view_all_blocks`, { ns: 'common' })}>
+            <Box>
+              <NextLink href={`/blocks`}>
+                <IconButton>
+                  <ReadMoreIcon />
+                </IconButton>
+              </NextLink>
+            </Box>
+          </Tooltip>
         </ListSubheader>
       }
       dense
