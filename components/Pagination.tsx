@@ -3,6 +3,7 @@ import NextLink from 'next/link'
 import { useRouter } from 'next/router'
 import { Box, Link } from '@mui/material'
 
+// TODO: fix total count calculation then add page size selector
 const PAGE_SIZE = 10
 const Pagination: React.FC<{ total: number; current: number }> = ({ total, current }) => {
   const [t] = useTranslation('common')
