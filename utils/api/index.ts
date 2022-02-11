@@ -1,5 +1,7 @@
 export * from './home'
+
 export * from './block'
+export * from './blocks'
 
 export * from './txs'
 export * from './tx'

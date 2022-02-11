@@ -14,5 +14,11 @@
   "withdrawal": "提取",
   "layer1Txn": "CKB 交易",
   "pending": "待确认",
-  "account": "账户"
+  "account": "账户",
+  "block_from_to": "#{{from}} 到 #{{to}} 的区块",
+  "block_list_title": "区块",
+  "block_number": "区块",
+  "tx_count": "交易",
+  "gas_used": "gas 消耗",
+  "gas_limit": "gas 上限"
 }
