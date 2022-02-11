@@ -1,17 +1,14 @@
 import type { GetServerSideProps } from 'next'
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
-import { useRouter } from 'next/router'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import {
   Avatar,
-  Box,
   Container,
   Paper,
   IconButton,
   Stack,
   Link,
-  Divider,
   Tooltip,
   TableContainer,
   Table,

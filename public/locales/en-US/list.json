@@ -14,5 +14,11 @@
   "withdrawal": "Withdrawal",
   "layer1Txn": "CKB Txn",
   "pending": "Pending",
-  "account": "Account"
+  "account": "Account",
+  "block_from_to": "Block from #{{from}} to #{{to}}",
+  "block_list_title": "Blocks",
+  "block_number": "block",
+  "tx_count": "txn",
+  "gas_used": "gas used",
+  "gas_limit": "gas limit"
 }
