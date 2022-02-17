@@ -99,7 +99,10 @@ const Token = ({ token, transferList, bridgedRecordList }: Props) => {
     },
   ]
   const tokenData = [
-    { label: 'totalSupply', value: <Typography variant="body2">{token.supply || '-'}</Typography> },
+    {
+      label: token.type === 'bridge' ? 'circulatingSupply' : 'totalSupply',
+      value: <Typography variant="body2">{token.supply || '-'}</Typography>,
+    },
     // {label: 'value', value: token.supply ?? '-'},
     { label: 'holderCount', value: <Typography variant="body2">{token.holderCount || '-'}</Typography> },
     { label: 'transferCount', value: <Typography variant="body2">{token.transferCount || '-'}</Typography> },
