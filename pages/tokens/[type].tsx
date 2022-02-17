@@ -38,7 +38,7 @@ const TokenList = ({ meta, tokens, type }: State) => {
   const headers = [
     { key: 'token' },
     { key: 'address', label: 'address' },
-    { key: 'totalSupply' },
+    { key: type === 'bridge' ? 'circulatingSupply' : 'totalSupply' },
     { key: 'holderCount' },
   ]
 
