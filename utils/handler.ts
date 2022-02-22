@@ -1,28 +1,28 @@
 import { ServerResponse } from 'http'
-// import { NotFoundException } from './exceptions'
+import { NotFoundException } from './exceptions'
 import { fetchSearch } from './api'
 
-export const handleApiError = (_err: Error, _res: ServerResponse, _locale: string, _query?: string) => {
-  return {
-    redirect: {
-      destination: `/notification`,
-      permanent: false,
-    },
-  }
-  // if (err instanceof NotFoundException) {
-  //   res.statusCode = 404
-  //   return {
-  //     redirect: {
-  //       destination: `/${locale}/404${query ? '?query=' + query : ''}`,
-  //       permanent: false,
-  //     },
-  //   }
+export const handleApiError = (err: Error, res: ServerResponse, locale: string, query?: string) => {
+  // return {
+  //   redirect: {
+  //     destination: `/notification`,
+  //     permanent: false,
+  //   },
   // }
-  // console.warn(err.message)
-  // res.setHeader('location', `/error?message=${err.message}`)
-  // res.statusCode = 302
-  // res.end()
-  // return
+  if (err instanceof NotFoundException) {
+    res.statusCode = 404
+    return {
+      redirect: {
+        destination: `/${locale}/404${query ? '?query=' + query : ''}`,
+        permanent: false,
+      },
+    }
+  }
+  console.warn(err.message)
+  res.setHeader('location', `/error?message=${err.message}`)
+  res.statusCode = 302
+  res.end()
+  return
 }
 
 export const handleSearchKeyPress = async (e: React.KeyboardEvent<HTMLInputElement>, push: (url: string) => any) => {
