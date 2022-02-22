@@ -49,53 +49,30 @@ interface Parsed {
 }
 
 interface Erc20Raw {
-  block_hash: string
   block_number: number
-  fee: string
   from: string
-  gas_limit: number
-  gas_price: string
-  gas_used: number
   hash: string
-  l1_block_number: number | null
-  method: string
-  nonce: number
-  receive_eth_address: string
   status: TxStatus
   polyjuice_status: 'succeed' | 'failed'
   timestamp: number
   to: string
-  to_alias: string
   transfer_value: string
-  type: TxType
   udt_id: number
   udt_symbol: string
-  value: string
+  udt_name: string
 }
 
 interface Erc20Parsed {
-  blockHash: string
   blockNumber: number
-  fee: string
   from: string
-  gasLimit: number
-  gasPrice: string
-  gasUsed: number
   hash: string
-  l1BlockNumber: number | null
-  method: string
-  nonce: number
-  receiveEthAddress: string
   status: TxStatus
   isSuccess: boolean
   timestamp: number
   to: string
-  toAlias: string
   transferValue: string
-  type: TxType
   udtId: number
   udtSymbol: string
-  value: string
 }
 
 export const getTxListRes = (txListRes: {
@@ -141,27 +118,15 @@ export const getERC20TransferListRes = (list: {
   page: list.page,
   totalCount: list.total_count,
   txs: list.txs.map(tx => ({
-    blockHash: tx.block_hash,
     blockNumber: tx.block_number,
-    fee: tx.fee,
     from: tx.from,
-    gasLimit: tx.gas_limit,
-    gasPrice: tx.gas_price,
-    gasUsed: tx.gas_used,
     hash: tx.hash,
-    l1BlockNumber: tx.l1_block_number || null,
-    method: tx.method,
-    nonce: tx.nonce,
-    receiveEthAddress: tx.receive_eth_address,
     status: tx.status,
     isSuccess: tx.polyjuice_status === 'succeed',
     timestamp: tx.timestamp ? tx.timestamp * 1000 : -1,
     to: tx.to,
-    toAlias: tx.to_alias,
     transferValue: tx.transfer_value,
-    type: tx.type,
     udtId: tx.udt_id,
-    value: tx.value,
     udtSymbol: tx.udt_symbol,
   })),
 })
