@@ -3,6 +3,12 @@ import { NotFoundException } from './exceptions'
 import { fetchSearch } from './api'
 
 export const handleApiError = (err: Error, res: ServerResponse, locale: string, query?: string) => {
+  // return {
+  //   redirect: {
+  //     destination: `/notification`,
+  //     permanent: false,
+  //   },
+  // }
   if (err instanceof NotFoundException) {
     res.statusCode = 404
     return {
