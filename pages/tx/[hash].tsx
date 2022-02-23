@@ -191,7 +191,7 @@ const Tx = (initState: State) => {
                 {tx.udtSymbol?.[0] ?? '?'}
               </Avatar>
               <Typography variant="body2" color="#000000de">{`${new BigNumber(tx.transferValue || '0').toString()} ${
-                tx.udtSymbol
+                tx.udtSymbol ?? ''
               }`}</Typography>
             </Stack>
           ),
