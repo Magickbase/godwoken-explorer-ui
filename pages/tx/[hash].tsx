@@ -32,6 +32,7 @@ import {
   OpenInNew as OpenInNewIcon,
   ContentCopyOutlined as CopyIcon,
   ErrorOutlineOutlined as ErrorIcon,
+  AccessTimeOutlined as PendingIcon,
 } from '@mui/icons-material'
 import { ExpandMore } from '@mui/icons-material'
 import { ethers } from 'ethers'
@@ -189,11 +190,16 @@ const Tx = (initState: State) => {
       : null,
   ]
   const basicInfo = [
-    tx.isSuccess
+    tx.polyjuiceStatus === 'succeed'
       ? null
       : {
           label: 'status',
-          value: <Chip icon={<ErrorIcon />} label={t(`failed`)} color="warning" size="small" />,
+          value:
+            tx.polyjuiceStatus === 'failed' ? (
+              <Chip icon={<ErrorIcon />} label={t(`failed`)} color="warning" size="small" />
+            ) : (
+              <Chip icon={<PendingIcon />} label={t(`pending`)} color="info" size="small" />
+            ),
         },
     { label: 'finalizeState', value: <Typography variant="body2">{t(tx.status)}</Typography> },
     { label: 'type', value: <Typography variant="body2">{tx.type.replace(/_/g, ' ')}</Typography> },

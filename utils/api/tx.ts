@@ -11,8 +11,8 @@ interface Raw {
   gas_used: number
   hash: string
   nonce: number
+  polyjuice_status: 'succeed' | 'failed' | null
   status?: TxStatus
-  polyjuice_status: 'succeed' | 'failed'
   timestamp: number
   from: string
   to: string
@@ -47,7 +47,7 @@ interface Parsed {
   hash: string
   nonce: number
   status: TxStatus
-  isSuccess: boolean
+  polyjuiceStatus: 'succeed' | 'failed' | 'pending'
   timestamp: number
   from: string
   to: string
@@ -81,7 +81,7 @@ export const getTxRes = (tx: Raw): Parsed => ({
   hash: tx.hash,
   nonce: tx.nonce,
   status: tx.status ?? 'pending',
-  isSuccess: tx.polyjuice_status === 'succeed',
+  polyjuiceStatus: tx.polyjuice_status ?? 'pending',
   timestamp: tx.timestamp ? tx.timestamp * 1000 : -1,
   from: tx.from,
   to: tx.to,
