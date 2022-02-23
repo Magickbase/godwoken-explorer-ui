@@ -198,7 +198,7 @@ const Tx = (initState: State) => {
             tx.polyjuiceStatus === 'failed' ? (
               <Chip icon={<ErrorIcon />} label={t(`failed`)} color="warning" size="small" />
             ) : (
-              <Chip icon={<PendingIcon />} label={t(`pending`)} color="info" size="small" />
+              <Chip icon={<PendingIcon />} label={t(`pending`)} size="small" />
             ),
         },
     { label: 'finalizeState', value: <Typography variant="body2">{t(tx.status)}</Typography> },
