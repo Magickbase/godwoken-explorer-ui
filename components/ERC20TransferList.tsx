@@ -34,7 +34,6 @@ const TxList: React.FC<{
               <TableCell component="th">{t('txHash')}</TableCell>
               <TableCell component="th">{t('block')} </TableCell>
               <TableCell component="th">{t('age')} </TableCell>
-              <TableCell component="th">{t('method')} </TableCell>
               <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }} component="th">
                 {t('from')}
               </TableCell>
@@ -93,27 +92,28 @@ const TxList: React.FC<{
                       {timeDistance(item.timestamp, language)}
                     </time>
                   </TableCell>
-                  <TableCell sx={{ whiteSpace: 'nowrap', fontSize: { xs: 12, md: 14 } }}>{item.method}</TableCell>
                   <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                     <Address address={item.from} size="normal" />
                   </TableCell>
                   <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                    {item.receiveEthAddress ? <Address address={item.receiveEthAddress} size="normal" /> : null}
+                    {item.to ? <Address address={item.to} size="normal" /> : null}
                   </TableCell>
                   <TableCell sx={{ display: { xs: 'table-cell', md: 'none' } }}>
                     <Stack>
                       <Stack direction="row" justifyContent="space-between">
-                        <Typography fontSize={12} sx={{ textTransform: 'capitalize', mr: 1 }}>{`${t(
-                          'from',
-                        )}:`}</Typography>
+                        <Typography
+                          fontSize={12}
+                          sx={{ textTransform: 'capitalize', mr: 1, whiteSpace: 'nowrap' }}
+                        >{`${t('from')}:`}</Typography>
                         <Address leading={5} address={item.from} />
                       </Stack>
 
                       <Stack direction="row" justifyContent="space-between">
-                        <Typography fontSize={12} sx={{ textTransform: 'capitalize', mr: 1 }}>{`${t(
-                          'to',
-                        )}:`}</Typography>
-                        {item.receiveEthAddress ? <Address address={item.receiveEthAddress} leading={5} /> : null}
+                        <Typography
+                          fontSize={12}
+                          sx={{ textTransform: 'capitalize', mr: 1, whiteSpace: 'nowrap' }}
+                        >{`${t('to')}:`}</Typography>
+                        {item.to ? <Address address={item.to} leading={5} /> : null}
                       </Stack>
                     </Stack>
                   </TableCell>

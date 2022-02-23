@@ -106,8 +106,17 @@ const Tx = (initState: State) => {
         setTx(prev => ({ ...getTxRes(init), gasUsed: prev.gasUsed, gasLimit: prev.gasLimit }))
       }
     },
-    ({ status = 'pending', l1_block_number }: Partial<Pick<RawTx, 'status' | 'l1_block_number'>>) => {
-      setTx(prev => ({ ...prev, status, l1BlockNumber: l1_block_number }))
+    ({
+      status = 'pending',
+      l1_block_number,
+      polyjuice_status,
+    }: Partial<Pick<RawTx, 'status' | 'l1_block_number' | 'polyjuice_status'>>) => {
+      setTx(prev => ({
+        ...prev,
+        status,
+        l1BlockNumber: l1_block_number,
+        polyjuiceStatus: polyjuice_status ?? prev.polyjuiceStatus,
+      }))
     },
     [setTx, tx.hash],
   )
