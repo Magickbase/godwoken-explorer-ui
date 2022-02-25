@@ -23,10 +23,6 @@
   "addressCopied": "地址已复制",
   "blockHashCopied": "区块哈希已复制",
   "txHashCopied": "交易哈希已复制",
-  "notifications": {
-    "domainMigrationPrefix": "为了清晰定位和方便访问, Godwoken 浏览器将在 2022 年 2 月 24日从 layerview.io 迁移至 ",
-    "domainMigrationSuffix": "."
-  },
   "page_size": {
     "show": "显示",
     "records": "条记录"

@@ -23,10 +23,6 @@
   "addressCopied": "Address copied to clipboard",
   "blockHashCopied": "Block hash copied to clipboard",
   "txHashCopied": "Transaction hash copied to clipboard",
-  "notifications": {
-    "domainMigrationPrefix": "Godwoken Explorer will migrate from layerview.io to ",
-    "domainMigrationSuffix": " since 2022-02-24 for clarity."
-  },
   "page_size": {
     "show": "Show",
     "records": "records"
