@@ -32,6 +32,7 @@ import ERC20TransferList from 'components/ERC20TransferList'
 import UdtList from 'components/UdtList'
 import TxList from 'components/TxList'
 import BridgedRecordList from 'components/BridgedRecordList'
+import ContractInfo from 'components/ContractInfo'
 import {
   handleCopy,
   fetchAccount,
@@ -57,7 +58,7 @@ type ParsedBridgedRecordList = ReturnType<typeof getBridgedRecordListRes>
 
 type State = API.Account.Parsed &
   Partial<{ txList: ParsedTxList; transferList: ParsedTransferList; bridgedRecordList: ParsedBridgedRecordList }>
-const tabs = ['transactions', 'erc20', 'bridged', 'assets']
+const tabs = ['transactions', 'erc20', 'bridged', 'assets', 'contract']
 const Account = (initState: State) => {
   const {
     push,
@@ -151,7 +152,7 @@ const Account = (initState: State) => {
               <Grid item xs={12} md={6}>
                 {account.metaContract ? <MetaContract {...account.metaContract} /> : null}
                 {account.user ? <User {...account.user} /> : null}
-                {account.smartContract ? <SmartContract /> : null}
+                {account.smartContract ? <SmartContract txHash={account.smartContract.txHash} /> : null}
                 {account.polyjuice ? <Polyjuice {...account.polyjuice} /> : null}
                 {account.sudt ? <SUDT {...account.sudt} /> : null}
               </Grid>
@@ -164,17 +165,20 @@ const Account = (initState: State) => {
                 t(`ERC20Records`),
                 t(`bridgedRecords`),
                 `${t('userDefinedAssets')} (${udtList.length})`,
-              ].map((label, idx) => (
-                <Tab
-                  key={label}
-                  label={label}
-                  onClick={e => {
-                    e.stopPropagation()
-                    e.preventDefault()
-                    push(`/account/${account.ethAddr}?tab=${tabs[idx]}`)
-                  }}
-                />
-              ))}
+                accountType === 'smartContract' ? t('contract') : null,
+              ].map((label, idx) =>
+                label ? (
+                  <Tab
+                    key={label}
+                    label={label}
+                    onClick={e => {
+                      e.stopPropagation()
+                      e.preventDefault()
+                      push(`/account/${account.ethAddr}?tab=${tabs[idx]}`)
+                    }}
+                  />
+                ) : null,
+              )}
             </Tabs>
             <Divider />
             {tab === 'transactions' && account.txList ? <TxList list={account.txList} /> : null}
@@ -183,6 +187,9 @@ const Account = (initState: State) => {
               <BridgedRecordList list={account.bridgedRecordList} />
             ) : null}
             {tab === 'assets' ? <UdtList list={udtList} /> : null}
+            {tab === 'contract' && account.smartContract ? (
+              <ContractInfo address={account.ethAddr} {...account.smartContract} />
+            ) : null}
           </Paper>
         </Stack>
         <Snackbar

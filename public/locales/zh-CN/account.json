@@ -53,5 +53,19 @@
   "bridged": "桥接",
   "transactionRecords": "交易记录",
   "ERC20Records": "ERC20 交易记录",
-  "bridgedRecords": "桥接交易记录"
+  "bridgedRecords": "桥接交易记录",
+  "contract_name": "合约名称",
+  "compiler_version": "编译器版本",
+  "compiler_file_format": "合约文件格式",
+  "contract_source_code": "合约源码",
+  "abi": "ABI",
+  "constructor_arguments": "合约构造参数",
+  "deployment_transaction_hash": "部署交易哈希",
+  "code": "代码",
+  "read_contract": "合约读取操作",
+  "write_contract": "合约写入操作",
+  "contract": "合约",
+  "parameters": "参数",
+  "response": "返回值",
+  "query": "查询"
 }
