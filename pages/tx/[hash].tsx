@@ -1,10 +1,10 @@
 import { useEffect, useState, useMemo } from 'react'
 import { GetServerSideProps } from 'next'
+import { useRouter } from 'next/router'
 import NextLink from 'next/link'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import {
-  Avatar,
   Alert,
   Accordion,
   AccordionSummary,
@@ -40,6 +40,7 @@ import BigNumber from 'bignumber.js'
 import SubpageHead from 'components/SubpageHead'
 import PageTitle from 'components/PageTitle'
 import Address from 'components/AddressInHalfPanel'
+import SimpleERC20TransferList from 'components/SimpleERC20TransferList'
 import {
   formatDatetime,
   fetchTx,
@@ -51,18 +52,26 @@ import {
   formatInt,
   handleCopy,
   CKB_DECIMAL,
-  nameToColor,
+  TabNotFoundException,
+  fetchERC20TransferList,
+  getERC20TransferListRes,
 } from 'utils'
 
+const tabs = ['erc20']
+type ParsedTransferList = ReturnType<typeof getERC20TransferListRes>
 type RawTx = Parameters<typeof getTxRes>[0]
 type ParsedTx = ReturnType<typeof getTxRes>
 
-type State = ParsedTx
+type State = ParsedTx & Partial<{ transferList: ParsedTransferList }>
 
 const Tx = (initState: State) => {
   const [tx, setTx] = useState(initState)
   const [inputMode, setInputMode] = useState<'raw' | 'decoded' | 'utf8'>('raw')
   const [isCopied, setIsCopied] = useState(false)
+  const {
+    push,
+    query: { tab = tabs[0] },
+  } = useRouter()
   const [t] = useTranslation('tx')
 
   const decodedInput = useMemo(() => {
@@ -160,43 +169,13 @@ const Tx = (initState: State) => {
       value: <Address address={tx.from} />,
     },
     {
-      label: tx.receiveEthAddress ? 'interactedContract' : 'to',
+      label: tx.toAlias ? 'interactedContract' : 'to',
       value: <Address address={tx.to} alias={tx.toAlias} />,
     },
     {
       label: 'value',
       value: <Typography variant="body2">{`${new BigNumber(tx.value || '0').toFormat()} CKB`}</Typography>,
     },
-    // tx.receiveEthAddress
-    //   ? {
-    //       label: 'erc20Receiver',
-    //       value: <Address address={tx.receiveEthAddress} />,
-    //     }
-    //   : null,
-    tx.receiveEthAddress
-      ? {
-          label: 'erc20Receiver',
-          value: <Address address={tx.receiveEthAddress} />,
-        }
-      : null,
-    tx.transferValue
-      ? {
-          label: 'erc20Value',
-          value: (
-            <Stack direction="row" alignItems="center" color="inherit">
-              <Avatar
-                src={tx.udtIcon ?? null}
-                sx={{ bgcolor: nameToColor(tx.udtSymbol), width: 20, height: 20, fontSize: 12, mr: 1 }}
-              >
-                {tx.udtSymbol?.[0] ?? '?'}
-              </Avatar>
-              <Typography variant="body2" color="#000000de">{`${new BigNumber(tx.transferValue || '0').toString()} ${
-                tx.udtSymbol ?? ''
-              }`}</Typography>
-            </Stack>
-          ),
-        }
-      : null,
   ]
   const basicInfo = [
     tx.polyjuiceStatus === 'succeed'
@@ -303,101 +282,122 @@ const Tx = (initState: State) => {
       <SubpageHead subtitle={`${title} ${tx.hash}`} />
       <Container sx={{ pb: 6 }}>
         <PageTitle>{title}</PageTitle>
-        <Paper>
-          <Grid container>
-            <Grid item xs={12} md={6}>
-              <List
-                subheader={<ListSubheader sx={{ bgcolor: 'transparent' }}>{t('overview')}</ListSubheader>}
-                sx={{ textTransform: 'capitalize' }}
-              >
-                <Divider variant="middle" />
-                {overview.map(field =>
-                  field ? (
-                    <ListItem key={field.label}>
-                      <ListItemText primary={t(field.label)} secondary={field.value} />
-                    </ListItem>
-                  ) : null,
-                )}
-                {tx.input ? (
-                  <Accordion sx={{ boxShadow: 'none', width: '100%' }}>
-                    <AccordionSummary sx={{ textTransform: 'capitalize' }} expandIcon={<ExpandMore />}>
-                      {t(`input`)}
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Stack>
-                        <Tabs value={inputMode} onChange={(_, v) => setInputMode(v)}>
-                          {inputContents.map(({ type }) => (
-                            <Tab
-                              key={type}
-                              value={type}
-                              label={t(`${type}Input`)}
-                              disableRipple
-                              sx={{ fontSize: 12 }}
-                            />
-                          ))}
-                        </Tabs>
-                        <Divider />
-                        <Typography
-                          variant="body2"
-                          component="pre"
-                          sx={{ wordBreak: 'break-all', whiteSpace: 'pre-wrap', maxHeight: '51ch', overflow: 'auto' }}
-                          p={2}
-                          mt={1}
-                          border="1px solid"
-                          borderColor="primary.light"
-                          borderRadius={1}
-                          bgcolor={colors.grey[50]}
-                          className="mono-font"
-                        >
-                          {inputContents.find(c => c.type === inputMode)?.text}
-                        </Typography>
-                      </Stack>
-                    </AccordionDetails>
-                  </Accordion>
-                ) : null}
-                {tx.scriptArgs ? (
-                  <Accordion sx={{ boxShadow: 'none', width: '100%' }}>
-                    <AccordionSummary sx={{ textTransform: 'capitalize' }} expandIcon={<ExpandMore />}>
-                      {t(`args`)}
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Typography
-                        variant="body2"
-                        component="pre"
-                        sx={{ wordBreak: 'break-all', whiteSpace: 'pre-wrap', maxHeight: '51ch', overflow: 'auto' }}
-                        p={2}
-                        border="1px solid"
-                        borderColor="primary.light"
-                        borderRadius={1}
-                        bgcolor={colors.grey[50]}
-                        className="mono-font"
-                      >
-                        {tx.scriptArgs}
-                      </Typography>
-                    </AccordionDetails>
-                  </Accordion>
-                ) : null}
-              </List>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <List
-                subheader={<ListSubheader sx={{ bgcolor: 'transparent' }}>{t('basicInfo')}</ListSubheader>}
-                sx={{ textTransform: 'capitalize' }}
-              >
-                <Divider variant="middle" />
-                {basicInfo
-                  .filter(v => v)
-                  .map(field =>
+        <Stack spacing={2}>
+          <Paper>
+            <Grid container>
+              <Grid item xs={12} md={6}>
+                <List
+                  subheader={<ListSubheader sx={{ bgcolor: 'transparent' }}>{t('overview')}</ListSubheader>}
+                  sx={{ textTransform: 'capitalize' }}
+                >
+                  <Divider variant="middle" />
+                  {overview.map(field =>
                     field ? (
                       <ListItem key={field.label}>
                         <ListItemText primary={t(field.label)} secondary={field.value} />
                       </ListItem>
                     ) : null,
                   )}
-              </List>
+                  {tx.input ? (
+                    <Accordion sx={{ boxShadow: 'none', width: '100%' }}>
+                      <AccordionSummary sx={{ textTransform: 'capitalize' }} expandIcon={<ExpandMore />}>
+                        {t(`input`)}
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Stack>
+                          <Tabs value={inputMode} onChange={(_, v) => setInputMode(v)}>
+                            {inputContents.map(({ type }) => (
+                              <Tab
+                                key={type}
+                                value={type}
+                                label={t(`${type}Input`)}
+                                disableRipple
+                                sx={{ fontSize: 12 }}
+                              />
+                            ))}
+                          </Tabs>
+                          <Divider />
+                          <Typography
+                            variant="body2"
+                            component="pre"
+                            sx={{ wordBreak: 'break-all', whiteSpace: 'pre-wrap', maxHeight: '51ch', overflow: 'auto' }}
+                            p={2}
+                            mt={1}
+                            border="1px solid"
+                            borderColor="primary.light"
+                            borderRadius={1}
+                            bgcolor={colors.grey[50]}
+                            className="mono-font"
+                          >
+                            {inputContents.find(c => c.type === inputMode)?.text}
+                          </Typography>
+                        </Stack>
+                      </AccordionDetails>
+                    </Accordion>
+                  ) : null}
+                  {tx.scriptArgs ? (
+                    <Accordion sx={{ boxShadow: 'none', width: '100%' }}>
+                      <AccordionSummary sx={{ textTransform: 'capitalize' }} expandIcon={<ExpandMore />}>
+                        {t(`args`)}
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Typography
+                          variant="body2"
+                          component="pre"
+                          sx={{ wordBreak: 'break-all', whiteSpace: 'pre-wrap', maxHeight: '51ch', overflow: 'auto' }}
+                          p={2}
+                          border="1px solid"
+                          borderColor="primary.light"
+                          borderRadius={1}
+                          bgcolor={colors.grey[50]}
+                          className="mono-font"
+                        >
+                          {tx.scriptArgs}
+                        </Typography>
+                      </AccordionDetails>
+                    </Accordion>
+                  ) : null}
+                </List>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <List
+                  subheader={<ListSubheader sx={{ bgcolor: 'transparent' }}>{t('basicInfo')}</ListSubheader>}
+                  sx={{ textTransform: 'capitalize' }}
+                >
+                  <Divider variant="middle" />
+                  {basicInfo
+                    .filter(v => v)
+                    .map(field =>
+                      field ? (
+                        <ListItem key={field.label}>
+                          <ListItemText primary={t(field.label)} secondary={field.value} />
+                        </ListItem>
+                      ) : null,
+                    )}
+                </List>
+              </Grid>
             </Grid>
-          </Grid>
-        </Paper>
+          </Paper>
+          <Paper>
+            <Tabs value={tabs.indexOf(tab as string)} variant="scrollable" scrollButtons="auto">
+              {['erc20_records'].map((label, idx) => (
+                <Tab
+                  key={label}
+                  label={t(label)}
+                  onClick={e => {
+                    e.stopPropagation()
+                    e.preventDefault()
+                    push(`/tx/${tx.hash}?tab=${tab[idx]}`)
+                  }}
+                />
+              ))}
+            </Tabs>
+            <Divider />
+            {tab === tabs[0] && initState.transferList ? (
+              <SimpleERC20TransferList list={initState.transferList} />
+            ) : null}
+          </Paper>
+        </Stack>
         <Snackbar
           open={isCopied}
           onClose={() => setIsCopied(false)}
@@ -417,15 +417,37 @@ const Tx = (initState: State) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<State, { hash: string }> = async ({ locale, res, params }) => {
+export const getServerSideProps: GetServerSideProps<State, { hash: string }> = async ({
+  locale,
+  res,
+  params,
+  query,
+}) => {
   const { hash } = params
+  const { tab = tabs[0] } = query
 
   try {
-    const tx = await fetchTx(hash)
-    const lng = await serverSideTranslations(locale, ['common', 'tx'])
-    return { props: { ...tx, ...lng } }
+    if (typeof tab !== 'string' || !tabs.includes(tab)) {
+      throw new TabNotFoundException()
+    }
+    const [tx, lng] = await Promise.all([fetchTx(hash), await serverSideTranslations(locale, ['common', 'tx', 'list'])])
+    const transferList =
+      tab === tabs[0] ? await fetchERC20TransferList({ tx_hash: hash, page: query.page as string }) : null
+    return { props: { ...tx, ...lng, transferList } }
   } catch (err) {
-    return handleApiError(err, res, locale, hash)
+    switch (true) {
+      case err instanceof TabNotFoundException: {
+        return {
+          redirect: {
+            destination: `/tx/${hash}`,
+            permanent: false,
+          },
+        }
+      }
+      default: {
+        return handleApiError(err, res, locale, hash)
+      }
+    }
   }
 }
 export default Tx

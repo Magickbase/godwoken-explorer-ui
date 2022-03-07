@@ -53,5 +53,19 @@
   "bridged": "bridged",
   "transactionRecords": "Transactions",
   "ERC20Records": "ERC20 Transfers",
-  "bridgedRecords": "Bridged Transfers"
+  "bridgedRecords": "Bridged Transfers",
+  "contract_name": "Contract Name",
+  "compiler_version": "Compiler Version",
+  "compiler_file_format": "Code File Format",
+  "contract_source_code": "Contract Source Code",
+  "abi": "ABI",
+  "constructor_arguments": "Constructor Arguments",
+  "deployment_transaction_hash": "Deployment Transaction Hash",
+  "code": "Code",
+  "read_contract": "Read Contract",
+  "write_contract": "Write Contract",
+  "contract": "Contract",
+  "parameters": "Parameters",
+  "response": "Response",
+  "query": "Query"
 }

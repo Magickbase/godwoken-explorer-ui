@@ -37,5 +37,6 @@
   "erc20Value": "ERC20 价值",
   "rawInput": "原文",
   "decodedInput": "解码",
-  "utf8Input": "UTF8"
+  "utf8Input": "UTF8",
+  "erc20_records": "ERC20 交易记录"
 }

@@ -37,5 +37,6 @@
   "erc20Value": "ERC20 Value",
   "rawInput": "Raw",
   "decodedInput": "Decoded",
-  "utf8Input": "UTF8"
+  "utf8Input": "UTF8",
+  "erc20_records": "ERC20 Transfers"
 }

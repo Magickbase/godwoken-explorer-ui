@@ -1,5 +1,5 @@
 import { NotFoundException } from '../exceptions'
-export { SERVER_URL } from '../constants'
+export { SERVER_URL, NODE_URL } from '../constants'
 export enum HttpStatus {
   NotFound = 404,
 }
@@ -142,6 +142,14 @@ export namespace API {
         smart_contract: {
           tx_hash: string
           udt_list: Array<UDT>
+          abi?: Array<any>
+          compiler_file_format?: string
+          compiler_version?: string
+          constructor_arguments?: string
+          contract_source_code?: string
+          deployment_tx_hash?: string
+          name?: string
+          other_info?: string
         }
       }>
     export type Parsed = Record<'id' | 'type' | 'ckb' | 'eth' | 'txCount' | 'ethAddr', string> &
@@ -165,6 +173,14 @@ export namespace API {
         smartContract: {
           txHash: string
           udtList: Array<UDT>
+          abi: Array<any>
+          compilerFileFormat: string
+          compilerVersion: string
+          constructorArguments: string
+          contractSourceCode: string
+          deploymentTxHash: string
+          name: string
+          otherInfo: string
         }
       }>
   }
