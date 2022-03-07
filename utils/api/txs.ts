@@ -131,7 +131,7 @@ export const getERC20TransferListRes = (list: {
   })),
 })
 export const fetchERC20TransferList = (
-  query: Partial<Record<'page' | 'udt_address' | 'eth_address', string>>,
+  query: Partial<Record<'page' | 'udt_address' | 'eth_address' | 'tx_hash', string>>,
 ): Promise<{ txs: Array<Erc20Parsed>; page: string; totalCount: string }> =>
   fetch(`${SERVER_URL}/transfers?${new URLSearchParams({ ...query, page: query.page || '1' })}`)
     .then(res => pretreat<{ txs: Array<Erc20Raw>; page: string; total_count: string }>(res))

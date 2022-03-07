@@ -21,7 +21,7 @@ import { timeDistance, getERC20TransferListRes } from 'utils'
 
 type ParsedTransferList = ReturnType<typeof getERC20TransferListRes>
 
-const TxList: React.FC<{
+const TransferList: React.FC<{
   list: ParsedTransferList
 }> = ({ list }) => {
   const [t, { language }] = useTranslation('list')
@@ -138,4 +138,4 @@ const TxList: React.FC<{
     </Box>
   )
 }
-export default TxList
+export default TransferList

@@ -46,6 +46,14 @@ const getPolyjuice = (polyjuice: API.Account.Raw['polyjuice']): API.Account.Pars
 const getSmartContract = (smartContract: API.Account.Raw['smart_contract']): API.Account.Parsed['smartContract'] => ({
   txHash: smartContract.tx_hash,
   udtList: smartContract.udt_list || [],
+  abi: smartContract.abi ?? [],
+  compilerFileFormat: smartContract.compiler_file_format ?? '',
+  compilerVersion: smartContract.compiler_version ?? '',
+  constructorArguments: smartContract.constructor_arguments ?? '',
+  contractSourceCode: smartContract.contract_source_code ?? '',
+  deploymentTxHash: smartContract.deployment_tx_hash ?? '',
+  name: smartContract.name ?? '',
+  otherInfo: smartContract.other_info ?? '',
 })
 
 export const getAccountRes = (account: API.Account.Raw): API.Account.Parsed => ({

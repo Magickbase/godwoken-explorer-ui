@@ -19,8 +19,6 @@ interface Raw {
   to_alias: string
   fee: string
   value: string
-  transfer_value?: string
-  receive_eth_address: string | null
   type: TxType
   udt_id: number | null
   udt_icon: string | null
@@ -54,8 +52,6 @@ interface Parsed {
   toAlias: string
   fee: string
   value: string
-  transferValue: string | null
-  receiveEthAddress: string | null
   type: TxType
   udtId: number | null
   udtIcon: string | null
@@ -88,8 +84,6 @@ export const getTxRes = (tx: Raw): Parsed => ({
   toAlias: tx.to_alias,
   fee: tx.fee,
   value: tx.value,
-  transferValue: tx.transfer_value ?? null,
-  receiveEthAddress: tx.receive_eth_address ?? null,
   type: tx.type,
   udtId: tx.udt_id ?? null,
   udtIcon: tx.udt_icon ?? null,
