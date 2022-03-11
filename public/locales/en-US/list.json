@@ -20,5 +20,11 @@
   "block_number": "block",
   "tx_count": "txn",
   "gas_used": "gas used",
-  "gas_limit": "gas limit"
+  "gas_limit": "gas limit",
+  "address": "address",
+  "contract_name": "contract name",
+  "compiler": "compiler",
+  "balance": "balance",
+  "compiler_version": "version",
+  "contract_list_title": "Registered Contracts"
 }
