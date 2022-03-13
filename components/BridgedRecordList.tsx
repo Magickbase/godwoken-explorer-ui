@@ -124,7 +124,7 @@ const BridgedRecordList: React.FC<{
           </TableBody>
         </Table>
       </TableContainer>
-      <Pagination total={+list.meta.total} current={+list.meta.page} />
+      <Pagination total={+list.meta.total} page={+list.meta.page} />
     </Box>
   )
 }
