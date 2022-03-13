@@ -134,7 +134,7 @@ const TransferList: React.FC<{
           </TableBody>
         </Table>
       </TableContainer>
-      <Pagination total={+list.totalCount} current={+list.page} />
+      <Pagination total={+list.totalCount} page={+list.page} />
     </Box>
   )
 }

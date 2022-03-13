@@ -63,7 +63,7 @@ const BlockList = (initState: State) => {
                     from: blockList.blocks[blockList.blocks.length - 1].number,
                   })}
                 </Typography>
-                <Pagination total={blockList.totalPage * 10} current={blockList.page} />
+                <Pagination total={blockList.totalPage * 10} page={blockList.page} pageSize={pageSize} />
               </Stack>
             ) : null}
             <TableContainer>
@@ -125,7 +125,7 @@ const BlockList = (initState: State) => {
             </TableContainer>
             <Stack direction="row" justifyContent="space-between" alignItems="center">
               <PageSize pageSize={pageSize} />
-              <Pagination total={blockList.totalPage * pageSize} current={blockList.page} />
+              <Pagination total={blockList.totalPage * pageSize} page={blockList.page} />
             </Stack>
           </Box>
         </Paper>
