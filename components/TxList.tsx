@@ -135,7 +135,7 @@ const TxList: React.FC<{
           </TableBody>
         </Table>
       </TableContainer>
-      <Pagination total={+list.totalCount} current={+list.page} />
+      <Pagination total={+list.totalCount} page={+list.page} pageSize={10} />
     </Box>
   )
 }

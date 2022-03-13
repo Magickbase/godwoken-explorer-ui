@@ -149,7 +149,7 @@ const TokenList = ({ meta, tokens, type }: State) => {
               </TableBody>
             </Table>
           </TableContainer>
-          <Pagination current={meta.current} total={meta.total * 10} />
+          <Pagination page={meta.current} total={meta.total * 10} />
         </Paper>
       </Container>
     </>
