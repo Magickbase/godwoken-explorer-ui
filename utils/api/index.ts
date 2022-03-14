@@ -12,4 +12,6 @@ export * from './account'
 export * from './tokens'
 export * from './token'
 
+export * from './contracts'
+
 export * from './search'

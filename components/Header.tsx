@@ -99,6 +99,11 @@ const Header = () => {
   }
   const handleTokenListClose = () => setAnchorEl(null)
 
+  const handleContractListOpen = (e: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(e.currentTarget)
+  }
+  const handleContractListClose = () => setAnchorEl(null)
+
   useEffect(() => {
     if (searchRef.current && typeof searchInQuery === 'string' && searchInQuery) {
       searchRef.current.value = searchInQuery
@@ -109,6 +114,30 @@ const Header = () => {
       }
     }
   }, [searchInQuery, searchRef])
+
+  const contractMenuItems = (
+    <MenuList dense>
+      <Typography
+        variant="subtitle2"
+        textAlign="center"
+        sx={{ display: { xs: 'block', md: 'none', pointerEvents: 'none' } }}
+      >
+        {t(`contracts`)}
+      </Typography>
+      <MenuItem onClick={handleContractListClose} sx={{ p: 0 }}>
+        <NextLink href={`/contracts`}>
+          <Link
+            href={`/contracts`}
+            title={t(`registered_contracts`)}
+            underline="none"
+            sx={{ width: '100%', padding: '6px 16px' }}
+          >
+            {t(`registered_contracts`)}
+          </Link>
+        </NextLink>
+      </MenuItem>
+    </MenuList>
+  )
 
   const tokenMenuItems = (
     <MenuList dense>
@@ -249,6 +278,27 @@ const Header = () => {
               {tokenMenuItems}
             </Menu>
             <Button
+              aria-label="contract-list"
+              aria-haspopup="true"
+              aria-expanded={anchorElLabel === 'contract-list' ? 'true' : undefined}
+              aria-controls={anchorElLabel === 'contract-list' ? 'contract-list' : undefined}
+              onClick={handleContractListOpen}
+              color="inherit"
+              disableRipple
+            >
+              {t(`contracts`)}
+            </Button>
+            <Menu
+              id="contract-list"
+              anchorEl={anchorEl}
+              open={anchorElLabel === 'contract-list'}
+              onClose={handleContractListClose}
+              MenuListProps={{ 'aria-labelledby': 'contract-item' }}
+              sx={{ display: { xs: 'none', md: 'block' } }}
+            >
+              {contractMenuItems}
+            </Menu>
+            <Button
               aria-label="chain-type"
               aria-haspopup="true"
               aria-expanded={anchorElLabel === 'chain-type' ? 'true' : undefined}
@@ -311,6 +361,8 @@ const Header = () => {
               autoFocus={false}
             >
               {tokenMenuItems}
+              <Divider />
+              {contractMenuItems}
               <Divider />
               {chainMenuItems}
               <Divider />

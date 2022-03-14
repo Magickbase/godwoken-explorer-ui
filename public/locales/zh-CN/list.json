@@ -20,5 +20,11 @@
   "block_number": "区块",
   "tx_count": "交易",
   "gas_used": "gas 消耗",
-  "gas_limit": "gas 上限"
+  "gas_limit": "gas 上限",
+  "address": "地址",
+  "contract_name": "合约名称",
+  "compiler": "编译器",
+  "balance": "余额",
+  "compiler_version": "版本",
+  "contract_list_title": "已登记合约"
 }
