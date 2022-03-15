@@ -10,6 +10,8 @@
   "token": "Token",
   "bridge-udt": "Bridged Token",
   "native-udt": "Layer 2 Native Token",
+  "contracts": "Contracts",
+  "registered_contracts": "Registered Contracts",
   "testnetAnnotation": "This is for testnet, and mainnet data ara available on",
   "en-US": "English",
   "zh-CN": "中文",
