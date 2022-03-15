@@ -21,7 +21,7 @@ import {
   alpha,
 } from '@mui/material'
 import { Search as SearchIcon, Translate as TranslateIcon, MoreVert as MoreIcon } from '@mui/icons-material'
-import { EXPLORER_TITLE, IMG_URL, SEARCH_FIELDS, handleSearchKeyPress } from 'utils'
+import { EXPLORER_TITLE, IMG_URL, SEARCH_FIELDS, GW_VERSION, handleSearchKeyPress } from 'utils'
 
 const Search = styled('div')(({ theme }) => ({
   'position': 'relative',
@@ -226,7 +226,12 @@ const Header = () => {
               underline="none"
               mr="auto"
               display="flex"
-              alignItems="center"
+              sx={{
+                alignItems: {
+                  xs: 'end',
+                  sm: 'center',
+                },
+              }}
             >
               <Image
                 src={`${IMG_URL}nervina-logo.svg`}
@@ -236,8 +241,22 @@ const Header = () => {
                 layout="fixed"
                 alt="logo"
               />
-              <Typography sx={{ mx: 2, display: { xs: 'none', sm: 'flex' } }} variant="h5" noWrap>
+              <Typography sx={{ ml: 2, display: { xs: 'none', sm: 'flex' } }} variant="h5" noWrap>
                 {EXPLORER_TITLE}
+              </Typography>
+              <Typography
+                variant="subtitle2"
+                letterSpacing={0}
+                sx={{
+                  lineHeight: '1em',
+                  alignSelf: 'end',
+                  ml: 0.5,
+                  mb: { xs: 0, sm: '6px' },
+                  fontVariant: 'unicase',
+                  fontStyle: 'italic',
+                }}
+              >
+                {`V${GW_VERSION}`}
               </Typography>
             </Link>
           </NextLink>
