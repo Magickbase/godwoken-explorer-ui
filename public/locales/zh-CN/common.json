@@ -13,6 +13,7 @@
   "contracts": "合约",
   "registered_contracts": "已登记合约",
   "testnetAnnotation": "当前为测试网浏览器, 主网数据请访问:",
+  "alphanetAnnotation": "Godwoken v1 正处于积极开发节点, Godwoken v1 alphanet 会定期重置状态",
   "en-US": "English",
   "zh-CN": "中文",
   "mainnet": "主网",

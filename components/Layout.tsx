@@ -3,6 +3,7 @@ import { useTranslation } from 'next-i18next'
 import Head from 'components/Head'
 import Header from 'components/Header'
 import Footer from 'components/Footer'
+import { GW_VERSION } from 'utils'
 
 const Layout = ({ children }) => {
   const [t, { language }] = useTranslation('common')
@@ -24,6 +25,11 @@ const Layout = ({ children }) => {
             >
               GwScan
             </Link>
+          </Alert>
+        ) : null}
+        {GW_VERSION === 1 ? (
+          <Alert severity="info" sx={{ display: 'flex', justifyContent: 'center', borderRadius: 0 }}>
+            {t(`alphanetAnnotation`)}
           </Alert>
         ) : null}
         {children}
