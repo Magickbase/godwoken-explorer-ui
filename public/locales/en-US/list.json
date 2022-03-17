@@ -25,5 +25,11 @@
   "address": "address",
   "balance": "balance",
   "percentage": "percentage",
-  "txCount": "Txns"
+  "txCount": "Txns",
+  "address": "address",
+  "contract_name": "contract name",
+  "compiler": "compiler",
+  "balance": "balance",
+  "compiler_version": "version",
+  "contract_list_title": "Registered Contracts"
 }

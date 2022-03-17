@@ -21,7 +21,7 @@ import {
   alpha,
 } from '@mui/material'
 import { Search as SearchIcon, Translate as TranslateIcon, MoreVert as MoreIcon } from '@mui/icons-material'
-import { EXPLORER_TITLE, IMG_URL, SEARCH_FIELDS, handleSearchKeyPress } from 'utils'
+import { EXPLORER_TITLE, IMG_URL, SEARCH_FIELDS, GW_VERSION, handleSearchKeyPress } from 'utils'
 
 const Search = styled('div')(({ theme }) => ({
   'position': 'relative',
@@ -99,6 +99,11 @@ const Header = () => {
   }
   const handleTokenListClose = () => setAnchorEl(null)
 
+  const handleContractListOpen = (e: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(e.currentTarget)
+  }
+  const handleContractListClose = () => setAnchorEl(null)
+
   useEffect(() => {
     if (searchRef.current && typeof searchInQuery === 'string' && searchInQuery) {
       searchRef.current.value = searchInQuery
@@ -109,6 +114,30 @@ const Header = () => {
       }
     }
   }, [searchInQuery, searchRef])
+
+  const contractMenuItems = (
+    <MenuList dense>
+      <Typography
+        variant="subtitle2"
+        textAlign="center"
+        sx={{ display: { xs: 'block', md: 'none', pointerEvents: 'none' } }}
+      >
+        {t(`contracts`)}
+      </Typography>
+      <MenuItem onClick={handleContractListClose} sx={{ p: 0 }}>
+        <NextLink href={`/contracts`}>
+          <Link
+            href={`/contracts`}
+            title={t(`registered_contracts`)}
+            underline="none"
+            sx={{ width: '100%', padding: '6px 16px' }}
+          >
+            {t(`registered_contracts`)}
+          </Link>
+        </NextLink>
+      </MenuItem>
+    </MenuList>
+  )
 
   const tokenMenuItems = (
     <MenuList dense>
@@ -197,7 +226,12 @@ const Header = () => {
               underline="none"
               mr="auto"
               display="flex"
-              alignItems="center"
+              sx={{
+                alignItems: {
+                  xs: 'end',
+                  sm: 'center',
+                },
+              }}
             >
               <Image
                 src={`${IMG_URL}nervina-logo.svg`}
@@ -207,8 +241,22 @@ const Header = () => {
                 layout="fixed"
                 alt="logo"
               />
-              <Typography sx={{ mx: 2, display: { xs: 'none', sm: 'flex' } }} variant="h5" noWrap>
+              <Typography sx={{ ml: 2, display: { xs: 'none', sm: 'flex' } }} variant="h5" noWrap>
                 {EXPLORER_TITLE}
+              </Typography>
+              <Typography
+                variant="subtitle2"
+                letterSpacing={0}
+                sx={{
+                  lineHeight: '1em',
+                  alignSelf: 'end',
+                  ml: 0.5,
+                  mb: { xs: 0, sm: '6px' },
+                  fontVariant: 'unicase',
+                  fontStyle: 'italic',
+                }}
+              >
+                {`V${GW_VERSION}`}
               </Typography>
             </Link>
           </NextLink>
@@ -247,6 +295,27 @@ const Header = () => {
               sx={{ display: { xs: 'none', md: 'block' } }}
             >
               {tokenMenuItems}
+            </Menu>
+            <Button
+              aria-label="contract-list"
+              aria-haspopup="true"
+              aria-expanded={anchorElLabel === 'contract-list' ? 'true' : undefined}
+              aria-controls={anchorElLabel === 'contract-list' ? 'contract-list' : undefined}
+              onClick={handleContractListOpen}
+              color="inherit"
+              disableRipple
+            >
+              {t(`contracts`)}
+            </Button>
+            <Menu
+              id="contract-list"
+              anchorEl={anchorEl}
+              open={anchorElLabel === 'contract-list'}
+              onClose={handleContractListClose}
+              MenuListProps={{ 'aria-labelledby': 'contract-item' }}
+              sx={{ display: { xs: 'none', md: 'block' } }}
+            >
+              {contractMenuItems}
             </Menu>
             <Button
               aria-label="chain-type"
@@ -311,6 +380,8 @@ const Header = () => {
               autoFocus={false}
             >
               {tokenMenuItems}
+              <Divider />
+              {contractMenuItems}
               <Divider />
               {chainMenuItems}
               <Divider />
