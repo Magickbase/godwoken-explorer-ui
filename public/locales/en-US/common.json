@@ -10,7 +10,10 @@
   "token": "Token",
   "bridge-udt": "Bridged Token",
   "native-udt": "Layer 2 Native Token",
+  "contracts": "Contracts",
+  "registered_contracts": "Registered Contracts",
   "testnetAnnotation": "This is for testnet, and mainnet data ara available on",
+  "alphanetAnnotation": "Godwoken v1 is under active development, Godwoken v1 alphanet will be reset periodically.",
   "en-US": "English",
   "zh-CN": "中文",
   "mainnet": "Mainnet",
@@ -27,5 +30,6 @@
     "show": "Show",
     "records": "records"
   },
-  "view_all_blocks": "View all blocks"
+  "view_all_blocks": "View all blocks",
+  "view_all_transactions": "View all transactions"
 }
