@@ -1,6 +1,7 @@
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import { Box, Link, Table, TableContainer, TableHead, TableBody, TableRow, TableCell } from '@mui/material'
+import BigNumber from 'bignumber.js'
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/Pagination'
 import { getTokenHolderListRes } from 'utils'
@@ -39,7 +40,7 @@ const TokenHolderList: React.FC<{
                   <TableCell sx={{ display: { xs: 'table-cell', md: 'none' } }} title={item.address}>
                     <Address address={item.address} />
                   </TableCell>
-                  <TableCell title={item.balance}>{item.balance}</TableCell>
+                  <TableCell title={item.balance}>{new BigNumber(item.balance ?? '0').toFormat()}</TableCell>
                   <TableCell title={item.percentage}>{`${item.percentage}%`}</TableCell>
                   <TableCell title={`${item.txCount}`}> {item.txCount.toLocaleString('en')} </TableCell>
                 </TableRow>
