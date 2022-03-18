@@ -3,6 +3,7 @@ import { GetServerSideProps } from 'next'
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import BigNumber from 'bignumber.js'
 import {
   Container,
   Paper,
@@ -64,7 +65,7 @@ const ContractList = (initState: State) => {
                     </TableCell>
                     <TableCell component="th">{t(`compiler`)}</TableCell>
                     <TableCell component="th">{t(`compiler_version`)}</TableCell>
-                    <TableCell component="th">{t(`balance`)}</TableCell>
+                    <TableCell component="th">{`${t(`balance`)} (CKB)`}</TableCell>
                     <TableCell component="th">{t(`tx_count`)}</TableCell>
                   </TableRow>
                 </TableHead>
@@ -105,7 +106,7 @@ const ContractList = (initState: State) => {
                           {c.compiler.version.split('+')[0]}
                         </TableCell>
                         <TableCell sx={{ fontSize: 'inherit' }} title={c.balance}>
-                          {c.balance}
+                          {new BigNumber(c.balance ?? '0').toFormat()}
                         </TableCell>
                         <TableCell sx={{ fontSize: 'inherit' }} title={`${c.txCount}`}>
                           {c.txCount.toLocaleString('en')}
