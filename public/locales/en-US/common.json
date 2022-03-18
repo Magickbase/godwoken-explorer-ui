@@ -30,5 +30,6 @@
     "show": "Show",
     "records": "records"
   },
-  "view_all_blocks": "View all blocks"
+  "view_all_blocks": "View all blocks",
+  "view_all_transactions": "View all transactions"
 }

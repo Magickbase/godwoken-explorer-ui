@@ -181,7 +181,7 @@ const Account = (initState: State) => {
               )}
             </Tabs>
             <Divider />
-            {tab === 'transactions' && account.txList ? <TxList list={account.txList} /> : null}
+            {tab === 'transactions' && account.txList ? <TxList list={account.txList} pageSize={10} /> : null}
             {tab === 'erc20' && account.transferList ? <ERC20TransferList list={account.transferList} /> : null}
             {tab === 'bridged' && account.bridgedRecordList ? (
               <BridgedRecordList list={account.bridgedRecordList} />

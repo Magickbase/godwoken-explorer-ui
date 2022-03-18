@@ -285,7 +285,7 @@ const Block = (initState: State) => {
               ))}
             </Tabs>
             <Divider />
-            {tab === 'transactions' && block.txList ? <TxList list={block.txList} /> : null}
+            {tab === 'transactions' && block.txList ? <TxList list={block.txList} pageSize={10} /> : null}
             {tab === 'bridged' && block.bridgedRecordList ? (
               <BridgedRecordList list={block.bridgedRecordList} showUser />
             ) : null}
