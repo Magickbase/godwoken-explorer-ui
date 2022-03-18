@@ -31,8 +31,8 @@ const TokenHolderList: React.FC<{
                 <TableRow key={item.address}>
                   <TableCell>{item.rank}</TableCell>
                   <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                    <NextLink href={`account/${item.address}`}>
-                      <Link href={`account/${item.address}`} underline="none" color="secondary" className="mono-font">
+                    <NextLink href={`/account/${item.address}`}>
+                      <Link href={`/account/${item.address}`} underline="none" color="secondary" className="mono-font">
                         {item.address}
                       </Link>
                     </NextLink>
