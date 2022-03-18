@@ -19,6 +19,7 @@ import {
   Link,
 } from '@mui/material'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
+import BigNumber from 'bignumber.js'
 import SubpageHead from 'components/SubpageHead'
 import PageTitle from 'components/PageTitle'
 import ERC20TransferList from 'components/ERC20TransferList'
@@ -106,7 +107,7 @@ const Token = ({ token, transferList, bridgedRecordList, tokenHolderList }: Prop
   const tokenData = [
     {
       label: token.type === 'bridge' ? 'circulatingSupply' : 'totalSupply',
-      value: <Typography variant="body2">{token.supply || '-'}</Typography>,
+      value: <Typography variant="body2">{token.supply ? new BigNumber(token.supply).toFormat() : '-'}</Typography>,
     },
     // {label: 'value', value: token.supply ?? '-'},
     { label: 'holderCount', value: <Typography variant="body2">{token.holderCount || '-'}</Typography> },
