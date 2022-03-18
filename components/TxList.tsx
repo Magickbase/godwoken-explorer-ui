@@ -18,13 +18,16 @@ import BigNumber from 'bignumber.js'
 import TxStatusIcon from './TxStatusIcon'
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/Pagination'
+import PageSize from 'components/PageSize'
 import { timeDistance, getTxListRes } from 'utils'
 
 type ParsedTxList = ReturnType<typeof getTxListRes>
 
 const TxList: React.FC<{
   list: ParsedTxList
-}> = ({ list }) => {
+  showPageSizeSelector?: boolean
+  pageSize: number
+}> = ({ list, pageSize, showPageSizeSelector }) => {
   const [t, { language }] = useTranslation('list')
   return (
     <Box sx={{ px: 1, py: 2 }}>
@@ -44,7 +47,7 @@ const TxList: React.FC<{
               <TableCell sx={{ display: { xs: 'table-cell', md: 'none' } }} component="th">
                 {t('transfer')}
               </TableCell>
-              <TableCell component="th">{`${t('value')} (CKB)`}</TableCell>
+              <TableCell component="th" sx={{ whiteSpace: 'nowrap' }}>{`${t('value')} (CKB)`}</TableCell>
               <TableCell component="th">{t('type')}</TableCell>
             </TableRow>
           </TableHead>
@@ -135,7 +138,14 @@ const TxList: React.FC<{
           </TableBody>
         </Table>
       </TableContainer>
-      <Pagination total={+list.totalCount} page={+list.page} pageSize={10} />
+      {showPageSizeSelector ? (
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <PageSize pageSize={pageSize} />
+          <Pagination total={+list.totalCount} page={+list.page} pageSize={pageSize} />
+        </Stack>
+      ) : (
+        <Pagination total={+list.totalCount} page={+list.page} pageSize={pageSize} />
+      )}
     </Box>
   )
 }

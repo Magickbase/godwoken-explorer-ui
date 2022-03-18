@@ -160,8 +160,20 @@ const TxList = ({ list }: { list: State['txList'] }) => {
   return (
     <List
       subheader={
-        <ListSubheader component="div" sx={{ textTransform: 'capitalize', bgcolor: 'transparent' }}>
+        <ListSubheader
+          component="div"
+          sx={{ textTransform: 'capitalize', bgcolor: 'transparent', display: 'flex', justifyContent: 'space-between' }}
+        >
           {t(`latestTxs`)}
+          <Tooltip placement="top" title={t(`view_all_transactions`, { ns: 'common' })}>
+            <Box>
+              <NextLink href={`/txs`}>
+                <IconButton>
+                  <ReadMoreIcon />
+                </IconButton>
+              </NextLink>
+            </Box>
+          </Tooltip>
         </ListSubheader>
       }
       dense
