@@ -165,7 +165,7 @@ const Account = (initState: State) => {
                 t(`ERC20Records`),
                 t(`bridgedRecords`),
                 `${t('userDefinedAssets')} (${udtList.length})`,
-                accountType === 'smartContract' ? t('contract') : null,
+                accountType === 'smartContract' && account.smartContract?.name ? t('contract') : null,
               ].map((label, idx) =>
                 label ? (
                   <Tab
