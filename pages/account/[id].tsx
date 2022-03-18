@@ -187,7 +187,7 @@ const Account = (initState: State) => {
               <BridgedRecordList list={account.bridgedRecordList} />
             ) : null}
             {tab === 'assets' ? <UdtList list={udtList} /> : null}
-            {tab === 'contract' && account.smartContract ? (
+            {tab === 'contract' && account.smartContract?.name ? (
               <ContractInfo address={account.ethAddr} {...account.smartContract} />
             ) : null}
           </Paper>
