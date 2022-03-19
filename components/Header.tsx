@@ -249,7 +249,7 @@ const Header = () => {
                 letterSpacing={0}
                 sx={{
                   lineHeight: '1em',
-                  alignSelf: 'end',
+                  alignSelf: 'flex-end',
                   ml: 0.5,
                   mb: { xs: 0, sm: '6px' },
                   fontVariant: 'unicase',
