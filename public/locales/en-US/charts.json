@@ -1,0 +1,18 @@
+{
+  "avgBlockSize": "Average Block Size in Bytes",
+  "avgBlockTime": "Average Block Time in Secs",
+  "blockCount": "Blocks per Day",
+  "txCount": "Transactions per Day",
+  "avgGasUsed": "Average Gas Used(Gwei)",
+  "avgGasLimit": "Average Gas Limit(Gwei)",
+  "erc20Transfers": "ERC20 Daily Token Transfer Count per Day",
+  "title": {
+    "avgBlockSize": "Average Block Size Chart",
+    "avgBlockTime": "Average Block Time Chart",
+    "blockCount": "Daily Blocks Chart",
+    "txCount": "Daily Transactions Chart",
+    "avgGasUsed/avgGasLimit": "Average Gas Used/Limit Chart",
+    "erc20Transfers": "ERC20 Daily Token Transfer Chart"
+  },
+  "updateTimeInfo": "Data will update at 00:10(UTC+0) everyday"
+}
