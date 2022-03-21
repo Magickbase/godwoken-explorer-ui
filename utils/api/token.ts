@@ -11,11 +11,11 @@ export const getTokenRes = ({
   transferCount: transfer_count,
   shortAddress: short_address,
   scriptHash: script_hash,
-  typeScript: {
-    args: type_script.args,
-    codeHash: type_script.code_hash,
-    hashType: type_script.hash_type,
-  },
+  // typeScript: {
+  //   args: type_script.args,
+  //   codeHash: type_script.code_hash,
+  //   hashType: type_script.hash_type,
+  // },
   ...rest,
 })
 

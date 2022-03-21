@@ -305,11 +305,11 @@ export namespace API {
       symbol: string
       transferCount: number
       type: 'bridge' | 'native'
-      typeScript: {
-        args: string
-        codeHash: string
-        hashType: 'data' | 'type'
-      }
+      // typeScript: {
+      //   args: string
+      //   codeHash: string
+      //   hashType: 'data' | 'type'
+      // }
       value: string | null
     }
   }
