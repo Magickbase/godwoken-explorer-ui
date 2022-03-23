@@ -2,5 +2,6 @@
   "blockHeight": "区块高度\n",
   "txCount": "交易总数\n",
   "tps": "TPS",
-  "accountCount": "账户总数"
+  "accountCount": "账户总数",
+  "averageBlockTime": "平均出块间隔"
 }
