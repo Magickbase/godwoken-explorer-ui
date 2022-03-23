@@ -12,6 +12,7 @@ export const getHomeRes = (home: API.Home.Raw): API.Home.Parsed => ({
     txCount: home.statistic.tx_count,
     tps: home.statistic.tps,
     accountCount: home.statistic.account_count,
+    averageBlockTime: `${home.statistic.average_block_time.toFixed(2)}`,
   },
 })
 export const fetchHome = (): Promise<API.Home.Parsed> =>
