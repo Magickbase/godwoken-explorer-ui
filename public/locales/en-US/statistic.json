@@ -2,5 +2,6 @@
   "blockHeight": "blocks",
   "txCount": "transactions",
   "tps": "TPS",
-  "accountCount": "account count"
+  "accountCount": "account count",
+  "averageBlockTime": "avg. block time"
 }
