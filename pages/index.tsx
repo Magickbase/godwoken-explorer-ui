@@ -31,8 +31,8 @@ import {
 } from '@mui/icons-material'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { timeDistance, fetchHome, handleApiError, useWS, CHANNEL, getHomeRes, formatInt } from 'utils'
 import { Typography } from '@mui/material'
+import { timeDistance, fetchHome, handleApiError, useWS, getHomeRes, formatInt, CHANNEL, GW_VERSION } from 'utils'
 
 type State = API.Home.Parsed
 
@@ -50,19 +50,24 @@ const statisticGroups = [
   { key: 'accountCount', icon: <AccountCountIcon /> },
 ]
 
-const Statistic = ({ blockCount, txCount, tps, accountCount }: State['statistic']) => {
+if (GW_VERSION === 1) {
+  statisticGroups.splice(1, 0, { key: 'averageBlockTime', icon: <BlockHeightIcon />, suffix: ' s ' })
+}
+
+const Statistic = ({ blockCount, txCount, tps, accountCount, averageBlockTime }: State['statistic']) => {
   const [t] = useTranslation('statistic')
   const stats = {
     blockHeight: +blockCount ? (+blockCount - 1).toLocaleString('en') : '-',
     txCount: (+txCount).toLocaleString('en'),
     tps: (+tps).toLocaleString('en'),
     accountCount: (+accountCount).toLocaleString('en'),
+    averageBlockTime,
   }
 
   return (
     <Grid container spacing={2}>
       {statisticGroups.map(field => (
-        <Grid item key={field.key} xs={6} md={3}>
+        <Grid item key={field.key} xs={6} md={12 / statisticGroups.length}>
           <Paper sx={{ bgcolor: 'primary.light', color: 'white', p: 5, textAlign: 'center' }}>
             <Stack direction="row" display="flex" alignItems="center" justifyContent="center">
               {field.icon}
