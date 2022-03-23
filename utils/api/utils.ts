@@ -42,12 +42,12 @@ export namespace API {
     export interface Raw {
       block_list: Array<Record<'hash' | 'number' | 'tx_count', string> & { timestamp: Timestamp }>
       tx_list: Array<Tx>
-      statistic: Record<'block_count' | 'tx_count' | 'tps' | 'account_count', string>
+      statistic: Record<'block_count' | 'tx_count' | 'tps' | 'account_count', string> & { average_block_time: number }
     }
     export interface Parsed {
       blockList: Array<Record<'hash' | 'number' | 'txCount', string> & { timestamp: Timestamp }>
       txList: Array<Tx>
-      statistic: Record<'blockCount' | 'txCount' | 'tps' | 'accountCount', string>
+      statistic: Record<'blockCount' | 'txCount' | 'tps' | 'accountCount' | 'averageBlockTime', string>
     }
   }
 
