@@ -1,0 +1,18 @@
+{
+  "avgBlockSize": "平均区块大小(字节)",
+  "avgBlockTime": "平均出块间隔(秒)",
+  "blockCount": "出块总数",
+  "txCount": "交易总数",
+  "avgGasUsed": "平均 Gas 消耗(Gwei)",
+  "avgGasLimit": "平均 Gas 上限(Gwei)",
+  "erc20Transfers": "ERC20 代币转账次数",
+  "title": {
+    "avgBlockSize": "平均区块大小图表",
+    "avgBlockTime": "平均出块间隔图表",
+    "blockCount": "出块总数图表",
+    "txCount": "交易总数图表",
+    "avgGasUsed/avgGasLimit": "平均Gas 消耗/上限图表",
+    "erc20Transfers": "ERC20 代币转账次数图表"
+  },
+  "updateTimeInfo": "数据将在每天 00:10(UTC+0) 更新"
+}
