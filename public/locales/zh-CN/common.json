@@ -26,6 +26,8 @@
   "addressCopied": "地址已复制",
   "blockHashCopied": "区块哈希已复制",
   "txHashCopied": "交易哈希已复制",
+  "more": "更多",
+  "charts": "图表",
   "page_size": {
     "show": "显示",
     "records": "条记录"
