@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { utils } from 'ethers'
 import {
   Alert,
   Container,
@@ -42,6 +43,7 @@ import {
   getBridgedRecordListRes,
   handleCopy,
   TabNotFoundException,
+  GAS_UNIT,
 } from 'utils'
 
 type RawBlock = Parameters<typeof getBlockRes>[0]
@@ -228,11 +230,11 @@ const Block = (initState: State) => {
     },
     {
       label: 'gasUsed',
-      value: <Typography variant="body2">{new BigNumber(block.gas.used).toFormat()}</Typography>,
+      value: <Typography variant="body2">{`${utils.formatUnits(block.gas.used, GAS_UNIT)} ${GAS_UNIT}`}</Typography>,
     },
     {
       label: 'gasLimit',
-      value: <Typography variant="body2">{new BigNumber(block.gas.limit).toFormat()}</Typography>,
+      value: <Typography variant="body2">{`${utils.formatUnits(block.gas.limit, GAS_UNIT)} ${GAS_UNIT}`}</Typography>,
     },
     {
       label: 'parentHash',

@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import NextLink from 'next/link'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { utils } from 'ethers'
 import {
   Alert,
   Accordion,
@@ -47,14 +48,15 @@ import {
   handleApiError,
   useWS,
   getTxRes,
-  CKB_EXPLORER_URL,
-  CHANNEL,
   formatInt,
   handleCopy,
-  CKB_DECIMAL,
   TabNotFoundException,
   fetchERC20TransferList,
   getERC20TransferListRes,
+  CKB_EXPLORER_URL,
+  CHANNEL,
+  CKB_DECIMAL,
+  GAS_UNIT,
 } from 'utils'
 
 const tabs = ['erc20']
@@ -239,13 +241,13 @@ const Tx = (initState: State) => {
     tx.gasUsed
       ? {
           label: 'gasUsed',
-          value: <Typography variant="body2">{Number(tx.gasUsed).toLocaleString('en')}</Typography>,
+          value: <Typography variant="body2">{`${utils.formatUnits(tx.gasUsed, GAS_UNIT)} ${GAS_UNIT}`}</Typography>,
         }
       : null,
     tx.gasLimit
       ? {
           label: 'gasLimit',
-          value: <Typography variant="body2">{Number(tx.gasLimit).toLocaleString('en')}</Typography>,
+          value: <Typography variant="body2">{`${utils.formatUnits(tx.gasLimit, GAS_UNIT)} ${GAS_UNIT}`}</Typography>,
         }
       : null,
     tx.gasUsed && tx.gasPrice

@@ -14,4 +14,6 @@ export * from './token'
 
 export * from './contracts'
 
+export * from './charts'
+
 export * from './search'

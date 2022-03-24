@@ -26,6 +26,8 @@
   "addressCopied": "Address copied to clipboard",
   "blockHashCopied": "Block hash copied to clipboard",
   "txHashCopied": "Transaction hash copied to clipboard",
+  "more": "More",
+  "charts": "Charts",
   "page_size": {
     "show": "Show",
     "records": "records"
