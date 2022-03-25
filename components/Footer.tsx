@@ -2,11 +2,11 @@ import NextLink from 'next/link'
 import Box from '@mui/material/Box'
 import Link from '@mui/material/Link'
 import Typography from '@mui/material/Typography'
-import { CKB_EXPLORER_URL, NERVINA_GITHUB_URL, NERVOS_FOUNDATION_URL } from 'utils'
+import { CKB_EXPLORER_URL, NERVINA_GITHUB_URL, NERVOS_URL } from 'utils'
 import Button from '@mui/material/Button'
 
 const links = [
-  { label: 'Nervos Foundation', url: NERVOS_FOUNDATION_URL },
+  { label: 'Nervos', url: NERVOS_URL },
   { label: 'GitHub', url: NERVINA_GITHUB_URL },
   { label: 'CKB Explorer', url: CKB_EXPLORER_URL },
 ]
