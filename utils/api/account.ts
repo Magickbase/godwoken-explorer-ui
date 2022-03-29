@@ -60,7 +60,6 @@ export const getAccountRes = (account: API.Account.Raw): API.Account.Parsed => (
   id: account.id,
   type: account.type,
   ckb: account.ckb,
-  eth: account.eth,
   txCount: account.tx_count,
   ethAddr: account.eth_addr,
   metaContract: account.meta_contract ? getMetaContract(account.meta_contract) : null,

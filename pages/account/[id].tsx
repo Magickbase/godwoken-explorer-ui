@@ -137,12 +137,6 @@ const Account = (initState: State) => {
                   </ListItem>
                   <ListItem>
                     <ListItemText
-                      primary={t(`ethBalance`)}
-                      secondary={<Typography variant="body2">{formatBalance(account.eth) + ' Ether'}</Typography>}
-                    />
-                  </ListItem>
-                  <ListItem>
-                    <ListItemText
                       primary={t(`txCount`)}
                       secondary={<Typography variant="body2">{formatInt(account.txCount)}</Typography>}
                     />
