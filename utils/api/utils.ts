@@ -118,7 +118,7 @@ export namespace API {
     }
     export type RawScript = Record<'args' | 'code_hash' | 'hash_type' | 'name', string>
     export type ParsedScript = Record<'args' | 'codeHash' | 'hashType' | 'name', string>
-    export type Raw = Record<'id' | 'type' | 'ckb' | 'eth' | 'tx_count' | 'eth_addr', string> &
+    export type Raw = Record<'id' | 'type' | 'ckb' | 'tx_count' | 'eth_addr', string> &
       Partial<{
         meta_contract: {
           status: 'running' | 'halting'
@@ -152,7 +152,7 @@ export namespace API {
           other_info?: string
         }
       }>
-    export type Parsed = Record<'id' | 'type' | 'ckb' | 'eth' | 'txCount' | 'ethAddr', string> &
+    export type Parsed = Record<'id' | 'type' | 'ckb' | 'txCount' | 'ethAddr', string> &
       Partial<{
         metaContract: {
           status: 'running' | 'halting'
