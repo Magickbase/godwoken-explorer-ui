@@ -73,7 +73,7 @@ const Account = (initState: State) => {
   }, [setAccount, initState])
 
   useWS(
-    `${CHANNEL.ACCOUNT_INFO}${account.id}`,
+    account.id ? `${CHANNEL.ACCOUNT_INFO}${account.id}` : ``,
     (init: API.Account.Raw) => {
       setAccount(prev => ({ ...prev, ...getAccountRes(init) }))
     },
