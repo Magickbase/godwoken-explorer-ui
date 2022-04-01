@@ -28,6 +28,9 @@ export const useWS = (
   deps = [],
 ) => {
   useEffect(() => {
+    if (!channel) {
+      return
+    }
     const socket = new Socket(WS_ENDPOINT)
     socket.connect()
     const _channel = socket.channel(channel)
