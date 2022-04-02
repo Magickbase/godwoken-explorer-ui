@@ -39,7 +39,7 @@
     "@types/node": "16.11.12",
     "@types/phoenix": "1.5.3",
     "@types/react": "17.0.37",
-    "autoprefixer": "10.4.0",
+    "autoprefixer": "10.4.4",
     "babel-plugin-istanbul": "6.1.1",
     "cypress": "9.1.1",
     "eslint": "8.6.0",
