@@ -38,7 +38,7 @@
     "@cypress/code-coverage": "3.9.12",
     "@types/node": "16.11.12",
     "@types/phoenix": "1.5.3",
-    "@types/react": "17.0.37",
+    "@types/react": "17.0.43",
     "autoprefixer": "10.4.0",
     "babel-plugin-istanbul": "6.1.1",
     "cypress": "9.1.1",
