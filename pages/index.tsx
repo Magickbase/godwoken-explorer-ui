@@ -264,7 +264,7 @@ const TxList = ({ list }: { list: State['txList'] }) => {
                     alignItems="end"
                   >
                     <Chip
-                      label={tx.type}
+                      label={tx.type.replace(/_/g, ' ')}
                       color="primary"
                       variant="outlined"
                       size="small"

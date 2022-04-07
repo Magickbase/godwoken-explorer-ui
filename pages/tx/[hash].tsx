@@ -192,7 +192,14 @@ const Tx = (initState: State) => {
             ),
         },
     { label: 'finalizeState', value: <Typography variant="body2">{t(tx.status)}</Typography> },
-    { label: 'type', value: <Typography variant="body2">{tx.type.replace(/_/g, ' ')}</Typography> },
+    {
+      label: 'type',
+      value: (
+        <Typography variant="body2" sx={{ textTransform: 'capitalize' }}>
+          {tx.type.replace(/_/g, ' ')}
+        </Typography>
+      ),
+    },
     {
       label: 'l1Block',
       value: tx.l1BlockNumber ? (

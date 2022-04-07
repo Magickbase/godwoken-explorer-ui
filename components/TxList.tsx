@@ -57,7 +57,9 @@ const TxList: React.FC<{
                 <TableRow key={item.hash}>
                   <TableCell>
                     <Stack direction="row" alignItems="center">
-                      <TxStatusIcon status={item.status} isSuccess={item.isSuccess} />
+                      {item.type === 'polyjuice' ? (
+                        <TxStatusIcon status={item.status} isSuccess={item.isSuccess} />
+                      ) : null}
                       <Tooltip title={item.hash} placement="top">
                         <Box>
                           <NextLink href={`/tx/${item.hash}`}>
@@ -121,10 +123,16 @@ const TxList: React.FC<{
                     </Stack>
                   </TableCell>
                   <TableCell sx={{ fontSize: { xs: 12, md: 14 }, whiteSpace: 'nowrap' }}>{`${new BigNumber(
-                    item.value,
+                    item.value || 0,
                   ).toFormat()}`}</TableCell>
                   <TableCell>
-                    <Chip label={item.type} size="small" variant="outlined" color="primary" />
+                    <Chip
+                      label={item.type.replace(/_/g, ' ')}
+                      size="small"
+                      variant="outlined"
+                      color="primary"
+                      sx={{ textTransform: 'capitalize' }}
+                    />
                   </TableCell>
                 </TableRow>
               ))
