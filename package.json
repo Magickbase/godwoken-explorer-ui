@@ -25,7 +25,7 @@
     "@mui/material": "5.2.5",
     "@nervosnetwork/ckb-sdk-utils": "0.101.0",
     "bignumber.js": "9.0.2",
-    "dayjs": "1.10.7",
+    "dayjs": "1.11.0",
     "ethers": "5.5.3",
     "next": "12.1.4",
     "next-i18next": "10.0.1",
