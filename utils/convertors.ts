@@ -62,4 +62,4 @@ export const formatBalance = (balance: string) => {
 
 export { scriptToHash }
 
-export const nameToColor = (name: string = '') => '#' + 2 * (name[0] ?? '?').charCodeAt(0)
+export const nameToColor = (name: string = '') => '#' + 2 * (name?.[0] ?? '?').charCodeAt(0)
