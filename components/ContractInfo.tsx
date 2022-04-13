@@ -11,14 +11,15 @@ import {
   TabsListUnstyled,
   TextareaAutosize,
   Typography,
-  buttonUnstyledClasses,
-  tabUnstyledClasses,
   Accordion,
   AccordionSummary,
   AccordionDetails,
   Divider,
   TextField,
   Button,
+  CircularProgress,
+  buttonUnstyledClasses,
+  tabUnstyledClasses,
 } from '@mui/material'
 import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material'
 
@@ -111,6 +112,7 @@ const ContractInfo: React.FC<ContractInfoProps> = ({
 }) => {
   const [tabIdx, setTabIdx] = useState(0)
   const [responseList, setResponseList] = useState([])
+  const [loadingList, setLoadingList] = useState([])
   const [t] = useTranslation('account')
 
   const [contract, viewMethods] = useMemo(() => {
@@ -151,8 +153,12 @@ const ContractInfo: React.FC<ContractInfoProps> = ({
     const params = inputs.map(input => target[input.name].value)
     const method = contract[viewMethods[signature].name]
     try {
+      setLoadingList(pre => {
+        const loadings = [...pre]
+        loadings[idx] = true
+        return loadings
+      })
       const result = await method(...params)
-      // setResponseList(list => list.map((item, i) => (i === idx ? result.toString() : item)))
       setResponseList(list => {
         const items = [...list]
         items[idx] = result.toString()
@@ -160,6 +166,12 @@ const ContractInfo: React.FC<ContractInfoProps> = ({
       })
     } catch (err) {
       window.alert(err.message)
+    } finally {
+      setLoadingList(pre => {
+        const loadings = [...pre]
+        loadings[idx] = false
+        return loadings
+      })
     }
   }
 
@@ -248,8 +260,20 @@ const ContractInfo: React.FC<ContractInfoProps> = ({
                         })}
                       </Stack>
                       <Box sx={{ textAlign: 'right', marginTop: '16px' }}>
-                        <Button type="submit" variant="contained" size="small">
+                        <Button type="submit" variant="contained" size="small" disabled={loadingList[idx]}>
                           Query
+                          {loadingList[idx] ? (
+                            <CircularProgress
+                              size={24}
+                              sx={{
+                                position: 'absolute',
+                                top: '50%',
+                                left: '50%',
+                                marginTop: '-12px',
+                                marginLeft: '-12px',
+                              }}
+                            />
+                          ) : null}
                         </Button>
                       </Box>
                     </form>
