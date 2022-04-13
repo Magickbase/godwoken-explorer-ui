@@ -18,10 +18,11 @@ import {
   TableCell,
   Typography,
 } from '@mui/material'
+import BigNumber from 'bignumber.js'
 import SubpageHead from 'components/SubpageHead'
 import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined'
 import Pagination from 'components/Pagination'
-import { fetchTokenList, handleApiError, formatInt, nameToColor } from 'utils'
+import { fetchTokenList, handleApiError, nameToColor } from 'utils'
 import { PageNonPositiveException, PageOverflowException, TypeNotFoundException } from 'utils/exceptions'
 import type { API } from 'utils/api/utils'
 
@@ -137,7 +138,7 @@ const TokenList = ({ meta, tokens, type }: State) => {
                           </Link>
                         </NextLink>
                       </TableCell>
-                      <TableCell>{formatInt(token.supply) || '-'}</TableCell>
+                      <TableCell>{new BigNumber(token.supply || '0').toFormat() || '-'}</TableCell>
                       <TableCell>{token.holderCount || '0'}</TableCell>
                     </TableRow>
                   ))
