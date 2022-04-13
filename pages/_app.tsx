@@ -73,7 +73,6 @@ const Agera = ({ Component, pageProps }: AppProps) => {
           {loading ? (
             <LinearProgress
               color="secondary"
-              className="nav-loading"
               variant="determinate"
               value={loading}
               sx={{
