@@ -3,6 +3,7 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import 'dayjs/locale/zh-cn'
 import 'dayjs/locale/en'
+import BigNumber from 'bignumber.js'
 import {
   systemScripts,
   bech32Address,
@@ -40,20 +41,8 @@ export const scriptToCkbAddress = (lockScript: CKBComponents.Script) => {
   return scriptToAddress(lockScript, IS_MAINNET)
 }
 
-export const formatInt = (int: string | number) => {
-  const i = typeof int === 'string' ? int : int.toString()
-  return (
-    i
-      .split('')
-      .reverse()
-      .join('')
-      .match(/\d{1,3}/g) || [0]
-  )
-    .join(',')
-    .split('')
-    .reverse()
-    .join('')
-}
+export const formatInt = (int: string | number) => new BigNumber(int || '0').toFormat()
+
 export const formatBalance = (balance: string) => {
   const [int, dec] = balance.split('.')
   const formattedInt = formatInt(int)
