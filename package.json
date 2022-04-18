@@ -21,8 +21,8 @@
   "dependencies": {
     "@emotion/react": "11.9.0",
     "@emotion/styled": "11.8.1",
-    "@mui/icons-material": "5.2.5",
-    "@mui/material": "5.2.5",
+    "@mui/icons-material": "5.6.2",
+    "@mui/material": "5.6.2",
     "@nervosnetwork/ckb-sdk-utils": "0.102.3",
     "bignumber.js": "9.0.2",
     "dayjs": "1.11.0",
