@@ -1,12 +1,21 @@
-import { NotFoundException } from '../exceptions'
+import { GwHashException, NotFoundException } from '../exceptions'
 export { SERVER_URL, NODE_URL } from '../constants'
 export enum HttpStatus {
   NotFound = 404,
 }
 
+enum ServerErrorCode {
+  UseEthHash = '303',
+}
+
 export type ErrorResponse = {
   error_code?: number
   message?: string
+  errors?: {
+    detail: string
+    status: ServerErrorCode
+    title: string
+  }
 }
 
 export const isError = (res: any): res is ErrorResponse => {
@@ -28,7 +37,13 @@ export const pretreat = async <T>(res: Response) => {
   if (res.status === HttpStatus.NotFound) {
     throw new NotFoundException()
   }
+
   const parsed: T | ErrorResponse = await res.json()
+
+  if ('errors' in parsed && parsed.errors.status === ServerErrorCode.UseEthHash) {
+    throw new GwHashException(parsed.errors.detail)
+  }
+
   if (isError(parsed)) {
     return handleError(parsed)
   }
