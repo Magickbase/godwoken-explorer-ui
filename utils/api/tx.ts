@@ -77,7 +77,7 @@ export const getTxRes = (tx: Raw): Parsed => ({
   hash: tx.hash,
   nonce: tx.nonce,
   status: tx.status ?? 'pending',
-  polyjuiceStatus: tx.polyjuice_status ?? 'pending',
+  polyjuiceStatus: tx.polyjuice_status ?? 'succeed',
   timestamp: tx.timestamp ? tx.timestamp * 1000 : -1,
   from: tx.from,
   to: tx.to,
