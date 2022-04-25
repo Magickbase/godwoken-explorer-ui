@@ -121,7 +121,7 @@ const TokenList = ({ meta, tokens, type }: State) => {
                                 },
                               }}
                             >
-                              {token.shortAddress}
+                              {token.address}
                             </Typography>
                             <Typography
                               fontSize="inherit"
@@ -133,7 +133,7 @@ const TokenList = ({ meta, tokens, type }: State) => {
                                 },
                               }}
                             >
-                              {`${token.shortAddress.slice(0, 8)}...${token.shortAddress.slice(-8)}`}
+                              {`${token.address.slice(0, 8)}...${token.address.slice(-8)}`}
                             </Typography>
                           </Link>
                         </NextLink>
