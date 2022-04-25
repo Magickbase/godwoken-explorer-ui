@@ -241,6 +241,7 @@ export namespace API {
         official_site: string | null
         script_hash: string
         short_address: string
+        eth_address: string
         supply: string | null
         symbol: string
         transfer_count: number
@@ -261,7 +262,7 @@ export namespace API {
       name: string
       officialSite: string | null
       scriptHash: string
-      shortAddress: string
+      address: string
       supply: string | null
       symbol: string
       transferCount: number
@@ -291,6 +292,7 @@ export namespace API {
           official_site: string | null
           script_hash: string
           short_address: string | null
+          eth_address: string | null
           supply: string | null
           symbol: string
           transfer_count: number
@@ -315,7 +317,7 @@ export namespace API {
       name: string
       officialSite: string | null
       scriptHash: string
-      shortAddress: string | null
+      address: string | null
       supply: string | null
       symbol: string
       transferCount: number
