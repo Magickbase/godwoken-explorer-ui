@@ -3,13 +3,22 @@ import { PAGE_SIZE } from 'utils/constants'
 
 export const getTokenRes = ({
   data: {
-    attributes: { official_site, holder_count, transfer_count, short_address, type_script, script_hash, ...rest },
+    attributes: {
+      official_site,
+      holder_count,
+      transfer_count,
+      short_address,
+      eth_address,
+      type_script,
+      script_hash,
+      ...rest
+    },
   },
 }: API.Token.Raw): API.Token.Parsed => ({
   officialSite: official_site,
   holderCount: holder_count,
   transferCount: transfer_count,
-  shortAddress: short_address,
+  address: eth_address || short_address || null,
   scriptHash: script_hash,
   // typeScript: {
   //   args: type_script.args,

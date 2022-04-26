@@ -7,12 +7,21 @@ export const getTokenListRes = (tokenListRes: API.Tokens.Raw): API.Tokens.Parsed
   },
   tokens: tokenListRes.data.map(
     ({
-      attributes: { official_site, script_hash, type_script, transfer_count, short_address, holder_count, ...attrs },
+      attributes: {
+        official_site,
+        script_hash,
+        type_script,
+        transfer_count,
+        short_address,
+        eth_address,
+        holder_count,
+        ...attrs
+      },
     }) => ({
       officialSite: official_site,
       scriptHash: script_hash,
       transferCount: transfer_count,
-      shortAddress: short_address,
+      address: eth_address || short_address || null,
       holderCount: holder_count,
       typeScript: type_script,
       ...attrs,

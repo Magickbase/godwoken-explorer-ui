@@ -64,7 +64,7 @@ const Token = ({ token, transferList, bridgedRecordList, tokenHolderList }: Prop
     { label: 'type', value: <Typography variant="body2">{t(token.type)}</Typography> },
     {
       label: 'contract',
-      value: token.shortAddress ? <Address address={token.shortAddress} /> : <Typography variant="body2">-</Typography>,
+      value: token.address ? <Address address={token.address} /> : <Typography variant="body2">-</Typography>,
     },
     // {
     //   label: 'layer1Lock',
@@ -199,8 +199,8 @@ export const getServerSideProps: GetServerSideProps<Props, { id: string }> = asy
       serverSideTranslations(locale, ['common', 'tokens', 'list']),
     ])
     const transferList =
-      tab === tabs[0] && token.shortAddress
-        ? await fetchERC20TransferList({ udt_address: token.shortAddress, page: page as string })
+      tab === tabs[0] && token.address
+        ? await fetchERC20TransferList({ udt_address: token.address, page: page as string })
         : null
 
     const bridgedRecordList =
