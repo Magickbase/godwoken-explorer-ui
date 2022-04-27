@@ -12,6 +12,7 @@
   "value": "价值",
   "l1Block": "l1 区块",
   "l2Block": "l2 区块",
+  "index": "交易序号",
   "input": "交易输入",
   "args": "参数",
   "gasPrice": "gas 价格",
