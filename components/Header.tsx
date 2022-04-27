@@ -352,17 +352,19 @@ const Header = () => {
             >
               {moreMenuItems}
             </Menu>
-            <Button
-              aria-label="chain-type"
-              aria-haspopup="true"
-              aria-expanded={anchorElLabel === 'chain-type' ? 'true' : undefined}
-              aria-controls={anchorElLabel === 'chain-type' ? 'chain-type' : undefined}
-              onClick={handleMenuListOpen}
-              color="inherit"
-              disableRipple
-            >
-              {t(process.env.NEXT_PUBLIC_CHAIN_TYPE || CHAIN_TYPE_LIST[1])}
-            </Button>
+            {!GW_VERSION ? (
+              <Button
+                aria-label="chain-type"
+                aria-haspopup="true"
+                aria-expanded={anchorElLabel === 'chain-type' ? 'true' : undefined}
+                aria-controls={anchorElLabel === 'chain-type' ? 'chain-type' : undefined}
+                onClick={handleMenuListOpen}
+                color="inherit"
+                disableRipple
+              >
+                {t(process.env.NEXT_PUBLIC_CHAIN_TYPE || CHAIN_TYPE_LIST[1])}
+              </Button>
+            ) : null}
             <Menu
               id="chain-type"
               anchorEl={anchorEl}
@@ -419,8 +421,12 @@ const Header = () => {
               {contractMenuItems}
               <Divider />
               {moreMenuItems}
-              <Divider />
-              {chainMenuItems}
+              {!GW_VERSION ? (
+                <>
+                  <Divider />
+                  {chainMenuItems}
+                </>
+              ) : null}
               <Divider />
               {localeMenuItems}
             </Menu>

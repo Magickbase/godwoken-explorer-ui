@@ -233,6 +233,7 @@ const Tx = (initState: State) => {
         <Typography variant="body2">{t('pending')}</Typography>
       ),
     },
+    { label: 'index', value: <Typography variant="body2">{tx.index}</Typography> },
     { label: 'nonce', value: <Typography variant="body2">{Number(tx.nonce).toLocaleString('en')}</Typography> },
 
     tx.gasPrice
