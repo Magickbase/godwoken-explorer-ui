@@ -6,6 +6,7 @@ export type TxType = 'polyjuice_creator' | 'polyjuice'
 interface Raw {
   block_hash?: string
   block_number?: number
+  transaction_index?: number
   gas_limit: number
   gas_price: string
   gas_used: number
@@ -39,6 +40,7 @@ interface Raw {
 interface Parsed {
   blockHash: string | null
   blockNumber: number | null
+  index: number | null
   gasLimit: number | null
   gasPrice: string
   gasUsed: number | null
@@ -71,6 +73,7 @@ interface Parsed {
 export const getTxRes = (tx: Raw): Parsed => ({
   blockHash: tx.block_hash ?? null,
   blockNumber: tx.block_number ?? null,
+  index: tx.transaction_index ?? null,
   gasLimit: tx.gas_limit ?? null,
   gasPrice: tx.gas_price,
   gasUsed: tx.gas_used ?? null,
