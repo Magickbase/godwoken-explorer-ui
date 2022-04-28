@@ -59,7 +59,9 @@ const TxList: React.FC<{
                     <Stack direction="row" alignItems="center">
                       {item.type === 'polyjuice' ? (
                         <TxStatusIcon status={item.status} isSuccess={item.isSuccess} />
-                      ) : null}
+                      ) : (
+                        <div style={{ display: 'flex', width: 24 }} />
+                      )}
                       <Tooltip title={item.hash} placement="top">
                         <Box>
                           <NextLink href={`/tx/${item.hash}`}>
