@@ -76,7 +76,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }))
 
 const TOKEN_TYPE_LIST = ['bridge', 'native']
-const CHAIN_TYPE_LIST = ['mainnet', 'testnet']
+const CHAIN_TYPE_LIST = GW_VERSION ? ['testnet'] : ['mainnet', 'testnet']
 const LOCALE_LIST = ['zh-CN', 'en-US']
 
 const Header = () => {
@@ -352,19 +352,17 @@ const Header = () => {
             >
               {moreMenuItems}
             </Menu>
-            {!GW_VERSION ? (
-              <Button
-                aria-label="chain-type"
-                aria-haspopup="true"
-                aria-expanded={anchorElLabel === 'chain-type' ? 'true' : undefined}
-                aria-controls={anchorElLabel === 'chain-type' ? 'chain-type' : undefined}
-                onClick={handleMenuListOpen}
-                color="inherit"
-                disableRipple
-              >
-                {t(process.env.NEXT_PUBLIC_CHAIN_TYPE || CHAIN_TYPE_LIST[1])}
-              </Button>
-            ) : null}
+            <Button
+              aria-label="chain-type"
+              aria-haspopup="true"
+              aria-expanded={anchorElLabel === 'chain-type' ? 'true' : undefined}
+              aria-controls={anchorElLabel === 'chain-type' ? 'chain-type' : undefined}
+              onClick={handleMenuListOpen}
+              color="inherit"
+              disableRipple
+            >
+              {t(process.env.NEXT_PUBLIC_CHAIN_TYPE || CHAIN_TYPE_LIST[1])}
+            </Button>
             <Menu
               id="chain-type"
               anchorEl={anchorEl}
@@ -421,12 +419,8 @@ const Header = () => {
               {contractMenuItems}
               <Divider />
               {moreMenuItems}
-              {!GW_VERSION ? (
-                <>
-                  <Divider />
-                  {chainMenuItems}
-                </>
-              ) : null}
+              <Divider />
+              {chainMenuItems}
               <Divider />
               {localeMenuItems}
             </Menu>
