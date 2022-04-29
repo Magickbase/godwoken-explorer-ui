@@ -13,7 +13,7 @@ import {
   Link,
   Tooltip,
 } from '@mui/material'
-import { OpenInNew as OpenInNewIcon, ContentCopyOutlined as CopyIcon } from '@mui/icons-material'
+import { OpenInNew as OpenInNewIcon } from '@mui/icons-material'
 import BigNumber from 'bignumber.js'
 
 import Address from 'components/TruncatedAddress'
