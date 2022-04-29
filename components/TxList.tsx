@@ -27,7 +27,8 @@ const TxList: React.FC<{
   list: ParsedTxList
   showPageSizeSelector?: boolean
   pageSize: number
-}> = ({ list, pageSize, showPageSizeSelector }) => {
+  maxCount?: string
+}> = ({ list, pageSize, showPageSizeSelector, maxCount }) => {
   const [t, { language }] = useTranslation('list')
   return (
     <Box sx={{ px: 1, py: 2 }}>
@@ -156,6 +157,13 @@ const TxList: React.FC<{
       ) : (
         <Pagination total={+list.totalCount} page={+list.page} pageSize={pageSize} />
       )}
+      {maxCount ? (
+        <Stack direction="row-reverse">
+          <Typography color="primary.light" variant="caption">
+            {t(`last-n-records`, { n: maxCount })}
+          </Typography>
+        </Stack>
+      ) : null}
     </Box>
   )
 }
