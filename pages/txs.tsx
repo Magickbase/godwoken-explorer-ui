@@ -53,7 +53,7 @@ const TxList = (initState: State) => {
                 <Pagination total={+txList.totalCount} page={+txList.page} pageSize={pageSize} />
               </Stack>
             ) : null}
-            <TxListComp list={txList} pageSize={pageSize} showPageSizeSelector />
+            <TxListComp list={txList} pageSize={pageSize} showPageSizeSelector maxCount="500k" />
           </Box>
         </Paper>
       </Container>
