@@ -2,9 +2,14 @@ import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
 import { Box, Link } from '@mui/material'
+import { PAGE_SIZE } from 'utils'
 
 // TODO: fix total count calculation then add page size selector
-const Pagination: React.FC<{ total: number; page: number; pageSize?: number }> = ({ total, page, pageSize = 10 }) => {
+const Pagination: React.FC<{ total: number; page: number; pageSize?: number }> = ({
+  total,
+  page,
+  pageSize = PAGE_SIZE,
+}) => {
   const [t] = useTranslation('common')
   const { query, push, asPath } = useRouter()
   const url = asPath.split('?')[0] ?? ''

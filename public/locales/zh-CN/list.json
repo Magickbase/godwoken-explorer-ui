@@ -33,5 +33,6 @@
   "compiler": "编译器",
   "balance": "余额",
   "compiler_version": "版本",
-  "contract_list_title": "已登记合约"
+  "contract_list_title": "已登记合约",
+  "last-n-records": "显示最近 {{n}} 条记录"
 }

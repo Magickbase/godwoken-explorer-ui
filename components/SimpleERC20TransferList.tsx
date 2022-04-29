@@ -98,6 +98,11 @@ const SimpleTransferList: React.FC<{
         </Table>
       </TableContainer>
       <Pagination total={+list.totalCount} page={+list.page} />
+      <Stack direction="row-reverse">
+        <Typography color="primary.light" variant="caption">
+          {t(`last-n-records`, { n: `100k` })}
+        </Typography>
+      </Stack>
     </Box>
   )
 }

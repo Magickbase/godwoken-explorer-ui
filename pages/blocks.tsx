@@ -64,7 +64,7 @@ const BlockList = (initState: State) => {
                     from: blockList.blocks[blockList.blocks.length - 1].number,
                   })}
                 </Typography>
-                <Pagination total={blockList.totalPage * 10} page={blockList.page} pageSize={pageSize} />
+                <Pagination total={blockList.totalPage * pageSize} page={blockList.page} pageSize={pageSize} />
               </Stack>
             ) : null}
             <TableContainer>
