@@ -28,6 +28,7 @@ export interface Raw {
     udt_symbol: string | null
     value: string
     state: BridgedState
+    capacity: string | null
   }>
 }
 
@@ -52,6 +53,7 @@ export interface Parsed {
     }
     value: string
     state: BridgedState
+    capacity: string | null
   }>
   meta: Record<'page' | 'total', string>
 }
@@ -81,6 +83,7 @@ export const getBridgedRecordListRes = (list: Raw): Parsed => ({
     },
     value: r.value,
     state: r.state,
+    capacity: r.capacity,
   })),
 })
 export const fetchBridgedRecordList = (
