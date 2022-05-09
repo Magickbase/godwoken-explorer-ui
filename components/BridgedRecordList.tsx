@@ -18,7 +18,7 @@ import BigNumber from 'bignumber.js'
 
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/Pagination'
-import { timeDistance, getBridgedRecordListRes, CKB_EXPLORER_URL } from 'utils'
+import { timeDistance, getBridgedRecordListRes, CKB_EXPLORER_URL, CKB_DECIMAL } from 'utils'
 
 type ParsedList = ReturnType<typeof getBridgedRecordListRes>
 
@@ -35,6 +35,7 @@ const BridgedRecordList: React.FC<{
             <TableRow>
               <TableCell component="th">{t('type')}</TableCell>
               <TableCell component="th">{t('value')} </TableCell>
+              <TableCell component="th">CKB</TableCell>
               <TableCell component="th">{t('age')} </TableCell>
               {showUser ? <TableCell component="th">{t('account')} </TableCell> : null}
               <TableCell component="th">{t('layer1Txn')} </TableCell>
@@ -48,6 +49,9 @@ const BridgedRecordList: React.FC<{
                   <TableCell sx={{ whiteSpace: 'nowrap', fontSize: { xs: 12, md: 14 } }}>{t(r.type)}</TableCell>
                   <TableCell sx={{ fontSize: { xs: 12, md: 14 }, whiteSpace: 'nowrap' }}>
                     {`${new BigNumber(r.value ?? '0').toFormat()} ${r.token.symbol ?? ''}`}
+                  </TableCell>
+                  <TableCell sx={{ fontSize: { xs: 12, md: 14 }, whiteSpace: 'nowrap' }}>
+                    {`${new BigNumber(r.capacity ?? '0').dividedBy(new BigNumber(CKB_DECIMAL)).toFormat()}`}
                   </TableCell>
                   <TableCell sx={{ whiteSpace: 'nowrap', fontSize: { xs: 12, md: 14 } }}>
                     {r.timestamp > 0 ? (
@@ -116,7 +120,7 @@ const BridgedRecordList: React.FC<{
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={showUser ? 6 : 5} align="center">
+                <TableCell colSpan={showUser ? 7 : 6} align="center">
                   {t(`no_records`)}
                 </TableCell>
               </TableRow>

@@ -139,7 +139,7 @@ const ContractInfo: React.FC<ContractInfoProps> = ({
     name ? `${t('contract_name')}: ${name}` : null,
     compilerVersion ? `${t('compiler_version')}: ${compilerVersion}` : null,
     compilerFileFormat ? `${t('compiler_file_format')}: ${compilerFileFormat}` : null,
-  ].map(c => c)
+  ].filter(c => c)
 
   const viewMethodSignatures = Object.keys(viewMethods)
 

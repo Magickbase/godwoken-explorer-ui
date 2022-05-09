@@ -29,7 +29,7 @@
     "ethers": "5.6.4",
     "next": "12.1.4",
     "next-i18next": "10.5.0",
-    "phoenix": "1.6.4",
+    "phoenix": "1.6.7",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "recharts": "2.1.9"
@@ -37,7 +37,7 @@
   "devDependencies": {
     "@cypress/code-coverage": "3.9.12",
     "@types/node": "16.11.26",
-    "@types/phoenix": "1.5.3",
+    "@types/phoenix": "1.5.4",
     "@types/react": "17.0.37",
     "autoprefixer": "10.4.4",
     "babel-plugin-istanbul": "6.1.1",
@@ -52,7 +52,7 @@
     "postcss-nesting": "10.0.2",
     "postcss-preset-env": "7.0.1",
     "prettier": "2.6.2",
-    "sass": "1.45.0",
+    "sass": "1.50.1",
     "typescript": "4.6.3"
   },
   "nyc": {
