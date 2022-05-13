@@ -35,6 +35,7 @@ interface Raw {
   /* polyjuice */
   contract_abi?: []
   input?: string
+  created_contract_address_hash?: string
 }
 
 interface Parsed {
@@ -68,6 +69,7 @@ interface Parsed {
   /* polyjuice */
   contractAbi: [] | null
   input: string | null
+  contractAddress: string | null
 }
 
 export const getTxRes = (tx: Raw): Parsed => ({
@@ -97,6 +99,7 @@ export const getTxRes = (tx: Raw): Parsed => ({
   hashType: tx.hash_type ?? null,
   scriptArgs: tx.script_args ?? null,
   contractAbi: tx.contract_abi ?? null,
+  contractAddress: tx.created_contract_address_hash ?? null,
   l1BlockNumber: tx.l1_block_number ?? null,
   input: tx.input,
 })
