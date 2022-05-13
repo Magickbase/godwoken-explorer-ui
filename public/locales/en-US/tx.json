@@ -39,5 +39,6 @@
   "rawInput": "Raw",
   "decodedInput": "Decoded",
   "utf8Input": "UTF8",
-  "erc20_records": "ERC20 Transfers"
+  "erc20_records": "ERC20 Transfers",
+  "deployed_contract": "Deployed Contract"
 }
