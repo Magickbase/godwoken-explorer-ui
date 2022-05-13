@@ -2,7 +2,7 @@ export const EXPLORER_TITLE = process.env.NEXT_PUBLIC_EXPLORER_TITLE
 export const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL
 export const NODE_URL = process.env.NEXT_PUBLIC_NODE_URL
 export const IS_MAINNET = process.env.NEXT_PUBLIC_CHAIN_TYPE === 'mainnet'
-export const CKB_EXPLORER_URL = `${process.env.NEXT_PUBLIC_CKB_EXPLORER_URL}${IS_MAINNET ? '' : '/aggron'}`
+export const CKB_EXPLORER_URL = `https://${IS_MAINNET ? '' : 'pudge.'}${process.env.NEXT_PUBLIC_CKB_EXPLORER_URL}`
 export const NERVINA_GITHUB_URL = process.env.NEXT_PUBLIC_NERVINA_GITHUB_URL
 export const NERVOS_URL = process.env.NEXT_PUBLIC_NERVOS_URL
 export const GW_VERSION = +(process.env.NEXT_PUBLIC_GW_VERSION || 0)

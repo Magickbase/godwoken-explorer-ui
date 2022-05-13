@@ -55,7 +55,6 @@ import {
   getERC20TransferListRes,
   CKB_EXPLORER_URL,
   CHANNEL,
-  CKB_DECIMAL,
   GAS_UNIT,
 } from 'utils'
 
@@ -174,6 +173,12 @@ const Tx = (initState: State) => {
       label: tx.toAlias ? 'interactedContract' : 'to',
       value: <Address address={tx.to} alias={tx.toAlias} />,
     },
+    tx.contractAddress
+      ? {
+          label: 'deployed_contract',
+          value: <Address address={tx.contractAddress} alias={tx.contractAddress} />,
+        }
+      : null,
     {
       label: 'value',
       value: <Typography variant="body2">{`${new BigNumber(tx.value || '0').toFormat()} CKB`}</Typography>,
