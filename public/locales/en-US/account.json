@@ -60,6 +60,7 @@
   "contract_source_code": "Contract Source Code",
   "abi": "ABI",
   "constructor_arguments": "Constructor Arguments",
+  "deployer": "Deployer",
   "deployment_transaction_hash": "Deployment Transaction Hash",
   "code": "Code",
   "read_contract": "Read Contract",
