@@ -60,6 +60,7 @@
   "contract_source_code": "合约源码",
   "abi": "ABI",
   "constructor_arguments": "合约构造参数",
+  "deployer": "部署者",
   "deployment_transaction_hash": "部署交易哈希",
   "code": "代码",
   "read_contract": "合约读取操作",
