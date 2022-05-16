@@ -147,7 +147,12 @@ const Account = (initState: State) => {
               <Grid item xs={12} md={6}>
                 {account.metaContract ? <MetaContract {...account.metaContract} /> : null}
                 {account.user ? <User {...account.user} /> : null}
-                {account.smartContract ? <SmartContract txHash={account.smartContract.deploymentTxHash} /> : null}
+                {account.smartContract ? (
+                  <SmartContract
+                    deployer={account.smartContract.creatorAddress}
+                    txHash={account.smartContract.deploymentTxHash}
+                  />
+                ) : null}
                 {account.polyjuice ? <Polyjuice {...account.polyjuice} /> : null}
                 {account.sudt ? <SUDT {...account.sudt} /> : null}
               </Grid>
