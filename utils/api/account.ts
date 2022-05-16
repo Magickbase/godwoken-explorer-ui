@@ -51,6 +51,7 @@ const getSmartContract = (smartContract: API.Account.Raw['smart_contract']): API
   compilerVersion: smartContract.compiler_version ?? '',
   constructorArguments: smartContract.constructor_arguments ?? '',
   contractSourceCode: smartContract.contract_source_code ?? '',
+  creatorAddress: smartContract.creator_address ?? '',
   deploymentTxHash: smartContract.deployment_tx_hash ?? '',
   name: smartContract.name ?? '',
   otherInfo: smartContract.other_info ?? '',

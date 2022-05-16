@@ -4,13 +4,29 @@ import { Tooltip, List, ListItem, ListItemText, ListSubheader, Divider, Typograp
 
 // type State = API.Account.Parsed['smartContract']
 
-const SmartContract: React.FC<{ txHash: string }> = ({ txHash }) => {
+const SmartContract: React.FC<Record<'deployer' | 'txHash', string>> = ({ deployer, txHash }) => {
   const [t] = useTranslation('account')
   const fields = [
     {
       label: t('type'),
       value: <Typography variant="body2">{'Smart Contract'}</Typography>,
     },
+    deployer
+      ? {
+          label: t('deployer'),
+          value: (
+            <Tooltip title={deployer} placement="top">
+              <Typography variant="body2" sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <NextLink href={`/account/${deployer}`}>
+                  <Link href={`/account/${deployer}`} underline="none" className="mono-font" color="secondary">
+                    {deployer}
+                  </Link>
+                </NextLink>
+              </Typography>
+            </Tooltip>
+          ),
+        }
+      : null,
     txHash
       ? {
           label: t('deployTx'),

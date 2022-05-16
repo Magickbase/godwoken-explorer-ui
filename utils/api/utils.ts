@@ -162,6 +162,7 @@ export namespace API {
           compiler_version?: string
           constructor_arguments?: string
           contract_source_code?: string
+          creator_address?: string
           deployment_tx_hash?: string
           name?: string
           other_info?: string
@@ -193,6 +194,7 @@ export namespace API {
           compilerVersion: string
           constructorArguments: string
           contractSourceCode: string
+          creatorAddress: string
           deploymentTxHash: string
           name: string
           otherInfo: string
