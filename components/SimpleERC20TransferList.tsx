@@ -46,7 +46,7 @@ const SimpleTransferList: React.FC<{
           <TableBody>
             {+list.totalCount ? (
               list.txs.map(item => (
-                <TableRow key={item.hash + item.from + item.to}>
+                <TableRow key={item.hash + item.logIndex}>
                   <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                     <NextLink href={`/account/${item.from}`}>
                       <Link href={`/account/${item.from}`} underline="none" color="secondary" className="mono-font">
