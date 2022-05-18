@@ -60,6 +60,7 @@ interface Erc20Raw {
   udt_id: number
   udt_symbol: string
   udt_name: string
+  log_index: number
 }
 
 interface Erc20Parsed {
@@ -73,6 +74,7 @@ interface Erc20Parsed {
   transferValue: string
   udtId: number
   udtSymbol: string
+  logIndex: number
 }
 
 export const getTxListRes = (txListRes: {
@@ -128,6 +130,7 @@ export const getERC20TransferListRes = (list: {
     transferValue: tx.transfer_value,
     udtId: tx.udt_id,
     udtSymbol: tx.udt_symbol,
+    logIndex: tx.log_index,
   })),
 })
 export const fetchERC20TransferList = (

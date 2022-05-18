@@ -49,7 +49,7 @@ const TransferList: React.FC<{
           <TableBody>
             {+list.totalCount ? (
               list.txs.map(item => (
-                <TableRow key={item.hash + item.from + item.to}>
+                <TableRow key={item.hash + item.logIndex}>
                   <TableCell>
                     <Stack direction="row" alignItems="center">
                       <TxStatusIcon status={item.status} isSuccess={item.isSuccess} />
