@@ -395,7 +395,7 @@ const Tx = (initState: State) => {
                   onClick={e => {
                     e.stopPropagation()
                     e.preventDefault()
-                    push(`/tx/${tx.hash}?tab=${tab[idx]}`)
+                    push(`/tx/${tx.hash}?tab=${tab[idx]}`, undefined, { scroll: false })
                   }}
                 />
               ))}
