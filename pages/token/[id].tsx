@@ -169,7 +169,7 @@ const Token = ({ token, transferList, bridgedRecordList, tokenHolderList }: Prop
                   onClick={e => {
                     e.stopPropagation()
                     e.preventDefault()
-                    push(`/token/${token.id}?tab=${tabs[idx]}`)
+                    push(`/token/${token.id}?tab=${tabs[idx]}`, undefined, { scroll: false })
                   }}
                 />
               ))}
