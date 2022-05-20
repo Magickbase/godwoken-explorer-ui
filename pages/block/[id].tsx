@@ -282,7 +282,7 @@ const Block = (initState: State) => {
                   onClick={e => {
                     e.stopPropagation()
                     e.preventDefault()
-                    push(`/block/${block.hash}?tab=${tabs[idx]}`)
+                    push(`/block/${block.hash}?tab=${tabs[idx]}`, undefined, { scroll: false })
                   }}
                 />
               ))}
