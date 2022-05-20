@@ -174,7 +174,7 @@ const Account = (initState: State) => {
                     onClick={e => {
                       e.stopPropagation()
                       e.preventDefault()
-                      push(`/account/${account.ethAddr}?tab=${tabs[idx]}`)
+                      push(`/account/${account.ethAddr}?tab=${tabs[idx]}`, undefined, { scroll: false })
                     }}
                   />
                 ) : null,
