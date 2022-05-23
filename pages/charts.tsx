@@ -82,7 +82,28 @@ const Charts = (initState: State) => {
                     ))}
                     <Tooltip />
                     <Legend />
-                    <Brush dataKey="date" height={20} stroke={theme.palette.primary.light} />
+                    <Brush height={20} tickFormatter={() => ''} stroke={theme.palette.primary.light}>
+                      <AreaChart height={30} data={charts.dailyData}>
+                        <defs>
+                          {keys.map(({ key }, idx) => (
+                            <linearGradient key={key} id={`color-${key}`} x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor={accentColors[idx]} stopOpacity={0.3} />
+                              <stop offset="95%" stopColor={accentColors[idx]} stopOpacity={0.1} />
+                            </linearGradient>
+                          ))}
+                        </defs>
+                        {keys.map(({ key }, idx) => (
+                          <Area
+                            key={key}
+                            type="monotone"
+                            dataKey={key}
+                            stroke={accentColors[idx]}
+                            fill={`url(#color-${key})`}
+                            fillOpacity={1}
+                          />
+                        ))}
+                      </AreaChart>
+                    </Brush>
                     {keys.map(({ key }, idx) => (
                       <Area
                         yAxisId={idx}
