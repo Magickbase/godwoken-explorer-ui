@@ -126,7 +126,7 @@ const BlockList = (initState: State) => {
             </TableContainer>
             <Stack direction="row" justifyContent="space-between" alignItems="center">
               <PageSize pageSize={pageSize} />
-              <Pagination total={blockList.totalPage * pageSize} page={blockList.page} />
+              <Pagination total={blockList.totalPage * pageSize} page={blockList.page} pageSize={pageSize} />
             </Stack>
           </Box>
         </Paper>
