@@ -9,7 +9,7 @@ interface RawContract {
   name: string
   other_info: string | null
   tx_count: number
-  short_address: string
+  registry_address: string
 }
 
 interface ParsedContract {
@@ -37,7 +37,7 @@ interface Parsed {
 
 export const getContractListRes = (contractListRes: Raw, pageSize: number): Parsed => ({
   contracts: contractListRes.data.map(({ attributes: c }) => ({
-    address: c.short_address,
+    address: c.registry_address,
     balance: c.balance,
     compiler: {
       fileFormat: c.compiler_file_format,
