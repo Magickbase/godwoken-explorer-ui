@@ -29,7 +29,7 @@ const Layout = ({ children }) => {
         ) : null}
         {GW_VERSION === 1 ? (
           <Alert severity="info" sx={{ display: 'flex', justifyContent: 'center', borderRadius: 0 }}>
-            {t(`alphanetAnnotation`)}
+            {t(`betanetAnnotation`)}
           </Alert>
         ) : null}
         {children}
