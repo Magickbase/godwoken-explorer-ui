@@ -52,7 +52,6 @@ const TokenList = ({ meta, tokens, type }: State) => {
           <Stack direction="row" justifyContent="space-between" alignItems="center">
             <Typography fontWeight={600}>{title}</Typography>
             <Stack direction="row" alignItems="center">
-              <Typography>{t(`total-count-of-udt`, { total: (meta.total - 1) * 10 + tokens.length })}</Typography>
               <Tooltip title={t(type === 'bridge' ? 'add-bridged-token' : 'add-native-erc20-token')} placement="top">
                 <Link
                   href={type === 'bridge' ? BRIDGED_TOKEN_TEMPLATE_URL : NATIVE_TOKEN_TEMPLATE_URL}
