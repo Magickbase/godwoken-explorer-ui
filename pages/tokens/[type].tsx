@@ -22,7 +22,7 @@ import BigNumber from 'bignumber.js'
 import SubpageHead from 'components/SubpageHead'
 import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined'
 import Pagination from 'components/Pagination'
-import { fetchTokenList, handleApiError, nameToColor } from 'utils'
+import { fetchTokenList, handleApiError, nameToColor, PAGE_SIZE } from 'utils'
 import { PageNonPositiveException, PageOverflowException, TypeNotFoundException } from 'utils/exceptions'
 import type { API } from 'utils/api/utils'
 
@@ -150,7 +150,7 @@ const TokenList = ({ meta, tokens, type }: State) => {
               </TableBody>
             </Table>
           </TableContainer>
-          <Pagination page={meta.current} total={meta.total * 10} />
+          <Pagination page={meta.current} total={meta.total * PAGE_SIZE} />
         </Paper>
       </Container>
     </>
