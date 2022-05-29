@@ -40,5 +40,7 @@
   "decodedInput": "Decoded",
   "utf8Input": "UTF8",
   "erc20_records": "ERC20 Transfers",
-  "deployed_contract": "Deployed Contract"
+  "deployed_contract": "Deployed Contract",
+  "logs": "Logs",
+  "noLogs": "No logs from this transaction"
 }

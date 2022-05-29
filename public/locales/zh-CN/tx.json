@@ -40,5 +40,7 @@
   "decodedInput": "解码",
   "utf8Input": "UTF8",
   "erc20_records": "ERC20 交易记录",
-  "deployed_contract": "已部署合约"
+  "deployed_contract": "已部署合约",
+  "logs": "日志",
+  "noLogs": "此交易没有日志"
 }

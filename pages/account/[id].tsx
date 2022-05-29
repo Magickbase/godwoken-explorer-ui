@@ -33,6 +33,7 @@ import UdtList from 'components/UdtList'
 import TxList from 'components/TxList'
 import BridgedRecordList from 'components/BridgedRecordList'
 import ContractInfo from 'components/ContractInfo'
+import ContractEventsList from 'components/ContractEventsList'
 import {
   handleCopy,
   fetchAccount,
@@ -50,6 +51,8 @@ import {
   fetchERC20TransferList,
   getBridgedRecordListRes,
   fetchBridgedRecordList,
+  ParsedLog,
+  fetchEventLogsListByType,
 } from 'utils'
 import PageTitle from 'components/PageTitle'
 
@@ -58,8 +61,13 @@ type ParsedTransferList = ReturnType<typeof getERC20TransferListRes>
 type ParsedBridgedRecordList = ReturnType<typeof getBridgedRecordListRes>
 
 type State = API.Account.Parsed &
-  Partial<{ txList: ParsedTxList; transferList: ParsedTransferList; bridgedRecordList: ParsedBridgedRecordList }>
-const tabs = ['transactions', 'erc20', 'bridged', 'assets', 'contract']
+  Partial<{
+    txList: ParsedTxList
+    transferList: ParsedTransferList
+    bridgedRecordList: ParsedBridgedRecordList
+    eventsList: ParsedLog[]
+  }>
+const tabs = ['transactions', 'erc20', 'bridged', 'assets', 'contract', 'events']
 const Account = (initState: State) => {
   const {
     push,
@@ -166,6 +174,7 @@ const Account = (initState: State) => {
                 t(`bridgedRecords`),
                 `${t('userDefinedAssets')} (${udtList.length})`,
                 accountType === 'smartContract' && account.smartContract?.name ? t('contract') : null,
+                t('events'),
               ].map((label, idx) =>
                 label ? (
                   <Tab
@@ -192,6 +201,7 @@ const Account = (initState: State) => {
             {tab === 'contract' && account.smartContract?.name ? (
               <ContractInfo address={account.ethAddr} {...account.smartContract} />
             ) : null}
+            {tab === 'events' && <ContractEventsList list={account.eventsList} />}
           </Paper>
         </Stack>
         <Snackbar
@@ -234,12 +244,13 @@ export const getServerSideProps: GetServerSideProps<State, { id: string }> = asy
       tab === 'erc20' && account.ethAddr
         ? await fetchERC20TransferList({ eth_address: account.ethAddr, page: query.page as string })
         : null
-
     const bridgedRecordList =
       tab === 'bridged' && account.ethAddr
         ? await fetchBridgedRecordList({ eth_address: account.ethAddr, page: query.page as string })
         : null
-    return { props: { ...account, ...lng, txList, transferList, bridgedRecordList } }
+    const eventsList =
+      tab === 'events' && account.ethAddr ? await fetchEventLogsListByType('accounts', account.ethAddr) : null
+    return { props: { ...account, ...lng, txList, transferList, bridgedRecordList, eventsList } }
   } catch (err) {
     switch (true) {
       case err instanceof TabNotFoundException: {
