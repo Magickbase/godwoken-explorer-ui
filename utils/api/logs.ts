@@ -1,3 +1,5 @@
+import { ethers } from 'ethers'
+import { LogDescription } from 'ethers/lib/utils'
 import { SERVER_URL, pretreat } from './utils'
 
 interface Log {
@@ -8,7 +10,7 @@ interface Log {
 }
 
 interface Attributes {
-  abi: ABI[]
+  abi: Fragment[]
   address_hash: string
   block_number: number
   data: string
@@ -37,7 +39,7 @@ interface Meta {
   total_page?: number
 }
 
-interface ABI {
+interface Fragment {
   anonymous?: boolean
   inputs: Input[]
   name: string
@@ -52,9 +54,9 @@ interface Raw {
   meta: Meta
 }
 
-export interface ParsedLog {
+export interface ParsedEventLog {
   id: number
-  abi: ABI
+  parsedLog: Omit<LogDescription, 'eventFragment'>
   addressHash: string
   txHash: string
   data: string
@@ -62,22 +64,31 @@ export interface ParsedLog {
   topics: string[]
 }
 
-export const getEventLogsListRes = (rawData: Raw): ParsedLog[] => {
-  return rawData.data.map(({ attributes, id }) => {
-    const matchingEventAbi = attributes.abi.find(abi => abi.type === 'event')[0] || null
-    return {
-      id: id,
-      abi: matchingEventAbi,
-      addressHash: attributes.address_hash,
-      txHash: attributes.transaction_hash,
-      data: attributes.data,
-      blockNumber: attributes.block_number,
-      topics: [attributes.first_topic, attributes.second_topic, attributes.third_topic, attributes.fourth_topic],
+export const getEventLogsListRes = (raw: Raw): ParsedEventLog[] => {
+  return raw.data.map(({ attributes, id }) => {
+    const topics = [attributes.first_topic, attributes.second_topic, attributes.third_topic]
+    const data = attributes.data
+    try {
+      const i = new ethers.utils.Interface(attributes.abi)
+      const parsedLog = i.parseLog({ data, topics })
+      return {
+        id: id,
+        parsedLog: JSON.parse(JSON.stringify(parsedLog)),
+        addressHash: attributes.address_hash,
+        txHash: attributes.transaction_hash,
+        data: data,
+        blockNumber: attributes.block_number,
+        topics: topics,
+      }
+    } catch (err) {
+      console.error(err)
+      return null
     }
   })
 }
 
-export const fetchEventLogsListByType = (type: 'txs' | 'accounts', address: string): Promise<ParsedLog[]> =>
-  fetch(`${SERVER_URL}/${type}/${address}/logs`)
+export const fetchEventLogsListByType = (type: 'txs' | 'accounts', address: string): Promise<ParsedEventLog[]> => {
+  return fetch(`${SERVER_URL}/${type}/${address}/logs`)
     .then(res => pretreat<Raw>(res))
     .then(getEventLogsListRes)
+}

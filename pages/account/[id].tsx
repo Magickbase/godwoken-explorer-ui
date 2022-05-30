@@ -51,7 +51,7 @@ import {
   fetchERC20TransferList,
   getBridgedRecordListRes,
   fetchBridgedRecordList,
-  ParsedLog,
+  ParsedEventLog,
   fetchEventLogsListByType,
 } from 'utils'
 import PageTitle from 'components/PageTitle'
@@ -65,7 +65,7 @@ type State = API.Account.Parsed &
     txList: ParsedTxList
     transferList: ParsedTransferList
     bridgedRecordList: ParsedBridgedRecordList
-    eventsList: ParsedLog[]
+    eventsList: ParsedEventLog[]
   }>
 const tabs = ['transactions', 'erc20', 'bridged', 'assets', 'contract', 'events']
 const Account = (initState: State) => {

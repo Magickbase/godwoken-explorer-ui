@@ -54,7 +54,7 @@ import {
   TabNotFoundException,
   fetchERC20TransferList,
   getERC20TransferListRes,
-  ParsedLog,
+  ParsedEventLog,
   fetchEventLogsListByType,
   CKB_EXPLORER_URL,
   CHANNEL,
@@ -64,7 +64,7 @@ import {
 type ParsedTransferList = ReturnType<typeof getERC20TransferListRes>
 type RawTx = Parameters<typeof getTxRes>[0]
 type ParsedTx = ReturnType<typeof getTxRes>
-type State = ParsedTx & Partial<{ transferList: ParsedTransferList; logsList: ParsedLog[] }>
+type State = ParsedTx & Partial<{ transferList: ParsedTransferList; logsList: ParsedEventLog[] }>
 
 const tabs = ['erc20', 'logs']
 
