@@ -56,7 +56,7 @@ interface Raw {
 
 export interface ParsedEventLog {
   id: number
-  parsedLog: Omit<LogDescription, 'eventFragment'>
+  parsedLog: LogDescription
   addressHash: string
   txHash: string
   data: string

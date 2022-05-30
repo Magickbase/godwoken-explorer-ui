@@ -42,5 +42,9 @@
   "erc20_records": "ERC20 Transfers",
   "deployed_contract": "Deployed Contract",
   "logs": "Logs",
-  "noLogs": "No logs from this transaction"
+  "noLogs": "No logs from this transaction",
+  "address": "Address",
+  "name": "Name",
+  "topics": "Topics",
+  "data": "Data"
 }
