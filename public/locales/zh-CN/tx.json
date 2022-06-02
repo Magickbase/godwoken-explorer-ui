@@ -42,9 +42,11 @@
   "erc20_records": "ERC20 交易记录",
   "deployed_contract": "已部署合约",
   "logs": "日志",
+  "txReceiptEventLogs": "交易收据事件日志",
   "noLogs": "此交易没有日志",
   "address": "地址",
   "name": "名称",
+  "viewSource": "查看源码",
   "topics": "Topics",
   "data": "Data"
 }
