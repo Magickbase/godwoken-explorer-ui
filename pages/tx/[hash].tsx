@@ -63,6 +63,7 @@ type RawTx = Parameters<typeof getTxRes>[0]
 type ParsedTx = ReturnType<typeof getTxRes>
 
 type State = ParsedTx & Partial<{ transferList: ParsedTransferList }>
+const ADDR_LENGTH = 42
 
 const Tx = (initState: State) => {
   const [tx, setTx] = useState(initState)
@@ -172,7 +173,7 @@ const Tx = (initState: State) => {
       label: tx.toAlias ? 'interactedContract' : 'to',
       value: <Address address={tx.to} alias={tx.toAlias} />,
     },
-    tx.contractAddress
+    tx.contractAddress?.length === ADDR_LENGTH
       ? {
           label: 'deployed_contract',
           value: <Address address={tx.contractAddress} alias={tx.contractAddress} />,
