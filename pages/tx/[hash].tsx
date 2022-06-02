@@ -55,7 +55,6 @@ import {
   getERC20TransferListRes,
   CKB_EXPLORER_URL,
   CHANNEL,
-  GAS_UNIT,
 } from 'utils'
 
 const tabs = ['erc20']
@@ -251,13 +250,13 @@ const Tx = (initState: State) => {
     tx.gasUsed
       ? {
           label: 'gasUsed',
-          value: <Typography variant="body2">{`${utils.formatUnits(tx.gasUsed, GAS_UNIT)} ${GAS_UNIT}`}</Typography>,
+          value: <Typography variant="body2">{new BigNumber(tx.gasUsed).toFormat()}</Typography>,
         }
       : null,
     tx.gasLimit
       ? {
           label: 'gasLimit',
-          value: <Typography variant="body2">{`${utils.formatUnits(tx.gasLimit, GAS_UNIT)} ${GAS_UNIT}`}</Typography>,
+          value: <Typography variant="body2">{new BigNumber(tx.gasLimit).toFormat()}</Typography>,
         }
       : null,
     tx.gasUsed && tx.gasPrice
