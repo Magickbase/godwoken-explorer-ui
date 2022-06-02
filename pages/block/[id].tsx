@@ -231,11 +231,11 @@ const Block = (initState: State) => {
     },
     {
       label: 'gasUsed',
-      value: <Typography variant="body2">{`${utils.formatUnits(block.gas.used, GAS_UNIT)} ${GAS_UNIT}`}</Typography>,
+      value: <Typography variant="body2">{new BigNumber(block.gas.used).toFormat()}</Typography>,
     },
     {
       label: 'gasLimit',
-      value: <Typography variant="body2">{`${utils.formatUnits(block.gas.limit, GAS_UNIT)} ${GAS_UNIT}`}</Typography>,
+      value: <Typography variant="body2">{new BigNumber(block.gas.limit).toFormat()}</Typography>,
     },
     {
       label: 'parentHash',
