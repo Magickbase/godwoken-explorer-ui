@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { useTranslation } from 'next-i18next'
 import { Box, Divider, Stack, Typography } from '@mui/material'
 import { ParsedEventLog } from 'utils'
@@ -8,12 +7,8 @@ const TxLogsList = ({ list }: { list: ParsedEventLog[] }) => {
   const [t] = useTranslation('tx')
   const listItems = list.filter(item => item !== null)
 
-  useEffect(() => {
-    console.log(listItems)
-  }, [])
-
   return listItems?.length ? (
-    <Box sx={{ m: 2 }}>
+    <Box sx={{ m: 2, mr: 4 }}>
       <Typography variant="body2" sx={{ color: '#333333' }}>
         {t('txReceiptEventLogs')}
       </Typography>
