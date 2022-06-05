@@ -1,4 +1,4 @@
-import { API, SERVER_URL, pretreat } from './utils'
+import { API, API_ENDPOINT, pretreat } from './utils'
 
 const getMetaContract = (metaContract: API.Account.Raw['meta_contract']): API.Account.Parsed['metaContract'] => ({
   status: metaContract.status,
@@ -71,6 +71,6 @@ export const getAccountRes = (account: API.Account.Raw): API.Account.Parsed => (
 })
 
 export const fetchAccount = (id: string): Promise<API.Account.Parsed> =>
-  fetch(`${SERVER_URL}/accounts/${id}`)
+  fetch(`${API_ENDPOINT}/accounts/${id}`)
     .then(res => pretreat<API.Account.Raw>(res))
     .then(getAccountRes)
