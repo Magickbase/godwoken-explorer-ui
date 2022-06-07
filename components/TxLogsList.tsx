@@ -5,7 +5,7 @@ import TxLogListItem from './TxLogListItem'
 
 const TxLogsList = ({ list }: { list: ParsedEventLog[] }) => {
   const [t] = useTranslation('tx')
-  const listItems = list.filter(item => item !== null)
+  const listItems = list?.filter(item => item !== null).sort((a, b) => a.id - b.id)
 
   return listItems?.length ? (
     <Box sx={{ m: 2, mr: 4 }}>
@@ -19,7 +19,9 @@ const TxLogsList = ({ list }: { list: ParsedEventLog[] }) => {
         spacing={0}
         divider={<Divider orientation="horizontal" flexItem />}
       >
-        {listItems.map(item => item && <TxLogListItem key={item.id} item={item} />)}
+        {listItems.map(item => (
+          <TxLogListItem key={item.id} item={item} />
+        ))}
       </Stack>
     </Box>
   ) : (

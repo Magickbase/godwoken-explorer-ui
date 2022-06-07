@@ -186,7 +186,9 @@ const Account = (initState: State) => {
                       push(`/account/${account.ethAddr}?tab=${tabs[idx]}`, undefined, { scroll: false })
                     }}
                   />
-                ) : null,
+                ) : (
+                  <Tab sx={{ display: 'none' }} />
+                ),
               )}
             </Tabs>
             <Divider />

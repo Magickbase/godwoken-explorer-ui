@@ -69,6 +69,5 @@
   "parameters": "参数",
   "response": "返回值",
   "query": "查询",
-  "events": "事件",
-  "noEvents": "没有事件"
+  "events": "事件"
 }

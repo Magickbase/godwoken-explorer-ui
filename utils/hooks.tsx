@@ -43,3 +43,16 @@ export const useWS = (
     }
   }, deps)
 }
+
+export const debounce = (func: Function, timeout: number = 300) => {
+  let timer: NodeJS.Timeout
+  return (...args: any) => {
+    if (!timer) {
+      func.apply(this, args)
+    }
+    clearTimeout(timer)
+    timer = setTimeout(() => {
+      timer = undefined
+    }, timeout)
+  }
+}

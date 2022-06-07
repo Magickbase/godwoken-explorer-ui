@@ -69,6 +69,5 @@
   "parameters": "Parameters",
   "response": "Response",
   "query": "Query",
-  "events": "Events",
-  "noEvents": "No events found"
+  "events": "Events"
 }
