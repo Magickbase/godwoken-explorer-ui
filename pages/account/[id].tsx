@@ -4,6 +4,7 @@ import { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import BigNumber from 'bignumber.js'
 import {
   Alert,
   Stack,
@@ -29,7 +30,7 @@ import SmartContract from 'components/SmartContract'
 import Polyjuice from 'components/Polyjuice'
 import SUDT from 'components/SUDT'
 import ERC20TransferList from 'components/ERC20TransferList'
-import UdtList from 'components/UdtList'
+import AssetList, { fetchUdtList, UdtList } from 'components/UdtList'
 import TxList, { AccountTxList, fetchTxList } from 'components/AccountTxList'
 import BridgedRecordList from 'components/BridgedRecordList'
 import ContractInfo from 'components/ContractInfo'
@@ -39,7 +40,6 @@ import {
   useWS,
   getAccountRes,
   handleApiError,
-  formatBalance,
   formatInt,
   getERC20TransferListRes,
   fetchERC20TransferList,
@@ -54,7 +54,12 @@ type ParsedTransferList = ReturnType<typeof getERC20TransferListRes>
 type ParsedBridgedRecordList = ReturnType<typeof getBridgedRecordListRes>
 
 type State = API.Account.Parsed &
-  Partial<{ txList: AccountTxList; transferList: ParsedTransferList; bridgedRecordList: ParsedBridgedRecordList }>
+  Partial<{
+    txList: AccountTxList
+    transferList: ParsedTransferList
+    bridgedRecordList: ParsedBridgedRecordList
+    udtList: UdtList
+  }>
 const tabs = ['transactions', 'erc20', 'bridged', 'assets', 'contract']
 const Account = (initState: State) => {
   const {
@@ -129,7 +134,9 @@ const Account = (initState: State) => {
                   <ListItem>
                     <ListItemText
                       primary={t(`ckbBalance`)}
-                      secondary={<Typography variant="body2">{formatBalance(account.ckb) + ' CKB'}</Typography>}
+                      secondary={
+                        <Typography variant="body2">{new BigNumber(account.ckb).toFormat() + ' CKB'}</Typography>
+                      }
                     />
                   </ListItem>
                   <ListItem>
@@ -160,7 +167,7 @@ const Account = (initState: State) => {
                 t('transactionRecords'),
                 t(`ERC20Records`),
                 t(`bridgedRecords`),
-                `${t('userDefinedAssets')} (${udtList.length})`,
+                t('userDefinedAssets'),
                 accountType === 'smartContract' && account.smartContract?.name ? t('contract') : null,
               ].map((label, idx) =>
                 label ? (
@@ -182,7 +189,7 @@ const Account = (initState: State) => {
             {tab === 'bridged' && account.bridgedRecordList ? (
               <BridgedRecordList list={account.bridgedRecordList} />
             ) : null}
-            {tab === 'assets' ? <UdtList list={udtList} /> : null}
+            {tab === 'assets' && account.udtList ? <AssetList list={account.udtList} /> : null}
             {tab === 'contract' && account.smartContract?.name ? (
               <ContractInfo address={account.ethAddr} {...account.smartContract} />
             ) : null}
@@ -237,7 +244,9 @@ export const getServerSideProps: GetServerSideProps<State, { id: string }> = asy
         ? await fetchBridgedRecordList({ eth_address: account.ethAddr, page: query.page as string })
         : null
 
-    return { props: { ...account, ...lng, txList, transferList, bridgedRecordList } }
+    const udtList = tab === 'assets' && account.ethAddr ? await fetchUdtList({ address: account.ethAddr }) : null
+
+    return { props: { ...account, ...lng, txList, transferList, bridgedRecordList, udtList } }
   } catch (err) {
     switch (true) {
       case err instanceof TabNotFoundException: {
