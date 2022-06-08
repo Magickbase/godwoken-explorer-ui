@@ -25,7 +25,9 @@ const TxLogsList = ({ list }: { list: ParsedEventLog[] }) => {
       </Stack>
     </Box>
   ) : (
-    <Box>{t('noLogs')}</Box>
+    <Stack sx={{ minHeight: 50 }} justifyContent="center" alignItems="center">
+      <Typography>{t('noLogs')}</Typography>
+    </Stack>
   )
 }
 
