@@ -1,4 +1,4 @@
-import { API, SERVER_URL, pretreat } from './utils'
+import { API, API_ENDPOINT, pretreat } from './utils'
 import { PAGE_SIZE } from 'utils/constants'
 
 export const getTokenRes = ({
@@ -29,7 +29,7 @@ export const getTokenRes = ({
 })
 
 export const fetchToken = (id: string) =>
-  fetch(`${SERVER_URL}/udts/${id}`)
+  fetch(`${API_ENDPOINT}/udts/${id}`)
     .then(res => pretreat<API.Token.Raw>(res))
     .then(getTokenRes)
 
@@ -74,6 +74,6 @@ export const fetchTokenHolderList = (query: {
   page?: string
   page_size?: string
 }): Promise<ParsedTokenHolderList> =>
-  fetch(`${SERVER_URL}/account_udts?${new URLSearchParams({ ...query, page: query.page || '1' })}`)
+  fetch(`${API_ENDPOINT}/account_udts?${new URLSearchParams({ ...query, page: query.page || '1' })}`)
     .then(res => pretreat<RawTokenHolderList>(res))
     .then(res => getTokenHolderListRes(res, +(query.page_size || PAGE_SIZE)))

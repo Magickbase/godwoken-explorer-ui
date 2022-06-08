@@ -1,5 +1,5 @@
 import { utils } from 'ethers'
-import { SERVER_URL, pretreat } from './utils'
+import { API_ENDPOINT, pretreat } from './utils'
 
 export interface RawDailyData {
   data: Array<{
@@ -44,6 +44,6 @@ export const getDailyDataRes = (raw: RawDailyData): ParsedDailyData =>
   }))
 
 export const fetchDailyData = (query?: Partial<Record<'start_date' | 'end_date', string>>): Promise<ParsedDailyData> =>
-  fetch(`${SERVER_URL}/daily_stats?${new URLSearchParams(query)}`)
+  fetch(`${API_ENDPOINT}/daily_stats?${new URLSearchParams(query)}`)
     .then(res => pretreat<RawDailyData>(res))
     .then(getDailyDataRes)

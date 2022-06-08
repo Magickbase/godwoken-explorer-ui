@@ -1,4 +1,4 @@
-import { SERVER_URL, pretreat } from './utils'
+import { API_ENDPOINT, pretreat } from './utils'
 
 type BridgedType = 'deposit' | 'withdrawal'
 type BridgedState = 'succeed' | 'available' | 'pending'
@@ -89,6 +89,6 @@ export const getBridgedRecordListRes = (list: Raw): Parsed => ({
 export const fetchBridgedRecordList = (
   query: Partial<Record<'page' | 'udt_id' | 'eth_address' | 'block_number', string>>,
 ): Promise<Parsed> =>
-  fetch(`${SERVER_URL}/deposit_withdrawals?${new URLSearchParams({ ...query, page: query.page || '1' })}`)
+  fetch(`${API_ENDPOINT}/deposit_withdrawals?${new URLSearchParams({ ...query, page: query.page || '1' })}`)
     .then(res => pretreat<Raw>(res))
     .then(getBridgedRecordListRes)

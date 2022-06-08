@@ -1,4 +1,4 @@
-import { SERVER_URL, pretreat } from './utils'
+import { API_ENDPOINT, pretreat } from './utils'
 import type { BlockState } from './block'
 
 interface Raw {
@@ -50,6 +50,6 @@ export const fetchBlockList = ({
   page_size = '30',
   ...query
 }: Partial<Record<'page' | 'page_size', string>>): Promise<ReturnType<typeof getBlockListRes>> =>
-  fetch(`${SERVER_URL}/blocks?${new URLSearchParams({ ...query, page, page_size })}`)
+  fetch(`${API_ENDPOINT}/blocks?${new URLSearchParams({ ...query, page, page_size })}`)
     .then(res => pretreat<Parameters<typeof getBlockListRes>[0]>(res))
     .then(getBlockListRes)

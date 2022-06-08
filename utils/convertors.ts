@@ -12,6 +12,7 @@ import {
   scriptToAddress,
 } from '@nervosnetwork/ckb-sdk-utils'
 import { IS_MAINNET } from './constants'
+import { GraphQLSchema } from './graphql'
 
 dayjs.extend(relativeTime)
 dayjs.extend(customParseFormat)
@@ -43,10 +44,10 @@ export const scriptToCkbAddress = (lockScript: CKBComponents.Script) => {
 
 export const formatInt = (int: string | number) => new BigNumber(int || '0').toFormat()
 
-export const formatBalance = (balance: string) => {
-  const [int, dec] = balance.split('.')
-  const formattedInt = formatInt(int)
-  return dec ? [formattedInt, dec].join('.') : formattedInt
+export const formatAmount = (value: string, udt: Pick<GraphQLSchema.Udt, 'decimal' | 'symbol'>) => {
+  if (!udt.decimal) return new BigNumber(value).toFormat()
+  const decimal = new BigNumber(10).exponentiatedBy(udt.decimal)
+  return `${new BigNumber(value).dividedBy(decimal)} ${udt.symbol}`
 }
 
 export { scriptToHash }
