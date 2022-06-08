@@ -1,4 +1,4 @@
-import { SERVER_URL, pretreat } from './utils'
+import { API_ENDPOINT, pretreat } from './utils'
 export type TxStatus = 'pending' | 'committed' | 'finalized'
 type HashType = 'type' | 'data'
 export type TxType = 'polyjuice_creator' | 'polyjuice'
@@ -105,6 +105,6 @@ export const getTxRes = (tx: Raw): Parsed => ({
 })
 
 export const fetchTx = (hash: string): Promise<Parsed> =>
-  fetch(`${SERVER_URL}/txs/${hash}`)
+  fetch(`${API_ENDPOINT}/txs/${hash}`)
     .then(res => pretreat<Raw>(res))
     .then(getTxRes)

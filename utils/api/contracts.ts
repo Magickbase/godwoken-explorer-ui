@@ -1,4 +1,4 @@
-import { SERVER_URL, pretreat } from './utils'
+import { API_ENDPOINT, pretreat } from './utils'
 
 interface RawContract {
   balance: string
@@ -60,6 +60,6 @@ export const fetchContractList = ({
   page_size = '30',
   ...query
 }: Partial<Record<'page' | 'page_size', string>>): Promise<ReturnType<typeof getContractListRes>> =>
-  fetch(`${SERVER_URL}/smart_contracts?${new URLSearchParams({ ...query, page, page_size })}`)
+  fetch(`${API_ENDPOINT}/smart_contracts?${new URLSearchParams({ ...query, page, page_size })}`)
     .then(res => pretreat<Parameters<typeof getContractListRes>[0]>(res))
     .then(res => getContractListRes(res, +page_size))
