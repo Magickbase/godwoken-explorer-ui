@@ -17,7 +17,7 @@
   "ckbBalance": "CKB Balance",
   "ethBalance": "ETH Balance",
   "txCount": "transaction count",
-  "userDefinedAssets": "User Defined Asset(s)",
+  "userDefinedAssets": "User Defined Assets",
   "ethAddr": "ethereum address",
   "ckbAddr": "CKB address",
   "ckbLockHash": "CKB lock hash",
