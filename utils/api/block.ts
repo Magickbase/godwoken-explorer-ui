@@ -1,4 +1,4 @@
-import { SERVER_URL, pretreat } from './utils'
+import { API_ENDPOINT, pretreat } from './utils'
 
 export type BlockState = 'committed' | 'finalized'
 
@@ -50,6 +50,6 @@ export const getBlockRes = (block: Raw): Parsed => ({
 })
 
 export const fetchBlock = (id: string): Promise<Parsed> =>
-  fetch(`${SERVER_URL}/blocks/${id}`)
+  fetch(`${API_ENDPOINT}/blocks/${id}`)
     .then(res => pretreat<Raw>(res))
     .then(getBlockRes)

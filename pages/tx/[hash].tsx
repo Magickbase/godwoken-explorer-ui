@@ -58,7 +58,6 @@ import {
   fetchEventLogsListByType,
   CKB_EXPLORER_URL,
   CHANNEL,
-  GAS_UNIT,
 } from 'utils'
 
 type ParsedTransferList = ReturnType<typeof getERC20TransferListRes>
@@ -254,13 +253,13 @@ const Tx = (initState: State) => {
     tx.gasUsed
       ? {
           label: 'gasUsed',
-          value: <Typography variant="body2">{`${utils.formatUnits(tx.gasUsed, GAS_UNIT)} ${GAS_UNIT}`}</Typography>,
+          value: <Typography variant="body2">{new BigNumber(tx.gasUsed).toFormat()}</Typography>,
         }
       : null,
     tx.gasLimit
       ? {
           label: 'gasLimit',
-          value: <Typography variant="body2">{`${utils.formatUnits(tx.gasLimit, GAS_UNIT)} ${GAS_UNIT}`}</Typography>,
+          value: <Typography variant="body2">{new BigNumber(tx.gasLimit).toFormat()}</Typography>,
         }
       : null,
     tx.gasUsed && tx.gasPrice

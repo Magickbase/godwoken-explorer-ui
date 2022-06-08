@@ -1,5 +1,5 @@
 import { addressToScript } from '@nervosnetwork/ckb-sdk-utils'
-import { isError, ErrorResponse, SERVER_URL, HttpStatus } from './utils'
+import { isError, ErrorResponse, API_ENDPOINT, HttpStatus } from './utils'
 
 export const fetchSearch = (search: string) => {
   let query = search
@@ -12,7 +12,7 @@ export const fetchSearch = (search: string) => {
     }
   }
 
-  return fetch(`${SERVER_URL}/search?keyword=${query}`)
+  return fetch(`${API_ENDPOINT}/search?keyword=${query}`)
     .then(async res => {
       if (res.status === HttpStatus.NotFound) {
         return `/404`

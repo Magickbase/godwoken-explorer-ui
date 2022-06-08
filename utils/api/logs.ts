@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 import { LogDescription } from 'ethers/lib/utils'
-import { SERVER_URL, pretreat } from './utils'
+import { API_ENDPOINT, pretreat } from './utils'
 
 interface Log {
   attributes: Attributes
@@ -88,7 +88,7 @@ export const getEventLogsListRes = (raw: Raw): ParsedEventLog[] => {
 }
 
 export const fetchEventLogsListByType = (type: 'txs' | 'accounts', address: string): Promise<ParsedEventLog[]> => {
-  return fetch(`${SERVER_URL}/${type}/${address}/logs`)
+  return fetch(`${API_ENDPOINT}/${type}/${address}/logs`)
     .then(res => pretreat<Raw>(res))
     .then(getEventLogsListRes)
 }
