@@ -80,7 +80,9 @@ const Charts = (initState: State) => {
                         tick={{ fontSize: 12 }}
                       />
                     ))}
-                    <Tooltip />
+                    {keys.map(({ key, unit }) => (
+                      <Tooltip key={key} formatter={value => (unit ? `${value} ${unit}` : value)} />
+                    ))}
                     <Legend />
                     <Brush height={20} tickFormatter={() => ''} stroke={theme.palette.primary.light}>
                       <AreaChart height={30} data={charts.dailyData}>
