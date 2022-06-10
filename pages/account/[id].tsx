@@ -22,7 +22,7 @@ import {
   Typography,
   Snackbar,
 } from '@mui/material'
-import { ContentCopyOutlined as CopyIcon } from '@mui/icons-material'
+import { BorderInner, ContentCopyOutlined as CopyIcon } from '@mui/icons-material'
 import SubpageHead from 'components/SubpageHead'
 import User from 'components/User'
 import MetaContract from 'components/MetaContract'
@@ -47,6 +47,8 @@ import {
   fetchBridgedRecordList,
   CHANNEL,
   TabNotFoundException,
+  GCKB_DECIMAL,
+  CKB_DECIMAL,
 } from 'utils'
 import PageTitle from 'components/PageTitle'
 
@@ -135,7 +137,11 @@ const Account = (initState: State) => {
                     <ListItemText
                       primary={t(`ckbBalance`)}
                       secondary={
-                        <Typography variant="body2">{new BigNumber(account.ckb).toFormat() + ' CKB'}</Typography>
+                        <Typography variant="body2">
+                          {/* FIXME: use response of graphql and GCKB_DECIMAL to foramt balance */}
+                          {new BigNumber(account.ckb).multipliedBy(CKB_DECIMAL).dividedBy(GCKB_DECIMAL).toFormat() +
+                            ' CKB'}
+                        </Typography>
                       }
                     />
                   </ListItem>
