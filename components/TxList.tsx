@@ -19,7 +19,7 @@ import TxStatusIcon from './TxStatusIcon'
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/Pagination'
 import PageSize from 'components/PageSize'
-import { timeDistance, getTxListRes } from 'utils'
+import { timeDistance, getTxListRes, CKB_DECIMAL, GCKB_DECIMAL } from 'utils'
 
 type ParsedTxList = ReturnType<typeof getTxListRes>
 
@@ -125,9 +125,13 @@ const TxList: React.FC<{
                       </Stack>
                     </Stack>
                   </TableCell>
+                  {/* FIXME: tx.value is formatted incorrectly */}
                   <TableCell sx={{ fontSize: { xs: 12, md: 14 }, whiteSpace: 'nowrap' }}>{`${new BigNumber(
                     item.value || 0,
-                  ).toFormat()}`}</TableCell>
+                  )
+                    .multipliedBy(CKB_DECIMAL)
+                    .dividedBy(GCKB_DECIMAL)
+                    .toFormat()}`}</TableCell>
                   <TableCell>
                     <Chip
                       label={item.type.replace(/_/g, ' ')}

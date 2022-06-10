@@ -55,6 +55,8 @@ import {
   getERC20TransferListRes,
   CKB_EXPLORER_URL,
   CHANNEL,
+  CKB_DECIMAL,
+  GCKB_DECIMAL,
 } from 'utils'
 
 const tabs = ['erc20']
@@ -181,7 +183,13 @@ const Tx = (initState: State) => {
       : null,
     {
       label: 'value',
-      value: <Typography variant="body2">{`${new BigNumber(tx.value || '0').toFormat()} CKB`}</Typography>,
+      // FIXME: tx.value is formatted incorrectly
+      value: (
+        <Typography variant="body2">{`${new BigNumber(tx.value || '0')
+          .multipliedBy(CKB_DECIMAL)
+          .dividedBy(GCKB_DECIMAL)
+          .toFormat()} CKB`}</Typography>
+      ),
     },
   ]
   const basicInfo = [
