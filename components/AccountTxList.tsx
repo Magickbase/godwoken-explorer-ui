@@ -23,11 +23,12 @@ import { timeDistance, GraphQLSchema, TxStatus, client, CKB_DECIMAL } from 'util
 
 export type AccountTxList = {
   entries: Array<{
-    eth_hash: string
+    hash: string
+    eth_hash: string | null
     type: GraphQLSchema.TRANSACTION_TYPE
     block?: Pick<GraphQLSchema.Block, 'hash' | 'number' | 'status' | 'timestamp'>
-    from_account: Pick<GraphQLSchema.Account, 'eth_address'>
-    to_account: Pick<GraphQLSchema.Account, 'eth_address'>
+    from_account: Pick<GraphQLSchema.Account, 'eth_address' | 'script_hash'>
+    to_account: Pick<GraphQLSchema.Account, 'eth_address' | 'script_hash'>
     polyjuice: Pick<GraphQLSchema.Polyjuice, 'value' | 'status'>
   }>
   metadata: GraphQLSchema.PageMetadata
@@ -37,6 +38,7 @@ const txListQuery = gql`
   query ($address: String!, $before: String, $after: String) {
     transactions(input: { address: $address, before: $before, after: $after }) {
       entries {
+        hash
         eth_hash
         block {
           hash
@@ -46,9 +48,11 @@ const txListQuery = gql`
         }
         from_account {
           eth_address
+          script_hash
         }
         to_account {
           eth_address
+          script_hash
         }
         polyjuice {
           value
@@ -108,7 +112,7 @@ const TxList: React.FC<{ list: AccountTxList; maxCount?: string }> = ({ list: { 
           <TableBody>
             {metadata.total_count ? (
               entries.map(item => (
-                <TableRow key={item.eth_hash}>
+                <TableRow key={item.eth_hash || item.hash}>
                   <TableCell>
                     <Stack direction="row" alignItems="center">
                       {item.polyjuice ? (
@@ -119,19 +123,29 @@ const TxList: React.FC<{ list: AccountTxList; maxCount?: string }> = ({ list: { 
                       ) : (
                         <div style={{ display: 'flex', width: 24 }} />
                       )}
-                      <Tooltip title={item.eth_hash} placement="top">
+                      <Tooltip title={item.eth_hash || item.hash} placement="top">
                         <Box>
-                          <NextLink href={`/tx/${item.eth_hash}`}>
-                            <Link href={`/tx/${item.eth_hash}`} underline="none" color="secondary">
-                              <Typography
-                                className="mono-font"
-                                overflow="hidden"
-                                sx={{ userSelect: 'none', fontSize: { xs: 12, md: 14 } }}
-                              >
-                                {`${item.eth_hash.slice(0, 8)}...${item.eth_hash.slice(-8)}`}
-                              </Typography>
-                            </Link>
-                          </NextLink>
+                          {item.eth_hash ? (
+                            <NextLink href={`/tx/${item.eth_hash}`}>
+                              <Link href={`/tx/${item.eth_hash}`} underline="none" color="secondary">
+                                <Typography
+                                  className="mono-font"
+                                  overflow="hidden"
+                                  sx={{ userSelect: 'none', fontSize: { xs: 12, md: 14 } }}
+                                >
+                                  {`${item.eth_hash.slice(0, 8)}...${item.eth_hash.slice(-8)}`}
+                                </Typography>
+                              </Link>
+                            </NextLink>
+                          ) : (
+                            <Typography
+                              className="mono-font"
+                              overflow="hidden"
+                              sx={{ userSelect: 'none', fontSize: { xs: 12, md: 14 } }}
+                            >
+                              {`${item.hash.slice(0, 8)}...${item.hash.slice(-8)}`}
+                            </Typography>
+                          )}
                         </Box>
                       </Tooltip>
                     </Stack>
@@ -167,10 +181,10 @@ const TxList: React.FC<{ list: AccountTxList; maxCount?: string }> = ({ list: { 
                     )}
                   </TableCell>
                   <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                    <Address address={item.from_account.eth_address} size="normal" />
+                    <Address address={item.from_account.eth_address || item.from_account.script_hash} size="normal" />
                   </TableCell>
                   <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                    <Address address={item.to_account.eth_address} size="normal" />
+                    <Address address={item.to_account.eth_address || item.to_account.script_hash} size="normal" />
                   </TableCell>
                   <TableCell sx={{ display: { xs: 'table-cell', md: 'none' } }}>
                     <Stack>
@@ -178,14 +192,14 @@ const TxList: React.FC<{ list: AccountTxList; maxCount?: string }> = ({ list: { 
                         <Typography fontSize={12} sx={{ textTransform: 'capitalize', mr: 1 }} noWrap>{`${t(
                           'from',
                         )}:`}</Typography>
-                        <Address leading={5} address={item.from_account.eth_address} />
+                        <Address leading={5} address={item.from_account.eth_address || item.from_account.script_hash} />
                       </Stack>
 
                       <Stack direction="row" justifyContent="space-between">
                         <Typography fontSize={12} sx={{ textTransform: 'capitalize', mr: 1 }} noWrap>{`${t(
                           'to',
                         )}:`}</Typography>
-                        <Address leading={5} address={item.to_account.eth_address} />
+                        <Address leading={5} address={item.to_account.eth_address || item.from_account.script_hash} />
                       </Stack>
                     </Stack>
                   </TableCell>
