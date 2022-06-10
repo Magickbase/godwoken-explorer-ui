@@ -66,7 +66,9 @@ export interface ParsedEventLog {
 
 export const getEventLogsListRes = (raw: Raw): ParsedEventLog[] => {
   return raw.data.map(({ attributes, id }) => {
-    const topics = [attributes.first_topic, attributes.second_topic, attributes.third_topic]
+    const log3 = [attributes.first_topic, attributes.second_topic, attributes.third_topic]
+    const log4 = [...log3, attributes.fourth_topic]
+    const topics = attributes.fourth_topic ? log4 : log3
     const data = attributes.data
     try {
       const i = new ethers.utils.Interface(attributes.abi)
