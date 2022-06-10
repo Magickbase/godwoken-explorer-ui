@@ -17,7 +17,7 @@ import {
   InputAdornment,
   TextField,
 } from '@mui/material'
-import { ParsedEventLog, IMG_URL, debounce } from 'utils'
+import { ParsedEventLog, IMG_URL, useDebounce } from 'utils'
 import ContractEventListItem from './ContractEventListItem'
 
 export const EventFilterIcon = ({ setSearchText, tooltip, value }) => (
@@ -43,9 +43,10 @@ const ContractEventsList = ({ list }: { list: ParsedEventLog[] }) => {
   const [t] = useTranslation('list')
   const [searchText, setSearchText] = useState('')
   const [listItems, setListItems] = useState(list)
+  const debouncedSetListItems = useDebounce(setListItems, 300)
 
   useEffect(() => {
-    setListItems(
+    debouncedSetListItems(
       list?.filter(item => {
         if (!item) {
           return false
@@ -60,7 +61,7 @@ const ContractEventsList = ({ list }: { list: ParsedEventLog[] }) => {
         }
       }),
     )
-  }, [list, searchText])
+  }, [debouncedSetListItems, list, searchText])
 
   return (
     <Box sx={{ px: 1, py: 2 }}>
@@ -94,7 +95,9 @@ const ContractEventsList = ({ list }: { list: ParsedEventLog[] }) => {
           }}
           variant="outlined"
           value={searchText}
-          onChange={debounce(e => setSearchText(e.target.value))}
+          onChange={e => {
+            setSearchText(e.target.value)
+          }}
           placeholder={t('eventsFilterPlaceholder')}
           size="small"
           sx={{ fontSize: 14, width: 240 }}
