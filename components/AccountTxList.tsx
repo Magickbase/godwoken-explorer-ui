@@ -113,130 +113,110 @@ const TxList: React.FC<{ list: AccountTxList; maxCount?: string }> = ({ list: { 
           </TableHead>
           <TableBody>
             {metadata.total_count ? (
-              entries.map(item => (
-                <TableRow key={item.eth_hash || item.hash}>
-                  <TableCell>
-                    <Stack direction="row" alignItems="center">
-                      {item.polyjuice ? (
-                        <TxStatusIcon
-                          status={getBlockStatus(item.block)}
-                          isSuccess={item.polyjuice.status === GraphQLSchema.POLYJUICE_STATUS.Succeed}
-                        />
-                      ) : (
-                        <div style={{ display: 'flex', width: 24 }} />
-                      )}
-                      <Tooltip title={item.eth_hash || item.hash} placement="top">
-                        <Box>
-                          {item.eth_hash ? (
-                            <NextLink href={`/tx/${item.eth_hash}`}>
-                              <Link href={`/tx/${item.eth_hash}`} underline="none" color="secondary">
+              entries.map(item => {
+                const hash = item.eth_hash || item.hash
+                const from = item.from_account.eth_address || item.from_account.script_hash
+                const to = item.to_account.eth_address || item.to_account.script_hash
+
+                return (
+                  <TableRow key={hash}>
+                    <TableCell>
+                      <Stack direction="row" alignItems="center">
+                        {item.polyjuice ? (
+                          <TxStatusIcon
+                            status={getBlockStatus(item.block)}
+                            isSuccess={item.polyjuice.status === GraphQLSchema.POLYJUICE_STATUS.Succeed}
+                          />
+                        ) : (
+                          <div style={{ display: 'flex', width: 24 }} />
+                        )}
+                        <Tooltip title={hash} placement="top">
+                          <Box>
+                            <NextLink href={`/tx/${hash}`}>
+                              <Link href={`/tx/${hash}`} underline="none" color="secondary">
                                 <Typography
                                   className="mono-font"
                                   overflow="hidden"
                                   sx={{ userSelect: 'none', fontSize: { xs: 12, md: 14 } }}
                                 >
-                                  {`${item.eth_hash.slice(0, 8)}...${item.eth_hash.slice(-8)}`}
+                                  {`${hash.slice(0, 8)}...${hash.slice(-8)}`}
                                 </Typography>
                               </Link>
                             </NextLink>
-                          ) : (
-                            <Typography
-                              className="mono-font"
-                              overflow="hidden"
-                              sx={{ userSelect: 'none', fontSize: { xs: 12, md: 14 } }}
-                            >
-                              {`${item.hash.slice(0, 8)}...${item.hash.slice(-8)}`}
-                            </Typography>
-                          )}
-                        </Box>
-                      </Tooltip>
-                    </Stack>
-                  </TableCell>
-                  <TableCell>
-                    {item.block ? (
-                      <NextLink href={`/block/${item.block.hash}`}>
-                        <Link
-                          href={`/block/${item.block.hash}`}
-                          underline="none"
-                          color="secondary"
-                          sx={{
-                            fontSize: {
-                              xs: 12,
-                              md: 14,
-                            },
-                          }}
-                        >
-                          {(+item.block.number).toLocaleString('en')}
-                        </Link>
-                      </NextLink>
-                    ) : (
-                      t(`pending`)
-                    )}
-                  </TableCell>
-                  <TableCell sx={{ whiteSpace: 'nowrap', fontSize: { xs: 12, md: 14 } }}>
-                    {item.block ? (
-                      <time dateTime={item.block.timestamp}>
-                        {timeDistance(new Date(item.block.timestamp).getTime(), language)}
-                      </time>
-                    ) : (
-                      t(`pending`)
-                    )}
-                  </TableCell>
-                  <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                    <Address
-                      address={item.from_account.eth_address || item.from_account.script_hash}
-                      type={item.from_account.type}
-                      size="normal"
-                    />
-                  </TableCell>
-                  <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                    <Address
-                      address={item.to_account.eth_address || item.to_account.script_hash}
-                      type={item.to_account.type}
-                      size="normal"
-                    />
-                  </TableCell>
-                  <TableCell sx={{ display: { xs: 'table-cell', md: 'none' } }}>
-                    <Stack>
-                      <Stack direction="row" justifyContent="space-between">
-                        <Typography fontSize={12} sx={{ textTransform: 'capitalize', mr: 1 }} noWrap>{`${t(
-                          'from',
-                        )}:`}</Typography>
-                        <Address
-                          leading={5}
-                          address={item.from_account.eth_address || item.from_account.script_hash}
-                          type={item.from_account.type}
-                        />
+                          </Box>
+                        </Tooltip>
                       </Stack>
+                    </TableCell>
+                    <TableCell>
+                      {item.block ? (
+                        <NextLink href={`/block/${item.block.hash}`}>
+                          <Link
+                            href={`/block/${item.block.hash}`}
+                            underline="none"
+                            color="secondary"
+                            sx={{
+                              fontSize: {
+                                xs: 12,
+                                md: 14,
+                              },
+                            }}
+                          >
+                            {(+item.block.number).toLocaleString('en')}
+                          </Link>
+                        </NextLink>
+                      ) : (
+                        t(`pending`)
+                      )}
+                    </TableCell>
+                    <TableCell sx={{ whiteSpace: 'nowrap', fontSize: { xs: 12, md: 14 } }}>
+                      {item.block ? (
+                        <time dateTime={item.block.timestamp}>
+                          {timeDistance(new Date(item.block.timestamp).getTime(), language)}
+                        </time>
+                      ) : (
+                        t(`pending`)
+                      )}
+                    </TableCell>
+                    <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
+                      <Address address={from} type={item.from_account.type} size="normal" />
+                    </TableCell>
+                    <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
+                      <Address address={to} type={item.to_account.type} size="normal" />
+                    </TableCell>
+                    <TableCell sx={{ display: { xs: 'table-cell', md: 'none' } }}>
+                      <Stack>
+                        <Stack direction="row" justifyContent="space-between">
+                          <Typography fontSize={12} sx={{ textTransform: 'capitalize', mr: 1 }} noWrap>{`${t(
+                            'from',
+                          )}:`}</Typography>
+                          <Address leading={5} address={from} type={item.from_account.type} />
+                        </Stack>
 
-                      <Stack direction="row" justifyContent="space-between">
-                        <Typography fontSize={12} sx={{ textTransform: 'capitalize', mr: 1 }} noWrap>{`${t(
-                          'to',
-                        )}:`}</Typography>
-                        <Address
-                          leading={5}
-                          address={item.to_account.eth_address || item.to_account.script_hash}
-                          type={item.to_account.type}
-                        />
+                        <Stack direction="row" justifyContent="space-between">
+                          <Typography fontSize={12} sx={{ textTransform: 'capitalize', mr: 1 }} noWrap>{`${t(
+                            'to',
+                          )}:`}</Typography>
+                          <Address leading={5} address={to} type={item.to_account.type} />
+                        </Stack>
                       </Stack>
-                    </Stack>
-                  </TableCell>
-                  <TableCell sx={{ fontSize: { xs: 12, md: 14 }, whiteSpace: 'nowrap' }}>{`${new BigNumber(
-                    item.polyjuice?.value ?? 0,
-                  )
-                    .dividedBy(GCKB_DECIMAL)
-                    .toFormat()}`}</TableCell>
-                  <TableCell>
-                    <Chip
-                      label={item.type.replace(/_/g, ' ')}
-                      size="small"
-                      variant="outlined"
-                      color="primary"
-                      sx={{ textTransform: 'capitalize' }}
-                    />
-                  </TableCell>
-                </TableRow>
-              ))
+                    </TableCell>
+                    <TableCell sx={{ fontSize: { xs: 12, md: 14 }, whiteSpace: 'nowrap' }}>{`${new BigNumber(
+                      item.polyjuice?.value ?? 0,
+                    )
+                      .dividedBy(GCKB_DECIMAL)
+                      .toFormat()}`}</TableCell>
+                    <TableCell>
+                      <Chip
+                        label={item.type.replace(/_/g, ' ')}
+                        size="small"
+                        variant="outlined"
+                        color="primary"
+                        sx={{ textTransform: 'capitalize' }}
+                      />
+                    </TableCell>
+                  </TableRow>
+                )
+              })
             ) : (
               <TableRow>
                 <TableCell colSpan={7} align="center">
