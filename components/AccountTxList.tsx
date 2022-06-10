@@ -27,8 +27,8 @@ export type AccountTxList = {
     eth_hash: string | null
     type: GraphQLSchema.TRANSACTION_TYPE
     block?: Pick<GraphQLSchema.Block, 'hash' | 'number' | 'status' | 'timestamp'>
-    from_account: Pick<GraphQLSchema.Account, 'eth_address' | 'script_hash'>
-    to_account: Pick<GraphQLSchema.Account, 'eth_address' | 'script_hash'>
+    from_account: Pick<GraphQLSchema.Account, 'eth_address' | 'script_hash' | 'type'>
+    to_account: Pick<GraphQLSchema.Account, 'eth_address' | 'script_hash' | 'type'>
     polyjuice: Pick<GraphQLSchema.Polyjuice, 'value' | 'status'>
   }>
   metadata: GraphQLSchema.PageMetadata
@@ -47,10 +47,12 @@ const txListQuery = gql`
           timestamp
         }
         from_account {
+          type
           eth_address
           script_hash
         }
         to_account {
+          type
           eth_address
           script_hash
         }
@@ -181,10 +183,18 @@ const TxList: React.FC<{ list: AccountTxList; maxCount?: string }> = ({ list: { 
                     )}
                   </TableCell>
                   <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                    <Address address={item.from_account.eth_address || item.from_account.script_hash} size="normal" />
+                    <Address
+                      address={item.from_account.eth_address || item.from_account.script_hash}
+                      type={item.from_account.type}
+                      size="normal"
+                    />
                   </TableCell>
                   <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                    <Address address={item.to_account.eth_address || item.to_account.script_hash} size="normal" />
+                    <Address
+                      address={item.to_account.eth_address || item.to_account.script_hash}
+                      type={item.to_account.type}
+                      size="normal"
+                    />
                   </TableCell>
                   <TableCell sx={{ display: { xs: 'table-cell', md: 'none' } }}>
                     <Stack>
@@ -192,14 +202,22 @@ const TxList: React.FC<{ list: AccountTxList; maxCount?: string }> = ({ list: { 
                         <Typography fontSize={12} sx={{ textTransform: 'capitalize', mr: 1 }} noWrap>{`${t(
                           'from',
                         )}:`}</Typography>
-                        <Address leading={5} address={item.from_account.eth_address || item.from_account.script_hash} />
+                        <Address
+                          leading={5}
+                          address={item.from_account.eth_address || item.from_account.script_hash}
+                          type={item.from_account.type}
+                        />
                       </Stack>
 
                       <Stack direction="row" justifyContent="space-between">
                         <Typography fontSize={12} sx={{ textTransform: 'capitalize', mr: 1 }} noWrap>{`${t(
                           'to',
                         )}:`}</Typography>
-                        <Address leading={5} address={item.to_account.eth_address || item.from_account.script_hash} />
+                        <Address
+                          leading={5}
+                          address={item.to_account.eth_address || item.to_account.script_hash}
+                          type={item.to_account.type}
+                        />
                       </Stack>
                     </Stack>
                   </TableCell>
