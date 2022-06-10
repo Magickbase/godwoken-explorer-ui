@@ -19,7 +19,7 @@ import { gql } from 'graphql-request'
 import TxStatusIcon from './TxStatusIcon'
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/SimplePagination'
-import { timeDistance, GraphQLSchema, TxStatus, client, CKB_DECIMAL } from 'utils'
+import { timeDistance, GraphQLSchema, TxStatus, client, GCKB_DECIMAL } from 'utils'
 
 export type AccountTxList = {
   entries: Array<{
@@ -206,7 +206,7 @@ const TxList: React.FC<{ list: AccountTxList; maxCount?: string }> = ({ list: { 
                   <TableCell sx={{ fontSize: { xs: 12, md: 14 }, whiteSpace: 'nowrap' }}>{`${new BigNumber(
                     item.polyjuice?.value ?? 0,
                   )
-                    .dividedBy(new BigNumber(CKB_DECIMAL))
+                    .dividedBy(GCKB_DECIMAL)
                     .toFormat()}`}</TableCell>
                   <TableCell>
                     <Chip

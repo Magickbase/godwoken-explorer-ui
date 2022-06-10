@@ -51,7 +51,7 @@ const BridgedRecordList: React.FC<{
                     {`${new BigNumber(r.value ?? '0').toFormat()} ${r.token.symbol ?? ''}`}
                   </TableCell>
                   <TableCell sx={{ fontSize: { xs: 12, md: 14 }, whiteSpace: 'nowrap' }}>
-                    {`${new BigNumber(r.capacity ?? '0').dividedBy(new BigNumber(CKB_DECIMAL)).toFormat()}`}
+                    {`${new BigNumber(r.capacity ?? '0').dividedBy(CKB_DECIMAL).toFormat()}`}
                   </TableCell>
                   <TableCell sx={{ whiteSpace: 'nowrap', fontSize: { xs: 12, md: 14 } }}>
                     {r.timestamp > 0 ? (
