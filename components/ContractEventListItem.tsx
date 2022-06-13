@@ -159,6 +159,9 @@ const ContractEventListItem = ({
           >{`[topic0] ${item.topics[0]}`}</Typography>
           <Typography component="span" className="mono-font" fontSize={14}>{`[topic1] ${item.topics[1]}`}</Typography>
           <Typography component="span" className="mono-font" fontSize={14}>{`[topic2] ${item.topics[2]}`}</Typography>
+          {item.topics[3] && item.topics[3] !== '0x' && (
+            <Typography component="span" className="mono-font" fontSize={14}>{`[topic3] ${item.topics[3]}`}</Typography>
+          )}
           <Stack direction="row" alignItems="center">
             <FormControl sx={{ my: 1, mr: 1 }} size="small">
               <Select

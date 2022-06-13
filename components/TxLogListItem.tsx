@@ -233,7 +233,8 @@ const TxLogsListItem = ({ item }: { item: ParsedEventLog }) => {
             </Box>
             {item.topics.slice(1).map(
               (topic, i) =>
-                topic && (
+                topic &&
+                topic !== '0x' && (
                   <Box key={i + 1} sx={{ display: 'flex', alignItems: 'center' }}>
                     <Typography
                       variant="body2"

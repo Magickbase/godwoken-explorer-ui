@@ -100,7 +100,7 @@ const ContractEventsList = ({ list }: { list: ParsedEventLog[] }) => {
           }}
           placeholder={t('eventsFilterPlaceholder')}
           size="small"
-          sx={{ fontSize: 14, width: 240 }}
+          sx={{ fontSize: 14, flex: '0 1 260px' }}
         />
       </Stack>
       <TableContainer>
