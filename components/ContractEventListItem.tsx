@@ -157,11 +157,15 @@ const ContractEventListItem = ({
             sx={{ color: '#666666' }}
             noWrap
           >{`[topic0] ${item.topics[0]}`}</Typography>
-          <Typography component="span" className="mono-font" fontSize={14}>{`[topic1] ${item.topics[1]}`}</Typography>
-          <Typography component="span" className="mono-font" fontSize={14}>{`[topic2] ${item.topics[2]}`}</Typography>
-          {item.topics[3] && item.topics[3] !== '0x' && (
-            <Typography component="span" className="mono-font" fontSize={14}>{`[topic3] ${item.topics[3]}`}</Typography>
-          )}
+          {item.topics
+            .slice(1)
+            .map((topic, idx) =>
+              topic !== '0x' ? (
+                <Typography key={topic} component="span" className="mono-font" fontSize={14}>{`[topic${
+                  idx + 1
+                }] ${topic}`}</Typography>
+              ) : null,
+            )}
           <Stack direction="row" alignItems="center">
             <FormControl sx={{ my: 1, mr: 1 }} size="small">
               <Select
