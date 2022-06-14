@@ -262,7 +262,11 @@ const Block = (initState: State) => {
             <List sx={{ textTransform: 'capitalize' }}>
               {fields.map(field => (
                 <ListItem key={field.label}>
-                  <ListItemText primary={t(field.label)} secondary={field.value} />
+                  <ListItemText
+                    primary={t(field.label)}
+                    secondary={field.value}
+                    secondaryTypographyProps={{ component: 'div' }}
+                  />
                 </ListItem>
               ))}
             </List>

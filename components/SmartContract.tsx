@@ -58,7 +58,11 @@ const SmartContract: React.FC<Record<'deployer' | 'txHash', string>> = ({ deploy
       {fields.map(field =>
         field ? (
           <ListItem key={field.label}>
-            <ListItemText primary={field.label} secondary={field.value} />
+            <ListItemText
+              primary={field.label}
+              secondary={field.value}
+              secondaryTypographyProps={{ component: 'div' }}
+            />
           </ListItem>
         ) : null,
       )}

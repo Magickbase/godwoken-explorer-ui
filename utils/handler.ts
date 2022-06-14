@@ -17,12 +17,16 @@ export const handleApiError = (err: Error, res: ServerResponse, locale: string, 
         permanent: false,
       },
     }
+  } else {
+    console.warn(err.message)
+    res.statusCode = 302
+    return {
+      redirect: {
+        destination: `/error?message=${err.message}`,
+        permanent: false,
+      },
+    }
   }
-  console.warn(err.message)
-  res.setHeader('location', `/error?message=${err.message}`)
-  res.statusCode = 302
-  res.end()
-  return
 }
 
 export const handleSearchKeyPress = async (e: React.KeyboardEvent<HTMLInputElement>, push: (url: string) => any) => {

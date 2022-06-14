@@ -143,7 +143,11 @@ const Token = ({ token, transferList, bridgedRecordList, tokenHolderList }: Prop
                   <Divider variant="middle" />
                   {tokenInfo.map(field => (
                     <ListItem key={field.label}>
-                      <ListItemText primary={t(field.label)} secondary={field.value} />
+                      <ListItemText
+                        primary={t(field.label)}
+                        secondary={field.value}
+                        secondaryTypographyProps={{ component: 'div' }}
+                      />
                     </ListItem>
                   ))}
                 </List>

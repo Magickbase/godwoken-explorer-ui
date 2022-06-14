@@ -312,7 +312,11 @@ const Tx = (initState: State) => {
                   {overview.map(field =>
                     field ? (
                       <ListItem key={field.label}>
-                        <ListItemText primary={t(field.label)} secondary={field.value} />
+                        <ListItemText
+                          primary={t(field.label)}
+                          secondary={field.value}
+                          secondaryTypographyProps={{ component: 'div' }}
+                        />
                       </ListItem>
                     ) : null,
                   )}
@@ -388,7 +392,11 @@ const Tx = (initState: State) => {
                     .map(field =>
                       field ? (
                         <ListItem key={field.label}>
-                          <ListItemText primary={t(field.label)} secondary={field.value} />
+                          <ListItemText
+                            primary={t(field.label)}
+                            secondary={field.value}
+                            secondaryTypographyProps={{ component: 'div' }}
+                          />
                         </ListItem>
                       ) : null,
                     )}

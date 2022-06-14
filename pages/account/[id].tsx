@@ -192,7 +192,7 @@ const Account = (initState: State) => {
                     }}
                   />
                 ) : (
-                  <Tab sx={{ display: 'none' }} />
+                  <Tab key="none" sx={{ display: 'none' }} />
                 ),
               )}
             </Tabs>
