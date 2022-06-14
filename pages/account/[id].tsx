@@ -22,7 +22,7 @@ import {
   Typography,
   Snackbar,
 } from '@mui/material'
-import { BorderInner, ContentCopyOutlined as CopyIcon } from '@mui/icons-material'
+import { ContentCopyOutlined as CopyIcon } from '@mui/icons-material'
 import SubpageHead from 'components/SubpageHead'
 import User from 'components/User'
 import MetaContract from 'components/MetaContract'
@@ -31,7 +31,7 @@ import Polyjuice from 'components/Polyjuice'
 import SUDT from 'components/SUDT'
 import ERC20TransferList from 'components/ERC20TransferList'
 import AssetList, { fetchUdtList, UdtList } from 'components/UdtList'
-import TxList, { AccountTxList, fetchTxList } from 'components/AccountTxList'
+import TxList, { TxListProps, fetchTxList } from 'components/TxList'
 import BridgedRecordList from 'components/BridgedRecordList'
 import ContractInfo from 'components/ContractInfo'
 import ContractEventsList from 'components/ContractEventsList'
@@ -60,7 +60,7 @@ type ParsedBridgedRecordList = ReturnType<typeof getBridgedRecordListRes>
 
 type State = API.Account.Parsed &
   Partial<{
-    txList: AccountTxList
+    txList: TxListProps['transactions']
     transferList: ParsedTransferList
     bridgedRecordList: ParsedBridgedRecordList
     udtList: UdtList
@@ -197,7 +197,7 @@ const Account = (initState: State) => {
               )}
             </Tabs>
             <Divider />
-            {tab === 'transactions' && account.txList ? <TxList list={account.txList} maxCount="100k" /> : null}
+            {tab === 'transactions' && account.txList ? <TxList transactions={account.txList} maxCount="100k" /> : null}
             {tab === 'erc20' && account.transferList ? <ERC20TransferList list={account.transferList} /> : null}
             {tab === 'bridged' && account.bridgedRecordList ? (
               <BridgedRecordList list={account.bridgedRecordList} />
