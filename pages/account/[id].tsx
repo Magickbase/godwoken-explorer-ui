@@ -22,7 +22,7 @@ import {
   Typography,
   Snackbar,
 } from '@mui/material'
-import { BorderInner, ContentCopyOutlined as CopyIcon } from '@mui/icons-material'
+import { ContentCopyOutlined as CopyIcon } from '@mui/icons-material'
 import SubpageHead from 'components/SubpageHead'
 import User from 'components/User'
 import MetaContract from 'components/MetaContract'
@@ -31,9 +31,10 @@ import Polyjuice from 'components/Polyjuice'
 import SUDT from 'components/SUDT'
 import ERC20TransferList from 'components/ERC20TransferList'
 import AssetList, { fetchUdtList, UdtList } from 'components/UdtList'
-import TxList, { AccountTxList, fetchTxList } from 'components/AccountTxList'
+import TxList, { TxListProps, fetchTxList } from 'components/TxList'
 import BridgedRecordList from 'components/BridgedRecordList'
 import ContractInfo from 'components/ContractInfo'
+import ContractEventsList from 'components/ContractEventsList'
 import {
   handleCopy,
   fetchAccount,
@@ -45,6 +46,8 @@ import {
   fetchERC20TransferList,
   getBridgedRecordListRes,
   fetchBridgedRecordList,
+  ParsedEventLog,
+  fetchEventLogsListByType,
   CHANNEL,
   TabNotFoundException,
   GCKB_DECIMAL,
@@ -57,12 +60,13 @@ type ParsedBridgedRecordList = ReturnType<typeof getBridgedRecordListRes>
 
 type State = API.Account.Parsed &
   Partial<{
-    txList: AccountTxList
+    txList: TxListProps['transactions']
     transferList: ParsedTransferList
     bridgedRecordList: ParsedBridgedRecordList
     udtList: UdtList
+    eventsList: ParsedEventLog[]
   }>
-const tabs = ['transactions', 'erc20', 'bridged', 'assets', 'contract']
+const tabs = ['transactions', 'erc20', 'bridged', 'assets', 'contract', 'events']
 const Account = (initState: State) => {
   const {
     push,
@@ -175,6 +179,7 @@ const Account = (initState: State) => {
                 t(`bridgedRecords`),
                 t('userDefinedAssets'),
                 accountType === 'smartContract' && account.smartContract?.name ? t('contract') : null,
+                accountType === 'smartContract' ? t('events') : null,
               ].map((label, idx) =>
                 label ? (
                   <Tab
@@ -186,11 +191,13 @@ const Account = (initState: State) => {
                       push(`/account/${account.ethAddr}?tab=${tabs[idx]}`, undefined, { scroll: false })
                     }}
                   />
-                ) : null,
+                ) : (
+                  <Tab sx={{ display: 'none' }} />
+                ),
               )}
             </Tabs>
             <Divider />
-            {tab === 'transactions' && account.txList ? <TxList list={account.txList} maxCount="100k" /> : null}
+            {tab === 'transactions' && account.txList ? <TxList transactions={account.txList} maxCount="100k" /> : null}
             {tab === 'erc20' && account.transferList ? <ERC20TransferList list={account.transferList} /> : null}
             {tab === 'bridged' && account.bridgedRecordList ? (
               <BridgedRecordList list={account.bridgedRecordList} />
@@ -199,6 +206,7 @@ const Account = (initState: State) => {
             {tab === 'contract' && account.smartContract?.name ? (
               <ContractInfo address={account.ethAddr} {...account.smartContract} />
             ) : null}
+            {tab === 'events' && <ContractEventsList list={account.eventsList} />}
           </Paper>
         </Stack>
         <Snackbar
@@ -244,15 +252,15 @@ export const getServerSideProps: GetServerSideProps<State, { id: string }> = asy
       tab === 'erc20' && account.ethAddr
         ? await fetchERC20TransferList({ eth_address: account.ethAddr, page: query.page as string })
         : null
-
     const bridgedRecordList =
       tab === 'bridged' && account.ethAddr
         ? await fetchBridgedRecordList({ eth_address: account.ethAddr, page: query.page as string })
         : null
-
+    const eventsList =
+      tab === 'events' && account.ethAddr ? await fetchEventLogsListByType('accounts', account.ethAddr) : null
     const udtList = tab === 'assets' && account.ethAddr ? await fetchUdtList({ address: account.ethAddr }) : null
 
-    return { props: { ...account, ...lng, txList, transferList, bridgedRecordList, udtList } }
+    return { props: { ...account, ...lng, txList, transferList, bridgedRecordList, udtList, eventsList } }
   } catch (err) {
     switch (true) {
       case err instanceof TabNotFoundException: {
