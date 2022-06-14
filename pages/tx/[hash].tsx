@@ -4,7 +4,6 @@ import { useRouter } from 'next/router'
 import NextLink from 'next/link'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { utils } from 'ethers'
 import {
   Alert,
   Accordion,
@@ -41,7 +40,7 @@ import BigNumber from 'bignumber.js'
 import SubpageHead from 'components/SubpageHead'
 import PageTitle from 'components/PageTitle'
 import Address from 'components/AddressInHalfPanel'
-import SimpleERC20TransferList from 'components/SimpleERC20TransferList'
+import TransferList, { fetchTransferList, TransferListProps } from 'components/SimpleERC20TransferList'
 import TxLogsList from 'components/TxLogsList'
 import {
   formatDatetime,
@@ -52,8 +51,6 @@ import {
   formatInt,
   handleCopy,
   TabNotFoundException,
-  fetchERC20TransferList,
-  getERC20TransferListRes,
   ParsedEventLog,
   fetchEventLogsListByType,
   CKB_EXPLORER_URL,
@@ -62,12 +59,11 @@ import {
   GCKB_DECIMAL,
 } from 'utils'
 
-type ParsedTransferList = ReturnType<typeof getERC20TransferListRes>
 type RawTx = Parameters<typeof getTxRes>[0]
 type ParsedTx = ReturnType<typeof getTxRes>
-type State = ParsedTx & Partial<{ transferList: ParsedTransferList; logsList: ParsedEventLog[] }>
 
 const tabs = ['erc20', 'logs']
+type State = ParsedTx & Partial<{ transferList: TransferListProps['token_transfers']; logsList: ParsedEventLog[] }>
 const ADDR_LENGTH = 42
 
 const Tx = (initState: State) => {
@@ -413,7 +409,7 @@ const Tx = (initState: State) => {
             </Tabs>
             <Divider />
             {tab === 'erc20' && initState.transferList ? (
-              <SimpleERC20TransferList list={initState.transferList} />
+              <TransferList token_transfers={initState.transferList} />
             ) : null}
             {tab === 'logs' && <TxLogsList list={initState.logsList} />}
           </Paper>
@@ -444,7 +440,7 @@ export const getServerSideProps: GetServerSideProps<State, { hash: string }> = a
   query,
 }) => {
   const { hash } = params
-  const { tab = tabs[0] } = query
+  const { tab = tabs[0], before = null, after = null } = query
 
   try {
     if (typeof tab !== 'string' || !tabs.includes(tab)) {
@@ -452,7 +448,13 @@ export const getServerSideProps: GetServerSideProps<State, { hash: string }> = a
     }
     const [tx, lng] = await Promise.all([fetchTx(hash), await serverSideTranslations(locale, ['common', 'tx', 'list'])])
     const transferList =
-      tab === 'erc20' ? await fetchERC20TransferList({ tx_hash: hash, page: query.page as string }) : null
+      tab === 'erc20'
+        ? await fetchTransferList({
+            transaction_hash: hash,
+            before: before as string | null,
+            after: after as string | null,
+          })
+        : null
     const logsList = tab === 'logs' ? await fetchEventLogsListByType('txs', hash) : null
     return { props: { ...tx, ...lng, transferList, logsList } }
   } catch (err) {

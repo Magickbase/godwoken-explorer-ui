@@ -67,7 +67,10 @@ const AssetList = ({ list = [] }: { list: UdtList }) => {
               <TableRow key={item.udt.id}>
                 <TableCell>
                   <Stack direction="row" alignItems="center">
-                    <Avatar src={item.udt.icon} sx={{ bgcolor: nameToColor(item.udt.name) }}>
+                    <Avatar
+                      src={item.udt.icon}
+                      sx={{ bgcolor: nameToColor(item.udt.name), textTransform: 'capitalize' }}
+                    >
                       {item.udt.name?.[0] ?? '?'}
                     </Avatar>
                     <NextLink href={`/token/${item.udt.id}`}>

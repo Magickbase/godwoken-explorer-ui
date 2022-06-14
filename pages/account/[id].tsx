@@ -22,7 +22,7 @@ import {
   Typography,
   Snackbar,
 } from '@mui/material'
-import { BorderInner, ContentCopyOutlined as CopyIcon } from '@mui/icons-material'
+import { ContentCopyOutlined as CopyIcon } from '@mui/icons-material'
 import SubpageHead from 'components/SubpageHead'
 import User from 'components/User'
 import MetaContract from 'components/MetaContract'

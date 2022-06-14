@@ -4,7 +4,6 @@ import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { utils } from 'ethers'
 import {
   Alert,
   Container,
@@ -44,7 +43,6 @@ import {
   getBridgedRecordListRes,
   handleCopy,
   TabNotFoundException,
-  GAS_UNIT,
 } from 'utils'
 
 type RawBlock = Parameters<typeof getBlockRes>[0]
