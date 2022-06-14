@@ -28,11 +28,13 @@
   "balance": "余额",
   "percentage": "百分比",
   "txCount": "交易数量",
-  "address": "地址",
   "contract_name": "合约名称",
   "compiler": "编译器",
-  "balance": "余额",
   "compiler_version": "版本",
   "contract_list_title": "已登记合约",
-  "last-n-records": "显示最近 {{n}} 条记录"
+  "last-n-records": "显示最近 {{n}} 条记录",
+  "latest25ContractEvents": "显示最近 25 条合约事件",
+  "logs": "日志",
+  "eventsFilterPlaceholder": "输入区块号或者 Topic0 进行筛选",
+  "filterEventBy": "筛选 {{filter}} 的事件"
 }
