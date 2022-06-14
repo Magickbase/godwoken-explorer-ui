@@ -4,7 +4,6 @@ import { useRouter } from 'next/router'
 import NextLink from 'next/link'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { utils } from 'ethers'
 import {
   Alert,
   Accordion,
@@ -42,6 +41,7 @@ import SubpageHead from 'components/SubpageHead'
 import PageTitle from 'components/PageTitle'
 import Address from 'components/AddressInHalfPanel'
 import SimpleERC20TransferList from 'components/SimpleERC20TransferList'
+import TxLogsList from 'components/TxLogsList'
 import {
   formatDatetime,
   fetchTx,
@@ -53,18 +53,20 @@ import {
   TabNotFoundException,
   fetchERC20TransferList,
   getERC20TransferListRes,
+  ParsedEventLog,
+  fetchEventLogsListByType,
   CKB_EXPLORER_URL,
   CHANNEL,
   CKB_DECIMAL,
   GCKB_DECIMAL,
 } from 'utils'
 
-const tabs = ['erc20']
 type ParsedTransferList = ReturnType<typeof getERC20TransferListRes>
 type RawTx = Parameters<typeof getTxRes>[0]
 type ParsedTx = ReturnType<typeof getTxRes>
+type State = ParsedTx & Partial<{ transferList: ParsedTransferList; logsList: ParsedEventLog[] }>
 
-type State = ParsedTx & Partial<{ transferList: ParsedTransferList }>
+const tabs = ['erc20', 'logs']
 const ADDR_LENGTH = 42
 
 const Tx = (initState: State) => {
@@ -73,7 +75,7 @@ const Tx = (initState: State) => {
   const [isCopied, setIsCopied] = useState(false)
   const {
     push,
-    query: { tab = tabs[0] },
+    query: { tab = 'erc20' },
   } = useRouter()
   const [t] = useTranslation('tx')
 
@@ -396,22 +398,23 @@ const Tx = (initState: State) => {
           </Paper>
           <Paper>
             <Tabs value={tabs.indexOf(tab as string)} variant="scrollable" scrollButtons="auto">
-              {['erc20_records'].map((label, idx) => (
+              {['erc20_records', 'logs'].map((label, idx) => (
                 <Tab
                   key={label}
                   label={t(label)}
                   onClick={e => {
                     e.stopPropagation()
                     e.preventDefault()
-                    push(`/tx/${tx.hash}?tab=${tab[idx]}`, undefined, { scroll: false })
+                    push(`/tx/${tx.hash}?tab=${tabs[idx]}`, undefined, { scroll: false })
                   }}
                 />
               ))}
             </Tabs>
             <Divider />
-            {tab === tabs[0] && initState.transferList ? (
+            {tab === 'erc20' && initState.transferList ? (
               <SimpleERC20TransferList list={initState.transferList} />
             ) : null}
+            {tab === 'logs' && <TxLogsList list={initState.logsList} />}
           </Paper>
         </Stack>
         <Snackbar
@@ -448,8 +451,9 @@ export const getServerSideProps: GetServerSideProps<State, { hash: string }> = a
     }
     const [tx, lng] = await Promise.all([fetchTx(hash), await serverSideTranslations(locale, ['common', 'tx', 'list'])])
     const transferList =
-      tab === tabs[0] ? await fetchERC20TransferList({ tx_hash: hash, page: query.page as string }) : null
-    return { props: { ...tx, ...lng, transferList } }
+      tab === 'erc20' ? await fetchERC20TransferList({ tx_hash: hash, page: query.page as string }) : null
+    const logsList = tab === 'logs' ? await fetchEventLogsListByType('txs', hash) : null
+    return { props: { ...tx, ...lng, transferList, logsList } }
   } catch (err) {
     switch (true) {
       case err instanceof TabNotFoundException: {
