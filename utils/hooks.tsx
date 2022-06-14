@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react'
 import { Socket } from 'phoenix'
 import { CHANNEL, IMG_URL, WS_ENDPOINT } from './constants'
 
@@ -42,4 +42,31 @@ export const useWS = (
       })
     }
   }, deps)
+}
+
+const debounce = (func: Function, wait: number) => {
+  let timer: NodeJS.Timeout
+  return (...args: any) => {
+    clearTimeout(timer)
+    timer = setTimeout(() => {
+      func.apply(this, args)
+    }, wait)
+  }
+}
+
+export const useDebounce = (func: Function, wait: number = 300) => {
+  const createDebouncedCallback = useCallback(
+    (func: Function) => {
+      return debounce(func, wait)
+    },
+    [wait],
+  )
+
+  const debouncedCallbackRef = useRef(createDebouncedCallback(func))
+
+  useEffect(() => {
+    debouncedCallbackRef.current = createDebouncedCallback(func)
+  }, [func, createDebouncedCallback])
+
+  return debouncedCallbackRef.current
 }

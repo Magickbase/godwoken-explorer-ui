@@ -68,5 +68,6 @@
   "contract": "Contract",
   "parameters": "Parameters",
   "response": "Response",
-  "query": "Query"
+  "query": "Query",
+  "events": "Events"
 }
