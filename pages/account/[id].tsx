@@ -179,7 +179,7 @@ const Account = (initState: State) => {
                 t(`bridgedRecords`),
                 t('userDefinedAssets'),
                 accountType === 'smartContract' && account.smartContract?.name ? t('contract') : null,
-                t('events'),
+                accountType === 'smartContract' ? t('events') : null,
               ].map((label, idx) =>
                 label ? (
                   <Tab
