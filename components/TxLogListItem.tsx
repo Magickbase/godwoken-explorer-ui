@@ -22,11 +22,13 @@ import TruncatedAddress from './TruncatedAddress'
 const argsFormatReducer = (state, action) => {
   switch (action.type) {
     case 'topic1':
-      return { ...state, topic1: action.payload }
     case 'topic2':
-      return { ...state, topic2: action.payload }
+    case 'topic3':
     case 'data':
-      return { ...state, data: action.payload }
+      return { ...state, [action.type]: action.payload }
+    default: {
+      return state
+    }
   }
 }
 
@@ -79,6 +81,7 @@ const TxLogsListItem = ({ item }: { item: ParsedEventLog }) => {
   const [argsFormatState, dispatch] = useReducer(argsFormatReducer, {
     topic1: 'decoded',
     topic2: 'decoded',
+    topic3: 'decoded',
     data: 'decoded',
   })
   const { name: eventName, inputs: eventInputs } = item.parsedLog.eventFragment
@@ -233,7 +236,6 @@ const TxLogsListItem = ({ item }: { item: ParsedEventLog }) => {
             </Box>
             {item.topics.slice(1).map(
               (topic, i) =>
-                topic &&
                 topic !== '0x' && (
                   <Box key={i + 1} sx={{ display: 'flex', alignItems: 'center' }}>
                     <Typography

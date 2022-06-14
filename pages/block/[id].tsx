@@ -4,7 +4,6 @@ import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { utils } from 'ethers'
 import {
   Alert,
   Container,
@@ -25,7 +24,7 @@ import {
 import { OpenInNew as OpenInNewIcon, ContentCopyOutlined as CopyIcon } from '@mui/icons-material'
 import BigNumber from 'bignumber.js'
 import SubpageHead from 'components/SubpageHead'
-import TxList from 'components/TxList'
+import TxList, { TxListProps, fetchTxList } from 'components/TxList'
 import BridgedRecordList from 'components/BridgedRecordList'
 import PageTitle from 'components/PageTitle'
 import {
@@ -36,25 +35,20 @@ import {
   getBlockRes,
   CKB_EXPLORER_URL,
   CHANNEL,
-  PAGE_SIZE,
   formatInt,
-  fetchTxList,
-  getTxListRes,
   fetchBridgedRecordList,
   getBridgedRecordListRes,
   handleCopy,
   TabNotFoundException,
-  GAS_UNIT,
 } from 'utils'
 
 type RawBlock = Parameters<typeof getBlockRes>[0]
 type ParsedBlock = ReturnType<typeof getBlockRes>
-type ParsedTxList = ReturnType<typeof getTxListRes>
 type ParsedBridgedRecordList = ReturnType<typeof getBridgedRecordListRes>
 
 const tabs = ['transactions', 'bridged']
 
-type State = ParsedBlock & Partial<{ txList: ParsedTxList; bridgedRecordList: ParsedBridgedRecordList }>
+type State = ParsedBlock & Partial<{ txList: TxListProps['transactions']; bridgedRecordList: ParsedBridgedRecordList }>
 
 const Block = (initState: State) => {
   const [block, setBlock] = useState(initState)
@@ -292,7 +286,7 @@ const Block = (initState: State) => {
               ))}
             </Tabs>
             <Divider />
-            {tab === 'transactions' && block.txList ? <TxList list={block.txList} pageSize={PAGE_SIZE} /> : null}
+            {tab === 'transactions' && block.txList ? <TxList transactions={block.txList} /> : null}
             {tab === 'bridged' && block.bridgedRecordList ? (
               <BridgedRecordList list={block.bridgedRecordList} showUser />
             ) : null}
@@ -319,7 +313,7 @@ const Block = (initState: State) => {
 
 export const getServerSideProps: GetServerSideProps<State> = async ({ locale, res, params, query }) => {
   const { id } = params
-  const { tab = tabs[0] } = query
+  const { tab = tabs[0], before = null, after = null } = query
   try {
     if (typeof tab !== 'string' || !tabs.includes(tab)) {
       throw new TabNotFoundException()
@@ -332,7 +326,11 @@ export const getServerSideProps: GetServerSideProps<State> = async ({ locale, re
 
     const txList =
       tab === 'transactions' && block.hash
-        ? await fetchTxList({ block_hash: block.hash, page: query.page as string })
+        ? await fetchTxList({
+            block_number: block.number,
+            before: before as string | null,
+            after: after as string | null,
+          })
         : null
 
     const bridgedRecordList =

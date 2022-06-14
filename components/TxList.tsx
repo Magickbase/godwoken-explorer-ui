@@ -15,20 +15,108 @@ import {
   Chip,
 } from '@mui/material'
 import BigNumber from 'bignumber.js'
+import { gql } from 'graphql-request'
 import TxStatusIcon from './TxStatusIcon'
 import Address from 'components/TruncatedAddress'
-import Pagination from 'components/Pagination'
 import PageSize from 'components/PageSize'
-import { timeDistance, getTxListRes } from 'utils'
+import Pagination from 'components/SimplePagination'
+import { timeDistance, GraphQLSchema, TxStatus, client, GCKB_DECIMAL } from 'utils'
 
-type ParsedTxList = ReturnType<typeof getTxListRes>
+export type TxListProps = {
+  transactions: {
+    entries: Array<{
+      hash: string
+      eth_hash: string | null
+      type: GraphQLSchema.TRANSACTION_TYPE
+      block?: Pick<GraphQLSchema.Block, 'hash' | 'number' | 'status' | 'timestamp'>
+      from_account: Pick<GraphQLSchema.Account, 'eth_address' | 'script_hash' | 'type'>
+      to_account: Pick<GraphQLSchema.Account, 'eth_address' | 'script_hash' | 'type'>
+      polyjuice: Pick<GraphQLSchema.Polyjuice, 'value' | 'status'>
+    }>
+    metadata: GraphQLSchema.PageMetadata
+  }
+}
 
-const TxList: React.FC<{
-  list: ParsedTxList
-  showPageSizeSelector?: boolean
-  pageSize: number
-  maxCount?: string
-}> = ({ list, pageSize, showPageSizeSelector, maxCount }) => {
+const txListQuery = gql`
+  query ($address: String, $block_number: Int, $before: String, $after: String, $limit: Int) {
+    transactions(
+      input: {
+        address: $address
+        start_block_number: $block_number
+        end_block_number: $block_number
+        before: $before
+        after: $after
+        limit: $limit
+      }
+    ) {
+      entries {
+        hash
+        eth_hash
+        block {
+          hash
+          number
+          status
+          timestamp
+        }
+        from_account {
+          type
+          eth_address
+          script_hash
+        }
+        to_account {
+          type
+          eth_address
+          script_hash
+        }
+        polyjuice {
+          value
+          status
+        }
+        type
+      }
+      metadata {
+        total_count
+        after
+        before
+      }
+    }
+  }
+`
+interface Cursor {
+  limit?: number
+  before: string
+  after: string
+}
+interface AccountTxListVariables extends Nullable<Cursor> {
+  address: string
+}
+interface BlockTxListVariables extends Nullable<Cursor> {
+  block_number: number
+}
+type Variables = Cursor | AccountTxListVariables | BlockTxListVariables
+
+export const fetchTxList = (variables: Variables) =>
+  client.request<TxListProps>(txListQuery, variables).then(data => data.transactions)
+
+const getBlockStatus = (block: Pick<GraphQLSchema.Block, 'status'> | null): TxStatus => {
+  switch (block?.status) {
+    case GraphQLSchema.BLOCK_STATUS.Committed: {
+      return 'committed'
+    }
+    case GraphQLSchema.BLOCK_STATUS.Finalized: {
+      return 'finalized'
+    }
+    default: {
+      return 'pending'
+    }
+  }
+}
+
+const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> = ({
+  transactions: { entries, metadata },
+  maxCount,
+  pageSize,
+}) => {
   const [t, { language }] = useTranslation('list')
   return (
     <Box sx={{ px: 1, py: 2 }}>
@@ -53,92 +141,111 @@ const TxList: React.FC<{
             </TableRow>
           </TableHead>
           <TableBody>
-            {+list.totalCount ? (
-              list.txs.map(item => (
-                <TableRow key={item.hash}>
-                  <TableCell>
-                    <Stack direction="row" alignItems="center">
-                      {item.type === 'polyjuice' ? (
-                        <TxStatusIcon status={item.status} isSuccess={item.isSuccess} />
-                      ) : (
-                        <div style={{ display: 'flex', width: 24 }} />
-                      )}
-                      <Tooltip title={item.hash} placement="top">
-                        <Box>
-                          <NextLink href={`/tx/${item.hash}`}>
-                            <Link href={`/tx/${item.hash}`} underline="none" color="secondary">
-                              <Typography
-                                className="mono-font"
-                                overflow="hidden"
-                                sx={{ userSelect: 'none', fontSize: { xs: 12, md: 14 } }}
-                              >
-                                {`${item.hash.slice(0, 8)}...${item.hash.slice(-8)}`}
-                              </Typography>
-                            </Link>
-                          </NextLink>
-                        </Box>
-                      </Tooltip>
-                    </Stack>
-                  </TableCell>
-                  <TableCell>
-                    <NextLink href={`/block/${item.blockHash}`}>
-                      <Link
-                        href={`/block/${item.blockHash}`}
-                        underline="none"
-                        color="secondary"
-                        sx={{
-                          fontSize: {
-                            xs: 12,
-                            md: 14,
-                          },
-                        }}
-                      >
-                        {(+item.blockNumber).toLocaleString('en')}
-                      </Link>
-                    </NextLink>
-                  </TableCell>
-                  <TableCell sx={{ whiteSpace: 'nowrap', fontSize: { xs: 12, md: 14 } }}>
-                    <time dateTime={new Date(+item.timestamp).toISOString()}>
-                      {timeDistance(item.timestamp, language)}
-                    </time>
-                  </TableCell>
-                  <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                    <Address address={item.from} size="normal" />
-                  </TableCell>
-                  <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                    <Address address={item.to} size="normal" />
-                  </TableCell>
-                  <TableCell sx={{ display: { xs: 'table-cell', md: 'none' } }}>
-                    <Stack>
-                      <Stack direction="row" justifyContent="space-between">
-                        <Typography fontSize={12} sx={{ textTransform: 'capitalize', mr: 1 }} noWrap>{`${t(
-                          'from',
-                        )}:`}</Typography>
-                        <Address leading={5} address={item.from} />
-                      </Stack>
+            {metadata.total_count ? (
+              entries.map(item => {
+                const hash = item.eth_hash || item.hash
+                const from = item.from_account.eth_address || item.from_account.script_hash
+                const to = item.to_account.eth_address || item.to_account.script_hash
 
-                      <Stack direction="row" justifyContent="space-between">
-                        <Typography fontSize={12} sx={{ textTransform: 'capitalize', mr: 1 }} noWrap>{`${t(
-                          'to',
-                        )}:`}</Typography>
-                        <Address leading={5} address={item.to} />
+                return (
+                  <TableRow key={hash}>
+                    <TableCell>
+                      <Stack direction="row" alignItems="center">
+                        {item.polyjuice ? (
+                          <TxStatusIcon
+                            status={getBlockStatus(item.block)}
+                            isSuccess={item.polyjuice.status === GraphQLSchema.POLYJUICE_STATUS.Succeed}
+                          />
+                        ) : (
+                          <div style={{ display: 'flex', width: 24 }} />
+                        )}
+                        <Tooltip title={hash} placement="top">
+                          <Box>
+                            <NextLink href={`/tx/${hash}`}>
+                              <Link href={`/tx/${hash}`} underline="none" color="secondary">
+                                <Typography
+                                  className="mono-font"
+                                  overflow="hidden"
+                                  sx={{ userSelect: 'none', fontSize: { xs: 12, md: 14 } }}
+                                >
+                                  {`${hash.slice(0, 8)}...${hash.slice(-8)}`}
+                                </Typography>
+                              </Link>
+                            </NextLink>
+                          </Box>
+                        </Tooltip>
                       </Stack>
-                    </Stack>
-                  </TableCell>
-                  <TableCell sx={{ fontSize: { xs: 12, md: 14 }, whiteSpace: 'nowrap' }}>{`${new BigNumber(
-                    item.value || 0,
-                  ).toFormat()}`}</TableCell>
-                  <TableCell>
-                    <Chip
-                      label={item.type.replace(/_/g, ' ')}
-                      size="small"
-                      variant="outlined"
-                      color="primary"
-                      sx={{ textTransform: 'capitalize' }}
-                    />
-                  </TableCell>
-                </TableRow>
-              ))
+                    </TableCell>
+                    <TableCell>
+                      {item.block ? (
+                        <NextLink href={`/block/${item.block.hash}`}>
+                          <Link
+                            href={`/block/${item.block.hash}`}
+                            underline="none"
+                            color="secondary"
+                            sx={{
+                              fontSize: {
+                                xs: 12,
+                                md: 14,
+                              },
+                            }}
+                          >
+                            {(+item.block.number).toLocaleString('en')}
+                          </Link>
+                        </NextLink>
+                      ) : (
+                        t(`pending`)
+                      )}
+                    </TableCell>
+                    <TableCell sx={{ whiteSpace: 'nowrap', fontSize: { xs: 12, md: 14 } }}>
+                      {item.block ? (
+                        <time dateTime={item.block.timestamp}>
+                          {timeDistance(new Date(item.block.timestamp).getTime(), language)}
+                        </time>
+                      ) : (
+                        t(`pending`)
+                      )}
+                    </TableCell>
+                    <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
+                      <Address address={from} type={item.from_account.type} size="normal" />
+                    </TableCell>
+                    <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
+                      <Address address={to} type={item.to_account.type} size="normal" />
+                    </TableCell>
+                    <TableCell sx={{ display: { xs: 'table-cell', md: 'none' } }}>
+                      <Stack>
+                        <Stack direction="row" justifyContent="space-between">
+                          <Typography fontSize={12} sx={{ textTransform: 'capitalize', mr: 1 }} noWrap>{`${t(
+                            'from',
+                          )}:`}</Typography>
+                          <Address leading={5} address={from} type={item.from_account.type} />
+                        </Stack>
+
+                        <Stack direction="row" justifyContent="space-between">
+                          <Typography fontSize={12} sx={{ textTransform: 'capitalize', mr: 1 }} noWrap>{`${t(
+                            'to',
+                          )}:`}</Typography>
+                          <Address leading={5} address={to} type={item.to_account.type} />
+                        </Stack>
+                      </Stack>
+                    </TableCell>
+                    <TableCell sx={{ fontSize: { xs: 12, md: 14 }, whiteSpace: 'nowrap' }}>{`${new BigNumber(
+                      item.polyjuice?.value ?? 0,
+                    )
+                      .dividedBy(GCKB_DECIMAL)
+                      .toFormat()}`}</TableCell>
+                    <TableCell>
+                      <Chip
+                        label={item.type.replace(/_/g, ' ')}
+                        size="small"
+                        variant="outlined"
+                        color="primary"
+                        sx={{ textTransform: 'capitalize' }}
+                      />
+                    </TableCell>
+                  </TableRow>
+                )
+              })
             ) : (
               <TableRow>
                 <TableCell colSpan={7} align="center">
@@ -149,13 +256,13 @@ const TxList: React.FC<{
           </TableBody>
         </Table>
       </TableContainer>
-      {showPageSizeSelector ? (
+      {pageSize ? (
         <Stack direction="row" justifyContent="space-between" alignItems="center">
           <PageSize pageSize={pageSize} />
-          <Pagination total={+list.totalCount} page={+list.page} pageSize={pageSize} />
+          <Pagination {...metadata} />
         </Stack>
       ) : (
-        <Pagination total={+list.totalCount} page={+list.page} pageSize={pageSize} />
+        <Pagination {...metadata} />
       )}
       {maxCount ? (
         <Stack direction="row-reverse">

@@ -4,22 +4,13 @@ import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { Container, Paper, Typography, Box, Stack } from '@mui/material'
 import PageTitle from 'components/PageTitle'
-import TxListComp from 'components/TxList'
+import TxListComp, { TxListProps, fetchTxList } from 'components/TxList'
 import SubpageHead from 'components/SubpageHead'
-import Pagination from 'components/Pagination'
+import Pagination from 'components/SimplePagination'
 import { SIZES } from 'components/PageSize'
-import {
-  fetchTxList,
-  getTxListRes,
-  handleApiError,
-  validatePageQuery,
-  PageNonPositiveException,
-  PageSizeException,
-} from 'utils'
+import { handleApiError, PageNonPositiveException, PageSizeException } from 'utils'
 
-// type RawTxList = Parameters<typeof getTxListRes>[0]
-type ParsedTxList = ReturnType<typeof getTxListRes>
-type State = { txList: ParsedTxList; pageSize: number }
+type State = { txList: TxListProps['transactions']; pageSize: number }
 
 const TxList = (initState: State) => {
   const [{ txList, pageSize }, setList] = useState(initState)
@@ -42,18 +33,18 @@ const TxList = (initState: State) => {
         </PageTitle>
         <Paper>
           <Box sx={{ px: 1, py: 2 }}>
-            {txList.txs.length >= 2 ? (
+            {txList.entries.length >= 2 ? (
               <Stack direction="row" justifyContent="sapce-between" alignItems="center">
                 <Typography variant="inherit" flex="1">
                   {t(`tx_in_block_from_to`, {
-                    to: txList.txs[0].blockNumber,
-                    from: txList.txs[txList.txs.length - 1].blockNumber,
+                    to: txList.entries[0].block.number,
+                    from: txList.entries[txList.entries.length - 1].block.number,
                   })}
                 </Typography>
-                <Pagination total={+txList.totalCount} page={+txList.page} pageSize={pageSize} />
+                <Pagination {...txList.metadata} />
               </Stack>
             ) : null}
-            <TxListComp list={txList} pageSize={pageSize} showPageSizeSelector maxCount="500k" />
+            <TxListComp transactions={txList} maxCount="500k" pageSize={pageSize} />
           </Box>
         </Paper>
       </Container>
@@ -62,15 +53,15 @@ const TxList = (initState: State) => {
 }
 
 export const getServerSideProps: GetServerSideProps<State> = async ({ locale, res, query }) => {
-  const { page, page_size = SIZES[1] } = query
+  const { page_size = SIZES[1], before = null, after = null } = query
 
   try {
-    validatePageQuery(page as string, { size: page_size as string, sizes: SIZES })
+    const pageSize = Number.isNaN(+page_size) ? +SIZES[1] : +page_size
     const [txList, lng] = await Promise.all([
-      fetchTxList({ page: query.page as string, page_size: page_size as string }),
+      fetchTxList({ limit: pageSize as number, before: before as string | null, after: after as string | null }),
       serverSideTranslations(locale, ['common', 'list']),
     ])
-    return { props: { ...lng, txList, pageSize: +page_size } }
+    return { props: { ...lng, txList, pageSize } }
   } catch (err) {
     switch (true) {
       case err instanceof PageNonPositiveException:

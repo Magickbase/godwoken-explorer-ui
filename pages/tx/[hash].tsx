@@ -4,7 +4,6 @@ import { useRouter } from 'next/router'
 import NextLink from 'next/link'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { utils } from 'ethers'
 import {
   Alert,
   Accordion,
@@ -58,6 +57,8 @@ import {
   fetchEventLogsListByType,
   CKB_EXPLORER_URL,
   CHANNEL,
+  CKB_DECIMAL,
+  GCKB_DECIMAL,
 } from 'utils'
 
 type ParsedTransferList = ReturnType<typeof getERC20TransferListRes>
@@ -184,7 +185,13 @@ const Tx = (initState: State) => {
       : null,
     {
       label: 'value',
-      value: <Typography variant="body2">{`${new BigNumber(tx.value || '0').toFormat()} CKB`}</Typography>,
+      // FIXME: tx.value is formatted incorrectly
+      value: (
+        <Typography variant="body2">{`${new BigNumber(tx.value || '0')
+          .multipliedBy(CKB_DECIMAL)
+          .dividedBy(GCKB_DECIMAL)
+          .toFormat()} CKB`}</Typography>
+      ),
     },
   ]
   const basicInfo = [
