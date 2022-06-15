@@ -87,13 +87,16 @@ interface Cursor {
   before: string
   after: string
 }
-interface AccountTxListVariables extends Nullable<Cursor> {
-  address: string
+interface EthAccountTxListVariables extends Nullable<Cursor> {
+  address?: string | null
+}
+interface GwAccountTxListVariables extends Nullable<Cursor> {
+  script_hash?: string | null
 }
 interface BlockTxListVariables extends Nullable<Cursor> {
   block_number: number
 }
-type Variables = Cursor | AccountTxListVariables | BlockTxListVariables
+type Variables = Cursor | EthAccountTxListVariables | GwAccountTxListVariables | BlockTxListVariables
 
 export const fetchTxList = (variables: Variables) =>
   client.request<TxListProps>(txListQuery, variables).then(data => data.transactions)

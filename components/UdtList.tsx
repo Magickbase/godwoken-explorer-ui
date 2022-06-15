@@ -12,7 +12,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
 } from '@mui/material'
 import { client, formatAmount, nameToColor, GraphQLSchema } from 'utils'
 
@@ -22,8 +21,8 @@ export type UdtList = Array<{
 }>
 
 const udtListQuery = gql`
-  query ($address: String!) {
-    account_udts(input: { address_hashes: [$address] }) {
+  query ($address_hashes: [String], $script_hashes: [String]) {
+    account_udts(input: { address_hashes: $address_hashes, script_hashes: $script_hashes }) {
       balance
       udt {
         id
@@ -36,9 +35,12 @@ const udtListQuery = gql`
     }
   }
 `
+type EthAccountUdtListVariables = Record<'address_hashes', Array<string>>
+type GwAccountUdtListVariables = Record<'script_hashes', Array<string>>
+type Variables = EthAccountUdtListVariables | GwAccountUdtListVariables
 
 const CKB_UDT_ID = '1'
-export const fetchUdtList = (variables: { address: string }) =>
+export const fetchUdtList = (variables: Variables) =>
   client
     .request<{ account_udts: UdtList }>(udtListQuery, variables)
     .then(data => data.account_udts.filter(u => u.udt.id !== CKB_UDT_ID))
@@ -67,7 +69,10 @@ const AssetList = ({ list = [] }: { list: UdtList }) => {
               <TableRow key={item.udt.id}>
                 <TableCell>
                   <Stack direction="row" alignItems="center">
-                    <Avatar src={item.udt.icon} sx={{ bgcolor: nameToColor(item.udt.name) }}>
+                    <Avatar
+                      src={item.udt.icon}
+                      sx={{ bgcolor: nameToColor(item.udt.name), textTransform: 'capitalize' }}
+                    >
                       {item.udt.name?.[0] ?? '?'}
                     </Avatar>
                     <NextLink href={`/token/${item.udt.id}`}>

@@ -152,6 +152,7 @@ const BlockList = ({ list }: { list: State['blockList'] }) => {
                   </Stack>
                 </Stack>
               }
+              primaryTypographyProps={{ component: 'div' }}
             />
           </ListItem>
         </Box>
@@ -274,6 +275,7 @@ const TxList = ({ list }: { list: State['txList'] }) => {
                   </Stack>
                 </Stack>
               }
+              primaryTypographyProps={{ component: 'div' }}
             />
           </ListItem>
         </Box>
