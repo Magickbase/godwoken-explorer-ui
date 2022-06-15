@@ -143,8 +143,10 @@ const Account = (initState: State) => {
                       secondary={
                         <Typography variant="body2">
                           {/* FIXME: use response of graphql and GCKB_DECIMAL to foramt balance */}
-                          {new BigNumber(account.ckb).multipliedBy(CKB_DECIMAL).dividedBy(GCKB_DECIMAL).toFormat() +
-                            ' CKB'}
+                          {new BigNumber(account.ckb || '0')
+                            .multipliedBy(CKB_DECIMAL)
+                            .dividedBy(GCKB_DECIMAL)
+                            .toFormat() + ' CKB'}
                         </Typography>
                       }
                     />
@@ -175,9 +177,9 @@ const Account = (initState: State) => {
             <Tabs value={tabs.indexOf(tab as string)} variant="scrollable" scrollButtons="auto">
               {[
                 t('transactionRecords'),
-                t(`ERC20Records`),
-                t(`bridgedRecords`),
-                t('userDefinedAssets'),
+                ['user', 'smartContract'].includes(accountType) ? t(`ERC20Records`) : null,
+                ['user', 'smartContract'].includes(accountType) ? t(`bridgedRecords`) : null,
+                ['user', 'smartContract'].includes(accountType) ? t('userDefinedAssets') : null,
                 accountType === 'smartContract' && account.smartContract?.name ? t('contract') : null,
                 accountType === 'smartContract' ? t('events') : null,
               ].map((label, idx) =>
