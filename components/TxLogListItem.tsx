@@ -84,7 +84,7 @@ const TxLogsListItem = ({ item }: { item: ParsedEventLog }) => {
     topic3: 'decoded',
     data: 'decoded',
   })
-  const { name: eventName, inputs: eventInputs } = item.parsedLog.eventFragment
+  const { name: eventName, inputs: eventInputs } = item.parsedLog?.eventFragment ?? { name: null, inputs: [] }
 
   const ArgsFormatSelector = ({ type, arg }: { type: 'select' | 'button'; arg: string }) => {
     const handleChange = event => {
@@ -159,46 +159,53 @@ const TxLogsListItem = ({ item }: { item: ParsedEventLog }) => {
             sx={{ whiteSpace: 'normal', wordBreak: 'break-word', overflowWrap: 'break-word' }}
           />
         </Box>
-        <Box key="name" sx={{ display: 'flex', mb: 2 }}>
-          <Typography key="name" fontSize={14} variant="body2" sx={{ flex: '0 0 60px', mr: 3, textAlign: 'right' }}>
-            {t('name')}
-          </Typography>
-          <Typography key="eventfullname" component="span" fontSize={14}>
-            <Typography
-              key="eventname"
-              component="span"
-              className="mono-font"
-              fontSize={14}
-            >{`${eventName} (`}</Typography>
-            {eventInputs.map((input, i) => (
-              <Typography key={i} component="span">
-                <Typography component="span" className="mono-font" fontSize={14}>
-                  {input.indexed && `index_topic_${i + 1}  `}
-                </Typography>
-                <Typography component="span" className="mono-font" fontSize={14} sx={{ color: '#00c9a7' }}>
-                  {`${input.type} `}
-                </Typography>
-                <Typography
-                  component="span"
-                  className="mono-font"
-                  fontSize={14}
-                  sx={{ color: '#de4437' }}
-                >{`${input.name}`}</Typography>
-                {i < eventInputs.length - 1 && (
+        {item.parsedLog ? (
+          <Box key="name" sx={{ display: 'flex', mb: 2 }}>
+            <Typography key="name" fontSize={14} variant="body2" sx={{ flex: '0 0 60px', mr: 3, textAlign: 'right' }}>
+              {t('name')}
+            </Typography>
+            <Typography key="eventfullname" component="span" fontSize={14}>
+              <Typography
+                key="eventname"
+                component="span"
+                className="mono-font"
+                fontSize={14}
+              >{`${eventName} (`}</Typography>
+              {eventInputs.map((input, i) => (
+                <Typography key={i} component="span">
                   <Typography component="span" className="mono-font" fontSize={14}>
-                    {', '}
+                    {input.indexed && `index_topic_${i + 1}  `}
                   </Typography>
-                )}
-              </Typography>
-            ))}
-            <Typography component="span" className="mono-font" fontSize={14}>{`) `}</Typography>
-            <NextLink href={`/account/${item.addressHash}?tab=contract`} passHref>
-              <Link href={`/account/${item.addressHash}?tab=contract`} underline="none" color="secondary" fontSize={14}>
-                {t('viewSource')}
-              </Link>
-            </NextLink>
-          </Typography>
-        </Box>
+                  <Typography component="span" className="mono-font" fontSize={14} sx={{ color: '#00c9a7' }}>
+                    {`${input.type} `}
+                  </Typography>
+                  <Typography
+                    component="span"
+                    className="mono-font"
+                    fontSize={14}
+                    sx={{ color: '#de4437' }}
+                  >{`${input.name}`}</Typography>
+                  {i < eventInputs.length - 1 && (
+                    <Typography component="span" className="mono-font" fontSize={14}>
+                      {', '}
+                    </Typography>
+                  )}
+                </Typography>
+              ))}
+              <Typography component="span" className="mono-font" fontSize={14}>{`) `}</Typography>
+              <NextLink href={`/account/${item.addressHash}?tab=contract`} passHref>
+                <Link
+                  href={`/account/${item.addressHash}?tab=contract`}
+                  underline="none"
+                  color="secondary"
+                  fontSize={14}
+                >
+                  {t('viewSource')}
+                </Link>
+              </NextLink>
+            </Typography>
+          </Box>
+        ) : null}
         <Box key="topics" sx={{ display: 'flex', mb: 2 }}>
           <Typography fontSize={14} variant="body2" sx={{ flex: '0 0 60px', mr: 3, textAlign: 'right' }}>
             {t('topics')}
@@ -231,13 +238,13 @@ const TxLogsListItem = ({ item }: { item: ParsedEventLog }) => {
                 0
               </Typography>
               <Typography variant="body2" className="mono-font" sx={{ px: 1 }}>
-                {item.parsedLog.topic}
+                {item.parsedLog?.topic ?? item.topics[0]}
               </Typography>
             </Box>
             {item.topics.slice(1).map(
               (topic, i) =>
                 topic !== '0x' && (
-                  <Box key={i + 1} sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Box key={i + 1} sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
                     <Typography
                       variant="body2"
                       sx={{
@@ -252,20 +259,24 @@ const TxLogsListItem = ({ item }: { item: ParsedEventLog }) => {
                     >
                       {i + 1}
                     </Typography>
-                    <ArgsFormatSelector type="select" arg={`topic${i + 1}`} />
-                    <Image
-                      src={`${IMG_URL}arrow-right-slim.svg`}
-                      loading="lazy"
-                      width="17"
-                      height="17"
-                      layout="fixed"
-                      alt="arrow-right"
-                    />
+                    {item.parsedLog ? (
+                      <>
+                        <ArgsFormatSelector type="select" arg={`topic${i + 1}`} />
+                        <Image
+                          src={`${IMG_URL}arrow-right-slim.svg`}
+                          loading="lazy"
+                          width="17"
+                          height="17"
+                          layout="fixed"
+                          alt="arrow-right"
+                        />
+                      </>
+                    ) : null}
                     <ArgsValueDisplay
                       format={argsFormatState[`topic${i + 1}`]}
-                      argType={eventInputs[i].type}
+                      argType={eventInputs[i]?.type}
                       hexValue={item.topics[i]}
-                      decodedValue={item.parsedLog.args[i]}
+                      decodedValue={item.parsedLog?.args[i] ?? item.topics[i]}
                       sx={{ flex: '0 1 auto' }}
                     />
                   </Box>
@@ -278,18 +289,18 @@ const TxLogsListItem = ({ item }: { item: ParsedEventLog }) => {
             {t('data')}
           </Typography>
           <Box sx={{ display: 'flex', width: '100%', background: '#FAFAFA', p: 2, borderRadius: 2 }}>
-            {argsFormatState.data === 'decoded' && (
+            {item.parsedLog && argsFormatState.data === 'decoded' ? (
               <Typography fontSize={14} component="span">
                 {eventInputs[2].name + ':'}
               </Typography>
-            )}
+            ) : null}
             <ArgsValueDisplay
               format={argsFormatState.data}
-              argType={eventInputs[2].type}
+              argType={eventInputs[2]?.type}
               hexValue={item.data}
-              decodedValue={item.parsedLog.args[2].hex}
+              decodedValue={item.parsedLog?.args[2].hex ?? item.data}
             />
-            <ArgsFormatSelector type="button" arg="data" />
+            {item.parsedLog ? <ArgsFormatSelector type="button" arg="data" /> : null}
           </Box>
         </Box>
       </Box>
