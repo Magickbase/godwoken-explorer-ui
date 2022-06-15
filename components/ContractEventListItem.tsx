@@ -53,7 +53,7 @@ const ContractEventListItem = ({
   const [expanded, setExpanded] = useState<boolean>(false)
   const [dataFormat, setDataFormat] = useState<'hex' | 'decoded'>('hex')
   const [t] = useTranslation('list')
-  const { name: eventName, inputs: eventInputs } = item.parsedLog.eventFragment
+  const { name: eventName, inputs: eventInputs } = item.parsedLog?.eventFragment ?? { name: null, inputs: [] }
 
   const handleExpand = () => {
     setExpanded(!expanded)
@@ -65,84 +65,92 @@ const ContractEventListItem = ({
 
   return (
     <Stack sx={{ my: 2, p: 2, width: '100%', background: '#FAFAFA', borderRadius: 2 }}>
-      <Accordion expanded={expanded} onChange={handleExpand}>
-        <AccordionSummary>
-          <Typography component="span" fontSize={14} sx={{ display: 'flex' }}>
-            <Typography
-              key="eventname"
-              component="span"
-              className="mono-font"
-              fontSize={14}
-              sx={{ flex: '0 0 auto ' }}
-            >{`${eventName} (`}</Typography>
-            {eventInputs.map((input, i) => (
-              <Typography key={i} sx={{ flex: '0 0 auto ', p: 0 }} fontSize={14} component="span">
-                <Typography component="span" className="mono-font" fontSize={14}>
-                  {input.indexed && `index_topic_${i + 1}  `}
-                </Typography>
-                <Typography component="span" className="mono-font" fontSize={14} sx={{ color: '#00c9a7' }}>
-                  {`${input.type} `}
-                </Typography>
-                <Typography
-                  component="span"
-                  className="mono-font"
-                  fontSize={14}
-                  sx={{ color: '#de4437' }}
-                >{`${input.name}`}</Typography>
-                {i < eventInputs.length - 1 && (
+      {item.parsedLog ? (
+        <Accordion expanded={expanded} onChange={handleExpand}>
+          <AccordionSummary>
+            <Typography component="span" fontSize={14} sx={{ display: 'flex' }}>
+              <Typography
+                key="eventname"
+                component="span"
+                className="mono-font"
+                fontSize={14}
+                sx={{ flex: '0 0 auto ' }}
+              >{`${eventName} (`}</Typography>
+              {eventInputs.map((input, i) => (
+                <Typography key={i} sx={{ flex: '0 0 auto ', p: 0 }} fontSize={14} component="span">
                   <Typography component="span" className="mono-font" fontSize={14}>
-                    {', '}
+                    {input.indexed && `index_topic_${i + 1}  `}
                   </Typography>
-                )}
-              </Typography>
-            ))}
-            <Typography component="span" className="mono-font" fontSize={14}>{`) `}</Typography>
-          </Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Stack spacing={0.5}>
-            <Box key="topic0">
-              <Typography component="span" className="mono-font" fontSize={14} sx={{ color: '#666666' }}>
-                {`${eventInputs[0].type} `}
-              </Typography>
-              <Typography component="span" className="mono-font" fontSize={14}>
-                {`${eventInputs[0].name}`}
-              </Typography>
-            </Box>
-            <TruncatedAddress
-              address={item.parsedLog.args[0]}
-              leading={30}
-              size="normal"
-              sx={{ width: 'fit-content' }}
-            />
-            <Box key="topic1">
-              <Typography component="span" className="mono-font" fontSize={14} sx={{ color: '#666666' }}>
-                {`${eventInputs[1].type} `}
-              </Typography>
-              <Typography component="span" className="mono-font" fontSize={14}>
-                {`${eventInputs[1].name}`}
-              </Typography>
-            </Box>
-            <TruncatedAddress
-              address={item.parsedLog.args[1]}
-              leading={30}
-              size="normal"
-              sx={{ width: 'fit-content' }}
-            />
-            <Box key="topic2">
-              <Typography component="span" className="mono-font" fontSize={14} sx={{ color: '#666666' }}>
-                {`${eventInputs[2].type} `}
-              </Typography>
-              <Typography component="span" className="mono-font" fontSize={14}>
-                {`${eventInputs[2].name}`}
-              </Typography>
-            </Box>
-            <Typography fontSize={14} variant="body2" className="mono-font">
-              {item.data}
+                  <Typography component="span" className="mono-font" fontSize={14} sx={{ color: '#00c9a7' }}>
+                    {`${input.type} `}
+                  </Typography>
+                  <Typography
+                    component="span"
+                    className="mono-font"
+                    fontSize={14}
+                    sx={{ color: '#de4437' }}
+                  >{`${input.name}`}</Typography>
+                  {i < eventInputs.length - 1 && (
+                    <Typography component="span" className="mono-font" fontSize={14}>
+                      {', '}
+                    </Typography>
+                  )}
+                </Typography>
+              ))}
+              <Typography component="span" className="mono-font" fontSize={14}>{`) `}</Typography>
             </Typography>
-          </Stack>
-        </AccordionDetails>
-      </Accordion>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Stack spacing={0.5}>
+              {eventInputs[0] ? (
+                <Box key="topic0">
+                  <Typography component="span" className="mono-font" fontSize={14} sx={{ color: '#666666' }}>
+                    {`${eventInputs[0].type} `}
+                  </Typography>
+                  <Typography component="span" className="mono-font" fontSize={14}>
+                    {`${eventInputs[0].name}`}
+                  </Typography>
+                </Box>
+              ) : null}
+              <TruncatedAddress
+                address={item.parsedLog?.args[0] ?? item.topics[0]}
+                leading={30}
+                size="normal"
+                sx={{ width: 'fit-content' }}
+              />
+              {eventInputs[1] ? (
+                <Box key="topic1">
+                  <Typography component="span" className="mono-font" fontSize={14} sx={{ color: '#666666' }}>
+                    {`${eventInputs[1].type} `}
+                  </Typography>
+                  <Typography component="span" className="mono-font" fontSize={14}>
+                    {`${eventInputs[1].name}`}
+                  </Typography>
+                </Box>
+              ) : null}
+              <TruncatedAddress
+                address={item.parsedLog?.args[1] ?? item.topics[1]}
+                leading={30}
+                size="normal"
+                sx={{ width: 'fit-content' }}
+              />
+              {eventInputs[2] ? (
+                <Box key="topic2">
+                  <Typography component="span" className="mono-font" fontSize={14} sx={{ color: '#666666' }}>
+                    {`${eventInputs[2].type} `}
+                  </Typography>
+                  <Typography component="span" className="mono-font" fontSize={14}>
+                    {`${eventInputs[2].name}`}
+                  </Typography>
+                </Box>
+              ) : null}
+              <Typography fontSize={14} variant="body2" className="mono-font">
+                {item.data}
+              </Typography>
+            </Stack>
+          </AccordionDetails>
+        </Accordion>
+      ) : null}
       <Stack direction="row" spacing={1}>
         <EventFilterIcon
           setSearchText={setSearchText}
@@ -167,34 +175,40 @@ const ContractEventListItem = ({
               ) : null,
             )}
           <Stack direction="row" alignItems="center">
-            <FormControl sx={{ my: 1, mr: 1 }} size="small">
-              <Select
-                value={dataFormat}
-                onChange={handleToggleButton}
-                size="small"
-                sx={{ width: '64px' }}
-                renderValue={(v: string) => (
-                  <Typography variant="body2">{v.charAt(0).toUpperCase() + v.slice(1, 3)}</Typography>
-                )}
-                input={<CustomizedInput />}
-              >
-                <MenuItem value={'decoded'}>Decoded</MenuItem>
-                <MenuItem value={'hex'}>Hex</MenuItem>
-              </Select>
-            </FormControl>
-            <Image
-              src={`${IMG_URL}arrow-right-slim.svg`}
-              loading="lazy"
-              width="17"
-              height="17"
-              layout="fixed"
-              alt="arrow-right"
-            />
+            {item.parsedLog?.args[2].hex ? (
+              <>
+                <FormControl sx={{ my: 1, mr: 1 }} size="small">
+                  <Select
+                    value={dataFormat}
+                    onChange={handleToggleButton}
+                    size="small"
+                    sx={{ width: '64px' }}
+                    renderValue={(v: string) => (
+                      <Typography variant="body2">{v.charAt(0).toUpperCase() + v.slice(1, 3)}</Typography>
+                    )}
+                    input={<CustomizedInput />}
+                  >
+                    <MenuItem value={'decoded'}>Decoded</MenuItem>
+                    <MenuItem value={'hex'}>Hex</MenuItem>
+                  </Select>
+                </FormControl>
+                <Image
+                  src={`${IMG_URL}arrow-right-slim.svg`}
+                  loading="lazy"
+                  width="17"
+                  height="17"
+                  layout="fixed"
+                  alt="arrow-right"
+                />
+              </>
+            ) : (
+              <span style={{ whiteSpace: 'pre' }}>{`Data:          `}</span>
+            )}
             <ArgsValueDisplay
               format={dataFormat}
-              argType={eventInputs[2].type}
+              argType={eventInputs[2]?.type}
               hexValue={item.data}
-              decodedValue={item.parsedLog.args[2].hex}
+              decodedValue={item.parsedLog?.args[2].hex}
             />
           </Stack>
         </Stack>

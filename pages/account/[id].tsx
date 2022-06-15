@@ -238,7 +238,7 @@ export const getServerSideProps: GetServerSideProps<State, { id: string }> = asy
     if (typeof tab !== 'string' || !tabs.includes(tab)) {
       throw new TabNotFoundException()
     }
-    const q = isEthAddress(id) ? { eth_address: id } : { script_hash: id }
+    const q = isEthAddress(id) ? { address: id } : { script_hash: id }
 
     const [account, lng] = await Promise.all([
       fetchAccount(id),
@@ -247,23 +247,22 @@ export const getServerSideProps: GetServerSideProps<State, { id: string }> = asy
     ])
 
     const txList =
-      tab === 'transactions' && (q.eth_address || q.script_hash)
+      tab === 'transactions' && (q.address || q.script_hash)
         ? await fetchTxList({ ...q, before: before as string, after: after as string })
         : null
 
     const transferList =
-      tab === 'erc20' && q.eth_address
-        ? await fetchERC20TransferList({ eth_address: q.eth_address, page: query.page as string })
+      tab === 'erc20' && q.address
+        ? await fetchERC20TransferList({ eth_address: q.address, page: query.page as string })
         : null
     const bridgedRecordList =
-      tab === 'bridged' && q.eth_address
-        ? await fetchBridgedRecordList({ eth_address: q.eth_address, page: query.page as string })
+      tab === 'bridged' && q.address
+        ? await fetchBridgedRecordList({ eth_address: q.address, page: query.page as string })
         : null
-    const eventsList =
-      tab === 'events' && q.eth_address ? await fetchEventLogsListByType('accounts', q.eth_address) : null
+    const eventsList = tab === 'events' && q.address ? await fetchEventLogsListByType('accounts', q.address) : null
     const udtList =
-      tab === 'assets' && (q.eth_address || q.script_hash)
-        ? await fetchUdtList(q.eth_address ? { address_hashes: [id] } : { script_hashes: [id] })
+      tab === 'assets' && (q.address || q.script_hash)
+        ? await fetchUdtList(q.address ? { address_hashes: [id] } : { script_hashes: [id] })
         : null
 
     return { props: { ...account, ...lng, txList, transferList, bridgedRecordList, udtList, eventsList } }
