@@ -21,9 +21,9 @@ import TruncatedAddress from './TruncatedAddress'
 
 const argsFormatReducer = (state, action) => {
   switch (action.type) {
+    case 'topic0':
     case 'topic1':
     case 'topic2':
-    case 'topic3':
     case 'data':
       return { ...state, [action.type]: action.payload }
     default: {
@@ -221,30 +221,10 @@ const TxLogsListItem = ({ item }: { item: ParsedEventLog }) => {
               width: '100%',
             }}
           >
-            <Box key={0} sx={{ display: 'flex', alignItems: 'center' }}>
-              <Typography
-                variant="body2"
-                sx={{
-                  color: '#666666',
-                  borderRadius: 1,
-                  px: 1,
-                  py: 0.5,
-                  mr: 1,
-                  mb: 0.5,
-                  background: '#F0F0F0',
-                  height: 'fit-content',
-                }}
-              >
-                0
-              </Typography>
-              <Typography variant="body2" className="mono-font" sx={{ px: 1 }}>
-                {item.parsedLog?.topic ?? item.topics[0]}
-              </Typography>
-            </Box>
-            {item.topics.slice(1).map(
+            {item.topics.map(
               (topic, i) =>
                 topic !== '0x' && (
-                  <Box key={i + 1} sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
+                  <Box key={i} sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
                     <Typography
                       variant="body2"
                       sx={{
@@ -257,26 +237,13 @@ const TxLogsListItem = ({ item }: { item: ParsedEventLog }) => {
                         height: 'fit-content',
                       }}
                     >
-                      {i + 1}
+                      {i}
                     </Typography>
-                    {item.parsedLog ? (
-                      <>
-                        <ArgsFormatSelector type="select" arg={`topic${i + 1}`} />
-                        <Image
-                          src={`${IMG_URL}arrow-right-slim.svg`}
-                          loading="lazy"
-                          width="17"
-                          height="17"
-                          layout="fixed"
-                          alt="arrow-right"
-                        />
-                      </>
-                    ) : null}
                     <ArgsValueDisplay
-                      format={argsFormatState[`topic${i + 1}`]}
-                      argType={eventInputs[i]?.type}
+                      format={argsFormatState[`topic${i}`]}
+                      argType={item.parsedLog?.eventFragment.inputs[i - 1]?.type}
                       hexValue={item.topics[i]}
-                      decodedValue={item.parsedLog?.args[i] ?? item.topics[i]}
+                      decodedValue={i > 0 ? item.parsedLog?.args[i - 1]?.toString() || item.topics[i] : item.topics[0]}
                       sx={{ flex: '0 1 auto' }}
                     />
                   </Box>
