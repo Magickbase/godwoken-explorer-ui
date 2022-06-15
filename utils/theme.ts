@@ -1,47 +1,38 @@
 import { createTheme } from '@mui/material/styles'
-import { red, green, orange } from '@mui/material/colors'
+import { red } from '@mui/material/colors'
 
 export const theme = createTheme(
   process.env.NEXT_PUBLIC_CHAIN_TYPE === 'mainnet'
     ? {
         palette: {
           primary: {
-            light: '#525b66',
-            main: '#29323c',
-            dark: '#000a16',
+            light: '#F0F0FC',
+            main: '#4C2CE4',
+            dark: '#2D2C3E',
             contrastText: '#fff',
           },
-          secondary: {
-            light: '#a255ff',
-            main: '#651fff',
-            dark: '#0100ca',
-          },
           success: {
-            light: green.A400,
-            main: green[300],
-            dark: green[800],
+            light: '#F0FCF1',
+            main: '#2BD46F',
           },
           error: {
             main: red.A400,
           },
+          warning: {
+            light: '#FFF5E5',
+            main: '#FF9900',
+          },
           info: {
-            light: orange[500],
-            main: orange[700],
-            dark: orange[900],
+            main: '#E8F4FF',
           },
         },
       }
     : {
         palette: {
           primary: {
-            light: '#7b8da1',
-            main: '#5a718a',
-            dark: '#3e4f60',
-          },
-          secondary: {
-            light: '#8798f3',
-            main: '#697ff1',
-            dark: '#4958a8',
+            light: '#F1FAFD',
+            main: '#2C97E4',
+            dark: '#274B82',
           },
         },
       },
