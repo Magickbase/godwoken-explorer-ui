@@ -102,51 +102,30 @@ const ContractEventListItem = ({
           </AccordionSummary>
           <AccordionDetails>
             <Stack spacing={0.5}>
-              {eventInputs[0] ? (
-                <Box key="topic0">
-                  <Typography component="span" className="mono-font" fontSize={14} sx={{ color: '#666666' }}>
-                    {`${eventInputs[0].type} `}
-                  </Typography>
-                  <Typography component="span" className="mono-font" fontSize={14}>
-                    {`${eventInputs[0].name}`}
-                  </Typography>
-                </Box>
-              ) : null}
-              <TruncatedAddress
-                address={item.parsedLog?.args[0] ?? item.topics[0]}
-                leading={30}
-                size="normal"
-                sx={{ width: 'fit-content' }}
-              />
-              {eventInputs[1] ? (
-                <Box key="topic1">
-                  <Typography component="span" className="mono-font" fontSize={14} sx={{ color: '#666666' }}>
-                    {`${eventInputs[1].type} `}
-                  </Typography>
-                  <Typography component="span" className="mono-font" fontSize={14}>
-                    {`${eventInputs[1].name}`}
-                  </Typography>
-                </Box>
-              ) : null}
-              <TruncatedAddress
-                address={item.parsedLog?.args[1] ?? item.topics[1]}
-                leading={30}
-                size="normal"
-                sx={{ width: 'fit-content' }}
-              />
-              {eventInputs[2] ? (
-                <Box key="topic2">
-                  <Typography component="span" className="mono-font" fontSize={14} sx={{ color: '#666666' }}>
-                    {`${eventInputs[2].type} `}
-                  </Typography>
-                  <Typography component="span" className="mono-font" fontSize={14}>
-                    {`${eventInputs[2].name}`}
-                  </Typography>
-                </Box>
-              ) : null}
-              <Typography fontSize={14} variant="body2" className="mono-font">
-                {item.data}
-              </Typography>
+              {eventInputs.map((eventInput, idx) => (
+                <>
+                  <Box key={`topic-${idx}`}>
+                    <Typography component="span" className="mono-font" fontSize={14} sx={{ color: '#666666' }}>
+                      {`${eventInput.type} `}
+                    </Typography>
+                    <Typography component="span" className="mono-font" fontSize={14}>
+                      {`${eventInput.name}`}
+                    </Typography>
+                  </Box>
+                  {eventInput.type === 'address' ? (
+                    <TruncatedAddress
+                      address={item.parsedLog?.args[0]}
+                      leading={30}
+                      size="normal"
+                      sx={{ width: 'fit-content' }}
+                    />
+                  ) : (
+                    <Typography fontSize={14} variant="body2" className="mono-font">
+                      {item.data}
+                    </Typography>
+                  )}
+                </>
+              ))}
             </Stack>
           </AccordionDetails>
         </Accordion>
