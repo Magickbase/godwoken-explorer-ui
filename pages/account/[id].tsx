@@ -46,12 +46,13 @@ import {
   fetchERC20TransferList,
   getBridgedRecordListRes,
   fetchBridgedRecordList,
-  ParsedEventLog,
   fetchEventLogsListByType,
-  CHANNEL,
+  ParsedEventLog,
   TabNotFoundException,
+  CHANNEL,
   GCKB_DECIMAL,
   CKB_DECIMAL,
+  isEthAddress,
 } from 'utils'
 import PageTitle from 'components/PageTitle'
 
@@ -90,7 +91,6 @@ const Account = (initState: State) => {
     },
     [setAccount, account.ethAddr],
   )
-  const udtList = account.user?.udtList ?? (account.smartContract?.udtList || [])
 
   const handleAddressCopy = async () => {
     await handleCopy(account.ethAddr)
@@ -179,7 +179,7 @@ const Account = (initState: State) => {
                 t(`bridgedRecords`),
                 t('userDefinedAssets'),
                 accountType === 'smartContract' && account.smartContract?.name ? t('contract') : null,
-                t('events'),
+                accountType === 'smartContract' ? t('events') : null,
               ].map((label, idx) =>
                 label ? (
                   <Tab
@@ -192,7 +192,7 @@ const Account = (initState: State) => {
                     }}
                   />
                 ) : (
-                  <Tab sx={{ display: 'none' }} />
+                  <Tab key="none" sx={{ display: 'none' }} />
                 ),
               )}
             </Tabs>
@@ -236,6 +236,7 @@ export const getServerSideProps: GetServerSideProps<State, { id: string }> = asy
     if (typeof tab !== 'string' || !tabs.includes(tab)) {
       throw new TabNotFoundException()
     }
+    const q = isEthAddress(id) ? { eth_address: id } : { script_hash: id }
 
     const [account, lng] = await Promise.all([
       fetchAccount(id),
@@ -244,21 +245,24 @@ export const getServerSideProps: GetServerSideProps<State, { id: string }> = asy
     ])
 
     const txList =
-      tab === 'transactions' && account.ethAddr
-        ? await fetchTxList({ address: id, before: before as string, after: after as string })
+      tab === 'transactions' && (q.eth_address || q.script_hash)
+        ? await fetchTxList({ ...q, before: before as string, after: after as string })
         : null
 
     const transferList =
-      tab === 'erc20' && account.ethAddr
-        ? await fetchERC20TransferList({ eth_address: account.ethAddr, page: query.page as string })
+      tab === 'erc20' && q.eth_address
+        ? await fetchERC20TransferList({ eth_address: q.eth_address, page: query.page as string })
         : null
     const bridgedRecordList =
-      tab === 'bridged' && account.ethAddr
-        ? await fetchBridgedRecordList({ eth_address: account.ethAddr, page: query.page as string })
+      tab === 'bridged' && q.eth_address
+        ? await fetchBridgedRecordList({ eth_address: q.eth_address, page: query.page as string })
         : null
     const eventsList =
-      tab === 'events' && account.ethAddr ? await fetchEventLogsListByType('accounts', account.ethAddr) : null
-    const udtList = tab === 'assets' && account.ethAddr ? await fetchUdtList({ address: account.ethAddr }) : null
+      tab === 'events' && q.eth_address ? await fetchEventLogsListByType('accounts', q.eth_address) : null
+    const udtList =
+      tab === 'assets' && (q.eth_address || q.script_hash)
+        ? await fetchUdtList(q.eth_address ? { address_hashes: [id] } : { script_hashes: [id] })
+        : null
 
     return { props: { ...account, ...lng, txList, transferList, bridgedRecordList, udtList, eventsList } }
   } catch (err) {
