@@ -1,17 +1,15 @@
 import { useTranslation } from 'next-i18next'
 import { List, ListItem, ListItemText, ListSubheader, Divider, Typography, Tooltip } from '@mui/material'
-import { formatInt } from 'utils'
-import { API } from 'utils/api/utils'
-
-type State = API.Account.Parsed['metaContract']
+import BigNumber from 'bignumber.js'
+import type { MetaContract as MetaContractProps } from './AccountOverview'
 
 const MetaContract = ({
   status,
-  accountMerkleState,
-  blockMerkleState,
-  revertedBlockRoot,
-  lastFinalizedBlockNumber,
-}: State) => {
+  account_merkle_state,
+  block_merkle_state,
+  reverted_block_root,
+  last_finalized_block_number,
+}: MetaContractProps['script']) => {
   const [t] = useTranslation('account')
   const fields: Array<{ label: string; value: React.ReactNode }> = [
     {
@@ -24,22 +22,22 @@ const MetaContract = ({
     },
     {
       label: t('accountCount'),
-      value: <Typography variant="body2">{formatInt(accountMerkleState.accountCount)}</Typography>,
+      value: <Typography variant="body2">{new BigNumber(account_merkle_state.account_count).toFormat()}</Typography>,
     },
     {
       label: t('blockCount'),
-      value: <Typography variant="body2">{formatInt(blockMerkleState.blockCount)}</Typography>,
+      value: <Typography variant="body2">{new BigNumber(block_merkle_state.block_count).toFormat()}</Typography>,
     },
     {
       label: t('lastFinalizedBlockNumber'),
-      value: <Typography variant="body2">{formatInt(lastFinalizedBlockNumber)}</Typography>,
+      value: <Typography variant="body2">{new BigNumber(last_finalized_block_number).toFormat()}</Typography>,
     },
     {
       label: t('accountMerkleRoot'),
       value: (
-        <Tooltip title={accountMerkleState.accountMerkleRoot} placement="top">
+        <Tooltip title={account_merkle_state.account_merkle_root} placement="top">
           <Typography variant="body2" overflow="hidden" textOverflow="ellipsis" className="mono-font">
-            {t(accountMerkleState.accountMerkleRoot)}
+            {t(account_merkle_state.account_merkle_root)}
           </Typography>
         </Tooltip>
       ),
@@ -47,9 +45,9 @@ const MetaContract = ({
     {
       label: t('blockMerkleRoot'),
       value: (
-        <Tooltip title={blockMerkleState.blockMerkleRoot} placement="top">
+        <Tooltip title={block_merkle_state.block_merkle_root} placement="top">
           <Typography variant="body2" overflow="hidden" textOverflow="ellipsis" className="mono-font">
-            {t(blockMerkleState.blockMerkleRoot)}
+            {t(block_merkle_state.block_merkle_root)}
           </Typography>
         </Tooltip>
       ),
@@ -57,9 +55,9 @@ const MetaContract = ({
     {
       label: t('revertedBlockRoot'),
       value: (
-        <Tooltip title={revertedBlockRoot} placement="top">
+        <Tooltip title={reverted_block_root} placement="top">
           <Typography variant="body2" overflow="hidden" textOverflow="ellipsis" className="mono-font">
-            {revertedBlockRoot}
+            {reverted_block_root}
           </Typography>
         </Tooltip>
       ),

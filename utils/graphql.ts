@@ -4,11 +4,11 @@ import { GRAPHQL_ENDPOINT } from './constants'
 export const client = new GraphQLClient(GRAPHQL_ENDPOINT, { headers: { Accept: 'application/json' } })
 
 export namespace GraphQLSchema {
-  export enum BLOCK_STATUS {
+  export enum BlockStatus {
     Committed = 'COMMITTED',
     Finalized = 'FINALIZED',
   }
-  export enum UDT_TYPE {
+  export enum UdtType {
     Bridge = 'BRIDGE',
     Native = 'NATIVE',
   }
@@ -23,12 +23,12 @@ export namespace GraphQLSchema {
     Uknown = 'UKNOWN',
   }
 
-  export enum POLYJUICE_STATUS {
+  export enum PolyjuiceStatus {
     Failed = 'FAILED',
     Succeed = 'SUCCEED',
   }
 
-  export enum TRANSACTION_TYPE {
+  export enum TransactionType {
     EthAddressRegistry = 'ETH_ADDRESS_REGISTRY',
     Polyjuice = 'POLYJUICE',
     PolyjuiceCreator = 'POLYJUICE_CREATOR',
@@ -47,7 +47,7 @@ export namespace GraphQLSchema {
     script_hash: string
     supply: string
     symbol: string
-    type: UDT_TYPE
+    type: UdtType
     type_script: object
     value: string
   }
@@ -58,7 +58,7 @@ export namespace GraphQLSchema {
     account_id: string
     compiler_file_format: String
     compiler_version: String
-    consstructor_arguments: string
+    constructor_arguments: string
     contract_source_code: string
     deployment_tx_hash: string
     id: number
@@ -102,7 +102,7 @@ export namespace GraphQLSchema {
     input: string
     input_size: number
     is_create: boolean
-    status: POLYJUICE_STATUS
+    status: PolyjuiceStatus
     tx_hash: string
     value: string
   }
@@ -128,7 +128,7 @@ export namespace GraphQLSchema {
     nonce: number
     polyjuice: Polyjuice
     polyjuice_creator: PolyjuiceCreator
-    type: TRANSACTION_TYPE
+    type: TransactionType
   }
 
   export interface Block {
@@ -147,7 +147,7 @@ export namespace GraphQLSchema {
     parent_hash: string
     size: number
     state_root: string
-    status: BLOCK_STATUS
+    status: BlockStatus
     timestamp: string
     total_difficulty: string
     transaction_count: number
