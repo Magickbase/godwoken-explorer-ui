@@ -56,7 +56,7 @@ interface Raw {
 
 export interface ParsedEventLog {
   id: number
-  parsedLog: LogDescription
+  parsedLog?: LogDescription
   addressHash: string
   txHash: string
   data: string
@@ -74,22 +74,25 @@ export const getEventLogsListRes = (raw: Raw): ParsedEventLog[] => {
     ].map(t => t || '0x')
 
     const data = attributes.data
+    const res: ParsedEventLog = {
+      id,
+      addressHash: attributes.address_hash,
+      txHash: attributes.transaction_hash,
+      data,
+      blockNumber: attributes.block_number,
+      topics,
+    }
+    if (!attributes.abi) {
+      return res
+    }
 
     try {
       const i = new ethers.utils.Interface(attributes.abi)
       const parsedLog = i.parseLog({ data, topics })
-      return {
-        id,
-        parsedLog: JSON.parse(JSON.stringify(parsedLog)),
-        addressHash: attributes.address_hash,
-        txHash: attributes.transaction_hash,
-        data,
-        blockNumber: attributes.block_number,
-        topics,
-      }
+      return { ...res, parsedLog: JSON.parse(JSON.stringify(parsedLog)) }
     } catch (err) {
       console.error(err)
-      return null
+      return res
     }
   })
 }

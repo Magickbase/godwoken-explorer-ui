@@ -1,15 +1,14 @@
 import { useTranslation } from 'next-i18next'
 import { List, ListItem, ListItemText, ListSubheader, Divider, Typography } from '@mui/material'
 
-const User = ({ nonce }: { nonce: number }) => {
+const EthAddrReg = () => {
   const [t] = useTranslation('account')
 
   const fields = [
     {
       label: t(`type`),
-      value: <Typography variant="body2">User</Typography>,
+      value: <Typography variant="body2">Eth Addr Reg</Typography>,
     },
-    { label: t('nonce'), value: <Typography variant="body2">{nonce.toLocaleString('en')}</Typography> },
   ]
 
   return (
@@ -31,4 +30,4 @@ const User = ({ nonce }: { nonce: number }) => {
   )
 }
 
-export default User
+export default EthAddrReg

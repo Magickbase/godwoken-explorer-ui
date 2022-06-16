@@ -3,11 +3,12 @@
   "basicInfo": "Basic Info",
   "account": "account",
   "accountType": {
-    "user": "User Account",
-    "smartContract": "Contract Account",
-    "sudt": "Bridged Token Account",
-    "polyjuice": "Polyjuice Account",
-    "metaContract": "Meta Contract Account"
+    "ETH_USER": "User Account",
+    "POLYJUICE_CONTRACT": "Contract Account",
+    "UDT": "Bridged Token Account",
+    "POLYJUICE_CREATOR": "Polyjuice Creator Account",
+    "META_CONTRACT": "Meta Contract Account",
+    "ETH_ADDR_REG": "Eth Addr Reg"
   },
   "id": "account id",
   "nonce": "nonce",
@@ -46,6 +47,7 @@
   "halting": "halting",
   "emptyAssetList": "No assets found",
   "l2ScriptHash": "l2 script hash",
+  "l2Script": "l2 script",
   "asset": "asset",
   "assetType": "asset type",
   "balance": "balance",
@@ -69,5 +71,6 @@
   "parameters": "Parameters",
   "response": "Response",
   "query": "Query",
-  "events": "Events"
+  "events": "Events",
+  "token": "Token"
 }

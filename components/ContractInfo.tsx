@@ -1,3 +1,4 @@
+import type { PolyjuiceContract as PolyjuiceContractProps } from './AccountOverview'
 import { useState, useMemo } from 'react'
 import { styled } from '@mui/system'
 import { useTranslation } from 'next-i18next'
@@ -77,18 +78,6 @@ const TabsList = styled(TabsListUnstyled)`
   align-content: space-between;
 `
 
-export interface ContractInfoProps {
-  address: string
-  abi: Array<any>
-  compilerFileFormat: string
-  compilerVersion: string
-  constructorArguments: string
-  contractSourceCode: string
-  deploymentTxHash: string
-  name: string
-  otherInfo: string
-}
-
 const textareaStyle: React.CSSProperties = {
   padding: '8px',
   resize: 'vertical',
@@ -100,15 +89,9 @@ const textareaStyle: React.CSSProperties = {
   borderColor: '#ddd',
 }
 
-const ContractInfo: React.FC<ContractInfoProps> = ({
+const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps['smart_contract'] }> = ({
   address,
-  abi,
-  compilerVersion,
-  compilerFileFormat,
-  contractSourceCode,
-  constructorArguments,
-  name,
-  // otherInfo,
+  contract: { abi, compiler_file_format, compiler_version, name, contract_source_code, constructor_arguments },
 }) => {
   const [tabIdx, setTabIdx] = useState(0)
   const [responseList, setResponseList] = useState([])
@@ -134,11 +117,11 @@ const ContractInfo: React.FC<ContractInfoProps> = ({
     }
   }, [abi])
   const handleTabChange = (_: React.SyntheticEvent, newIdx: number) => setTabIdx(newIdx)
-  const vm = compilerFileFormat.split(' ')[0]
+  const vm = compiler_file_format?.split(' ')[0]
   const chips = [
     name ? `${t('contract_name')}: ${name}` : null,
-    compilerVersion ? `${t('compiler_version')}: ${compilerVersion}` : null,
-    compilerFileFormat ? `${t('compiler_file_format')}: ${compilerFileFormat}` : null,
+    compiler_version ? `${t('compiler_version')}: ${compiler_version}` : null,
+    compiler_file_format ? `${t('compiler_file_format')}: ${compiler_file_format}` : null,
   ].filter(c => c)
 
   const viewMethodSignatures = Object.keys(viewMethods)
@@ -191,13 +174,13 @@ const ContractInfo: React.FC<ContractInfoProps> = ({
                 <Chip key={c} label={c} style={{ margin: '0 8px 8px 0' }} />
               ))}
             </Stack>
-            {contractSourceCode ? (
+            {contract_source_code ? (
               <Stack>
                 <Stack direction="row" alignItems="center">
                   <Typography variant="h6">{t(`contract_source_code`)}</Typography>
                   {vm ? <Typography variant="body2" color="grey" ml={1}>{`(${vm})`}</Typography> : null}
                 </Stack>
-                <TextareaAutosize defaultValue={contractSourceCode} readOnly style={textareaStyle} />
+                <TextareaAutosize defaultValue={contract_source_code} readOnly style={textareaStyle} />
               </Stack>
             ) : null}
             {contract ? (
@@ -206,10 +189,10 @@ const ContractInfo: React.FC<ContractInfoProps> = ({
                 <TextareaAutosize defaultValue={JSON.stringify(abi, null, 2)} readOnly style={textareaStyle} />
               </Stack>
             ) : null}
-            {constructorArguments ? (
+            {constructor_arguments ? (
               <Stack>
                 <Typography variant="h6">{t(`constructor_arguments`)}</Typography>
-                <TextareaAutosize defaultValue={constructorArguments} readOnly style={textareaStyle} />
+                <TextareaAutosize defaultValue={constructor_arguments} readOnly style={textareaStyle} />
               </Stack>
             ) : null}
           </Stack>
