@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import NextLink from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
@@ -14,66 +14,11 @@ import {
   MenuList,
   MenuItem,
   Typography,
-  InputBase,
   IconButton,
   Divider,
-  styled,
-  alpha,
 } from '@mui/material'
-import { Search as SearchIcon, Translate as TranslateIcon, MoreVert as MoreIcon } from '@mui/icons-material'
-import { EXPLORER_TITLE, IMG_URL, SEARCH_FIELDS, GW_VERSION, handleSearchKeyPress } from 'utils'
-
-const Search = styled('div')(({ theme }) => ({
-  'position': 'relative',
-  'borderRadius': theme.shape.borderRadius,
-  'backgroundColor': alpha(theme.palette.common.white, 0.15),
-  '&:hover': {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
-  },
-  'width': '100%',
-  [theme.breakpoints.up('sm')]: {
-    marginLeft: theme.spacing(1),
-    width: 'auto',
-  },
-}))
-
-const SearchIconWrapper = styled('div')(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: '100%',
-  position: 'absolute',
-  pointerEvents: 'none',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-}))
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  'color': 'inherit',
-  '& .MuiInputBase-input': {
-    padding: theme.spacing(1, 1, 1, 0),
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create('width'),
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-      'width': '25ch',
-      '&:focus': {
-        width: '30ch',
-      },
-    },
-    [theme.breakpoints.up('md')]: {
-      'width': '30ch',
-      '&:focus': {
-        width: '40ch',
-      },
-    },
-    [theme.breakpoints.up('lg')]: {
-      'width': '40ch',
-      '&:focus': {
-        width: '66ch',
-      },
-    },
-  },
-}))
+import { Translate as TranslateIcon, MoreVert as MoreIcon } from '@mui/icons-material'
+import { EXPLORER_TITLE, IMG_URL, GW_VERSION } from 'utils'
 
 const TOKEN_TYPE_LIST = ['bridge', 'native']
 const CHAIN_TYPE_LIST = GW_VERSION ? ['testnet'] : ['mainnet', 'testnet']
@@ -83,32 +28,12 @@ const Header = () => {
   const [t, { language }] = useTranslation('common')
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
   const anchorElLabel = anchorEl?.getAttribute('aria-label')
-  const {
-    push,
-    query: { search: searchInQuery },
-    asPath,
-  } = useRouter()
-  const searchRef = useRef<HTMLInputElement | null>(null)
-
-  const handleSearch = async (e: React.KeyboardEvent<HTMLInputElement>) => {
-    handleSearchKeyPress(e, push)
-  }
+  const { asPath } = useRouter()
 
   const handleMenuListOpen = (e: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(e.currentTarget)
   }
   const handleMenuListClose = () => setAnchorEl(null)
-
-  useEffect(() => {
-    if (searchRef.current && typeof searchInQuery === 'string' && searchInQuery) {
-      searchRef.current.value = searchInQuery
-    }
-    return () => {
-      if (searchRef.current) {
-        searchRef.current.value = ''
-      }
-    }
-  }, [searchInQuery, searchRef])
 
   const contractMenuItems = (
     <MenuList dense>
@@ -120,7 +45,7 @@ const Header = () => {
         {t(`contracts`)}
       </Typography>
       <MenuItem onClick={handleMenuListClose} sx={{ p: 0 }}>
-        <NextLink href={`/contracts`}>
+        <NextLink href={`/contracts`} passHref>
           <Link
             href={`/contracts`}
             title={t(`registered_contracts`)}
@@ -144,7 +69,7 @@ const Header = () => {
         {t(`more`)}
       </Typography>
       <MenuItem onClick={handleMenuListClose} sx={{ p: 0 }}>
-        <NextLink href={`/charts`}>
+        <NextLink href={`/charts`} passHref>
           <Link href={`/charts`} title={t(`charts`)} underline="none" sx={{ width: '100%', padding: '6px 16px' }}>
             {t(`charts`)}
           </Link>
@@ -164,7 +89,7 @@ const Header = () => {
       </Typography>
       {TOKEN_TYPE_LIST.map(type => (
         <MenuItem key={type} onClick={handleMenuListClose} sx={{ p: 0 }}>
-          <NextLink href={`/tokens/${type}`}>
+          <NextLink href={`/tokens/${type}`} passHref>
             <Link
               href={`/tokens/${type}`}
               title={t(`${type}-udt`)}
@@ -196,7 +121,7 @@ const Header = () => {
         }/${language}`
         return (
           <MenuItem key={chain} onClick={handleMenuListClose} sx={{ p: 0 }}>
-            <NextLink href={url}>
+            <NextLink href={url} passHref>
               <Link href={url} title={t(chain)} underline="none" sx={{ width: '100%', padding: '6px 16px' }}>
                 {t(chain)}
               </Link>
@@ -232,7 +157,7 @@ const Header = () => {
     <AppBar position="sticky" sx={{ bgcolor: 'primary.dark' }}>
       <Container>
         <Toolbar sx={{ flexGrow: 1 }} disableGutters>
-          <NextLink href="/">
+          <NextLink href="/" passHref>
             <Link
               href="/"
               title={EXPLORER_TITLE}
@@ -275,19 +200,6 @@ const Header = () => {
             </Link>
           </NextLink>
 
-          <Search sx={{ ml: 2 }}>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder={SEARCH_FIELDS}
-              autoFocus
-              title={SEARCH_FIELDS}
-              inputProps={{ 'aria-label': 'search' }}
-              onKeyPress={handleSearch}
-              inputRef={searchRef}
-            />
-          </Search>
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
             <Button
               aria-label="token-list"
