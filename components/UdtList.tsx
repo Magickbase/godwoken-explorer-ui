@@ -83,7 +83,7 @@ const AssetList = ({ list = [] }: { list: UdtList }) => {
                   </Stack>
                 </TableCell>
                 <TableCell sx={{ textTransform: 'capitalize', whiteSpace: 'nowrap' }}>
-                  {t(item.udt.type === GraphQLSchema.UDT_TYPE.Native ? 'native' : 'bridged')}
+                  {t(item.udt.type === GraphQLSchema.UdtType.Native ? 'native' : 'bridged')}
                 </TableCell>
                 <TableCell align="right">
                   <Box overflow="hidden" textOverflow="ellipsis" maxWidth={{ xs: '30vw', sm: '100%' }} ml="auto">

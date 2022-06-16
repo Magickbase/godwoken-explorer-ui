@@ -1,11 +1,9 @@
-import type { API } from 'utils/api/utils'
+import type { PolyjuiceCreator as PolyjuiceCreatorProps } from './AccountOverview'
 import { useTranslation } from 'next-i18next'
 import { List, ListSubheader, ListItem, ListItemText, Divider, Typography } from '@mui/material'
 import CollapsableScript from 'components/CollapsableScript'
 
-type State = API.Account.Parsed['polyjuice']
-
-const Polyjuice = ({ script, scriptHash }: State) => {
+const Polyjuice = ({ script, scriptHash }: { script: PolyjuiceCreatorProps['script']; scriptHash: string }) => {
   const [t] = useTranslation('account')
   return (
     <List
@@ -31,7 +29,7 @@ const Polyjuice = ({ script, scriptHash }: State) => {
         />
       </ListItem>
       <ListItem>
-        <CollapsableScript script={script} name={t(`script`)} />
+        <CollapsableScript script={script} name={t(`l2Script`)} />
       </ListItem>
     </List>
   )

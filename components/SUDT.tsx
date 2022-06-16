@@ -1,27 +1,37 @@
+import type { Udt as UdtProps } from './AccountOverview'
+import NextLink from 'next/link'
 import { useTranslation } from 'next-i18next'
-import { List, ListItem, ListItemText, ListSubheader, Divider, Typography, Avatar } from '@mui/material'
-import { scriptToHash, formatInt } from 'utils'
+import { Link, List, ListItem, ListItemText, ListSubheader, Divider, Typography } from '@mui/material'
 import CollapsableScript from './CollapsableScript'
-import type { API } from 'utils/api/utils'
 
-type State = API.Account.Parsed['sudt']
+interface SudtProps extends Pick<UdtProps, 'udt' | 'script'> {
+  script_hash: string
+}
 
-const SUDT = ({ name, symbol, decimal, supply, holders, icon, typeScript, scriptHash }: State) => {
+const SUDT = ({ udt, script, script_hash }: SudtProps) => {
   const [t] = useTranslation('account')
 
   const fields = [
     { label: t(`type`), value: <Typography variant="body2">{`sUDT`}</Typography> },
-    { label: t('name'), value: <Typography variant="body2">{name}</Typography> },
+    {
+      label: t('name'),
+      value: (
+        <Typography variant="body2">
+          <Typography variant="body2" sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <NextLink href={`/token/${udt.id}`}>
+              <Link href={`/token/${udt.id}`} underline="none" className="mono-font" color="secondary">
+                {udt.name ?? '-'}
+              </Link>
+            </NextLink>
+          </Typography>
+        </Typography>
+      ),
+    },
     {
       label: t('symbol'),
-      value: <Typography variant="body2">{symbol}</Typography>,
+      value: <Typography variant="body2">{udt.symbol}</Typography>,
     },
-    { label: t('decimal'), value: <Typography variant="body2">{decimal}</Typography> },
-    { label: t('l2Supply'), value: <Typography variant="body2">{formatInt(supply)}</Typography> },
-    {
-      label: t('holders'),
-      value: <Typography variant="body2">{formatInt(holders)}</Typography>,
-    },
+    { label: t('decimal'), value: <Typography variant="body2">{udt.decimal}</Typography> },
   ]
 
   return (
@@ -39,34 +49,22 @@ const SUDT = ({ name, symbol, decimal, supply, holders, icon, typeScript, script
           <ListItemText primary={field.label} secondary={field.value} />
         </ListItem>
       ))}
-      {typeScript ? (
+      {script ? (
         <>
           <ListItem>
             <ListItemText
-              primary={t(`l1TypeHash`)}
+              primary={t(`l2ScriptHash`)}
               secondary={
                 <Typography variant="body2" overflow="hidden" textOverflow="ellipsis" className="mono-font">
-                  {scriptToHash(typeScript as CKBComponents.Script)}
+                  {script_hash}
                 </Typography>
               }
             />
           </ListItem>
           <ListItem>
-            <CollapsableScript script={typeScript} name={t(`l1TypeScript`)} />
+            <CollapsableScript script={script} name={t(`l2Script`)} />
           </ListItem>
         </>
-      ) : null}
-      {scriptHash ? (
-        <ListItem>
-          <ListItemText
-            primary={t(`l2ScriptHash`)}
-            secondary={
-              <Typography variant="body2" overflow="hidden" textOverflow="ellipsis" className="mono-font">
-                {scriptHash}
-              </Typography>
-            }
-          />
-        </ListItem>
       ) : null}
     </List>
   )

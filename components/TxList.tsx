@@ -27,7 +27,7 @@ export type TxListProps = {
     entries: Array<{
       hash: string
       eth_hash: string | null
-      type: GraphQLSchema.TRANSACTION_TYPE
+      type: GraphQLSchema.TransactionType
       block?: Pick<GraphQLSchema.Block, 'hash' | 'number' | 'status' | 'timestamp'>
       from_account: Pick<GraphQLSchema.Account, 'eth_address' | 'script_hash' | 'type'>
       to_account: Pick<GraphQLSchema.Account, 'eth_address' | 'script_hash' | 'type'>
@@ -38,10 +38,11 @@ export type TxListProps = {
 }
 
 const txListQuery = gql`
-  query ($address: String, $block_number: Int, $before: String, $after: String, $limit: Int) {
+  query ($address: String, $script_hash: String, $block_number: Int, $before: String, $after: String, $limit: Int) {
     transactions(
       input: {
         address: $address
+        script_hash: $script_hash
         start_block_number: $block_number
         end_block_number: $block_number
         before: $before
@@ -103,10 +104,10 @@ export const fetchTxList = (variables: Variables) =>
 
 const getBlockStatus = (block: Pick<GraphQLSchema.Block, 'status'> | null): TxStatus => {
   switch (block?.status) {
-    case GraphQLSchema.BLOCK_STATUS.Committed: {
+    case GraphQLSchema.BlockStatus.Committed: {
       return 'committed'
     }
-    case GraphQLSchema.BLOCK_STATUS.Finalized: {
+    case GraphQLSchema.BlockStatus.Finalized: {
       return 'finalized'
     }
     default: {
@@ -157,7 +158,7 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
                         {item.polyjuice ? (
                           <TxStatusIcon
                             status={getBlockStatus(item.block)}
-                            isSuccess={item.polyjuice.status === GraphQLSchema.POLYJUICE_STATUS.Succeed}
+                            isSuccess={item.polyjuice.status === GraphQLSchema.PolyjuiceStatus.Succeed}
                           />
                         ) : (
                           <div style={{ display: 'flex', width: 24 }} />
