@@ -8,9 +8,10 @@ import { ContentCopyOutlined as CopyIcon } from '@mui/icons-material'
 import SubpageHead from 'components/SubpageHead'
 import AccountOverview, {
   fetchAccountOverview,
-  AccountOverviewProps,
   fetchAccountBalance,
   fetchDeployAddress,
+  AccountOverviewProps,
+  PolyjuiceContract,
 } from 'components/AccountOverview'
 import ERC20TransferList from 'components/ERC20TransferList'
 import AssetList, { fetchUdtList, UdtList } from 'components/UdtList'
@@ -32,6 +33,7 @@ import {
   GraphQLSchema,
   ParsedEventLog,
   TabNotFoundException,
+  NotFoundException,
 } from 'utils'
 import PageTitle from 'components/PageTitle'
 
@@ -47,6 +49,11 @@ type State = AccountOverviewProps &
     eventsList: ParsedEventLog[]
   }>
 const tabs = ['transactions', 'erc20', 'bridged', 'assets', 'contract', 'events']
+
+const isSmartContractAccount = (account: AccountOverviewProps['account']): account is PolyjuiceContract => {
+  return !!(account as PolyjuiceContract)?.smart_contract
+}
+
 const Account = (initState: State) => {
   const {
     push,
@@ -116,7 +123,11 @@ const Account = (initState: State) => {
                 [GraphQLSchema.AccountType.EthUser, GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType)
                   ? t('userDefinedAssets')
                   : null,
-                [GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType) ? t('contract') : null,
+                [GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType) &&
+                isSmartContractAccount(accountAndList.account) &&
+                accountAndList.account.smart_contract?.abi
+                  ? t('contract')
+                  : null,
                 [GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType) ? t('events') : null,
               ].map((label, idx) =>
                 label ? (
@@ -145,7 +156,9 @@ const Account = (initState: State) => {
               <BridgedRecordList list={accountAndList.bridgedRecordList} />
             ) : null}
             {tab === 'assets' && accountAndList.udtList ? <AssetList list={accountAndList.udtList} /> : null}
-            {tab === 'contract' && 'smart_contract' in accountAndList.account ? (
+            {tab === 'contract' &&
+            isSmartContractAccount(accountAndList.account) &&
+            accountAndList.account.smart_contract?.abi ? (
               <ContractInfo
                 address={accountAndList.account.eth_address}
                 contract={accountAndList.account.smart_contract}
@@ -190,6 +203,10 @@ export const getServerSideProps: GetServerSideProps<State, { id: string }> = asy
       null,
     ])
 
+    if (!account) {
+      throw new NotFoundException()
+    }
+
     const txList =
       tab === 'transactions' && (q.address || q.script_hash)
         ? await fetchTxList({ ...q, before: before as string, after: after as string })
@@ -210,7 +227,7 @@ export const getServerSideProps: GetServerSideProps<State, { id: string }> = asy
         : null
 
     const deployerAddr =
-      'smart_contract' in account && account.smart_contract?.deployment_tx_hash
+      isSmartContractAccount(account) && account.smart_contract?.deployment_tx_hash
         ? await fetchDeployAddress({ eth_hash: account.smart_contract.deployment_tx_hash })
         : null
 
