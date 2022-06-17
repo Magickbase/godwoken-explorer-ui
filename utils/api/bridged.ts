@@ -29,6 +29,7 @@ export interface Raw {
     value: string
     state: BridgedState
     capacity: string | null
+    is_fast_withdrawal: boolean
   }>
 }
 
@@ -54,6 +55,7 @@ export interface Parsed {
     value: string
     state: BridgedState
     capacity: string | null
+    isFastWithdrawal: boolean
   }>
   meta: Record<'page' | 'total', string>
 }
@@ -84,6 +86,7 @@ export const getBridgedRecordListRes = (list: Raw): Parsed => ({
     value: r.value,
     state: r.state,
     capacity: r.capacity,
+    isFastWithdrawal: r.is_fast_withdrawal ?? false,
   })),
 })
 export const fetchBridgedRecordList = (

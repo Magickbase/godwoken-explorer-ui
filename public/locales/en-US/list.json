@@ -24,8 +24,6 @@
   "gas_used": "gas used",
   "gas_limit": "gas limit",
   "rank": "rank",
-  "address": "address",
-  "balance": "balance",
   "percentage": "percentage",
   "txCount": "Txns",
   "contract_name": "contract name",
@@ -36,5 +34,6 @@
   "latest25ContractEvents": "Latest 25 Contract Events",
   "logs": "Logs",
   "eventsFilterPlaceholder": "Filter by BlockNo Or Topic0",
-  "filterEventBy": "Apply filter by {{filter}}"
+  "filterEventBy": "Apply filter by {{filter}}",
+  "fast-withdrawal": "Fast withdrawal"
 }
