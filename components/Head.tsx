@@ -12,7 +12,7 @@ const Head = () => (
     <meta property="og:title" content={EXPLORER_TITLE} />
     <meta property="og:description" content={DESCRIPTION} />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="/icons/favicon.svg" />
+    <meta property="og:image" content="/icon-512x512.png" />
 
     <meta name="application-name" content={EXPLORER_TITLE} />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -23,7 +23,12 @@ const Head = () => (
     <meta name="format-detection" content="telephone=no" />
 
     <title>{EXPLORER_TITLE}</title>
-    <link rel="icon" type="image/svg+xml" sizes="32x32" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="192" href="/icon-192x192.png" />
+    <link rel="icon" type="image/png" sizes="512" href="/icon-512x512.png" />
+    <link rel="apple-touch-icon" href="/icon-192x192.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/icon-192x192.png" />
+    <link rel="apple-touch-icon" sizes="167x167" href="/icon-192x192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icon-192x192.png" />
     <link rel="shortcut icon" href="/favicon.ico" />
     <link rel="manifest" href="/manifest.json" />
   </NextHead>
