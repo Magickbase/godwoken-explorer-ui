@@ -33,6 +33,7 @@
     "graphql-request": "4.3.0",
     "next": "12.1.4",
     "next-i18next": "10.5.0",
+    "next-pwa": "5.5.4",
     "phoenix": "1.6.7",
     "react": "17.0.2",
     "react-dom": "17.0.2",

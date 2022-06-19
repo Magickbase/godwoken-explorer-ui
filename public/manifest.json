@@ -1,0 +1,21 @@
+{
+  "name": "GwScan",
+  "short_name": "GwScan",
+  "description": "A blockchain explorer for godwoken",
+  "icons": [
+    {
+      "src": "/icons/favicon.svg",
+      "size": "32x32",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/icons/favicon.svg",
+      "size": "512x512",
+      "type": "image/svg+xml"
+    }
+  ],
+  "theme_color": "#651fff",
+  "background_color": "#FFF",
+  "start_url": "/",
+  "display": "standalone"
+}
