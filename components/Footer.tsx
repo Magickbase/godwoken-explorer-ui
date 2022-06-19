@@ -56,6 +56,7 @@ const Footer = () => {
         </Box>
         <Stack spacing={0} sx={{ flex: '1 0 auto', justifyContent: { xs: 'space-around', md: 'space-evenly' } }}>
           <Box
+            id="footer-links"
             component="div"
             sx={{
               display: 'flex',
@@ -96,13 +97,14 @@ const Footer = () => {
           <Typography
             variant="body2"
             color="secondary.light"
+            id="footer-copy-right"
             sx={{ textAlign: { xs: 'center', md: 'left' }, pl: 4, mt: 1 }}
           >
             Copyright &copy; 2022 Nervina Labs All Rights Reserved.
           </Typography>
         </Stack>
         <Box
-          sx={{ width: '100%', display: { xs: 'none', md: 'flex' }, flex: '0 0 150px', alignItems: 'flex-end', mb: 3 }}
+          sx={{ width: '100%', display: { xs: 'none', md: 'flex' }, flex: '0 0 150px', alignItems: 'flex-end', mb: 4 }}
         >
           <NextLink href="/" passHref>
             <Link
