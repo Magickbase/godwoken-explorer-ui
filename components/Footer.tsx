@@ -91,21 +91,27 @@ const Footer = () => {
                 </NextLink>
                 {i !== links.length - 1 && (
                   <Divider
-                    sx={{ display: { xs: 'block', md: 'none' }, mx: 2, height: '12px', alignSelf: 'center' }}
+                    sx={{
+                      display: { xs: 'block', md: 'none' },
+                      mx: 2,
+                      height: '12px',
+                      alignSelf: 'center',
+                      opacity: 0.5,
+                    }}
                     orientation="vertical"
-                    color="#999"
+                    color="#fff"
                     flexItem
                   />
                 )}
               </Fragment>
             ))}
           </Box>
-          <Divider sx={{ display: { xs: 'block', md: 'none', backgroundColor: '#4d4d4d' } }} />
+          <Divider sx={{ display: { xs: 'block', md: 'none', backgroundColor: '#f0f0f0', opacity: 0.1 } }} />
           <Typography
             variant="body2"
-            color="secondary.light"
+            color="#fff"
             id="footer-copy-right"
-            sx={{ textAlign: { xs: 'center', md: 'left' }, fontSize: { xs: 12 }, pl: 4, mt: 1 }}
+            sx={{ textAlign: { xs: 'center', md: 'left' }, fontSize: { xs: 12 }, pl: 4, mt: 1, opacity: 0.5 }}
           >
             Copyright &copy; 2022 Nervina Labs All Rights Reserved.
           </Typography>

@@ -1,6 +1,27 @@
 import { createTheme } from '@mui/material/styles'
 import { red } from '@mui/material/colors'
 
+const commonPalette = {
+  secondary: {
+    light: '#999999',
+    main: '#333333',
+  },
+  success: {
+    light: '#F0FCF1',
+    main: '#2BD46F',
+  },
+  error: {
+    main: red.A400,
+  },
+  warning: {
+    light: '#FFF5E5',
+    main: '#FF9900',
+  },
+  info: {
+    main: '#E8F4FF',
+  },
+}
+
 export const theme = createTheme(
   process.env.NEXT_PUBLIC_CHAIN_TYPE === 'mainnet'
     ? {
@@ -11,24 +32,7 @@ export const theme = createTheme(
             dark: '#2D2C3E',
             contrastText: '#fff',
           },
-          secondary: {
-            light: '#999999',
-            main: '#333333',
-          },
-          success: {
-            light: '#F0FCF1',
-            main: '#2BD46F',
-          },
-          error: {
-            main: red.A400,
-          },
-          warning: {
-            light: '#FFF5E5',
-            main: '#FF9900',
-          },
-          info: {
-            main: '#E8F4FF',
-          },
+          ...commonPalette,
         },
       }
     : {
@@ -38,6 +42,7 @@ export const theme = createTheme(
             main: '#2C97E4',
             dark: '#274B82',
           },
+          ...commonPalette,
         },
       },
 )
