@@ -54,13 +54,20 @@ const Footer = () => {
             </Link>
           </NextLink>
         </Box>
-        <Stack spacing={0} sx={{ flex: '1 0 auto', justifyContent: { xs: 'space-around', md: 'space-evenly' } }}>
+        <Box
+          sx={{
+            flex: '1 0 auto',
+            display: { xs: 'block', md: 'flex' },
+            flexDirection: 'column',
+            justifyContent: { xs: 'space-around', md: 'space-evenly' },
+          }}
+        >
           <Box
             id="footer-links"
             component="div"
             sx={{
               display: 'flex',
-              height: '1em',
+              height: '70px',
               justifyContent: { xs: 'center', md: 'left' },
               alignItems: 'center',
               pl: { xs: 4, md: 3 },
@@ -84,7 +91,7 @@ const Footer = () => {
                 </NextLink>
                 {i !== links.length - 1 && (
                   <Divider
-                    sx={{ display: { xs: 'block', md: 'none' }, lineHeight: '8px', mx: 2 }}
+                    sx={{ display: { xs: 'block', md: 'none' }, mx: 2, height: '12px', alignSelf: 'center' }}
                     orientation="vertical"
                     color="#999"
                     flexItem
@@ -98,11 +105,11 @@ const Footer = () => {
             variant="body2"
             color="secondary.light"
             id="footer-copy-right"
-            sx={{ textAlign: { xs: 'center', md: 'left' }, pl: 4, mt: 1 }}
+            sx={{ textAlign: { xs: 'center', md: 'left' }, fontSize: { xs: 12 }, pl: 4, mt: 1 }}
           >
             Copyright &copy; 2022 Nervina Labs All Rights Reserved.
           </Typography>
-        </Stack>
+        </Box>
         <Box
           sx={{ width: '100%', display: { xs: 'none', md: 'flex' }, flex: '0 0 150px', alignItems: 'flex-end', mb: 4 }}
         >
