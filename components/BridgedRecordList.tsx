@@ -13,7 +13,8 @@ import {
   Link,
   Tooltip,
 } from '@mui/material'
-import { OpenInNew as OpenInNewIcon } from '@mui/icons-material'
+import { OpenInNew as OpenInNewIcon, Bolt as FastWithdrawalIcon } from '@mui/icons-material'
+import { yellow } from '@mui/material/colors'
 import BigNumber from 'bignumber.js'
 
 import Address from 'components/TruncatedAddress'
@@ -46,7 +47,20 @@ const BridgedRecordList: React.FC<{
             {+list.meta.total ? (
               list.records.map(r => (
                 <TableRow key={r.layer1.output.hash + r.layer1.output.index}>
-                  <TableCell sx={{ whiteSpace: 'nowrap', fontSize: { xs: 12, md: 14 } }}>{t(r.type)}</TableCell>
+                  <TableCell>
+                    <Stack
+                      direction="row"
+                      sx={{ whiteSpace: 'nowrap', fontSize: { xs: 12, md: 14 } }}
+                      alignItems="center"
+                    >
+                      {r.isFastWithdrawal ? (
+                        <Tooltip title={t(`fast-withdrawal`)} placement="top">
+                          <FastWithdrawalIcon sx={{ color: yellow[700], fontSize: 20 }} />
+                        </Tooltip>
+                      ) : null}
+                      {t(r.type)}
+                    </Stack>
+                  </TableCell>
                   <TableCell sx={{ fontSize: { xs: 12, md: 14 }, whiteSpace: 'nowrap' }}>
                     {`${new BigNumber(r.value ?? '0').toFormat()} ${r.token.symbol ?? ''}`}
                   </TableCell>

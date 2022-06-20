@@ -24,8 +24,6 @@
   "gas_used": "gas used",
   "gas_limit": "gas limit",
   "rank": "rank",
-  "address": "address",
-  "balance": "balance",
   "percentage": "percentage",
   "txCount": "Txns",
   "address": "address",
@@ -34,5 +32,6 @@
   "balance": "balance",
   "compiler_version": "version",
   "contract_list_title": "Registered Contracts",
-  "last-n-records": "Showing the last {{n}} records"
+  "last-n-records": "Showing the last {{n}} records",
+  "fast-withdrawal": "Fast withdrawal"
 }
