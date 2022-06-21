@@ -16,7 +16,8 @@ import {
 import { client, formatAmount, nameToColor, GraphQLSchema } from 'utils'
 
 export type UdtList = Array<{
-  balance: string
+  balance?: string
+  value?: string
   udt: Pick<GraphQLSchema.Udt, 'id' | 'type' | 'name' | 'decimal' | 'icon' | 'symbol'>
 }>
 
@@ -35,15 +36,52 @@ const udtListQuery = gql`
     }
   }
 `
+const newUdtListQuery = gql`
+  query ($address_hashes: [String], $script_hashes: [String]) {
+    account_current_udts(input: { address_hashes: $address_hashes, script_hashes: $script_hashes }) {
+      value
+      udt {
+        id
+        type
+        name
+        icon
+        decimal
+        symbol
+      }
+    }
+
+    account_current_bridged_udts(input: { address_hashes: $address_hashes, script_hashes: $script_hashes }) {
+      value
+      udt {
+        id
+        type
+        name
+        icon
+        decimal
+        symbol
+      }
+    }
+  }
+`
 type EthAccountUdtListVariables = Record<'address_hashes', Array<string>>
 type GwAccountUdtListVariables = Record<'script_hashes', Array<string>>
 type Variables = EthAccountUdtListVariables | GwAccountUdtListVariables
 
 const CKB_UDT_ID = '1'
-export const fetchUdtList = (variables: Variables) =>
+export const fetchUdtList = (variables: Variables): Promise<UdtList> =>
   client
     .request<{ account_udts: UdtList }>(udtListQuery, variables)
     .then(data => data.account_udts.filter(u => u.udt.id !== CKB_UDT_ID))
+    .catch(() => [])
+
+export const fetchNewUdtList = (variables: Variables): Promise<UdtList> =>
+  client
+    .request<Record<'account_current_udts' | 'account_current_bridged_udts', UdtList>>(newUdtListQuery, variables)
+    .then(data => [
+      ...data.account_current_bridged_udts.filter(u => u.udt.id !== CKB_UDT_ID),
+      ...data.account_current_udts,
+    ])
+    .catch(() => [])
 
 const AssetList = ({ list = [] }: { list: UdtList }) => {
   const [t] = useTranslation('account')
@@ -87,7 +125,7 @@ const AssetList = ({ list = [] }: { list: UdtList }) => {
                 </TableCell>
                 <TableCell align="right">
                   <Box overflow="hidden" textOverflow="ellipsis" maxWidth={{ xs: '30vw', sm: '100%' }} ml="auto">
-                    {formatAmount(item.balance, item.udt)}
+                    {formatAmount(item.balance ?? item.value, item.udt)}
                   </Box>
                 </TableCell>
               </TableRow>

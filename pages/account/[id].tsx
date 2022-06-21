@@ -14,7 +14,7 @@ import AccountOverview, {
   PolyjuiceContract,
 } from 'components/AccountOverview'
 import ERC20TransferList from 'components/ERC20TransferList'
-import AssetList, { fetchUdtList, UdtList } from 'components/UdtList'
+import AssetList, { fetchUdtList, fetchNewUdtList, UdtList } from 'components/UdtList'
 import TxList, { TxListProps, fetchTxList } from 'components/TxList'
 import BridgedRecordList from 'components/BridgedRecordList'
 import ContractInfo from 'components/ContractInfo'
@@ -223,7 +223,10 @@ export const getServerSideProps: GetServerSideProps<State, { id: string }> = asy
     const eventsList = tab === 'events' && q.address ? await fetchEventLogsListByType('accounts', q.address) : null
     const udtList =
       tab === 'assets' && (q.address || q.script_hash)
-        ? await fetchUdtList(q.address ? { address_hashes: [id] } : { script_hashes: [id] })
+        ? await Promise.all([
+            fetchUdtList(q.address ? { address_hashes: [id] } : { script_hashes: [id] }),
+            fetchNewUdtList(q.address ? { address_hashes: [id] } : { script_hashes: [id] }),
+          ]).then(([list, newList]) => (list.length ? list : newList))
         : null
 
     const deployerAddr =
