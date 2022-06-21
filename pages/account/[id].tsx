@@ -9,6 +9,7 @@ import SubpageHead from 'components/SubpageHead'
 import AccountOverview, {
   fetchAccountOverview,
   fetchAccountBalance,
+  fetchNewAccountBalance,
   fetchDeployAddress,
   AccountOverviewProps,
   PolyjuiceContract,
@@ -196,9 +197,10 @@ export const getServerSideProps: GetServerSideProps<State, { id: string }> = asy
     }
     const q = isEthAddress(id) ? { address: id } : { script_hash: id }
 
-    const [account, balance, lng] = await Promise.all([
+    const [account, balance, newBalance, lng] = await Promise.all([
       fetchAccountOverview(q),
       fetchAccountBalance(q.address ? { address_hashes: [q.address] } : { script_hashes: [q.script_hash] }),
+      fetchNewAccountBalance(q.address ? { address_hashes: [q.address] } : { script_hashes: [q.script_hash] }),
       serverSideTranslations(locale, ['common', 'account', 'list']),
       null,
     ])
@@ -235,7 +237,17 @@ export const getServerSideProps: GetServerSideProps<State, { id: string }> = asy
         : null
 
     return {
-      props: { ...lng, account, deployerAddr, balance, txList, transferList, bridgedRecordList, udtList, eventsList },
+      props: {
+        ...lng,
+        account,
+        deployerAddr,
+        balance: +balance ? balance : newBalance,
+        txList,
+        transferList,
+        bridgedRecordList,
+        udtList,
+        eventsList,
+      },
     }
   } catch (err) {
     switch (true) {

@@ -110,6 +110,14 @@ const accountBalanceQuery = gql`
   }
 `
 
+const newAccountBalanceQuery = gql`
+  query ($address_hashes: [String], $script_hashes: [String]) {
+    account_current_bridged_udts_of_ckb(input: { address_hashes: $address_hashes, script_hashes: $script_hashes }) {
+      value
+    }
+  }
+`
+
 const deployAddrQuery = gql`
   query ($eth_hash: String!) {
     transaction(input: { eth_hash: $eth_hash }) {
@@ -129,6 +137,15 @@ export const fetchAccountBalance = (variables: { address_hashes: Array<string> }
   client
     .request<{ account_ckbs: Array<{ balance: string }> }>(accountBalanceQuery, variables)
     .then(data => data.account_ckbs[0]?.balance ?? '0')
+    .catch(() => '0')
+
+export const fetchNewAccountBalance = (
+  variables: { address_hashes: Array<string> } | { script_hashes: Array<string> },
+) =>
+  client
+    .request<{ account_current_bridged_udts_of_ckb: { value: string } }>(newAccountBalanceQuery, variables)
+    .then(data => data.account_current_bridged_udts_of_ckb[0]?.value ?? '0')
+    .catch(() => '0')
 
 export const fetchDeployAddress = (variables: { eth_hash: string }) =>
   client
