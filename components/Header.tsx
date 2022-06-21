@@ -24,7 +24,7 @@ import MuiAccordionSummary, { AccordionSummaryProps } from '@mui/material/Accord
 import MuiAccordionDetails from '@mui/material/AccordionDetails'
 import { styled } from '@mui/material/styles'
 import { Language as LanguageIcon, KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material'
-import { EXPLORER_TITLE, IMG_URL, GW_VERSION } from 'utils'
+import { EXPLORER_TITLE, GW_VERSION } from 'utils'
 import Logo from './Logo'
 import CloseIcon from '../assets/close.svg'
 import MobileMenuIcon from '../assets/mobile-Menu.svg'
@@ -46,7 +46,7 @@ const Accordion = styled((props: AccordionProps) => <MuiAccordion disableGutters
 
 const AccordionSummary = styled((props: AccordionSummaryProps) => (
   <MuiAccordionSummary
-    expandIcon={<KeyboardArrowDown color="secondary" sx={{ mr: '2px', fontSize: 32 }} />}
+    expandIcon={<KeyboardArrowDown color="secondary" sx={{ ml: '2px', fontSize: 32 }} />}
     {...props}
   />
 ))(({ theme }) => ({
@@ -339,6 +339,7 @@ const Header = () => {
               onClick={handleMenuListOpen}
               color="primary"
               disableRipple
+              sx={{ p: 0 }}
             >
               {anchorElLabel === 'mobile-menu' ? (
                 <SvgIcon component={CloseIcon} />
