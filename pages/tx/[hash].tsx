@@ -448,7 +448,7 @@ export const getServerSideProps: GetServerSideProps<State, { hash: string }> = a
   query,
 }) => {
   const { hash } = params
-  const { tab = tabs[0], before = null, after = null } = query
+  const { tab = tabs[0], before = null, after = null, address_from = null, address_to = null } = query
 
   try {
     if (typeof tab !== 'string' || !tabs.includes(tab)) {
@@ -461,6 +461,8 @@ export const getServerSideProps: GetServerSideProps<State, { hash: string }> = a
             transaction_hash: hash,
             before: before as string | null,
             after: after as string | null,
+            from_address: address_from as string | null,
+            to_address: address_to as string | null,
           })
         : null
     const logsList = tab === 'logs' ? await fetchEventLogsListByType('txs', hash) : null

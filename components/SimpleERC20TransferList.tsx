@@ -1,5 +1,6 @@
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
+import { useRouter } from 'next/router'
 import {
   Stack,
   Box,
@@ -11,11 +12,16 @@ import {
   TableRow,
   TableCell,
   Typography,
+  IconButton,
+  Menu,
+  TextField,
+  Button,
 } from '@mui/material'
+import { FilterAlt as FilterIcon, Clear as ClearIcon } from '@mui/icons-material'
 import { gql } from 'graphql-request'
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/SimplePagination'
-import { GraphQLSchema, client, formatAmount } from 'utils'
+import { GraphQLSchema, client, formatAmount, useFilterMenu } from 'utils'
 
 export type TransferListProps = {
   token_transfers: {
@@ -33,8 +39,16 @@ export type TransferListProps = {
 }
 
 const transferListQuery = gql`
-  query ($transaction_hash: String!, $before: String, $after: String) {
-    token_transfers(input: { transaction_hash: $transaction_hash, before: $before, after: $after }) {
+  query ($transaction_hash: String!, $before: String, $after: String, $from_address: String, $to_address: String) {
+    token_transfers(
+      input: {
+        transaction_hash: $transaction_hash
+        before: $before
+        after: $after
+        from_address: $from_address
+        to_address: $to_address
+      }
+    ) {
       entries {
         amount
         from_address
@@ -74,10 +88,46 @@ export const fetchTransferList = (variables: {
   transaction_hash: string
   before: string | null
   after: string | null
+  from_address?: string | null
+  to_address?: string | null
 }) => client.request<TransferListProps>(transferListQuery, variables).then(data => data.token_transfers)
 
+const FILTER_KEYS = ['address_from', 'address_to'] as const
 const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries, metadata } }) => {
   const [t] = useTranslation('list')
+  const {
+    query: { id: _, ...query },
+    push,
+    asPath,
+  } = useRouter()
+
+  const {
+    filters,
+    setFilters,
+    handleFilterOpen,
+    handleFilterDismiss,
+    filterAnchorEl,
+    handleFilterSubmit: handleFilterSubmitFunc,
+    handleFilterClear,
+  } = useFilterMenu<typeof FILTER_KEYS[number]>()
+
+  const handleBlockFilterOpen = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const {
+      dataset: { field },
+    } = e.currentTarget
+    if (FILTER_KEYS.includes(field as any)) {
+      setFilters([field as any])
+      handleFilterOpen(e)
+    }
+  }
+
+  const handleFilterSubmit = handleFilterSubmitFunc({
+    filterKeys: FILTER_KEYS,
+    url: asPath,
+    push,
+    query: query as Record<string, string>,
+  })
+
   return (
     <Box sx={{ px: 1, py: 2 }}>
       <TableContainer>
@@ -85,10 +135,20 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
           <TableHead sx={{ textTransform: 'capitalize' }}>
             <TableRow>
               <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }} component="th">
-                {t('from')}
+                <Stack direction="row" alignItems="center" whiteSpace="nowrap">
+                  {t('from')}
+                  <IconButton size="small" data-field="address_from" onClick={handleBlockFilterOpen}>
+                    <FilterIcon fontSize="inherit" />
+                  </IconButton>
+                </Stack>
               </TableCell>
               <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }} component="th">
-                {t('to')}
+                <Stack direction="row" alignItems="center" whiteSpace="nowrap">
+                  {t('to')}
+                  <IconButton size="small" data-field="address_to" onClick={handleBlockFilterOpen}>
+                    <FilterIcon fontSize="inherit" />
+                  </IconButton>
+                </Stack>
               </TableCell>
               <TableCell sx={{ display: { xs: 'table-cell', md: 'none' } }} component="th">
                 {t('transfer')}
@@ -162,6 +222,43 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
           </TableBody>
         </Table>
       </TableContainer>
+      <Menu
+        anchorEl={filterAnchorEl}
+        open={!!filterAnchorEl}
+        onClose={handleFilterDismiss}
+        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+      >
+        <form onSubmit={handleFilterSubmit}>
+          {filters.map((field, idx) => {
+            return (
+              <Box key={field} px="16px" py="4px">
+                <TextField
+                  type={['block_from', 'block_to'].includes(field) ? 'number' : 'text'}
+                  name={field}
+                  label={t(field)}
+                  size="small"
+                  defaultValue={query[field] ?? ''}
+                  autoFocus={!idx}
+                  sx={{
+                    label: {
+                      textTransform: 'capitalize',
+                    },
+                  }}
+                />
+              </Box>
+            )
+          })}
+          <Stack direction="row" justifyContent="space-between" px="16px" pt="16px">
+            <Button type="submit" variant="contained" size="small" startIcon={<FilterIcon />}>
+              {t(`filter`)}
+            </Button>
+            <Button type="button" variant="text" onClick={handleFilterClear} size="small" startIcon={<ClearIcon />}>
+              {t(`clear`)}
+            </Button>
+          </Stack>
+        </form>
+      </Menu>
       <Pagination {...metadata} />
       <Stack direction="row-reverse">
         <Typography color="primary.light" variant="caption">

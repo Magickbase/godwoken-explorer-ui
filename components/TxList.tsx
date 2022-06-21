@@ -1,5 +1,6 @@
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
+import { useRouter } from 'next/router'
 import {
   Stack,
   Box,
@@ -13,14 +14,19 @@ import {
   Link,
   Tooltip,
   Chip,
+  IconButton,
+  Menu,
+  TextField,
+  Button,
 } from '@mui/material'
+import { FilterAlt as FilterIcon, Clear as ClearIcon } from '@mui/icons-material'
 import BigNumber from 'bignumber.js'
 import { gql } from 'graphql-request'
 import TxStatusIcon from './TxStatusIcon'
 import Address from 'components/TruncatedAddress'
 import PageSize from 'components/PageSize'
 import Pagination from 'components/SimplePagination'
-import { timeDistance, GraphQLSchema, TxStatus, client, GCKB_DECIMAL } from 'utils'
+import { timeDistance, GraphQLSchema, TxStatus, client, GCKB_DECIMAL, useFilterMenu } from 'utils'
 
 export type TxListProps = {
   transactions: {
@@ -38,16 +44,24 @@ export type TxListProps = {
 }
 
 const txListQuery = gql`
-  query ($address: String, $script_hash: String, $block_number: Int, $before: String, $after: String, $limit: Int) {
+  query (
+    $address: String
+    $script_hash: String
+    $before: String
+    $after: String
+    $limit: Int
+    $start_block_number: Int
+    $end_block_number: Int
+  ) {
     transactions(
       input: {
         address: $address
         script_hash: $script_hash
-        start_block_number: $block_number
-        end_block_number: $block_number
         before: $before
         after: $after
         limit: $limit
+        start_block_number: $start_block_number
+        end_block_number: $end_block_number
       }
     ) {
       entries {
@@ -87,6 +101,8 @@ interface Cursor {
   limit?: number
   before: string
   after: string
+  start_block_number?: number | null
+  end_block_number?: number | null
 }
 interface EthAccountTxListVariables extends Nullable<Cursor> {
   address?: string | null
@@ -94,9 +110,7 @@ interface EthAccountTxListVariables extends Nullable<Cursor> {
 interface GwAccountTxListVariables extends Nullable<Cursor> {
   script_hash?: string | null
 }
-interface BlockTxListVariables extends Nullable<Cursor> {
-  block_number: number
-}
+interface BlockTxListVariables extends Nullable<Cursor> {}
 type Variables = Cursor | EthAccountTxListVariables | GwAccountTxListVariables | BlockTxListVariables
 
 export const fetchTxList = (variables: Variables) =>
@@ -116,12 +130,40 @@ const getBlockStatus = (block: Pick<GraphQLSchema.Block, 'status'> | null): TxSt
   }
 }
 
+const FILTER_KEYS = ['block_from', 'block_to'] as const
 const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> = ({
   transactions: { entries, metadata },
   maxCount,
   pageSize,
 }) => {
   const [t, { language }] = useTranslation('list')
+  const {
+    query: { id: _, ...query },
+    push,
+    asPath,
+  } = useRouter()
+  const {
+    filters,
+    setFilters,
+    handleFilterOpen,
+    handleFilterDismiss,
+    filterAnchorEl,
+    handleFilterSubmit: handleFilterSubmitFunc,
+    handleFilterClear,
+  } = useFilterMenu<typeof FILTER_KEYS[number]>()
+
+  const handleBlockFilterOpen = (e: React.MouseEvent<HTMLButtonElement>) => {
+    setFilters(['block_from', 'block_to'])
+    handleFilterOpen(e)
+  }
+
+  const handleFilterSubmit = handleFilterSubmitFunc({
+    filterKeys: FILTER_KEYS,
+    query: query as Record<string, string>,
+    url: asPath,
+    push,
+  })
+
   return (
     <Box sx={{ px: 1, py: 2 }}>
       <TableContainer>
@@ -129,7 +171,14 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
           <TableHead sx={{ textTransform: 'capitalize' }}>
             <TableRow>
               <TableCell component="th">{t('txHash')}</TableCell>
-              <TableCell component="th">{t('block')} </TableCell>
+              <TableCell component="th">
+                <Stack direction="row" alignItems="center" whiteSpace="nowrap">
+                  {t('block')}
+                  <IconButton size="small" onClick={handleBlockFilterOpen}>
+                    <FilterIcon fontSize="inherit" />
+                  </IconButton>
+                </Stack>
+              </TableCell>
               <TableCell component="th">{t('age')} </TableCell>
               <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }} component="th">
                 {t('from')}
@@ -260,6 +309,43 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
           </TableBody>
         </Table>
       </TableContainer>
+      <Menu
+        anchorEl={filterAnchorEl}
+        open={!!filterAnchorEl}
+        onClose={handleFilterDismiss}
+        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+      >
+        <form onSubmit={handleFilterSubmit}>
+          {filters.map((field, idx) => {
+            return (
+              <Box key={field} px="16px" py="4px">
+                <TextField
+                  type={['block_from', 'block_to'].includes(field) ? 'number' : 'text'}
+                  name={field}
+                  label={t(field)}
+                  size="small"
+                  defaultValue={query[field] ?? ''}
+                  autoFocus={!idx}
+                  sx={{
+                    label: {
+                      textTransform: 'capitalize',
+                    },
+                  }}
+                />
+              </Box>
+            )
+          })}
+          <Stack direction="row" justifyContent="space-between" px="16px" pt="16px">
+            <Button type="submit" variant="contained" size="small" startIcon={<FilterIcon />}>
+              {t(`filter`)}
+            </Button>
+            <Button type="button" variant="text" onClick={handleFilterClear} size="small" startIcon={<ClearIcon />}>
+              {t(`clear`)}
+            </Button>
+          </Stack>
+        </form>
+      </Menu>
       {pageSize ? (
         <Stack direction="row" justifyContent="space-between" alignItems="center">
           <PageSize pageSize={pageSize} />

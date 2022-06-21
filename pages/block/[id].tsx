@@ -327,7 +327,8 @@ export const getServerSideProps: GetServerSideProps<State> = async ({ locale, re
     const txList =
       tab === 'transactions' && block.hash
         ? await fetchTxList({
-            block_number: block.number,
+            start_block_number: block.number,
+            end_block_number: block.number,
             before: before as string | null,
             after: after as string | null,
           })
