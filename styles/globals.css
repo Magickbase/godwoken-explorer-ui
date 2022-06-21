@@ -32,3 +32,9 @@ a {
     --footer-height: 192px;
   }
 }
+
+@font-face {
+  font-family: 'DIN Pro';
+  font-weight: 900;
+  src: local(''), url('../assets/D-DIN-PRO-900-Heavy.otf') format('opentype');
+}

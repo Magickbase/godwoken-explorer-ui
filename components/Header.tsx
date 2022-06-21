@@ -17,6 +17,7 @@ import {
   IconButton,
   MenuProps,
   Backdrop,
+  SvgIcon,
 } from '@mui/material'
 import MuiAccordion, { AccordionProps } from '@mui/material/Accordion'
 import MuiAccordionSummary, { AccordionSummaryProps } from '@mui/material/AccordionSummary'
@@ -24,6 +25,9 @@ import MuiAccordionDetails from '@mui/material/AccordionDetails'
 import { styled } from '@mui/material/styles'
 import { Language as LanguageIcon, KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material'
 import { EXPLORER_TITLE, IMG_URL, GW_VERSION } from 'utils'
+import Logo from './Logo'
+import CloseIcon from '../assets/close.svg'
+import MobileMenuIcon from '../assets/mobile-Menu.svg'
 
 const TOKEN_TYPE_LIST = ['bridge', 'native']
 const CHAIN_TYPE_LIST = GW_VERSION ? ['testnet'] : ['mainnet', 'testnet']
@@ -42,7 +46,7 @@ const Accordion = styled((props: AccordionProps) => <MuiAccordion disableGutters
 
 const AccordionSummary = styled((props: AccordionSummaryProps) => (
   <MuiAccordionSummary
-    expandIcon={<KeyboardArrowDown color="secondary" sx={{ ml: '2px', fontSize: 32 }} />}
+    expandIcon={<KeyboardArrowDown color="secondary" sx={{ mr: '2px', fontSize: 32 }} />}
     {...props}
   />
 ))(({ theme }) => ({
@@ -212,14 +216,7 @@ const Header = () => {
                 },
               }}
             >
-              <Image
-                src={`${IMG_URL}nervina-logo-primary.svg`}
-                loading="lazy"
-                width="96"
-                height="23"
-                layout="fixed"
-                alt="logo"
-              />
+              <Logo id="logo" color="primary" />
             </Link>
           </NextLink>
 
@@ -340,17 +337,14 @@ const Header = () => {
               size="small"
               aria-haspopup="true"
               onClick={handleMenuListOpen}
-              color="secondary"
+              color="primary"
+              disableRipple
             >
-              <Image
-                src={anchorElLabel === 'mobile-menu' ? `${IMG_URL}close.svg` : `${IMG_URL}mobile-menu.svg`}
-                loading="lazy"
-                color="red"
-                width="20"
-                height="20"
-                layout="fixed"
-                alt="mobile-expand-icon"
-              />
+              {anchorElLabel === 'mobile-menu' ? (
+                <SvgIcon component={CloseIcon} />
+              ) : (
+                <SvgIcon component={MobileMenuIcon} />
+              )}
             </IconButton>
             <Backdrop
               sx={{ zIndex: theme => theme.zIndex.drawer + 1, top: 56 }}
@@ -375,7 +369,7 @@ const Header = () => {
                       variant="body1"
                       textAlign="left"
                       color={isHome ? 'primary' : 'secondary'}
-                      sx={{ display: { xs: 'block', md: 'none', pointerEvents: 'none' } }}
+                      sx={{ display: { xs: 'block', md: 'none', pointerEvents: 'none' }, py: '6px' }}
                     >
                       {t(`home`)}
                     </Typography>
@@ -397,7 +391,7 @@ const Header = () => {
                       variant="body1"
                       textAlign="left"
                       color={asPath.startsWith('/contracts') ? 'primary' : 'secondary'}
-                      sx={{ display: { xs: 'block', md: 'none', pointerEvents: 'none' } }}
+                      sx={{ display: { xs: 'block', md: 'none', pointerEvents: 'none' }, py: '6px' }}
                     >
                       {t(`contracts`)}
                     </Typography>
@@ -411,7 +405,7 @@ const Header = () => {
                       variant="body1"
                       textAlign="left"
                       color={asPath.startsWith('/charts') ? 'primary' : 'secondary'}
-                      sx={{ display: { xs: 'block', md: 'none', pointerEvents: 'none' } }}
+                      sx={{ display: { xs: 'block', md: 'none', pointerEvents: 'none' }, py: '6px' }}
                     >
                       {t(`charts`)}
                     </Typography>

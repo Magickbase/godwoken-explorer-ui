@@ -5,9 +5,9 @@ import Link from '@mui/material/Link'
 import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
 import Button from '@mui/material/Button'
-import Stack from '@mui/material/Stack'
 import { CKB_EXPLORER_URL, EXPLORER_TITLE, IMG_URL, NERVINA_GITHUB_URL, NERVOS_URL } from 'utils'
 import { Fragment } from 'react'
+import Logo from './Logo'
 
 const links = [
   { label: 'Nervos', url: NERVOS_URL },
@@ -26,7 +26,7 @@ const Footer = () => {
           width: '100%',
           color: 'white',
           flexDirection: { xs: 'column', md: 'row' },
-          py: 1.5,
+          pt: 1.5,
           maxWidth: 1200,
         }}
       >
@@ -43,14 +43,7 @@ const Footer = () => {
                 color: '#fff',
               }}
             >
-              <Image
-                src={`${IMG_URL}nervina-logo-white.svg`}
-                loading="lazy"
-                width="96"
-                height="23"
-                layout="fixed"
-                alt="logo"
-              />
+              <Logo sx={{ color: '#fff' }} id="logo" />
             </Link>
           </NextLink>
         </Box>
@@ -67,10 +60,10 @@ const Footer = () => {
             component="div"
             sx={{
               display: 'flex',
-              height: '70px',
+              height: '55px',
               justifyContent: { xs: 'center', md: 'left' },
               alignItems: 'center',
-              pl: { xs: 4, md: 3 },
+              pl: 3,
               my: 2,
             }}
           >
@@ -82,7 +75,7 @@ const Footer = () => {
                     title={link.label}
                     color="inherit"
                     component={Link}
-                    sx={{ textTransform: 'none' }}
+                    sx={{ textTransform: 'none', fontWeight: 400 }}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -93,7 +86,8 @@ const Footer = () => {
                   <Divider
                     sx={{
                       display: { xs: 'block', md: 'none' },
-                      mx: 2,
+                      ml: 2.8,
+                      mr: i === links.length - 2 ? 1.5 : 2.5,
                       height: '12px',
                       alignSelf: 'center',
                       opacity: 0.5,
@@ -111,7 +105,13 @@ const Footer = () => {
             variant="body2"
             color="#fff"
             id="footer-copy-right"
-            sx={{ textAlign: { xs: 'center', md: 'left' }, fontSize: { xs: 12 }, pl: 4, mt: 1, opacity: 0.5 }}
+            sx={{
+              textAlign: { xs: 'center', md: 'left' },
+              fontSize: { xs: 12 },
+              pl: { xs: 1, md: 4 },
+              mt: 1,
+              opacity: 0.5,
+            }}
           >
             Copyright &copy; 2022 Nervina Labs All Rights Reserved.
           </Typography>
@@ -131,14 +131,7 @@ const Footer = () => {
                 color: '#fff',
               }}
             >
-              <Image
-                src={`${IMG_URL}nervina-logo-white.svg`}
-                loading="lazy"
-                width="96"
-                height="23"
-                layout="fixed"
-                alt="logo"
-              />
+              <Logo sx={{ color: '#fff' }} id="logo" />
             </Link>
           </NextLink>
         </Box>

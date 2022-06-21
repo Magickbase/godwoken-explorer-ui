@@ -4,7 +4,7 @@ context('Header', () => {
   before(() => cy.visit('/en-US'))
 
   it('should have a logo', () => {
-    cy.get(`header img[alt='logo']`).should('to.exist')
+    cy.get(`header svg[id="logo"]`).should('to.exist')
   })
 
   it('should have a link to the home page', () => {
