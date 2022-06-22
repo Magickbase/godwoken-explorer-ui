@@ -127,7 +127,7 @@ const Footer = () => {
             height: '55px',
             justifyContent: { xs: 'center', md: 'left' },
             alignItems: 'center',
-            pl: { xs: 1, md: 3 },
+            pl: { xs: 1, md: 2 },
           }}
         >
           {links.map((link, i) => (
