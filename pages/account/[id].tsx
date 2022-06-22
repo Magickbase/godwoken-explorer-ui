@@ -1,34 +1,18 @@
-import type { API } from 'utils/api/utils'
 import { useEffect, useState } from 'react'
 import { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import BigNumber from 'bignumber.js'
-import {
-  Alert,
-  Stack,
-  Container,
-  Paper,
-  IconButton,
-  List,
-  ListItem,
-  ListItemText,
-  Divider,
-  Grid,
-  ListSubheader,
-  Tabs,
-  Tab,
-  Typography,
-  Snackbar,
-} from '@mui/material'
+import { Alert, Stack, Container, Paper, IconButton, Divider, Tabs, Tab, Typography, Snackbar } from '@mui/material'
 import { ContentCopyOutlined as CopyIcon } from '@mui/icons-material'
 import SubpageHead from 'components/SubpageHead'
-import User from 'components/User'
-import MetaContract from 'components/MetaContract'
-import SmartContract from 'components/SmartContract'
-import Polyjuice from 'components/Polyjuice'
-import SUDT from 'components/SUDT'
+import AccountOverview, {
+  fetchAccountOverview,
+  fetchAccountBalance,
+  fetchDeployAddress,
+  AccountOverviewProps,
+  PolyjuiceContract,
+} from 'components/AccountOverview'
 import ERC20TransferList from 'components/ERC20TransferList'
 import AssetList, { fetchUdtList, UdtList } from 'components/UdtList'
 import TxList, { TxListProps, fetchTxList } from 'components/TxList'
@@ -37,29 +21,26 @@ import ContractInfo from 'components/ContractInfo'
 import ContractEventsList from 'components/ContractEventsList'
 import {
   handleCopy,
-  fetchAccount,
-  useWS,
-  getAccountRes,
+  // useWS,
+  // getAccountRes,
   handleApiError,
-  formatInt,
   getERC20TransferListRes,
   fetchERC20TransferList,
   getBridgedRecordListRes,
   fetchBridgedRecordList,
   fetchEventLogsListByType,
+  isEthAddress,
+  GraphQLSchema,
   ParsedEventLog,
   TabNotFoundException,
-  CHANNEL,
-  GCKB_DECIMAL,
-  CKB_DECIMAL,
-  isEthAddress,
+  NotFoundException,
 } from 'utils'
 import PageTitle from 'components/PageTitle'
 
 type ParsedTransferList = ReturnType<typeof getERC20TransferListRes>
 type ParsedBridgedRecordList = ReturnType<typeof getBridgedRecordListRes>
 
-type State = API.Account.Parsed &
+type State = AccountOverviewProps &
   Partial<{
     txList: TxListProps['transactions']
     transferList: ParsedTransferList
@@ -68,46 +49,45 @@ type State = API.Account.Parsed &
     eventsList: ParsedEventLog[]
   }>
 const tabs = ['transactions', 'erc20', 'bridged', 'assets', 'contract', 'events']
+
+const isSmartContractAccount = (account: AccountOverviewProps['account']): account is PolyjuiceContract => {
+  return !!(account as PolyjuiceContract)?.smart_contract
+}
+
 const Account = (initState: State) => {
   const {
     push,
     query: { tab = 'transactions' },
   } = useRouter()
-  const [account, setAccount] = useState(initState)
+  const [accountAndList, setAccountAndList] = useState(initState)
   const [isCopied, setIsCopied] = useState(false)
   const [t] = useTranslation(['account', 'common'])
 
-  useEffect(() => {
-    setAccount(initState)
-  }, [setAccount, initState])
+  const id = accountAndList.account.eth_address || accountAndList.account.script_hash
 
-  useWS(
-    account.id ? `${CHANNEL.ACCOUNT_INFO}${account.id}` : ``,
-    (init: API.Account.Raw) => {
-      setAccount(prev => ({ ...prev, ...getAccountRes(init) }))
-    },
-    (update: API.Account.Raw) => {
-      setAccount(prev => ({ ...prev, ...getAccountRes(update) }))
-    },
-    [setAccount, account.ethAddr],
-  )
+  useEffect(() => {
+    setAccountAndList(initState)
+  }, [setAccountAndList, initState])
+
+  // TODO: update balance and tx count actively
+  // useWS(
+  //   account.id ? `${CHANNEL.ACCOUNT_INFO}${account.id}` : ``,
+  //   (init: API.Account.Raw) => {
+  //     setAccount(prev => ({ ...prev, ...getAccountRes(init) }))
+  //   },
+  //   (update: API.Account.Raw) => {
+  //     setAccount(prev => ({ ...prev, ...getAccountRes(update) }))
+  //   },
+  //   [setAccount, account.ethAddr],
+  // )
 
   const handleAddressCopy = async () => {
-    await handleCopy(account.ethAddr)
+    await handleCopy(id)
     setIsCopied(true)
   }
 
-  const accountType = account.user
-    ? 'user'
-    : account.smartContract
-    ? 'smartContract'
-    : account.sudt
-    ? 'sudt'
-    : account.polyjuice
-    ? 'polyjuice'
-    : 'metaContract'
-
-  const title = `${t('accountType.' + accountType)} ${account.ethAddr}`
+  const title = `${t('accountType.' + accountAndList.account.type)} ${id}`
+  const accountType = accountAndList.account.type
 
   return (
     <>
@@ -125,63 +105,30 @@ const Account = (initState: State) => {
           </Stack>
         </PageTitle>
         <Stack spacing={2}>
-          <Paper>
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={6}>
-                <List
-                  subheader={
-                    <ListSubheader component="div" sx={{ textTransform: 'capitalize', bgcolor: 'transparent' }}>
-                      {t(`overview`)}
-                    </ListSubheader>
-                  }
-                  sx={{ textTransform: 'capitalize' }}
-                >
-                  <Divider variant="middle" />
-                  <ListItem>
-                    <ListItemText
-                      primary={t(`ckbBalance`)}
-                      secondary={
-                        <Typography variant="body2">
-                          {/* FIXME: use response of graphql and GCKB_DECIMAL to foramt balance */}
-                          {new BigNumber(account.ckb || '0')
-                            .multipliedBy(CKB_DECIMAL)
-                            .dividedBy(GCKB_DECIMAL)
-                            .toFormat() + ' CKB'}
-                        </Typography>
-                      }
-                    />
-                  </ListItem>
-                  <ListItem>
-                    <ListItemText
-                      primary={t(`txCount`)}
-                      secondary={<Typography variant="body2">{formatInt(account.txCount)}</Typography>}
-                    />
-                  </ListItem>
-                </List>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                {account.metaContract ? <MetaContract {...account.metaContract} /> : null}
-                {account.user ? <User {...account.user} /> : null}
-                {account.smartContract ? (
-                  <SmartContract
-                    deployer={account.smartContract.creatorAddress}
-                    txHash={account.smartContract.deploymentTxHash}
-                  />
-                ) : null}
-                {account.polyjuice ? <Polyjuice {...account.polyjuice} /> : null}
-                {account.sudt ? <SUDT {...account.sudt} /> : null}
-              </Grid>
-            </Grid>
-          </Paper>
+          <AccountOverview
+            account={accountAndList.account}
+            balance={accountAndList.balance}
+            deployerAddr={accountAndList.deployerAddr}
+          />
           <Paper>
             <Tabs value={tabs.indexOf(tab as string)} variant="scrollable" scrollButtons="auto">
               {[
                 t('transactionRecords'),
-                ['user', 'smartContract'].includes(accountType) ? t(`ERC20Records`) : null,
-                ['user', 'smartContract'].includes(accountType) ? t(`bridgedRecords`) : null,
-                ['user', 'smartContract'].includes(accountType) ? t('userDefinedAssets') : null,
-                accountType === 'smartContract' && account.smartContract?.name ? t('contract') : null,
-                accountType === 'smartContract' ? t('events') : null,
+                [GraphQLSchema.AccountType.EthUser, GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType)
+                  ? t(`ERC20Records`)
+                  : null,
+                [GraphQLSchema.AccountType.EthUser, GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType)
+                  ? t(`bridgedRecords`)
+                  : null,
+                [GraphQLSchema.AccountType.EthUser, GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType)
+                  ? t('userDefinedAssets')
+                  : null,
+                [GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType) &&
+                isSmartContractAccount(accountAndList.account) &&
+                accountAndList.account.smart_contract?.abi
+                  ? t('contract')
+                  : null,
+                [GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType) ? t('events') : null,
               ].map((label, idx) =>
                 label ? (
                   <Tab
@@ -190,7 +137,7 @@ const Account = (initState: State) => {
                     onClick={e => {
                       e.stopPropagation()
                       e.preventDefault()
-                      push(`/account/${account.ethAddr}?tab=${tabs[idx]}`, undefined, { scroll: false })
+                      push(`/account/${id}?tab=${tabs[idx]}`, undefined, { scroll: false })
                     }}
                   />
                 ) : (
@@ -199,16 +146,25 @@ const Account = (initState: State) => {
               )}
             </Tabs>
             <Divider />
-            {tab === 'transactions' && account.txList ? <TxList transactions={account.txList} maxCount="100k" /> : null}
-            {tab === 'erc20' && account.transferList ? <ERC20TransferList list={account.transferList} /> : null}
-            {tab === 'bridged' && account.bridgedRecordList ? (
-              <BridgedRecordList list={account.bridgedRecordList} />
+            {tab === 'transactions' && accountAndList.txList ? (
+              <TxList transactions={accountAndList.txList} maxCount="100k" />
             ) : null}
-            {tab === 'assets' && account.udtList ? <AssetList list={account.udtList} /> : null}
-            {tab === 'contract' && account.smartContract?.name ? (
-              <ContractInfo address={account.ethAddr} {...account.smartContract} />
+            {tab === 'erc20' && accountAndList.transferList ? (
+              <ERC20TransferList list={accountAndList.transferList} />
             ) : null}
-            {tab === 'events' && <ContractEventsList list={account.eventsList} />}
+            {tab === 'bridged' && accountAndList.bridgedRecordList ? (
+              <BridgedRecordList list={accountAndList.bridgedRecordList} />
+            ) : null}
+            {tab === 'assets' && accountAndList.udtList ? <AssetList list={accountAndList.udtList} /> : null}
+            {tab === 'contract' &&
+            isSmartContractAccount(accountAndList.account) &&
+            accountAndList.account.smart_contract?.abi ? (
+              <ContractInfo
+                address={accountAndList.account.eth_address}
+                contract={accountAndList.account.smart_contract}
+              />
+            ) : null}
+            {tab === 'events' && <ContractEventsList list={accountAndList.eventsList} />}
           </Paper>
         </Stack>
         <Snackbar
@@ -240,11 +196,16 @@ export const getServerSideProps: GetServerSideProps<State, { id: string }> = asy
     }
     const q = isEthAddress(id) ? { address: id } : { script_hash: id }
 
-    const [account, lng] = await Promise.all([
-      fetchAccount(id),
+    const [account, balance, lng] = await Promise.all([
+      fetchAccountOverview(q),
+      fetchAccountBalance(q.address ? { address_hashes: [q.address] } : { script_hashes: [q.script_hash] }),
       serverSideTranslations(locale, ['common', 'account', 'list']),
       null,
     ])
+
+    if (!account) {
+      throw new NotFoundException()
+    }
 
     const txList =
       tab === 'transactions' && (q.address || q.script_hash)
@@ -265,7 +226,14 @@ export const getServerSideProps: GetServerSideProps<State, { id: string }> = asy
         ? await fetchUdtList(q.address ? { address_hashes: [id] } : { script_hashes: [id] })
         : null
 
-    return { props: { ...account, ...lng, txList, transferList, bridgedRecordList, udtList, eventsList } }
+    const deployerAddr =
+      isSmartContractAccount(account) && account.smart_contract?.deployment_tx_hash
+        ? await fetchDeployAddress({ eth_hash: account.smart_contract.deployment_tx_hash })
+        : null
+
+    return {
+      props: { ...lng, account, deployerAddr, balance, txList, transferList, bridgedRecordList, udtList, eventsList },
+    }
   } catch (err) {
     switch (true) {
       case err instanceof TabNotFoundException: {
