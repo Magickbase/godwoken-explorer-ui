@@ -222,6 +222,15 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
                     </Stack>
                   </TableCell>
                   <TableCell sx={{ whiteSpace: 'nowrap' }} title={item.udt.name}>
+                    {item.udt.id ? (
+                      <NextLink href={`/token/${item.udt.id}`}>
+                        <Link href={`/token/${item.udt.id}`} underline="none" color="secondary">
+                          {formatAmount(item.amount, item.udt)}
+                        </Link>
+                      </NextLink>
+                    ) : (
+                      formatAmount(item.amount, item.udt)
+                    )}
                     <NextLink href={`/token/${item.udt.id}`}>
                       <Link href={`/token/${item.udt.id}`} underline="none" color="secondary">
                         {formatAmount(item.amount, item.udt)}

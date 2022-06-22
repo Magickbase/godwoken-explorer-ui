@@ -13,7 +13,7 @@ import AccountOverview, {
   AccountOverviewProps,
   PolyjuiceContract,
 } from 'components/AccountOverview'
-import ERC20TransferList from 'components/ERC20TransferList'
+import ERC20TransferList, { fetchTransferList, TransferListProps } from 'components/ERC20TransferList'
 import AssetList, { fetchUdtList, UdtList } from 'components/UdtList'
 import TxList, { TxListProps, fetchTxList } from 'components/TxList'
 import BridgedRecordList from 'components/BridgedRecordList'
@@ -22,9 +22,7 @@ import ContractEventsList from 'components/ContractEventsList'
 import {
   handleCopy,
   // useWS,
-  // getAccountRes,
   handleApiError,
-  getERC20TransferListRes,
   fetchERC20TransferList,
   getBridgedRecordListRes,
   fetchBridgedRecordList,
@@ -37,13 +35,12 @@ import {
 } from 'utils'
 import PageTitle from 'components/PageTitle'
 
-type ParsedTransferList = ReturnType<typeof getERC20TransferListRes>
 type ParsedBridgedRecordList = ReturnType<typeof getBridgedRecordListRes>
 
 type State = AccountOverviewProps &
   Partial<{
     txList: TxListProps['transactions']
-    transferList: ParsedTransferList
+    transferList: TransferListProps['token_transfers']
     bridgedRecordList: ParsedBridgedRecordList
     udtList: UdtList
     eventsList: ParsedEventLog[]
@@ -150,7 +147,7 @@ const Account = (initState: State) => {
               <TxList transactions={accountAndList.txList} maxCount="100k" />
             ) : null}
             {tab === 'erc20' && accountAndList.transferList ? (
-              <ERC20TransferList list={accountAndList.transferList} />
+              <ERC20TransferList token_transfers={accountAndList.transferList} />
             ) : null}
             {tab === 'bridged' && accountAndList.bridgedRecordList ? (
               <BridgedRecordList list={accountAndList.bridgedRecordList} />
@@ -220,7 +217,12 @@ export const getServerSideProps: GetServerSideProps<State, { id: string }> = asy
 
     const transferList =
       tab === 'erc20' && q.address
-        ? await fetchERC20TransferList({ eth_address: q.address, page: query.page as string })
+        ? await fetchTransferList({
+            from_address: q.address,
+            to_address: q.address,
+            before: before as string | null,
+            after: after as string | null,
+          })
         : null
     const bridgedRecordList =
       tab === 'bridged' && q.address

@@ -22,16 +22,14 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import BigNumber from 'bignumber.js'
 import SubpageHead from 'components/SubpageHead'
 import PageTitle from 'components/PageTitle'
-import ERC20TransferList from 'components/ERC20TransferList'
+import ERC20TransferList, { fetchTransferList, TransferListProps } from 'components/ERC20TransferList'
 import BridgedRecordList from 'components/BridgedRecordList'
 import TokenHolderList from 'components/TokenHolderList'
 import Address from 'components/AddressInHalfPanel'
 import {
   handleApiError,
   fetchToken,
-  fetchERC20TransferList,
   nameToColor,
-  getERC20TransferListRes,
   getBridgedRecordListRes,
   fetchBridgedRecordList,
   getTokenHolderListRes,
@@ -40,7 +38,6 @@ import {
 import { PageNonPositiveException, PageOverflowException, TabNotFoundException } from 'utils/exceptions'
 import type { API } from 'utils/api/utils'
 
-type ParsedTransferList = ReturnType<typeof getERC20TransferListRes>
 type ParsedbridgedRecordList = ReturnType<typeof getBridgedRecordListRes>
 type ParsedTokenHolderList = ReturnType<typeof getTokenHolderListRes>
 
@@ -48,7 +45,7 @@ const tabs = ['transfers', 'bridged', 'holders']
 
 type Props = {
   token: API.Token.Parsed
-  transferList?: ParsedTransferList
+  transferList?: TransferListProps['token_transfers']
   bridgedRecordList?: ParsedbridgedRecordList
   tokenHolderList?: ParsedTokenHolderList
 }
@@ -179,7 +176,7 @@ const Token = ({ token, transferList, bridgedRecordList, tokenHolderList }: Prop
               ))}
             </Tabs>
             <Divider />
-            {tab === tabs[0] && transferList ? <ERC20TransferList list={transferList} /> : null}
+            {tab === tabs[0] && transferList ? <ERC20TransferList token_transfers={transferList} /> : null}
             {tab === tabs[1] && bridgedRecordList ? <BridgedRecordList list={bridgedRecordList} showUser /> : null}
             {tab === tabs[2] && tokenHolderList ? <TokenHolderList list={tokenHolderList} /> : null}
           </Paper>
@@ -191,7 +188,7 @@ const Token = ({ token, transferList, bridgedRecordList, tokenHolderList }: Prop
 
 export const getServerSideProps: GetServerSideProps<Props, { id: string }> = async ({ locale, res, params, query }) => {
   const { id } = params
-  const { page, tab = tabs[0] } = query
+  const { page, tab = tabs[0], before = null, after = null } = query
 
   try {
     if (typeof tab !== 'string' || !tabs.includes(tab)) {
@@ -202,9 +199,14 @@ export const getServerSideProps: GetServerSideProps<Props, { id: string }> = asy
       fetchToken(id),
       serverSideTranslations(locale, ['common', 'tokens', 'list']),
     ])
+
     const transferList =
       tab === tabs[0] && token.address
-        ? await fetchERC20TransferList({ udt_address: token.address, page: page as string })
+        ? await fetchTransferList({
+            token_contract_address_hash: token.address,
+            before: before as string | null,
+            after: after as string | null,
+          })
         : null
 
     const bridgedRecordList =

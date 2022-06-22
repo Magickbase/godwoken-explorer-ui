@@ -26,7 +26,7 @@ import TxStatusIcon from './TxStatusIcon'
 import Address from 'components/TruncatedAddress'
 import PageSize from 'components/PageSize'
 import Pagination from 'components/SimplePagination'
-import { timeDistance, GraphQLSchema, TxStatus, client, GCKB_DECIMAL, useFilterMenu } from 'utils'
+import { timeDistance, getBlockStatus, GraphQLSchema, client, GCKB_DECIMAL, useFilterMenu } from 'utils'
 
 export type TxListProps = {
   transactions: {
@@ -110,7 +110,7 @@ interface EthAccountTxListVariables extends Nullable<Cursor> {
 interface GwAccountTxListVariables extends Nullable<Cursor> {
   script_hash?: string | null
 }
-interface BlockTxListVariables extends Nullable<Cursor> {}
+interface BlockTxListVariables extends Nullable<Cursor> { }
 type Variables = Cursor | EthAccountTxListVariables | GwAccountTxListVariables | BlockTxListVariables
 
 export const fetchTxList = (variables: Variables) =>
@@ -118,20 +118,6 @@ export const fetchTxList = (variables: Variables) =>
     .request<TxListProps>(txListQuery, variables)
     .then(data => data.transactions)
     .catch(() => ({ entries: [], metadata: { before: null, after: null, total_count: 0 } }))
-
-const getBlockStatus = (block: Pick<GraphQLSchema.Block, 'status'> | null): TxStatus => {
-  switch (block?.status) {
-    case GraphQLSchema.BlockStatus.Committed: {
-      return 'committed'
-    }
-    case GraphQLSchema.BlockStatus.Finalized: {
-      return 'finalized'
-    }
-    default: {
-      return 'pending'
-    }
-  }
-}
 
 const FILTER_KEYS = ['block_from', 'block_to'] as const
 const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> = ({
