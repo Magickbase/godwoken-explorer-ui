@@ -27,7 +27,7 @@ import { Language as LanguageIcon, KeyboardArrowDown, KeyboardArrowUp } from '@m
 import { EXPLORER_TITLE, GW_VERSION } from 'utils'
 import Logo from './Logo'
 import CloseIcon from '../assets/close.svg'
-import MobileMenuIcon from '../assets/mobile-Menu.svg'
+import MobileMenuIcon from '../assets/mobile-menu.svg'
 
 const TOKEN_TYPE_LIST = ['bridge', 'native']
 const CHAIN_TYPE_LIST = GW_VERSION ? ['testnet'] : ['mainnet', 'testnet']
