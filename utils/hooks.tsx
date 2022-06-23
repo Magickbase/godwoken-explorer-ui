@@ -72,7 +72,11 @@ export const useFilterMenu = <T extends string>() => {
         filterKeys.forEach(field => {
           const v = e.currentTarget[field.toString()]?.value
           if (v) {
-            q[field] = v
+            if (['block_from', 'block_to'].includes(field)) {
+              q[field] = `${+v}`
+            } else {
+              q[field] = v
+            }
           } else {
             delete q[field]
           }
