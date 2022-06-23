@@ -1,4 +1,5 @@
 import type { API } from 'utils/api/utils'
+import type { Cache } from 'pages/api/cache'
 import { useState } from 'react'
 import { GetServerSideProps } from 'next'
 import NextLink from 'next/link'
@@ -32,7 +33,7 @@ import {
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { Typography } from '@mui/material'
-import { timeDistance, fetchHome, handleApiError, useWS, getHomeRes, formatInt, CHANNEL } from 'utils'
+import { timeDistance, handleApiError, useWS, getHomeRes, formatInt, CHANNEL } from 'utils'
 
 type State = API.Home.Parsed
 
@@ -314,9 +315,11 @@ const Home = (initState: State) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<State> = async ({ res, locale }) => {
+export const getServerSideProps: GetServerSideProps<State> = async ({ req, res, locale }) => {
   try {
-    const home = await fetchHome()
+    const home = await fetch(`http://${req.headers.host}/api/cache`)
+      .then(res => res.json())
+      .then((res: Cache) => res.home)
     const lng = await serverSideTranslations(locale, ['common', 'block', 'tx', 'statistic'])
     return { props: { ...home, ...lng } }
   } catch (err) {
