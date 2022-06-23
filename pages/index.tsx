@@ -32,7 +32,7 @@ import {
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { Typography } from '@mui/material'
-import { timeDistance, fetchHome, handleApiError, useWS, getHomeRes, formatInt, CHANNEL, GW_VERSION } from 'utils'
+import { timeDistance, fetchHome, handleApiError, useWS, getHomeRes, formatInt, CHANNEL } from 'utils'
 
 type State = API.Home.Parsed
 
@@ -45,14 +45,11 @@ const formatAddress = (addr: string) => {
 
 const statisticGroups = [
   { key: 'blockHeight', icon: <BlockHeightIcon />, prefix: '# ' },
+  { key: 'averageBlockTime', icon: <BlockHeightIcon />, suffix: ' s ' },
   { key: 'txCount', icon: <TxCountIcon /> },
   { key: 'tps', icon: <TpsIcon />, suffix: ' txs/s' },
   { key: 'accountCount', icon: <AccountCountIcon /> },
 ]
-
-if (GW_VERSION === 1) {
-  statisticGroups.splice(1, 0, { key: 'averageBlockTime', icon: <BlockHeightIcon />, suffix: ' s ' })
-}
 
 const Statistic = ({ blockCount, txCount, tps, accountCount, averageBlockTime }: State['statistic']) => {
   const [t] = useTranslation('statistic')
