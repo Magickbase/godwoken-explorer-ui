@@ -39,7 +39,14 @@ export type TransferListProps = {
 }
 
 const transferListQuery = gql`
-  query ($transaction_hash: String!, $before: String, $after: String, $from_address: String, $to_address: String) {
+  query (
+    $transaction_hash: String!
+    $before: String
+    $after: String
+    $from_address: String
+    $to_address: String
+    $combine_from_to: Boolean
+  ) {
     token_transfers(
       input: {
         transaction_hash: $transaction_hash
@@ -47,6 +54,7 @@ const transferListQuery = gql`
         after: $after
         from_address: $from_address
         to_address: $to_address
+        combine_from_to: $combine_from_to
       }
     ) {
       entries {
@@ -90,6 +98,7 @@ export const fetchTransferList = (variables: {
   after: string | null
   from_address?: string | null
   to_address?: string | null
+  combine_from_to?: boolean | null
 }) =>
   client
     .request<TransferListProps>(transferListQuery, variables)
@@ -119,10 +128,7 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
     const {
       dataset: { fields },
     } = e.currentTarget
-    const fieldList = fields
-      .split(',')
-      .map(field => field.trim())
-      .filter(field => FILTER_KEYS.includes(field as any)) as Array<any>
+    const fieldList = fields.split(',').filter(field => FILTER_KEYS.includes(field as any)) as Array<any>
 
     if (fieldList.length) {
       setFilters(fieldList)

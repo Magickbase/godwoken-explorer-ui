@@ -463,6 +463,7 @@ export const getServerSideProps: GetServerSideProps<State, { hash: string }> = a
             after: after as string | null,
             from_address: address_from as string | null,
             to_address: address_to as string | null,
+            combine_from_to: false,
           })
         : null
     const logsList = tab === 'logs' ? await fetchEventLogsListByType('txs', hash) : null

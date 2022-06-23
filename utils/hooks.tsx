@@ -70,15 +70,18 @@ export const useFilterMenu = <T extends string>() => {
 
         const q = { ...query } as Record<string, string>
         filterKeys.forEach(field => {
-          const v = e.currentTarget[field.toString()]?.value
-          if (v) {
-            if (['block_from', 'block_to'].includes(field)) {
-              q[field] = `${+v}`
+          const input = e.currentTarget[field.toString()]
+          if (input) {
+            const v = input.value.trim()
+            if (v) {
+              if (['block_from', 'block_to'].includes(field)) {
+                q[field] = `${+v}`
+              } else {
+                q[field] = v
+              }
             } else {
-              q[field] = v
+              delete q[field]
             }
-          } else {
-            delete q[field]
           }
         })
 
