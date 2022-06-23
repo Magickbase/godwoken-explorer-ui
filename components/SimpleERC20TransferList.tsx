@@ -117,10 +117,15 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
 
   const handleBlockFilterOpen = (e: React.MouseEvent<HTMLButtonElement>) => {
     const {
-      dataset: { field },
+      dataset: { fields },
     } = e.currentTarget
-    if (FILTER_KEYS.includes(field as any)) {
-      setFilters([field as any])
+    const fieldList = fields
+      .split(',')
+      .map(field => field.trim())
+      .filter(field => FILTER_KEYS.includes(field as any)) as Array<any>
+
+    if (fieldList.length) {
+      setFilters(fieldList)
       handleFilterOpen(e)
     }
   }
@@ -141,7 +146,7 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
               <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }} component="th">
                 <Stack direction="row" alignItems="center" whiteSpace="nowrap">
                   {t('from')}
-                  <IconButton size="small" data-field="address_from" onClick={handleBlockFilterOpen}>
+                  <IconButton size="small" data-fields="address_from" onClick={handleBlockFilterOpen}>
                     <FilterIcon fontSize="inherit" />
                   </IconButton>
                 </Stack>
@@ -149,13 +154,16 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
               <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }} component="th">
                 <Stack direction="row" alignItems="center" whiteSpace="nowrap">
                   {t('to')}
-                  <IconButton size="small" data-field="address_to" onClick={handleBlockFilterOpen}>
+                  <IconButton size="small" data-fields="address_to" onClick={handleBlockFilterOpen}>
                     <FilterIcon fontSize="inherit" />
                   </IconButton>
                 </Stack>
               </TableCell>
               <TableCell sx={{ display: { xs: 'table-cell', md: 'none' } }} component="th">
                 {t('transfer')}
+                <IconButton size="small" data-fields="address_from,address_to" onClick={handleBlockFilterOpen}>
+                  <FilterIcon fontSize="inherit" />
+                </IconButton>
               </TableCell>
               <TableCell component="th">{`${t('value')}`}</TableCell>
             </TableRow>
