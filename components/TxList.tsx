@@ -114,7 +114,10 @@ interface BlockTxListVariables extends Nullable<Cursor> {}
 type Variables = Cursor | EthAccountTxListVariables | GwAccountTxListVariables | BlockTxListVariables
 
 export const fetchTxList = (variables: Variables) =>
-  client.request<TxListProps>(txListQuery, variables).then(data => data.transactions)
+  client
+    .request<TxListProps>(txListQuery, variables)
+    .then(data => data.transactions)
+    .catch(() => ({ entries: [], metadata: { before: null, after: null, total_count: 0 } }))
 
 const getBlockStatus = (block: Pick<GraphQLSchema.Block, 'status'> | null): TxStatus => {
   switch (block?.status) {

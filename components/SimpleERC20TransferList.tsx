@@ -90,7 +90,11 @@ export const fetchTransferList = (variables: {
   after: string | null
   from_address?: string | null
   to_address?: string | null
-}) => client.request<TransferListProps>(transferListQuery, variables).then(data => data.token_transfers)
+}) =>
+  client
+    .request<TransferListProps>(transferListQuery, variables)
+    .then(data => data.token_transfers)
+    .catch(() => ({ entries: [], metadata: { before: null, after: null, total_count: 0 } }))
 
 const FILTER_KEYS = ['address_from', 'address_to'] as const
 const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries, metadata } }) => {
