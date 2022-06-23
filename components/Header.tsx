@@ -1,6 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import NextLink from 'next/link'
-import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import {
@@ -24,13 +23,12 @@ import MuiAccordionSummary, { AccordionSummaryProps } from '@mui/material/Accord
 import MuiAccordionDetails from '@mui/material/AccordionDetails'
 import { styled } from '@mui/material/styles'
 import { Language as LanguageIcon, KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material'
-import { EXPLORER_TITLE, GW_VERSION } from 'utils'
+import { EXPLORER_TITLE, fetchVersion } from 'utils'
 import Logo from './Logo'
 import CloseIcon from '../assets/close.svg'
 import MobileMenuIcon from '../assets/mobile-menu.svg'
 
 const TOKEN_TYPE_LIST = ['bridge', 'native']
-const CHAIN_TYPE_LIST = GW_VERSION ? ['testnet'] : ['mainnet', 'testnet']
 const LOCALE_LIST = ['en-US', 'zh-CN']
 
 const Accordion = styled((props: AccordionProps) => <MuiAccordion disableGutters elevation={0} square {...props} />)(
@@ -118,12 +116,24 @@ const MobileMenu = styled((props: MenuProps) => (
 
 const Header = () => {
   const [t, { language }] = useTranslation('common')
+  const [version, setVersion] = useState<string | null>(null)
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
   const [expanded, setExpanded] = useState<string | false>('')
 
   const anchorElLabel = anchorEl?.getAttribute('aria-label')
   const { asPath } = useRouter()
   const isHome = asPath === '/'
+  const CHAIN_TYPE_LIST = !version?.startsWith('0.') ? ['testnet'] : ['mainnet', 'testnet']
+
+  useEffect(() => {
+    fetchVersion()
+      .then(versions => {
+        setVersion(versions.godwokenVersion?.split(' ')[0])
+      })
+      .catch(() => {
+        /* ignore */
+      })
+  }, [setVersion])
 
   const handleMobileMenuChange = (panel: string) => (e: React.SyntheticEvent, newExpanded: boolean) => {
     setExpanded(newExpanded ? panel : false)
