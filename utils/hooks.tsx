@@ -1,5 +1,6 @@
-import Image from 'next/image'
+import type { useRouter } from 'next/router'
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react'
+import Image from 'next/image'
 import { Socket } from 'phoenix'
 import { CHANNEL, IMG_URL, WS_ENDPOINT } from './constants'
 
@@ -42,6 +43,72 @@ export const useWS = (
       })
     }
   }, deps)
+}
+
+export const useFilterMenu = <T extends string>() => {
+  const [filters, setFilters] = useState<Array<T>>([])
+  const [filterAnchorEl, setFilterAnchorEl] = useState<HTMLElement | null>(null)
+
+  const handleFilterOpen = (e: React.MouseEvent<HTMLButtonElement>) => setFilterAnchorEl(e.currentTarget)
+  const handleFilterDismiss = () => setFilterAnchorEl(null)
+
+  const handleFilterSubmit = ({
+    filterKeys,
+    query,
+    push,
+    url,
+  }: {
+    filterKeys: Readonly<Array<T>>
+    query: Record<string, string>
+    push: ReturnType<typeof useRouter>['push']
+    url: string
+  }) =>
+    useCallback(
+      (e: React.FormEvent) => {
+        e.stopPropagation()
+        e.preventDefault()
+
+        const q = { ...query } as Record<string, string>
+        filterKeys.forEach(field => {
+          const input = e.currentTarget[field.toString()]
+          if (input) {
+            const v = input.value.trim()
+            if (v) {
+              if (['block_from', 'block_to'].includes(field)) {
+                q[field] = `${+v}`
+              } else {
+                q[field] = v
+              }
+            } else {
+              delete q[field]
+            }
+          }
+        })
+
+        push(`${url.split('?')[0] ?? ''}?${new URLSearchParams(q)}`)
+        handleFilterDismiss()
+      },
+      [filterKeys, query, push, url],
+    )
+
+  const handleFilterClear = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation()
+    e.preventDefault()
+    e.currentTarget
+      .closest('form')
+      ?.querySelectorAll('input')
+      .forEach(i => (i.value = ''))
+  }
+
+  return {
+    filters,
+    setFilters,
+    handleFilterOpen,
+    handleFilterDismiss,
+    filterAnchorEl,
+    handleFilterSubmit,
+    handleFilterClear,
+  }
 }
 
 const debounce = (func: Function, wait: number) => {

@@ -36,5 +36,11 @@
   "latest25ContractEvents": "Latest 25 Contract Events",
   "logs": "Logs",
   "eventsFilterPlaceholder": "Filter by BlockNo Or Topic0",
-  "filterEventBy": "Apply filter by {{filter}}"
+  "filterEventBy": "Apply filter by {{filter}}",
+  "block_from": "from",
+  "block_to": "to",
+  "address_from": "from",
+  "address_to": "to",
+  "filter": "filter",
+  "clear": "clear"
 }
