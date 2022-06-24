@@ -188,7 +188,7 @@ const Account = (initState: State) => {
 
 export const getServerSideProps: GetServerSideProps<State, { id: string }> = async ({ locale, res, params, query }) => {
   const { id } = params
-  const { tab = tabs[0], before = null, after = null } = query
+  const { tab = tabs[0], before = null, after = null, block_from = null, block_to = null } = query
 
   try {
     if (typeof tab !== 'string' || !tabs.includes(tab)) {
@@ -209,7 +209,13 @@ export const getServerSideProps: GetServerSideProps<State, { id: string }> = asy
 
     const txList =
       tab === 'transactions' && (q.address || q.script_hash)
-        ? await fetchTxList({ ...q, before: before as string, after: after as string })
+        ? await fetchTxList({
+            ...q,
+            before: before as string,
+            after: after as string,
+            start_block_number: block_from ? +block_from : null,
+            end_block_number: block_to ? +block_to : null,
+          })
         : null
 
     const transferList =

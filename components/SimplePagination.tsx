@@ -6,7 +6,7 @@ import { Box, Link } from '@mui/material'
 const SimplePagination: React.FC<Record<'before' | 'after', string | null>> = ({ before, after }) => {
   const [t] = useTranslation('common')
   const {
-    query: { before: _before, after: _after, ...query },
+    query: { before: _before, after: _after, id: _, ...query },
     asPath,
   } = useRouter()
   const url = asPath.split('?')[0] ?? ''

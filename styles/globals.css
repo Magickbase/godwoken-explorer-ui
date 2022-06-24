@@ -26,6 +26,13 @@ a {
   font-family: 'Roboto Mono', monospace, 'Courier New' !important;
 }
 
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
 @media screen and (max-width: 600px) {
   :root {
     --header-height: 56px;
