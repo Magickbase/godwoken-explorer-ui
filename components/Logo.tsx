@@ -20,10 +20,20 @@ function Logo(props: SvgIconProps) {
   return (
     <Box sx={{ width: 100 }}>
       <SvgIcon {...props} sx={{ height: 16 }} component={LogoSvg} viewBox="0 0 27 16" />
-      <Typography component="span" fontFamily="DIN Pro" fontSize={14} fontStyle="italic" sx={{ mr: '1px' }}>
+      <Typography
+        component="span"
+        fontFamily="DIN Pro"
+        fontStyle="italic"
+        sx={{ mr: '1px', fontSize: { xs: '14.67px', md: '16px' } }}
+      >
         {EXPLORER_TITLE}
       </Typography>
-      <Typography component="span" fontFamily="DIN Pro" fontSize={7.3} fontStyle="italic">
+      <Typography
+        component="span"
+        fontFamily="DIN Pro"
+        fontStyle="italic"
+        sx={{ fontSize: { xs: '7.33px', md: '8px' } }}
+      >
         V{version}
       </Typography>
     </Box>
