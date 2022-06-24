@@ -21,7 +21,7 @@ import {
   alpha,
 } from '@mui/material'
 import { Search as SearchIcon, Translate as TranslateIcon, MoreVert as MoreIcon } from '@mui/icons-material'
-import { EXPLORER_TITLE, IMG_URL, SEARCH_FIELDS, GW_VERSION, handleSearchKeyPress } from 'utils'
+import { EXPLORER_TITLE, IMG_URL, SEARCH_FIELDS, handleSearchKeyPress, fetchVersion } from 'utils'
 
 const Search = styled('div')(({ theme }) => ({
   'position': 'relative',
@@ -76,11 +76,11 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }))
 
 const TOKEN_TYPE_LIST = ['bridge', 'native']
-const CHAIN_TYPE_LIST = GW_VERSION ? ['testnet'] : ['mainnet', 'testnet']
 const LOCALE_LIST = ['zh-CN', 'en-US']
 
 const Header = () => {
   const [t, { language }] = useTranslation('common')
+  const [version, setVersion] = useState<string | null>(null)
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
   const anchorElLabel = anchorEl?.getAttribute('aria-label')
   const {
@@ -89,6 +89,8 @@ const Header = () => {
     asPath,
   } = useRouter()
   const searchRef = useRef<HTMLInputElement | null>(null)
+
+  const CHAIN_TYPE_LIST = !version?.startsWith('0.') ? ['testnet'] : ['mainnet', 'testnet']
 
   const handleSearch = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     handleSearchKeyPress(e, push)
@@ -109,6 +111,16 @@ const Header = () => {
       }
     }
   }, [searchInQuery, searchRef])
+
+  useEffect(() => {
+    fetchVersion()
+      .then(versions => {
+        setVersion(versions.godwokenVersion?.split(' ')[0])
+      })
+      .catch(() => {
+        /* ignore */
+      })
+  }, [setVersion])
 
   const contractMenuItems = (
     <MenuList dense>
@@ -258,20 +270,22 @@ const Header = () => {
               <Typography sx={{ ml: 2, display: { xs: 'none', sm: 'flex' } }} variant="h5" noWrap>
                 {EXPLORER_TITLE}
               </Typography>
-              <Typography
-                variant="subtitle2"
-                letterSpacing={0}
-                sx={{
-                  lineHeight: '1em',
-                  alignSelf: 'flex-end',
-                  ml: 0.5,
-                  mb: { xs: 0, sm: '6px' },
-                  fontVariant: 'unicase',
-                  fontStyle: 'italic',
-                }}
-              >
-                {`V${GW_VERSION}`}
-              </Typography>
+              {version ? (
+                <Typography
+                  variant="subtitle2"
+                  letterSpacing={0}
+                  sx={{
+                    lineHeight: '1em',
+                    alignSelf: 'flex-end',
+                    ml: 0.5,
+                    mb: { xs: 0, sm: '6px' },
+                    fontVariant: 'unicase',
+                    fontStyle: 'italic',
+                  }}
+                >
+                  {`V${version}`}
+                </Typography>
+              ) : null}
             </Link>
           </NextLink>
 
