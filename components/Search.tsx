@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import { InputBase, IconButton, Divider, alpha, styled } from '@mui/material'
 import { Search as SearchIcon, Translate as TranslateIcon, MoreVert as MoreIcon } from '@mui/icons-material'
-import { EXPLORER_TITLE, IMG_URL, SEARCH_FIELDS, GW_VERSION, handleSearchKeyPress } from 'utils'
+import { EXPLORER_TITLE, IMG_URL, SEARCH_FIELDS, handleSearchKeyPress } from 'utils'
 
 const SearchStyled = styled('div')(({ theme }) => ({
   'position': 'relative',
