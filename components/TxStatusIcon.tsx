@@ -1,10 +1,8 @@
-import {
-  HourglassEmptyOutlined as PendingIcon,
-  Done as CommittedIcon,
-  DoneAllOutlined as FinalizedIcon,
-  ErrorOutlineOutlined as ErrorIcon,
-} from '@mui/icons-material'
+import { HourglassEmptyOutlined as PendingIcon } from '@mui/icons-material'
 import { SxProps, Tooltip } from '@mui/material'
+import CommittedIcon from 'assets/icons/committed.svg'
+import FailedIcon from 'assets/icons/failed.svg'
+import FinalizedIcon from 'assets/icons/finalized.svg'
 import { useTranslation } from 'next-i18next'
 import type { TxStatus } from 'utils'
 
@@ -15,7 +13,7 @@ const TxStatusIcon: React.FC<{ status: TxStatus; isSuccess?: boolean }> = ({ sta
     color: isSuccess ? 'success' : 'warning',
   }
   if (!isSuccess) {
-    return <ErrorIcon {...properties} color="warning" />
+    return <FailedIcon style={{ flexShrink: 0 }} />
   }
 
   if (status === 'pending') {
@@ -28,18 +26,22 @@ const TxStatusIcon: React.FC<{ status: TxStatus; isSuccess?: boolean }> = ({ sta
   if (status === 'committed') {
     return (
       <Tooltip title={t(status)} placement="top">
-        <CommittedIcon {...properties} />
+        <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+          <CommittedIcon />
+        </div>
       </Tooltip>
     )
   }
   if (status === 'finalized') {
     return (
       <Tooltip title={t(status)} placement="top">
-        <FinalizedIcon {...properties} />
+        <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+          <FinalizedIcon />
+        </div>
       </Tooltip>
     )
   }
-  return <ErrorIcon {...properties} color="warning" />
+  return <FailedIcon style={{ flexShrink: 0 }} />
 }
 
 export default TxStatusIcon

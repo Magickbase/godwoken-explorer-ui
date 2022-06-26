@@ -3,9 +3,9 @@ import { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { Paper, Tabs, Tab, Divider } from '@mui/material'
 import { OpenInNew as OpenInNewIcon } from '@mui/icons-material'
 import BigNumber from 'bignumber.js'
+import Tabs from 'components/Tabs'
 import SubpageHead from 'components/SubpageHead'
 import InfoList from 'components/InfoList'
 import TxList, { TxListProps, fetchTxList } from 'components/TxList'
@@ -40,7 +40,6 @@ const Block = (initState: State) => {
   const [block, setBlock] = useState(initState)
   const [t, { language }] = useTranslation('block')
   const {
-    push,
     query: { tab = 'transactions' },
   } = useRouter()
 
@@ -151,28 +150,21 @@ const Block = (initState: State) => {
         <PageTitle>{title}</PageTitle>
         <InfoList
           list={fields.map(field => ({ field: t(field.label), content: field.value }))}
-          style={{ marginBottom: '1rem' }}
+          style={{ marginBottom: '2rem' }}
         />
-        <Paper>
-          <Tabs value={tabs.indexOf(tab as string)} variant="scrollable" scrollButtons="auto">
-            {[t('transactionRecords'), t(`bridgedRecords`)].map((label, idx) => (
-              <Tab
-                key={label}
-                label={label}
-                onClick={e => {
-                  e.stopPropagation()
-                  e.preventDefault()
-                  push(`/block/${block.hash}?tab=${tabs[idx]}`, undefined, { scroll: false })
-                }}
-              />
-            ))}
-          </Tabs>
-          <Divider />
+        <div className={styles.list}>
+          <Tabs
+            value={tabs.indexOf(tab as string)}
+            tabs={[t('transactionRecords'), t(`bridgedRecords`)].map((label, idx) => ({
+              label,
+              href: `/block/${block.hash}?tab=${tabs[idx]}`,
+            }))}
+          />
           {tab === 'transactions' && block.txList ? <TxList transactions={block.txList} /> : null}
           {tab === 'bridged' && block.bridgedRecordList ? (
             <BridgedRecordList list={block.bridgedRecordList} showUser />
           ) : null}
-        </Paper>
+        </div>
       </div>
     </>
   )

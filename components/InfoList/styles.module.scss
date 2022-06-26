@@ -1,7 +1,7 @@
 .container {
   display: flex;
   background-color: #fff;
-  border: 0.5px solid #f0f0f0;
+  border: 0.5px solid var(--border-color);
   border-radius: 0.5rem;
   overflow: hidden;
   font-family: Roboto;
@@ -37,7 +37,7 @@
     }
 
     border-top: 1px solid transparent;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--border-color);
 
     &:last-of-type {
       border-bottom-color: transparent;
