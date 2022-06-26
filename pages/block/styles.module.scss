@@ -1,0 +1,59 @@
+.container {
+  .blockHash {
+    word-break: break-all;
+    span {
+      padding-right: 6px;
+    }
+  }
+
+  .finalizeState {
+    text-transform: capitalize;
+  }
+
+  .aggregator {
+    word-break: break-all;
+  }
+
+  .layer1Info {
+    display: flex;
+    div[attr-role='tx'] {
+      display: flex;
+      align-items: center;
+      a {
+        padding-left: 8px;
+      }
+    }
+    div[attr-role='block'] {
+      display: flex;
+      white-space: nowrap;
+      a {
+        padding: 0 8px;
+        display: flex;
+        align-items: center;
+      }
+    }
+    hr[attr-role='divider'] {
+      margin: 2px 16px;
+      opacity: 0.3;
+    }
+
+    @media screen and (max-width: 1080px) {
+      flex-direction: column;
+      hr {
+        display: none;
+      }
+      div:first-of-type {
+        margin-bottom: 16px;
+      }
+      div[attr-role='block'],
+      div[attr-role='tx'] {
+        flex-direction: column;
+        align-items: flex-start;
+        a {
+          padding-left: 0;
+          word-break: break-all;
+        }
+      }
+    }
+  }
+}

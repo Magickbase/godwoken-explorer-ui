@@ -1,0 +1,46 @@
+.container {
+  display: flex;
+  background-color: #fff;
+  border: 0.5px solid #f0f0f0;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  font-family: Roboto;
+  font-size: 0.875rem;
+
+  div[role='list'] {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-transform: capitalize;
+    width: 100%;
+  }
+
+  dl {
+    display: flex;
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.5rem;
+    padding: 0.9375rem 1.6rem;
+    margin: 0;
+
+    dt {
+      flex-shrink: 0;
+      flex-basis: 7.25rem;
+      padding-right: 1rem;
+      color: var(--secondary-text-color);
+      font-weight: 400;
+    }
+
+    dd {
+      margin: 0;
+    }
+
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid #f0f0f0;
+
+    &:last-of-type {
+      border-bottom-color: transparent;
+    }
+  }
+}

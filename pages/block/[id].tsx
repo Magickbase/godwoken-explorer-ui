@@ -2,31 +2,17 @@ import { useEffect, useState } from 'react'
 import { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
-import NextLink from 'next/link'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import {
-  Alert,
-  Container,
-  Stack,
-  List,
-  ListItem,
-  ListItemText,
-  Typography,
-  Paper,
-  Link,
-  Tabs,
-  Tab,
-  Tooltip,
-  Divider,
-  IconButton,
-  Snackbar,
-} from '@mui/material'
-import { OpenInNew as OpenInNewIcon, ContentCopyOutlined as CopyIcon } from '@mui/icons-material'
+import { Paper, Tabs, Tab, Divider } from '@mui/material'
+import { OpenInNew as OpenInNewIcon } from '@mui/icons-material'
 import BigNumber from 'bignumber.js'
 import SubpageHead from 'components/SubpageHead'
+import InfoList from 'components/InfoList'
 import TxList, { TxListProps, fetchTxList } from 'components/TxList'
 import BridgedRecordList from 'components/BridgedRecordList'
 import PageTitle from 'components/PageTitle'
+import HashLink from 'components/HashLink'
+import CopyBtn from 'components/CopyBtn'
 import {
   fetchBlock,
   handleApiError,
@@ -38,9 +24,9 @@ import {
   formatInt,
   fetchBridgedRecordList,
   getBridgedRecordListRes,
-  handleCopy,
   TabNotFoundException,
 } from 'utils'
+import styles from './styles.module.scss'
 
 type RawBlock = Parameters<typeof getBlockRes>[0]
 type ParsedBlock = ReturnType<typeof getBlockRes>
@@ -52,7 +38,6 @@ type State = ParsedBlock & Partial<{ txList: TxListProps['transactions']; bridge
 
 const Block = (initState: State) => {
   const [block, setBlock] = useState(initState)
-  const [isCopied, setIsCopied] = useState(false)
   const [t, { language }] = useTranslation('block')
   const {
     push,
@@ -75,238 +60,120 @@ const Block = (initState: State) => {
     [setBlock, block.number],
   )
 
-  const handleHashCopy = async () => {
-    await handleCopy(block.hash)
-    setIsCopied(true)
-  }
-
   const fields = [
     {
       label: 'hash',
       value: (
-        <Stack direction="row" alignItems="center">
-          <Tooltip title={block.hash} placement="top">
-            <Typography
-              variant="body2"
-              className="mono-font"
-              overflow="hidden"
-              textOverflow="ellipsis"
-              color="#000000de"
-            >
-              {block.hash}
-            </Typography>
-          </Tooltip>
-          <IconButton aria-label="copy" size="small" onClick={handleHashCopy}>
-            <CopyIcon fontSize="inherit" />
-          </IconButton>
-        </Stack>
+        <div className={styles.blockHash}>
+          <span className="mono-font">{block.hash}</span>
+          <CopyBtn content={block.hash} />
+        </div>
       ),
     },
     {
       label: 'timestamp',
-      value: (
-        <Typography variant="body2">
-          {block.timestamp > 0 ? (
-            <time dateTime={new Date(block.timestamp).toISOString()} title={t('timestamp')}>
-              {formatDatetime(block.timestamp)}
-            </time>
-          ) : (
-            t('pending')
-          )}
-        </Typography>
-      ),
+      value:
+        block.timestamp > 0 ? (
+          <time dateTime={new Date(block.timestamp).toISOString()} title={t('timestamp')}>
+            {formatDatetime(block.timestamp)}
+          </time>
+        ) : (
+          t('pending')
+        ),
     },
     {
       label: 'layer1Info',
       value: block.layer1 ? (
-        <Stack sx={{ whiteSpace: 'nowrap', flexDirection: { xs: 'column', md: 'row' } }} color="#000000de">
+        <div className={styles.layer1Info}>
           {language === 'zh-CN' ? (
             <>
-              <Stack direction="row">
-                <Typography variant="body2">区块</Typography>
-                <Link
-                  href={`${CKB_EXPLORER_URL}/block/${block.layer1.block}`}
-                  underline="none"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  display="flex"
-                  alignItems="center"
-                  color="secondary"
-                  mx={1}
-                >
+              <div attr-role="block">
+                区块
+                <a href={`${CKB_EXPLORER_URL}/block/${block.layer1.block}`} target="_blank" rel="noopener noreferrer">
                   {formatInt(block.layer1.block)}
                   <OpenInNewIcon sx={{ fontSize: 16, ml: 0.5 }} />
-                </Link>
+                </a>
                 中的
-              </Stack>
-              <Stack direction="row">
+              </div>
+              <hr attr-role="divider" />
+              <div attr-role="tx">
                 交易
-                <Link
+                <HashLink
+                  label={block.layer1.txHash}
                   href={`${CKB_EXPLORER_URL}/transaction/${block.layer1.txHash}`}
-                  underline="none"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  display="flex"
-                  alignItems="center"
-                  color="secondary"
-                  ml={1}
-                  width={{ xs: 'calc(100% - 40px)', md: 'unset' }}
-                >
-                  <Typography variant="body2" overflow="hidden" textOverflow="ellipsis" className="mono-font">
-                    {block.layer1.txHash}
-                  </Typography>
-                  <OpenInNewIcon sx={{ fontSize: 16, ml: 0.5 }} />
-                </Link>
-              </Stack>
+                  external
+                />
+              </div>
             </>
           ) : (
             <>
-              <Stack direction="row" alignItems="center">
+              <div attr-role="tx">
                 Transaction
-                <Link
+                <HashLink
+                  label={block.layer1.txHash}
                   href={`${CKB_EXPLORER_URL}/transaction/${block.layer1.txHash}`}
-                  underline="none"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  display="flex"
-                  alignItems="center"
-                  color="secondary"
-                  mx={1}
-                  width={{ xs: 'calc(100% - 90px)', md: 'unset' }}
-                >
-                  <Typography variant="body2" overflow="hidden" textOverflow="ellipsis" className="mono-font">
-                    {block.layer1.txHash}
-                  </Typography>
-                  <OpenInNewIcon sx={{ fontSize: 16, ml: 0.5 }} />
-                </Link>
-              </Stack>
-              <Stack direction="row" alignItems="center">
+                  external
+                />
+              </div>
+              <hr attr-role="divider" />
+              <div attr-role="block">
                 in block
-                <Link
-                  href={`${CKB_EXPLORER_URL}/block/${block.layer1.block}`}
-                  underline="none"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  display="flex"
-                  alignItems="center"
-                  color="secondary"
-                  ml={1}
-                >
+                <a href={`${CKB_EXPLORER_URL}/block/${block.layer1.block}`} target="_blank" rel="noopener noreferrer">
                   {formatInt(block.layer1.block)}
                   <OpenInNewIcon sx={{ fontSize: 16, ml: 0.5 }} />
-                </Link>
-              </Stack>
+                </a>
+              </div>
             </>
           )}
-        </Stack>
+        </div>
       ) : (
-        <Typography variant="body2">{t('pending')}</Typography>
+        t('pending')
       ),
     },
-    {
-      label: 'finalizeState',
-      value: (
-        <Typography variant="body2" sx={{ textTransform: 'capitalize' }}>
-          {t(block.finalizeState)}
-        </Typography>
-      ),
-    },
-    {
-      label: 'txCount',
-      value: <Typography variant="body2">{formatInt(block.txCount)}</Typography>,
-    },
-    {
-      label: 'aggregator',
-      value: <Typography variant="body2">{block.miner.hash}</Typography>,
-    },
-    {
-      label: 'size',
-      value: <Typography variant="body2">{new BigNumber(block.size || '0').toFormat() + ' bytes'}</Typography>,
-    },
-    {
-      label: 'gasUsed',
-      value: <Typography variant="body2">{new BigNumber(block.gas.used).toFormat()}</Typography>,
-    },
-    {
-      label: 'gasLimit',
-      value: <Typography variant="body2">{new BigNumber(block.gas.limit).toFormat()}</Typography>,
-    },
+    { label: 'finalizeState', value: <span className={styles.finalizeState}>{t(block.finalizeState)}</span> },
+    { label: 'txCount', value: formatInt(block.txCount) },
+    { label: 'aggregator', value: <span className={`${styles.aggregator} mono-font`}>{block.miner.hash}</span> },
+    { label: 'size', value: new BigNumber(block.size || '0').toFormat() + ' bytes' },
+    { label: 'gasUsed', value: new BigNumber(block.gas.used).toFormat() },
+    { label: 'gasLimit', value: new BigNumber(block.gas.limit).toFormat() },
     {
       label: 'parentHash',
       value: (
-        <Tooltip title={block.parentHash} placement="top">
-          <Typography
-            variant="body2"
-            overflow="hidden"
-            textOverflow="ellipsis"
-            sx={{ width: 'fit-content', maxWidth: '100%' }}
-          >
-            <NextLink href={`/block/${block.parentHash}`}>
-              <Link href={`/block/${block.parentHash}`} underline="none" color="secondary">
-                {block.parentHash}
-              </Link>
-            </NextLink>
-          </Typography>
-        </Tooltip>
+        <HashLink label={block.parentHash} href={`/block/${block.parentHash}`} style={{ wordBreak: 'break-all' }} />
       ),
     },
   ]
-  const title = `${t('block')} # ${formatInt(block.number)}`
+  const title = `${t('block')} #${block.number}`
   return (
     <>
       <SubpageHead subtitle={title} />
-      <Container sx={{ py: 6 }}>
+      <div className={`main-center ${styles.container}`}>
         <PageTitle>{title}</PageTitle>
-        <Stack spacing={2}>
-          <Paper>
-            <List sx={{ textTransform: 'capitalize' }}>
-              {fields.map(field => (
-                <ListItem key={field.label}>
-                  <ListItemText
-                    primary={t(field.label)}
-                    secondary={field.value}
-                    secondaryTypographyProps={{ component: 'div' }}
-                  />
-                </ListItem>
-              ))}
-            </List>
-          </Paper>
-          <Paper>
-            <Tabs value={tabs.indexOf(tab as string)} variant="scrollable" scrollButtons="auto">
-              {[t('transactionRecords'), t(`bridgedRecords`)].map((label, idx) => (
-                <Tab
-                  key={label}
-                  label={label}
-                  onClick={e => {
-                    e.stopPropagation()
-                    e.preventDefault()
-                    push(`/block/${block.hash}?tab=${tabs[idx]}`, undefined, { scroll: false })
-                  }}
-                />
-              ))}
-            </Tabs>
-            <Divider />
-            {tab === 'transactions' && block.txList ? <TxList transactions={block.txList} /> : null}
-            {tab === 'bridged' && block.bridgedRecordList ? (
-              <BridgedRecordList list={block.bridgedRecordList} showUser />
-            ) : null}
-          </Paper>
-        </Stack>
-        <Snackbar
-          open={isCopied}
-          onClose={() => setIsCopied(false)}
-          anchorOrigin={{
-            horizontal: 'center',
-            vertical: 'top',
-          }}
-          autoHideDuration={3000}
-          color="secondary"
-        >
-          <Alert severity="success" variant="filled">
-            {t(`blockHashCopied`, { ns: 'common' })}
-          </Alert>
-        </Snackbar>
-      </Container>
+        <InfoList
+          list={fields.map(field => ({ field: t(field.label), content: field.value }))}
+          style={{ marginBottom: '1rem' }}
+        />
+        <Paper>
+          <Tabs value={tabs.indexOf(tab as string)} variant="scrollable" scrollButtons="auto">
+            {[t('transactionRecords'), t(`bridgedRecords`)].map((label, idx) => (
+              <Tab
+                key={label}
+                label={label}
+                onClick={e => {
+                  e.stopPropagation()
+                  e.preventDefault()
+                  push(`/block/${block.hash}?tab=${tabs[idx]}`, undefined, { scroll: false })
+                }}
+              />
+            ))}
+          </Tabs>
+          <Divider />
+          {tab === 'transactions' && block.txList ? <TxList transactions={block.txList} /> : null}
+          {tab === 'bridged' && block.bridgedRecordList ? (
+            <BridgedRecordList list={block.bridgedRecordList} showUser />
+          ) : null}
+        </Paper>
+      </div>
     </>
   )
 }
