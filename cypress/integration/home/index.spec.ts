@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-context('Home Page', () => {
+context.skip('Home Page', () => {
   before(() => cy.visit('/en-US'))
 
   describe('general sets', () => {

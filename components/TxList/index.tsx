@@ -165,7 +165,7 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
                 <FilterIcon fontSize="inherit" />
               </IconButton>
             </th>
-            <th>{t('age')} </th>
+            <th>{t('age')}</th>
             <th>{t('from')}</th>
             <th>{t('to')}</th>
             <th>{`${t('value')} (CKB)`}</th>
@@ -229,7 +229,7 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
             })
           ) : (
             <tr>
-              <td colSpan={7} align="center">
+              <td colSpan={7} align="center" style={{ textAlign: 'center' }}>
                 {t(`no_records`)}
               </td>
             </tr>

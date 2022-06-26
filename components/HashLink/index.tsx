@@ -16,7 +16,7 @@ const HashLink: React.FC<HashLinkProps> = ({ label, href, external = false, styl
       title={label}
       className={`${styles.container} mono-font`}
       style={style}
-      target={external ? '_target' : '_self'}
+      target={external ? '_blank' : '_self'}
       rel="noopener noreferrer"
     >
       {external ? (

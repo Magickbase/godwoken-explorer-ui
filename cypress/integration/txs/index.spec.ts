@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-context('Transaction List Page', () => {
+context.skip('Transaction List Page', () => {
   describe('general sets', () => {
     let id: number
     before(() => {

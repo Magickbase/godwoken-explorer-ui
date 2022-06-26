@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-context('Footer', () => {
+context.skip('Footer', () => {
   before(() => cy.visit('/en-US'))
 
   it('should have three links', () => {

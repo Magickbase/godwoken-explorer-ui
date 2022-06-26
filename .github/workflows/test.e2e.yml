@@ -8,7 +8,6 @@ on:
 
 jobs:
   e2e_tests:
-    if: false
     runs-on: ubuntu-18.04
     steps:
       - name: Checkout
@@ -17,7 +16,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v2-beta
         with:
-          node-version: 12
+          node-version: 16
 
       - name: Cache node modules
         uses: actions/cache@v3
@@ -51,6 +50,7 @@ jobs:
       - name: Test
         run: npm run test:e2e
         env:
+          NEXT_PUBLIC_SERVER_ENDPOINT: ${{ secrets.NEXT_PUBLIC_SERVER_ENDPOINT }}
           NEXT_PUBLIC_SERVER_URL: ${{ secrets.NEXT_PUBLIC_SERVER_URL }}
           NEXT_PUBLIC_WS_URL: ${{ secrets.NEXT_PUBLIC_WS_URL }}
           NEXT_PUBLIC_CHAIN_TYPE: ${{ secrets.NEXT_PUBLIC_CHAIN_TYPE }}

@@ -113,12 +113,7 @@ const ContractEventListItem = ({
                     </Typography>
                   </Box>
                   {eventInput.type === 'address' ? (
-                    <TruncatedAddress
-                      address={item.parsedLog?.args[0]}
-                      leading={30}
-                      size="normal"
-                      sx={{ width: 'fit-content' }}
-                    />
+                    <TruncatedAddress address={item.parsedLog?.args[0]} leading={30} sx={{ width: 'fit-content' }} />
                   ) : (
                     <Typography fontSize={14} variant="body2" className="mono-font">
                       {item.data}
