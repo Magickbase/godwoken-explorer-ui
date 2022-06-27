@@ -32,7 +32,7 @@ function Logo(props: SvgIconProps) {
         component="span"
         fontFamily="DIN Pro"
         fontStyle="italic"
-        sx={{ fontSize: '12px', fontVariant: 'all-petite-caps' }}
+        sx={{ fontSize: { xs: '10px', md: '12px' }, fontVariant: 'all-petite-caps' }}
       >
         V{version}
       </Typography>
