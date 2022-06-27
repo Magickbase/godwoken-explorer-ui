@@ -49,7 +49,7 @@ const TransferList: React.FC<{
           <TableBody>
             {+list.totalCount ? (
               list.txs.map(item => (
-                <TableRow key={item.hash + item.from + item.to}>
+                <TableRow key={item.hash + item.logIndex}>
                   <TableCell>
                     <Stack direction="row" alignItems="center">
                       <TxStatusIcon status={item.status} isSuccess={item.isSuccess} />
@@ -135,6 +135,11 @@ const TransferList: React.FC<{
         </Table>
       </TableContainer>
       <Pagination total={+list.totalCount} page={+list.page} />
+      <Stack direction="row-reverse">
+        <Typography color="primary.light" variant="caption">
+          {t(`last-n-records`, { n: `100k` })}
+        </Typography>
+      </Stack>
     </Box>
   )
 }

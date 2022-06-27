@@ -29,6 +29,7 @@ import {
   PageNonPositiveException,
   PageSizeException,
   timeDistance,
+  validatePageQuery,
 } from 'utils'
 
 type ParsedBlockList = ReturnType<typeof getBlockListRes>
@@ -63,7 +64,7 @@ const BlockList = (initState: State) => {
                     from: blockList.blocks[blockList.blocks.length - 1].number,
                   })}
                 </Typography>
-                <Pagination total={blockList.totalPage * 10} page={blockList.page} pageSize={pageSize} />
+                <Pagination total={blockList.totalPage * pageSize} page={blockList.page} pageSize={pageSize} />
               </Stack>
             ) : null}
             <TableContainer>
@@ -125,7 +126,7 @@ const BlockList = (initState: State) => {
             </TableContainer>
             <Stack direction="row" justifyContent="space-between" alignItems="center">
               <PageSize pageSize={pageSize} />
-              <Pagination total={blockList.totalPage * pageSize} page={blockList.page} />
+              <Pagination total={blockList.totalPage * pageSize} page={blockList.page} pageSize={pageSize} />
             </Stack>
           </Box>
         </Paper>
@@ -138,13 +139,7 @@ export const getServerSideProps: GetServerSideProps<State> = async ({ locale, re
   const { page, page_size = SIZES[1] } = query
 
   try {
-    if (+page < 1) {
-      throw new PageNonPositiveException()
-    }
-
-    if (!SIZES.includes(page_size as string)) {
-      throw new PageSizeException()
-    }
+    validatePageQuery(page as string, { size: page_size as string, sizes: SIZES })
 
     const [blockList, lng] = await Promise.all([
       fetchBlockList({ page: page as string, page_size: page_size as string }),

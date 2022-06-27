@@ -19,10 +19,12 @@ import {
   Link,
 } from '@mui/material'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
+import BigNumber from 'bignumber.js'
 import SubpageHead from 'components/SubpageHead'
 import PageTitle from 'components/PageTitle'
 import ERC20TransferList from 'components/ERC20TransferList'
 import BridgedRecordList from 'components/BridgedRecordList'
+import TokenHolderList from 'components/TokenHolderList'
 import Address from 'components/AddressInHalfPanel'
 import {
   handleApiError,
@@ -32,22 +34,26 @@ import {
   getERC20TransferListRes,
   getBridgedRecordListRes,
   fetchBridgedRecordList,
+  getTokenHolderListRes,
+  fetchTokenHolderList,
 } from 'utils'
 import { PageNonPositiveException, PageOverflowException, TabNotFoundException } from 'utils/exceptions'
 import type { API } from 'utils/api/utils'
 
 type ParsedTransferList = ReturnType<typeof getERC20TransferListRes>
 type ParsedbridgedRecordList = ReturnType<typeof getBridgedRecordListRes>
+type ParsedTokenHolderList = ReturnType<typeof getTokenHolderListRes>
 
-const tabs = ['transfers', 'bridged']
+const tabs = ['transfers', 'bridged', 'holders']
 
 type Props = {
   token: API.Token.Parsed
   transferList?: ParsedTransferList
   bridgedRecordList?: ParsedbridgedRecordList
+  tokenHolderList?: ParsedTokenHolderList
 }
 
-const Token = ({ token, transferList, bridgedRecordList }: Props) => {
+const Token = ({ token, transferList, bridgedRecordList, tokenHolderList }: Props) => {
   const [t] = useTranslation('tokens')
   const {
     push,
@@ -58,7 +64,7 @@ const Token = ({ token, transferList, bridgedRecordList }: Props) => {
     { label: 'type', value: <Typography variant="body2">{t(token.type)}</Typography> },
     {
       label: 'contract',
-      value: token.shortAddress ? <Address address={token.shortAddress} /> : <Typography variant="body2">-</Typography>,
+      value: token.address ? <Address address={token.address} /> : <Typography variant="body2">-</Typography>,
     },
     // {
     //   label: 'layer1Lock',
@@ -101,7 +107,7 @@ const Token = ({ token, transferList, bridgedRecordList }: Props) => {
   const tokenData = [
     {
       label: token.type === 'bridge' ? 'circulatingSupply' : 'totalSupply',
-      value: <Typography variant="body2">{token.supply || '-'}</Typography>,
+      value: <Typography variant="body2">{token.supply ? new BigNumber(token.supply).toFormat() : '-'}</Typography>,
     },
     // {label: 'value', value: token.supply ?? '-'},
     { label: 'holderCount', value: <Typography variant="body2">{token.holderCount || '-'}</Typography> },
@@ -137,7 +143,11 @@ const Token = ({ token, transferList, bridgedRecordList }: Props) => {
                   <Divider variant="middle" />
                   {tokenInfo.map(field => (
                     <ListItem key={field.label}>
-                      <ListItemText primary={t(field.label)} secondary={field.value} />
+                      <ListItemText
+                        primary={t(field.label)}
+                        secondary={field.value}
+                        secondaryTypographyProps={{ component: 'div' }}
+                      />
                     </ListItem>
                   ))}
                 </List>
@@ -156,21 +166,22 @@ const Token = ({ token, transferList, bridgedRecordList }: Props) => {
           </Paper>
           <Paper>
             <Tabs value={tabs.indexOf(tab as string)} variant="scrollable" scrollButtons="auto">
-              {[t('transferRecords'), t(`bridgedRecords`)].map((label, idx) => (
+              {[t('transferRecords'), t(`bridgedRecords`), t(`tokenHolders`)].map((label, idx) => (
                 <Tab
                   key={label}
                   label={label}
                   onClick={e => {
                     e.stopPropagation()
                     e.preventDefault()
-                    push(`/token/${token.id}?tab=${tabs[idx]}`)
+                    push(`/token/${token.id}?tab=${tabs[idx]}`, undefined, { scroll: false })
                   }}
                 />
               ))}
             </Tabs>
             <Divider />
-            {tab === 'transfers' && transferList ? <ERC20TransferList list={transferList} /> : null}
-            {tab === 'bridged' && bridgedRecordList ? <BridgedRecordList list={bridgedRecordList} showUser /> : null}
+            {tab === tabs[0] && transferList ? <ERC20TransferList list={transferList} /> : null}
+            {tab === tabs[1] && bridgedRecordList ? <BridgedRecordList list={bridgedRecordList} showUser /> : null}
+            {tab === tabs[2] && tokenHolderList ? <TokenHolderList list={tokenHolderList} /> : null}
           </Paper>
         </Stack>
       </Container>
@@ -187,26 +198,23 @@ export const getServerSideProps: GetServerSideProps<Props, { id: string }> = asy
       throw new TabNotFoundException()
     }
 
-    // if (+page < 1) {
-    //   throw new PageNonPositiveException()
-    // }
-
     const [token, lng] = await Promise.all([
       fetchToken(id),
       serverSideTranslations(locale, ['common', 'tokens', 'list']),
     ])
-    // const q = { udt_address: token.shortAddress, }
-    // if (typeof page === 'string' && !Number.isNaN(+page)) {
-    //   q['page'] = page
-    // }
     const transferList =
-      tab === 'transfers' && token.shortAddress
-        ? await fetchERC20TransferList({ udt_address: token.shortAddress, page: page as string })
+      tab === tabs[0] && token.address
+        ? await fetchERC20TransferList({ udt_address: token.address, page: page as string })
         : null
 
     const bridgedRecordList =
-      tab === 'bridged' && token.id
+      tab === tabs[1] && token.id
         ? await fetchBridgedRecordList({ udt_id: token.id.toString(), page: page as string })
+        : null
+
+    const tokenHolderList =
+      tab === tabs[2] && token.id
+        ? await fetchTokenHolderList({ udt_id: token.id.toString(), page: page as string })
         : null
     // const totalPage = Math.ceil(+transferListRes.totalCount / 10)
     // if (totalPage < +page) {
@@ -218,6 +226,7 @@ export const getServerSideProps: GetServerSideProps<Props, { id: string }> = asy
         token,
         transferList,
         bridgedRecordList,
+        tokenHolderList,
         ...lng,
       },
     }

@@ -1,4 +1,4 @@
-import { API, SERVER_URL, pretreat } from './utils'
+import { API, API_ENDPOINT, pretreat } from './utils'
 
 export const getTokenListRes = (tokenListRes: API.Tokens.Raw): API.Tokens.Parsed => ({
   meta: {
@@ -7,12 +7,21 @@ export const getTokenListRes = (tokenListRes: API.Tokens.Raw): API.Tokens.Parsed
   },
   tokens: tokenListRes.data.map(
     ({
-      attributes: { official_site, script_hash, type_script, transfer_count, short_address, holder_count, ...attrs },
+      attributes: {
+        official_site,
+        script_hash,
+        type_script,
+        transfer_count,
+        short_address,
+        eth_address,
+        holder_count,
+        ...attrs
+      },
     }) => ({
       officialSite: official_site,
       scriptHash: script_hash,
       transferCount: transfer_count,
-      shortAddress: short_address,
+      address: eth_address || short_address || null,
       holderCount: holder_count,
       typeScript: type_script,
       ...attrs,
@@ -22,6 +31,6 @@ export const getTokenListRes = (tokenListRes: API.Tokens.Raw): API.Tokens.Parsed
 export const fetchTokenList = (
   query: Partial<Record<'page' | 'type' | 'account_id', string>>,
 ): Promise<API.Tokens.Parsed> =>
-  fetch(`${SERVER_URL}/udts?${new URLSearchParams({ ...query, page: query.page || '1' })}`)
+  fetch(`${API_ENDPOINT}/udts?${new URLSearchParams({ ...query, page: query.page || '1' })}`)
     .then(res => pretreat<API.Tokens.Raw>(res))
     .then(getTokenListRes)

@@ -1,4 +1,5 @@
 import type { API } from 'utils/api/utils'
+import type { Cache } from 'pages/api/cache'
 import { useState } from 'react'
 import { GetServerSideProps } from 'next'
 import NextLink from 'next/link'
@@ -31,8 +32,8 @@ import {
 } from '@mui/icons-material'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { timeDistance, fetchHome, handleApiError, useWS, CHANNEL, getHomeRes, formatInt } from 'utils'
 import { Typography } from '@mui/material'
+import { timeDistance, handleApiError, useWS, getHomeRes, formatInt, CHANNEL } from 'utils'
 
 type State = API.Home.Parsed
 
@@ -45,24 +46,26 @@ const formatAddress = (addr: string) => {
 
 const statisticGroups = [
   { key: 'blockHeight', icon: <BlockHeightIcon />, prefix: '# ' },
+  { key: 'averageBlockTime', icon: <BlockHeightIcon />, suffix: ' s ' },
   { key: 'txCount', icon: <TxCountIcon /> },
   { key: 'tps', icon: <TpsIcon />, suffix: ' txs/s' },
   { key: 'accountCount', icon: <AccountCountIcon /> },
 ]
 
-const Statistic = ({ blockCount, txCount, tps, accountCount }: State['statistic']) => {
+const Statistic = ({ blockCount, txCount, tps, accountCount, averageBlockTime }: State['statistic']) => {
   const [t] = useTranslation('statistic')
   const stats = {
     blockHeight: +blockCount ? (+blockCount - 1).toLocaleString('en') : '-',
     txCount: (+txCount).toLocaleString('en'),
     tps: (+tps).toLocaleString('en'),
     accountCount: (+accountCount).toLocaleString('en'),
+    averageBlockTime,
   }
 
   return (
     <Grid container spacing={2}>
       {statisticGroups.map(field => (
-        <Grid item key={field.key} xs={6} md={3}>
+        <Grid item key={field.key} xs={6} md={12 / statisticGroups.length}>
           <Paper sx={{ bgcolor: 'primary.light', color: 'white', p: 5, textAlign: 'center' }}>
             <Stack direction="row" display="flex" alignItems="center" justifyContent="center">
               {field.icon}
@@ -147,6 +150,7 @@ const BlockList = ({ list }: { list: State['blockList'] }) => {
                   </Stack>
                 </Stack>
               }
+              primaryTypographyProps={{ component: 'div' }}
             />
           </ListItem>
         </Box>
@@ -160,8 +164,20 @@ const TxList = ({ list }: { list: State['txList'] }) => {
   return (
     <List
       subheader={
-        <ListSubheader component="div" sx={{ textTransform: 'capitalize', bgcolor: 'transparent' }}>
+        <ListSubheader
+          component="div"
+          sx={{ textTransform: 'capitalize', bgcolor: 'transparent', display: 'flex', justifyContent: 'space-between' }}
+        >
           {t(`latestTxs`)}
+          <Tooltip placement="top" title={t(`view_all_transactions`, { ns: 'common' })}>
+            <Box>
+              <NextLink href={`/txs`}>
+                <IconButton>
+                  <ReadMoreIcon />
+                </IconButton>
+              </NextLink>
+            </Box>
+          </Tooltip>
         </ListSubheader>
       }
       dense
@@ -247,7 +263,7 @@ const TxList = ({ list }: { list: State['txList'] }) => {
                     alignItems="end"
                   >
                     <Chip
-                      label={tx.type}
+                      label={tx.type.replace(/_/g, ' ')}
                       color="primary"
                       variant="outlined"
                       size="small"
@@ -257,6 +273,7 @@ const TxList = ({ list }: { list: State['txList'] }) => {
                   </Stack>
                 </Stack>
               }
+              primaryTypographyProps={{ component: 'div' }}
             />
           </ListItem>
         </Box>
@@ -298,9 +315,11 @@ const Home = (initState: State) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<State> = async ({ res, locale }) => {
+export const getServerSideProps: GetServerSideProps<State> = async ({ req, res, locale }) => {
   try {
-    const home = await fetchHome()
+    const home = await fetch(`http://${req.headers.host}/api/cache`)
+      .then(res => res.json())
+      .then((res: Cache) => res.home)
     const lng = await serverSideTranslations(locale, ['common', 'block', 'tx', 'statistic'])
     return { props: { ...home, ...lng } }
   } catch (err) {

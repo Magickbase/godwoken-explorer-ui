@@ -1,12 +1,21 @@
-import { NotFoundException } from '../exceptions'
-export { SERVER_URL, NODE_URL } from '../constants'
+import { GwHashException, NotFoundException } from '../exceptions'
+export { API_ENDPOINT, NODE_URL } from '../constants'
 export enum HttpStatus {
   NotFound = 404,
+}
+
+enum ServerErrorCode {
+  UseEthHash = '303',
 }
 
 export type ErrorResponse = {
   error_code?: number
   message?: string
+  errors?: {
+    detail: string
+    status: ServerErrorCode
+    title: string
+  }
 }
 
 export const isError = (res: any): res is ErrorResponse => {
@@ -28,7 +37,13 @@ export const pretreat = async <T>(res: Response) => {
   if (res.status === HttpStatus.NotFound) {
     throw new NotFoundException()
   }
+
   const parsed: T | ErrorResponse = await res.json()
+
+  if ('errors' in parsed && parsed.errors.status === ServerErrorCode.UseEthHash) {
+    throw new GwHashException(parsed.errors.detail)
+  }
+
   if (isError(parsed)) {
     return handleError(parsed)
   }
@@ -42,12 +57,12 @@ export namespace API {
     export interface Raw {
       block_list: Array<Record<'hash' | 'number' | 'tx_count', string> & { timestamp: Timestamp }>
       tx_list: Array<Tx>
-      statistic: Record<'block_count' | 'tx_count' | 'tps' | 'account_count', string>
+      statistic: Record<'block_count' | 'tx_count' | 'tps' | 'account_count', string> & { average_block_time: number }
     }
     export interface Parsed {
       blockList: Array<Record<'hash' | 'number' | 'txCount', string> & { timestamp: Timestamp }>
       txList: Array<Tx>
-      statistic: Record<'blockCount' | 'txCount' | 'tps' | 'accountCount', string>
+      statistic: Record<'blockCount' | 'txCount' | 'tps' | 'accountCount' | 'averageBlockTime', string>
     }
   }
 
@@ -118,7 +133,7 @@ export namespace API {
     }
     export type RawScript = Record<'args' | 'code_hash' | 'hash_type' | 'name', string>
     export type ParsedScript = Record<'args' | 'codeHash' | 'hashType' | 'name', string>
-    export type Raw = Record<'id' | 'type' | 'ckb' | 'eth' | 'tx_count' | 'eth_addr', string> &
+    export type Raw = Record<'id' | 'type' | 'ckb' | 'tx_count' | 'eth_addr', string> &
       Partial<{
         meta_contract: {
           status: 'running' | 'halting'
@@ -147,12 +162,13 @@ export namespace API {
           compiler_version?: string
           constructor_arguments?: string
           contract_source_code?: string
+          creator_address?: string
           deployment_tx_hash?: string
           name?: string
           other_info?: string
         }
       }>
-    export type Parsed = Record<'id' | 'type' | 'ckb' | 'eth' | 'txCount' | 'ethAddr', string> &
+    export type Parsed = Record<'id' | 'type' | 'ckb' | 'txCount' | 'ethAddr', string> &
       Partial<{
         metaContract: {
           status: 'running' | 'halting'
@@ -178,6 +194,7 @@ export namespace API {
           compilerVersion: string
           constructorArguments: string
           contractSourceCode: string
+          creatorAddress: string
           deploymentTxHash: string
           name: string
           otherInfo: string
@@ -226,6 +243,7 @@ export namespace API {
         official_site: string | null
         script_hash: string
         short_address: string
+        eth_address: string
         supply: string | null
         symbol: string
         transfer_count: number
@@ -246,7 +264,7 @@ export namespace API {
       name: string
       officialSite: string | null
       scriptHash: string
-      shortAddress: string
+      address: string
       supply: string | null
       symbol: string
       transferCount: number
@@ -276,6 +294,7 @@ export namespace API {
           official_site: string | null
           script_hash: string
           short_address: string | null
+          eth_address: string | null
           supply: string | null
           symbol: string
           transfer_count: number
@@ -300,16 +319,16 @@ export namespace API {
       name: string
       officialSite: string | null
       scriptHash: string
-      shortAddress: string | null
+      address: string | null
       supply: string | null
       symbol: string
       transferCount: number
       type: 'bridge' | 'native'
-      typeScript: {
-        args: string
-        codeHash: string
-        hashType: 'data' | 'type'
-      }
+      // typeScript: {
+      //   args: string
+      //   codeHash: string
+      //   hashType: 'data' | 'type'
+      // }
       value: string | null
     }
   }

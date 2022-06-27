@@ -4,7 +4,7 @@ import Address from 'components/TruncatedAddress'
 const AddressInHalfPanel = ({ address, alias }: { address: string; alias?: string }) => {
   const text = alias || address
   return (
-    <Typography variant="body2">
+    <Typography variant="body2" component="div">
       <NextLink href={`/account/${address}`}>
         <Link
           href={`/account/${address}`}

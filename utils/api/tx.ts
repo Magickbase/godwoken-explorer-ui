@@ -1,4 +1,4 @@
-import { SERVER_URL, pretreat } from './utils'
+import { API_ENDPOINT, pretreat } from './utils'
 export type TxStatus = 'pending' | 'committed' | 'finalized'
 type HashType = 'type' | 'data'
 export type TxType = 'polyjuice_creator' | 'polyjuice'
@@ -6,6 +6,7 @@ export type TxType = 'polyjuice_creator' | 'polyjuice'
 interface Raw {
   block_hash?: string
   block_number?: number
+  transaction_index?: number
   gas_limit: number
   gas_price: string
   gas_used: number
@@ -34,11 +35,13 @@ interface Raw {
   /* polyjuice */
   contract_abi?: []
   input?: string
+  created_contract_address_hash?: string
 }
 
 interface Parsed {
   blockHash: string | null
   blockNumber: number | null
+  index: number | null
   gasLimit: number | null
   gasPrice: string
   gasUsed: number | null
@@ -66,18 +69,20 @@ interface Parsed {
   /* polyjuice */
   contractAbi: [] | null
   input: string | null
+  contractAddress: string | null
 }
 
 export const getTxRes = (tx: Raw): Parsed => ({
   blockHash: tx.block_hash ?? null,
   blockNumber: tx.block_number ?? null,
+  index: tx.transaction_index ?? null,
   gasLimit: tx.gas_limit ?? null,
   gasPrice: tx.gas_price,
   gasUsed: tx.gas_used ?? null,
   hash: tx.hash,
   nonce: tx.nonce,
   status: tx.status ?? 'pending',
-  polyjuiceStatus: tx.polyjuice_status ?? 'pending',
+  polyjuiceStatus: tx.polyjuice_status ?? 'succeed',
   timestamp: tx.timestamp ? tx.timestamp * 1000 : -1,
   from: tx.from,
   to: tx.to,
@@ -94,11 +99,12 @@ export const getTxRes = (tx: Raw): Parsed => ({
   hashType: tx.hash_type ?? null,
   scriptArgs: tx.script_args ?? null,
   contractAbi: tx.contract_abi ?? null,
+  contractAddress: tx.created_contract_address_hash ?? null,
   l1BlockNumber: tx.l1_block_number ?? null,
   input: tx.input,
 })
 
 export const fetchTx = (hash: string): Promise<Parsed> =>
-  fetch(`${SERVER_URL}/txs/${hash}`)
+  fetch(`${API_ENDPOINT}/txs/${hash}`)
     .then(res => pretreat<Raw>(res))
     .then(getTxRes)

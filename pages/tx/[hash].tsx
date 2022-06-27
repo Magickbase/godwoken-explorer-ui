@@ -40,29 +40,31 @@ import BigNumber from 'bignumber.js'
 import SubpageHead from 'components/SubpageHead'
 import PageTitle from 'components/PageTitle'
 import Address from 'components/AddressInHalfPanel'
-import SimpleERC20TransferList from 'components/SimpleERC20TransferList'
+import TransferList, { fetchTransferList, TransferListProps } from 'components/SimpleERC20TransferList'
+import TxLogsList from 'components/TxLogsList'
 import {
   formatDatetime,
   fetchTx,
   handleApiError,
   useWS,
   getTxRes,
-  CKB_EXPLORER_URL,
-  CHANNEL,
   formatInt,
   handleCopy,
-  CKB_DECIMAL,
   TabNotFoundException,
-  fetchERC20TransferList,
-  getERC20TransferListRes,
+  ParsedEventLog,
+  fetchEventLogsListByType,
+  CKB_EXPLORER_URL,
+  CHANNEL,
+  CKB_DECIMAL,
+  GCKB_DECIMAL,
 } from 'utils'
 
-const tabs = ['erc20']
-type ParsedTransferList = ReturnType<typeof getERC20TransferListRes>
 type RawTx = Parameters<typeof getTxRes>[0]
 type ParsedTx = ReturnType<typeof getTxRes>
 
-type State = ParsedTx & Partial<{ transferList: ParsedTransferList }>
+const tabs = ['erc20', 'logs']
+type State = ParsedTx & Partial<{ transferList: TransferListProps['token_transfers']; logsList: ParsedEventLog[] }>
+const ADDR_LENGTH = 42
 
 const Tx = (initState: State) => {
   const [tx, setTx] = useState(initState)
@@ -70,7 +72,7 @@ const Tx = (initState: State) => {
   const [isCopied, setIsCopied] = useState(false)
   const {
     push,
-    query: { tab = tabs[0] },
+    query: { tab = 'erc20' },
   } = useRouter()
   const [t] = useTranslation('tx')
 
@@ -172,9 +174,21 @@ const Tx = (initState: State) => {
       label: tx.toAlias ? 'interactedContract' : 'to',
       value: <Address address={tx.to} alias={tx.toAlias} />,
     },
+    tx.contractAddress?.length === ADDR_LENGTH
+      ? {
+          label: 'deployed_contract',
+          value: <Address address={tx.contractAddress} alias={tx.contractAddress} />,
+        }
+      : null,
     {
       label: 'value',
-      value: <Typography variant="body2">{`${new BigNumber(tx.value || '0').toFormat()} CKB`}</Typography>,
+      // FIXME: tx.value is formatted incorrectly
+      value: (
+        <Typography variant="body2">{`${new BigNumber(tx.value || '0')
+          .multipliedBy(CKB_DECIMAL)
+          .dividedBy(GCKB_DECIMAL)
+          .toFormat()} CKB`}</Typography>
+      ),
     },
   ]
   const basicInfo = [
@@ -190,7 +204,14 @@ const Tx = (initState: State) => {
             ),
         },
     { label: 'finalizeState', value: <Typography variant="body2">{t(tx.status)}</Typography> },
-    { label: 'type', value: <Typography variant="body2">{tx.type.replace(/_/g, ' ')}</Typography> },
+    {
+      label: 'type',
+      value: (
+        <Typography variant="body2" sx={{ textTransform: 'capitalize' }}>
+          {tx.type.replace(/_/g, ' ')}
+        </Typography>
+      ),
+    },
     {
       label: 'l1Block',
       value: tx.l1BlockNumber ? (
@@ -224,28 +245,25 @@ const Tx = (initState: State) => {
         <Typography variant="body2">{t('pending')}</Typography>
       ),
     },
+    tx.index !== null ? { label: 'index', value: <Typography variant="body2">{tx.index}</Typography> } : null,
     { label: 'nonce', value: <Typography variant="body2">{Number(tx.nonce).toLocaleString('en')}</Typography> },
 
     tx.gasPrice
       ? {
           label: 'gasPrice',
-          value: (
-            <Typography variant="body2">
-              {new BigNumber(tx.gasPrice).dividedBy(new BigNumber(CKB_DECIMAL)).toFormat() + ' CKB'}
-            </Typography>
-          ),
+          value: <Typography variant="body2">{new BigNumber(tx.gasPrice).toFormat() + ' CKB'}</Typography>,
         }
       : null,
     tx.gasUsed
       ? {
           label: 'gasUsed',
-          value: <Typography variant="body2">{Number(tx.gasUsed).toLocaleString('en')}</Typography>,
+          value: <Typography variant="body2">{new BigNumber(tx.gasUsed).toFormat()}</Typography>,
         }
       : null,
     tx.gasLimit
       ? {
           label: 'gasLimit',
-          value: <Typography variant="body2">{Number(tx.gasLimit).toLocaleString('en')}</Typography>,
+          value: <Typography variant="body2">{new BigNumber(tx.gasLimit).toFormat()}</Typography>,
         }
       : null,
     tx.gasUsed && tx.gasPrice
@@ -253,10 +271,7 @@ const Tx = (initState: State) => {
           label: 'fee',
           value: (
             <Typography variant="body2">
-              {new BigNumber(tx.gasUsed)
-                .times(new BigNumber(tx.gasPrice))
-                .dividedBy(new BigNumber(CKB_DECIMAL))
-                .toFormat() + ' CKB'}
+              {new BigNumber(tx.gasUsed).times(new BigNumber(tx.gasPrice)).toFormat() + ' CKB'}
             </Typography>
           ),
         }
@@ -294,7 +309,11 @@ const Tx = (initState: State) => {
                   {overview.map(field =>
                     field ? (
                       <ListItem key={field.label}>
-                        <ListItemText primary={t(field.label)} secondary={field.value} />
+                        <ListItemText
+                          primary={t(field.label)}
+                          secondary={field.value}
+                          secondaryTypographyProps={{ component: 'div' }}
+                        />
                       </ListItem>
                     ) : null,
                   )}
@@ -370,7 +389,11 @@ const Tx = (initState: State) => {
                     .map(field =>
                       field ? (
                         <ListItem key={field.label}>
-                          <ListItemText primary={t(field.label)} secondary={field.value} />
+                          <ListItemText
+                            primary={t(field.label)}
+                            secondary={field.value}
+                            secondaryTypographyProps={{ component: 'div' }}
+                          />
                         </ListItem>
                       ) : null,
                     )}
@@ -380,22 +403,23 @@ const Tx = (initState: State) => {
           </Paper>
           <Paper>
             <Tabs value={tabs.indexOf(tab as string)} variant="scrollable" scrollButtons="auto">
-              {['erc20_records'].map((label, idx) => (
+              {['erc20_records', 'logs'].map((label, idx) => (
                 <Tab
                   key={label}
                   label={t(label)}
                   onClick={e => {
                     e.stopPropagation()
                     e.preventDefault()
-                    push(`/tx/${tx.hash}?tab=${tab[idx]}`)
+                    push(`/tx/${tx.hash}?tab=${tabs[idx]}`, undefined, { scroll: false })
                   }}
                 />
               ))}
             </Tabs>
             <Divider />
-            {tab === tabs[0] && initState.transferList ? (
-              <SimpleERC20TransferList list={initState.transferList} />
+            {tab === 'erc20' && initState.transferList ? (
+              <TransferList token_transfers={initState.transferList} />
             ) : null}
+            {tab === 'logs' && <TxLogsList list={initState.logsList} />}
           </Paper>
         </Stack>
         <Snackbar
@@ -424,7 +448,7 @@ export const getServerSideProps: GetServerSideProps<State, { hash: string }> = a
   query,
 }) => {
   const { hash } = params
-  const { tab = tabs[0] } = query
+  const { tab = tabs[0], before = null, after = null, address_from = null, address_to = null } = query
 
   try {
     if (typeof tab !== 'string' || !tabs.includes(tab)) {
@@ -432,8 +456,18 @@ export const getServerSideProps: GetServerSideProps<State, { hash: string }> = a
     }
     const [tx, lng] = await Promise.all([fetchTx(hash), await serverSideTranslations(locale, ['common', 'tx', 'list'])])
     const transferList =
-      tab === tabs[0] ? await fetchERC20TransferList({ tx_hash: hash, page: query.page as string }) : null
-    return { props: { ...tx, ...lng, transferList } }
+      tab === 'erc20'
+        ? await fetchTransferList({
+            transaction_hash: hash,
+            before: before as string | null,
+            after: after as string | null,
+            from_address: address_from as string | null,
+            to_address: address_to as string | null,
+            combine_from_to: false,
+          })
+        : null
+    const logsList = tab === 'logs' ? await fetchEventLogsListByType('txs', hash) : null
+    return { props: { ...tx, ...lng, transferList, logsList } }
   } catch (err) {
     switch (true) {
       case err instanceof TabNotFoundException: {

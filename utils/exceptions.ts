@@ -33,3 +33,11 @@ export class TabNotFoundException extends Error {
     super()
   }
 }
+
+export class GwHashException extends Error {
+  constructor(ethHash: string) {
+    super(
+      `You're visiting a polyjuice transaction with a gw_hash which is just for developers, please use an eth_hash(${ethHash}) instead`,
+    )
+  }
+}

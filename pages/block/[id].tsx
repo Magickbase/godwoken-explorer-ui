@@ -24,7 +24,7 @@ import {
 import { OpenInNew as OpenInNewIcon, ContentCopyOutlined as CopyIcon } from '@mui/icons-material'
 import BigNumber from 'bignumber.js'
 import SubpageHead from 'components/SubpageHead'
-import TxList from 'components/TxList'
+import TxList, { TxListProps, fetchTxList } from 'components/TxList'
 import BridgedRecordList from 'components/BridgedRecordList'
 import PageTitle from 'components/PageTitle'
 import {
@@ -36,8 +36,6 @@ import {
   CKB_EXPLORER_URL,
   CHANNEL,
   formatInt,
-  fetchTxList,
-  getTxListRes,
   fetchBridgedRecordList,
   getBridgedRecordListRes,
   handleCopy,
@@ -46,12 +44,11 @@ import {
 
 type RawBlock = Parameters<typeof getBlockRes>[0]
 type ParsedBlock = ReturnType<typeof getBlockRes>
-type ParsedTxList = ReturnType<typeof getTxListRes>
 type ParsedBridgedRecordList = ReturnType<typeof getBridgedRecordListRes>
 
 const tabs = ['transactions', 'bridged']
 
-type State = ParsedBlock & Partial<{ txList: ParsedTxList; bridgedRecordList: ParsedBridgedRecordList }>
+type State = ParsedBlock & Partial<{ txList: TxListProps['transactions']; bridgedRecordList: ParsedBridgedRecordList }>
 
 const Block = (initState: State) => {
   const [block, setBlock] = useState(initState)
@@ -265,7 +262,11 @@ const Block = (initState: State) => {
             <List sx={{ textTransform: 'capitalize' }}>
               {fields.map(field => (
                 <ListItem key={field.label}>
-                  <ListItemText primary={t(field.label)} secondary={field.value} />
+                  <ListItemText
+                    primary={t(field.label)}
+                    secondary={field.value}
+                    secondaryTypographyProps={{ component: 'div' }}
+                  />
                 </ListItem>
               ))}
             </List>
@@ -279,13 +280,13 @@ const Block = (initState: State) => {
                   onClick={e => {
                     e.stopPropagation()
                     e.preventDefault()
-                    push(`/block/${block.hash}?tab=${tabs[idx]}`)
+                    push(`/block/${block.hash}?tab=${tabs[idx]}`, undefined, { scroll: false })
                   }}
                 />
               ))}
             </Tabs>
             <Divider />
-            {tab === 'transactions' && block.txList ? <TxList list={block.txList} /> : null}
+            {tab === 'transactions' && block.txList ? <TxList transactions={block.txList} /> : null}
             {tab === 'bridged' && block.bridgedRecordList ? (
               <BridgedRecordList list={block.bridgedRecordList} showUser />
             ) : null}
@@ -312,7 +313,7 @@ const Block = (initState: State) => {
 
 export const getServerSideProps: GetServerSideProps<State> = async ({ locale, res, params, query }) => {
   const { id } = params
-  const { tab = tabs[0] } = query
+  const { tab = tabs[0], before = null, after = null } = query
   try {
     if (typeof tab !== 'string' || !tabs.includes(tab)) {
       throw new TabNotFoundException()
@@ -325,7 +326,12 @@ export const getServerSideProps: GetServerSideProps<State> = async ({ locale, re
 
     const txList =
       tab === 'transactions' && block.hash
-        ? await fetchTxList({ block_hash: block.hash, page: query.page as string })
+        ? await fetchTxList({
+            start_block_number: block.number,
+            end_block_number: block.number,
+            before: before as string | null,
+            after: after as string | null,
+          })
         : null
 
     const bridgedRecordList =

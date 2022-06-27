@@ -4,6 +4,7 @@
 /node_modules
 /.pnp
 .pnp.js
+.npmrc
 
 # testing
 /coverage
@@ -14,6 +15,8 @@
 
 # production
 /build
+/public/sw.js
+/public/workbox-*.js
 
 # misc
 .DS_Store

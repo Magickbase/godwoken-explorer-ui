@@ -12,6 +12,7 @@
   "value": "value",
   "l1Block": "l1 block",
   "l2Block": "l2 block",
+  "index": "index",
   "input": "input",
   "args": "args",
   "gasPrice": "gas price",
@@ -38,5 +39,14 @@
   "rawInput": "Raw",
   "decodedInput": "Decoded",
   "utf8Input": "UTF8",
-  "erc20_records": "ERC20 Transfers"
+  "erc20_records": "ERC20 Transfers",
+  "deployed_contract": "Deployed Contract",
+  "logs": "Logs",
+  "txReceiptEventLogs": "Transaction Receipt Event Logs",
+  "noLogs": "No logs from this transaction",
+  "address": "Address",
+  "name": "Name",
+  "viewSource": "View Source",
+  "topics": "Topics",
+  "data": "Data"
 }

@@ -3,11 +3,12 @@
   "basicInfo": "Basic Info",
   "account": "account",
   "accountType": {
-    "user": "User Account",
-    "smartContract": "Contract Account",
-    "sudt": "Bridged Token Account",
-    "polyjuice": "Polyjuice Account",
-    "metaContract": "Meta Contract Account"
+    "ETH_USER": "User Account",
+    "POLYJUICE_CONTRACT": "Contract Account",
+    "UDT": "Bridged Token Account",
+    "POLYJUICE_CREATOR": "Polyjuice Creator Account",
+    "META_CONTRACT": "Meta Contract Account",
+    "ETH_ADDR_REG": "Eth Addr Reg"
   },
   "id": "account id",
   "nonce": "nonce",
@@ -17,7 +18,7 @@
   "ckbBalance": "CKB Balance",
   "ethBalance": "ETH Balance",
   "txCount": "transaction count",
-  "userDefinedAssets": "User Defined Asset(s)",
+  "userDefinedAssets": "User Defined Assets",
   "ethAddr": "ethereum address",
   "ckbAddr": "CKB address",
   "ckbLockHash": "CKB lock hash",
@@ -46,6 +47,7 @@
   "halting": "halting",
   "emptyAssetList": "No assets found",
   "l2ScriptHash": "l2 script hash",
+  "l2Script": "l2 script",
   "asset": "asset",
   "assetType": "asset type",
   "balance": "balance",
@@ -60,6 +62,7 @@
   "contract_source_code": "Contract Source Code",
   "abi": "ABI",
   "constructor_arguments": "Constructor Arguments",
+  "deployer": "Deployer",
   "deployment_transaction_hash": "Deployment Transaction Hash",
   "code": "Code",
   "read_contract": "Read Contract",
@@ -67,5 +70,7 @@
   "contract": "Contract",
   "parameters": "Parameters",
   "response": "Response",
-  "query": "Query"
+  "query": "Query",
+  "events": "Events",
+  "token": "Token"
 }

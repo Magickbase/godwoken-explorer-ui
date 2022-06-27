@@ -1,21 +1,51 @@
 import { useTranslation } from 'next-i18next'
+import NextLink from 'next/link'
+import { gql } from 'graphql-request'
 import {
   Avatar,
   Box,
   Stack,
+  Link,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
 } from '@mui/material'
-import { formatBalance, nameToColor } from 'utils'
-import type { API } from 'utils/api/utils'
+import { client, formatAmount, nameToColor, GraphQLSchema } from 'utils'
 
-// balance, decimal, icon, id, name, type
-const AssetList = ({ list = [] }: { list: Array<API.Account.UDT> }) => {
+export type UdtList = Array<{
+  balance: string
+  udt: Pick<GraphQLSchema.Udt, 'id' | 'type' | 'name' | 'decimal' | 'icon' | 'symbol'>
+}>
+
+const udtListQuery = gql`
+  query ($address_hashes: [String], $script_hashes: [String]) {
+    account_udts(input: { address_hashes: $address_hashes, script_hashes: $script_hashes }) {
+      balance
+      udt {
+        id
+        type
+        name
+        icon
+        decimal
+        symbol
+      }
+    }
+  }
+`
+type EthAccountUdtListVariables = Record<'address_hashes', Array<string>>
+type GwAccountUdtListVariables = Record<'script_hashes', Array<string>>
+type Variables = EthAccountUdtListVariables | GwAccountUdtListVariables
+
+const CKB_UDT_ID = '1'
+export const fetchUdtList = (variables: Variables) =>
+  client
+    .request<{ account_udts: UdtList }>(udtListQuery, variables)
+    .then(data => data.account_udts.filter(u => u.udt.id !== CKB_UDT_ID))
+
+const AssetList = ({ list = [] }: { list: UdtList }) => {
   const [t] = useTranslation('account')
   return (
     <TableContainer sx={{ px: 1, py: 2 }}>
@@ -36,23 +66,28 @@ const AssetList = ({ list = [] }: { list: Array<API.Account.UDT> }) => {
         <TableBody>
           {list.length ? (
             list.map(item => (
-              <TableRow key={item.id}>
+              <TableRow key={item.udt.id}>
                 <TableCell>
                   <Stack direction="row" alignItems="center">
-                    <Avatar src={item.icon ?? null} sx={{ bgcolor: nameToColor(item.name) }}>
-                      {item.name?.[0] ?? '?'}
+                    <Avatar
+                      src={item.udt.icon}
+                      sx={{ bgcolor: nameToColor(item.udt.name), textTransform: 'capitalize' }}
+                    >
+                      {item.udt.name?.[0] ?? '?'}
                     </Avatar>
-                    <Typography variant="body2" ml={2}>
-                      {item.name}
-                    </Typography>
+                    <NextLink href={`/token/${item.udt.id}`}>
+                      <Link href={`/token/${item.udt.id}`} underline="none" color="secondary" ml={2}>
+                        {`${item.udt.name || '-'}${item.udt.symbol ? '(' + item.udt.symbol + ')' : ''}`}
+                      </Link>
+                    </NextLink>
                   </Stack>
                 </TableCell>
                 <TableCell sx={{ textTransform: 'capitalize', whiteSpace: 'nowrap' }}>
-                  {t(item.type === 'native' ? 'native' : 'bridged')}
+                  {t(item.udt.type === GraphQLSchema.UdtType.Native ? 'native' : 'bridged')}
                 </TableCell>
                 <TableCell align="right">
                   <Box overflow="hidden" textOverflow="ellipsis" maxWidth={{ xs: '30vw', sm: '100%' }} ml="auto">
-                    {`${formatBalance(item.balance)}`}
+                    {formatAmount(item.balance, item.udt)}
                   </Box>
                 </TableCell>
               </TableRow>

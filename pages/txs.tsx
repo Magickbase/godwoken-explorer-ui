@@ -2,25 +2,25 @@ import { useEffect, useState } from 'react'
 import { GetServerSideProps } from 'next'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { Container, Paper, Typography } from '@mui/material'
+import { Container, Paper, Typography, Box, Stack } from '@mui/material'
 import PageTitle from 'components/PageTitle'
-import TxListComp from 'components/TxList'
+import TxListComp, { TxListProps, fetchTxList } from 'components/TxList'
 import SubpageHead from 'components/SubpageHead'
-import { fetchTxList, getTxListRes, handleApiError } from 'utils'
+import Pagination from 'components/SimplePagination'
+import { SIZES } from 'components/PageSize'
+import { handleApiError, PageNonPositiveException, PageSizeException } from 'utils'
 
-// type RawTxList = Parameters<typeof getTxListRes>[0]
-type ParsedTxList = ReturnType<typeof getTxListRes>
-type State = { query: Record<string, string>; txList: ParsedTxList }
+type State = { txList: TxListProps['transactions']; pageSize: number }
 
 const TxList = (initState: State) => {
-  const [{ txList }, setTxList] = useState(initState)
-  const [txT] = useTranslation('tx')
+  const [{ txList, pageSize }, setList] = useState(initState)
+  const [t] = useTranslation('list')
 
   useEffect(() => {
-    setTxList(initState)
+    setList(initState)
   }, [initState])
 
-  const title = txT('txListTitle')
+  const title = t('tx_list_title')
 
   return (
     <>
@@ -30,14 +30,22 @@ const TxList = (initState: State) => {
           <Typography variant="inherit" display="inline" pr={1}>
             {title}
           </Typography>
-          {/* <NextLink href={`/account/${id}`}>
-          <Link href={`/account/${id}`} underline="none" color="secondary">
-            {id}
-          </Link>
-        </NextLink> */}
         </PageTitle>
         <Paper>
-          <TxListComp list={txList} />
+          <Box sx={{ px: 1, py: 2 }}>
+            {txList.entries.length >= 2 ? (
+              <Stack direction="row" justifyContent="sapce-between" alignItems="center">
+                <Typography variant="inherit" flex="1">
+                  {t(`tx_in_block_from_to`, {
+                    to: txList.entries[0].block.number,
+                    from: txList.entries[txList.entries.length - 1].block.number,
+                  })}
+                </Typography>
+                <Pagination {...txList.metadata} />
+              </Stack>
+            ) : null}
+            <TxListComp transactions={txList} maxCount="500k" pageSize={pageSize} />
+          </Box>
         </Paper>
       </Container>
     </>
@@ -45,16 +53,31 @@ const TxList = (initState: State) => {
 }
 
 export const getServerSideProps: GetServerSideProps<State> = async ({ locale, res, query }) => {
-  return {
-    notFound: true,
+  const { page_size = SIZES[1], before = null, after = null } = query
+
+  try {
+    const pageSize = Number.isNaN(+page_size) ? +SIZES[1] : +page_size
+    const [txList, lng] = await Promise.all([
+      fetchTxList({ limit: pageSize as number, before: before as string | null, after: after as string | null }),
+      serverSideTranslations(locale, ['common', 'list']),
+    ])
+    return { props: { ...lng, txList, pageSize } }
+  } catch (err) {
+    switch (true) {
+      case err instanceof PageNonPositiveException:
+      case err instanceof PageSizeException: {
+        return {
+          redirect: {
+            destination: `/${locale}/txs`,
+            permanent: false,
+          },
+        }
+      }
+      default: {
+        return handleApiError(err, res, locale)
+      }
+    }
   }
-  // try {
-  //   const txList = await fetchTxList(query)
-  //   const lng = await serverSideTranslations(locale, ['common', 'tx', 'list'])
-  //   return { props: { query: query as Record<string, string>, txList, ...lng } }
-  // } catch (err) {
-  //   return handleApiError(err, res, locale)
-  // }
 }
 
 export default TxList

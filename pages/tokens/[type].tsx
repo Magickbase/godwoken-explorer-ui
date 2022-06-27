@@ -18,10 +18,11 @@ import {
   TableCell,
   Typography,
 } from '@mui/material'
+import BigNumber from 'bignumber.js'
 import SubpageHead from 'components/SubpageHead'
 import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined'
 import Pagination from 'components/Pagination'
-import { fetchTokenList, handleApiError, formatInt, nameToColor } from 'utils'
+import { fetchTokenList, handleApiError, nameToColor, PAGE_SIZE } from 'utils'
 import { PageNonPositiveException, PageOverflowException, TypeNotFoundException } from 'utils/exceptions'
 import type { API } from 'utils/api/utils'
 
@@ -51,7 +52,6 @@ const TokenList = ({ meta, tokens, type }: State) => {
           <Stack direction="row" justifyContent="space-between" alignItems="center">
             <Typography fontWeight={600}>{title}</Typography>
             <Stack direction="row" alignItems="center">
-              <Typography>{t(`total-count-of-udt`, { total: (meta.total - 1) * 10 + tokens.length })}</Typography>
               <Tooltip title={t(type === 'bridge' ? 'add-bridged-token' : 'add-native-erc20-token')} placement="top">
                 <Link
                   href={type === 'bridge' ? BRIDGED_TOKEN_TEMPLATE_URL : NATIVE_TOKEN_TEMPLATE_URL}
@@ -120,7 +120,7 @@ const TokenList = ({ meta, tokens, type }: State) => {
                                 },
                               }}
                             >
-                              {token.shortAddress}
+                              {token.address}
                             </Typography>
                             <Typography
                               fontSize="inherit"
@@ -132,12 +132,12 @@ const TokenList = ({ meta, tokens, type }: State) => {
                                 },
                               }}
                             >
-                              {`${token.shortAddress.slice(0, 8)}...${token.shortAddress.slice(-8)}`}
+                              {`${token.address.slice(0, 8)}...${token.address.slice(-8)}`}
                             </Typography>
                           </Link>
                         </NextLink>
                       </TableCell>
-                      <TableCell>{formatInt(token.supply) || '-'}</TableCell>
+                      <TableCell>{new BigNumber(token.supply || '0').toFormat() || '-'}</TableCell>
                       <TableCell>{token.holderCount || '0'}</TableCell>
                     </TableRow>
                   ))
@@ -149,7 +149,7 @@ const TokenList = ({ meta, tokens, type }: State) => {
               </TableBody>
             </Table>
           </TableContainer>
-          <Pagination page={meta.current} total={meta.total * 10} />
+          <Pagination page={meta.current} total={meta.total * PAGE_SIZE} />
         </Paper>
       </Container>
     </>
