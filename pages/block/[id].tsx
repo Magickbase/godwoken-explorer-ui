@@ -3,7 +3,6 @@ import { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { OpenInNew as OpenInNewIcon } from '@mui/icons-material'
 import BigNumber from 'bignumber.js'
 import Tabs from 'components/Tabs'
 import SubpageHead from 'components/SubpageHead'
@@ -13,6 +12,7 @@ import BridgedRecordList from 'components/BridgedRecordList'
 import PageTitle from 'components/PageTitle'
 import HashLink from 'components/HashLink'
 import CopyBtn from 'components/CopyBtn'
+import OpenInNewIcon from 'assets/icons/open-in-new.svg'
 import {
   fetchBlock,
   handleApiError,
@@ -90,7 +90,7 @@ const Block = (initState: State) => {
                 区块
                 <a href={`${CKB_EXPLORER_URL}/block/${block.layer1.block}`} target="_blank" rel="noopener noreferrer">
                   {formatInt(block.layer1.block)}
-                  <OpenInNewIcon sx={{ fontSize: 16, ml: 0.5 }} />
+                  <OpenInNewIcon style={{ marginLeft: 8 }} />
                 </a>
                 中的
               </div>
@@ -119,7 +119,7 @@ const Block = (initState: State) => {
                 in block
                 <a href={`${CKB_EXPLORER_URL}/block/${block.layer1.block}`} target="_blank" rel="noopener noreferrer">
                   {formatInt(block.layer1.block)}
-                  <OpenInNewIcon sx={{ fontSize: 16, ml: 0.5 }} />
+                  <OpenInNewIcon style={{ marginLeft: 8 }} />
                 </a>
               </div>
             </>

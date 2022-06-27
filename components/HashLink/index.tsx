@@ -1,5 +1,5 @@
 import NextLink from 'next/link'
-import { OpenInNew as OpenInNewIcon } from '@mui/icons-material'
+import OpenInNewIcon from 'assets/icons/open-in-new.svg'
 import styles from './styles.module.scss'
 
 interface HashLinkProps {
@@ -23,7 +23,7 @@ const HashLink: React.FC<HashLinkProps> = ({ label, href, external = false, styl
         <>
           <span>{label}</span>
           <button>
-            <OpenInNewIcon sx={{ fontSize: 16, ml: 0.5 }} />
+            <OpenInNewIcon />
           </button>
         </>
       ) : (
