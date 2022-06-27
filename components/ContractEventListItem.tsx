@@ -54,6 +54,7 @@ const ContractEventListItem = ({
   const [dataFormat, setDataFormat] = useState<'hex' | 'decoded'>('hex')
   const [t] = useTranslation('list')
   const { name: eventName, inputs: eventInputs } = item.parsedLog?.eventFragment ?? { name: null, inputs: [] }
+  const indexedArgsCount = item.topics.reduce((sum, topic) => (topic !== '0x' ? sum + 1 : sum), 0)
 
   const handleExpand = () => {
     setExpanded(!expanded)
@@ -153,43 +154,53 @@ const ContractEventListItem = ({
                 }] ${topic}`}</Typography>
               ) : null,
             )}
-          <Stack direction="row" alignItems="center">
-            {item.parsedLog?.args[2].hex ? (
-              <>
-                <FormControl sx={{ my: 1, mr: 1 }} size="small">
-                  <Select
-                    value={dataFormat}
-                    onChange={handleToggleButton}
-                    size="small"
-                    sx={{ width: '64px' }}
-                    renderValue={(v: string) => (
-                      <Typography variant="body2">{v.charAt(0).toUpperCase() + v.slice(1, 3)}</Typography>
-                    )}
-                    input={<CustomizedInput />}
-                  >
-                    <MenuItem value={'decoded'}>Decoded</MenuItem>
-                    <MenuItem value={'hex'}>Hex</MenuItem>
-                  </Select>
-                </FormControl>
-                <Image
-                  src={`${IMG_URL}arrow-right-slim.svg`}
-                  loading="lazy"
-                  width="17"
-                  height="17"
-                  layout="fixed"
-                  alt="arrow-right"
-                />
-              </>
-            ) : (
-              <span style={{ whiteSpace: 'pre' }}>{`Data:          `}</span>
-            )}
-            <ArgsValueDisplay
-              format={dataFormat}
-              argType={eventInputs[2]?.type}
-              hexValue={item.data}
-              decodedValue={item.parsedLog?.args[2].hex}
-            />
-          </Stack>
+          {item.data && (
+            <Stack direction="row">
+              {item.parsedLog?.args[2].hex ? (
+                <>
+                  <FormControl sx={{ my: 1, mr: 1 }} size="small">
+                    <Select
+                      value={dataFormat}
+                      onChange={handleToggleButton}
+                      size="small"
+                      sx={{ width: '64px' }}
+                      renderValue={(v: string) => (
+                        <Typography variant="body2">{v.charAt(0).toUpperCase() + v.slice(1, 3)}</Typography>
+                      )}
+                      input={<CustomizedInput />}
+                    >
+                      <MenuItem value={'decoded'}>Decoded</MenuItem>
+                      <MenuItem value={'hex'}>Hex</MenuItem>
+                    </Select>
+                  </FormControl>
+                  <Image
+                    src={`${IMG_URL}arrow-right-slim.svg`}
+                    loading="lazy"
+                    width="17"
+                    height="17"
+                    layout="fixed"
+                    alt="arrow-right"
+                  />
+                </>
+              ) : (
+                <span style={{ whiteSpace: 'pre' }}>{`Data:          `}</span>
+              )}
+              {item.data
+                .slice(2)
+                .split(/(.{64})/)
+                .filter(str => str.length > 0)
+                .map((data, i) => (
+                  <ArgsValueDisplay
+                    key={i}
+                    format={dataFormat}
+                    argType={eventInputs[indexedArgsCount + i]?.type}
+                    hexValue={data}
+                    decodedValue={item.parsedLog?.args[indexedArgsCount + i].hex}
+                    sx={{ m: 0 }}
+                  />
+                ))}
+            </Stack>
+          )}
         </Stack>
       </Stack>
     </Stack>
