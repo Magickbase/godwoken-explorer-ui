@@ -1,5 +1,5 @@
-import { HourglassEmptyOutlined as PendingIcon } from '@mui/icons-material'
 import { SxProps, Tooltip } from '@mui/material'
+import PendingIcon from 'assets/icons/pending.svg'
 import CommittedIcon from 'assets/icons/committed.svg'
 import FailedIcon from 'assets/icons/failed.svg'
 import FinalizedIcon from 'assets/icons/finalized.svg'
@@ -8,10 +8,6 @@ import type { TxStatus } from 'utils'
 
 const TxStatusIcon: React.FC<{ status: TxStatus; isSuccess?: boolean }> = ({ status, isSuccess = false }) => {
   const [t] = useTranslation('common')
-  const properties: { sx: SxProps; color: 'success' | 'warning' } = {
-    sx: { fontSize: 16, mr: 1 },
-    color: isSuccess ? 'success' : 'warning',
-  }
   if (!isSuccess) {
     return <FailedIcon style={{ flexShrink: 0 }} />
   }
@@ -19,7 +15,7 @@ const TxStatusIcon: React.FC<{ status: TxStatus; isSuccess?: boolean }> = ({ sta
   if (status === 'pending') {
     return (
       <Tooltip title={t(status)} placement="top">
-        <PendingIcon {...properties} />
+        <PendingIcon />
       </Tooltip>
     )
   }
