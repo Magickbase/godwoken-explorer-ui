@@ -54,7 +54,8 @@ const ContractEventListItem = ({
   const [dataFormat, setDataFormat] = useState<'hex' | 'decoded'>('hex')
   const [t] = useTranslation('list')
   const { name: eventName, inputs: eventInputs } = item.parsedLog?.eventFragment ?? { name: null, inputs: [] }
-  const indexedArgsCount = item.topics.reduce((sum, topic) => (topic !== '0x' ? sum + 1 : sum), 0)
+  const unindexedInputs = eventInputs.filter(input => input.indexed === false)
+  const unindexedParsedArgs = item.parsedLog?.args.filter(arg => typeof arg !== 'string')
 
   const handleExpand = () => {
     setExpanded(!expanded)
@@ -155,8 +156,8 @@ const ContractEventListItem = ({
               ) : null,
             )}
           {item.data && (
-            <Stack direction="row">
-              {item.parsedLog?.args[2].hex ? (
+            <Stack direction="row" alignItems="center">
+              {unindexedInputs.length ? (
                 <>
                   <FormControl sx={{ my: 1, mr: 1 }} size="small">
                     <Select
@@ -183,7 +184,7 @@ const ContractEventListItem = ({
                   />
                 </>
               ) : (
-                <span style={{ whiteSpace: 'pre' }}>{`Data:          `}</span>
+                <span style={{ whiteSpace: 'pre', alignSelf: 'flex-start' }}>{`Data:         `}</span>
               )}
               {item.data
                 .slice(2)
@@ -193,10 +194,10 @@ const ContractEventListItem = ({
                   <ArgsValueDisplay
                     key={i}
                     format={dataFormat}
-                    argType={eventInputs[indexedArgsCount + i]?.type}
+                    argType={unindexedInputs[i]?.type}
                     hexValue={data}
-                    decodedValue={item.parsedLog?.args[indexedArgsCount + i].hex}
-                    sx={{ m: 0 }}
+                    decodedValue={unindexedParsedArgs ? unindexedParsedArgs[i]?.hex : data}
+                    sx={{ ml: 1 }}
                   />
                 ))}
             </Stack>

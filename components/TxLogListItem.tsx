@@ -85,7 +85,8 @@ const TxLogsListItem = ({ item }: { item: ParsedEventLog }) => {
     data: 'decoded',
   })
   const { name: eventName, inputs: eventInputs } = item.parsedLog?.eventFragment ?? { name: null, inputs: [] }
-  const indexedArgsCount = item.topics.reduce((sum, topic) => (topic !== '0x' ? sum + 1 : sum), 0)
+  const unindexedInputs = eventInputs.filter(input => input.indexed === false)
+  const unindexedParsedArgs = item.parsedLog?.args.filter(arg => typeof arg !== 'string')
 
   const ArgsFormatSelector = ({ type, arg }: { type: 'select' | 'button'; arg: string }) => {
     const handleChange = event => {
@@ -267,14 +268,14 @@ const TxLogsListItem = ({ item }: { item: ParsedEventLog }) => {
                   <Box sx={{ display: 'flex' }} key={i}>
                     {item.parsedLog && argsFormatState.data === 'decoded' ? (
                       <Typography fontSize={14} component="span">
-                        {eventInputs[indexedArgsCount + i].name + ':'}
+                        {unindexedInputs[i].name + ':'}
                       </Typography>
                     ) : null}
                     <ArgsValueDisplay
                       format={argsFormatState.data}
-                      argType={eventInputs[indexedArgsCount + i]?.type}
+                      argType={unindexedInputs[i]?.type}
                       hexValue={data}
-                      decodedValue={item.parsedLog?.args[indexedArgsCount + i].hex ?? data}
+                      decodedValue={unindexedParsedArgs ? unindexedParsedArgs[i]?.hex : data}
                     />
                   </Box>
                 ))}
