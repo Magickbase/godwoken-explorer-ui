@@ -120,7 +120,10 @@ const Token = ({ token, transferList, bridgedRecordList, tokenHolderList }: Prop
       <Container sx={{ py: 6 }}>
         <PageTitle>
           <Stack direction="row" alignItems="center">
-            <Avatar src={token.icon ?? null} sx={{ bgcolor: nameToColor(token.name ?? ''), mr: 2 }}>
+            <Avatar
+              src={token.icon ?? null}
+              sx={{ bgcolor: token.icon ? '#f0f0f0' : nameToColor(token.name ?? ''), mr: 2 }}
+            >
               {token.name?.[0] ?? '?'}
             </Avatar>
             <Typography variant="h5" fontWeight="inherit">
