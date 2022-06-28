@@ -12,15 +12,14 @@ const Layout = ({ children }) => {
       <Header />
       <main>
         {process.env.NEXT_PUBLIC_CHAIN_TYPE !== 'mainnet' ? (
-          <Alert severity="info" sx={{ display: 'flex', justifyContent: 'center', borderRadius: 0 }}>
+          <Alert sx={{ display: 'flex', justifyContent: 'center', borderRadius: 0, bgcolor: 'info.main' }}>
             {t(`testnetAnnotation`)}
             <Link
               href={`https://${process.env.NEXT_PUBLIC_MAINNET_EXPLORER_HOSTNAME}/${language}`}
               target="_blank"
               rel="noopener noreferrer"
               ml={1}
-              color="secondary"
-              sx={{ fontWeight: 700 }}
+              sx={{ fontWeight: 700, color: '#4C2CE4' }}
             >
               GwScan
             </Link>

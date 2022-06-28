@@ -22,18 +22,11 @@ import {
   Paper,
   IconButton,
 } from '@mui/material'
-import {
-  LineWeightOutlined as BlockHeightIcon,
-  AccountBoxOutlined as AccountCountIcon,
-  SpeedOutlined as TpsIcon,
-  FormatListNumberedOutlined as TxCountIcon,
-  ErrorOutlineOutlined as ErrorIcon,
-  ReadMoreOutlined as ReadMoreIcon,
-} from '@mui/icons-material'
+import { ErrorOutlineOutlined as ErrorIcon, ReadMoreOutlined as ReadMoreIcon } from '@mui/icons-material'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { Typography } from '@mui/material'
-import { timeDistance, handleApiError, useWS, getHomeRes, formatInt, CHANNEL } from 'utils'
+import { timeDistance, handleApiError, useWS, getHomeRes, formatInt, CHANNEL, IS_MAINNET } from 'utils'
 
 type State = API.Home.Parsed
 
@@ -45,11 +38,11 @@ const formatAddress = (addr: string) => {
 }
 
 const statisticGroups = [
-  { key: 'blockHeight', icon: <BlockHeightIcon />, prefix: '# ' },
-  { key: 'averageBlockTime', icon: <BlockHeightIcon />, suffix: ' s ' },
-  { key: 'txCount', icon: <TxCountIcon /> },
-  { key: 'tps', icon: <TpsIcon />, suffix: ' txs/s' },
-  { key: 'accountCount', icon: <AccountCountIcon /> },
+  { key: 'blockHeight', prefix: '# ' },
+  { key: 'averageBlockTime', suffix: ' s ' },
+  { key: 'txCount' },
+  { key: 'tps', suffix: ' txs/s' },
+  { key: 'accountCount' },
 ]
 
 const Statistic = ({ blockCount, txCount, tps, accountCount, averageBlockTime }: State['statistic']) => {
@@ -64,19 +57,24 @@ const Statistic = ({ blockCount, txCount, tps, accountCount, averageBlockTime }:
 
   return (
     <Grid container spacing={2}>
-      {statisticGroups.map(field => (
-        <Grid item key={field.key} xs={6} md={12 / statisticGroups.length}>
-          <Paper sx={{ bgcolor: 'primary.light', color: 'white', p: 5, textAlign: 'center' }}>
-            <Stack direction="row" display="flex" alignItems="center" justifyContent="center">
-              {field.icon}
-              <Typography variant="body2" noWrap sx={{ textTransform: 'capitalize', pl: 1 }}>
-                {t(field.key)}
-              </Typography>
-            </Stack>
+      {statisticGroups.map((field, i) => (
+        <Grid
+          item
+          key={field.key}
+          xs={12}
+          md={i === 1 ? 8 : 4}
+          display="flex"
+          justifyContent="left"
+          alignItems="center"
+        >
+          <Stack direction="column" alignItems="left" justifyContent="center">
+            <Typography variant="body2" noWrap sx={{ textTransform: 'capitalize' }}>
+              {t(field.key)}
+            </Typography>
             <Typography variant="body1" noWrap>
               {`${field.prefix || ''}${stats[field.key]}${field.suffix || ''}`}
             </Typography>
-          </Paper>
+          </Stack>
         </Grid>
       ))}
     </Grid>
@@ -95,7 +93,7 @@ const BlockList = ({ list }: { list: State['blockList'] }) => {
           {t(`latestBlocks`)}
           <Tooltip placement="top" title={t(`view_all_blocks`, { ns: 'common' })}>
             <Box>
-              <NextLink href={`/blocks`}>
+              <NextLink href={`/blocks`} passHref>
                 <IconButton>
                   <ReadMoreIcon />
                 </IconButton>
@@ -118,7 +116,7 @@ const BlockList = ({ list }: { list: State['blockList'] }) => {
                 <Stack minHeight={73}>
                   <Stack direction="row" justifyContent="space-between">
                     <Box>
-                      <NextLink href={`/block/${block.hash}`}>
+                      <NextLink href={`/block/${block.hash}`} passHref>
                         <Button color="secondary" href={`/block/${block.hash}`} component={Link}>
                           {`# ${formatInt(block.number)}`}
                         </Button>
@@ -171,7 +169,7 @@ const TxList = ({ list }: { list: State['txList'] }) => {
           {t(`latestTxs`)}
           <Tooltip placement="top" title={t(`view_all_transactions`, { ns: 'common' })}>
             <Box>
-              <NextLink href={`/txs`}>
+              <NextLink href={`/txs`} passHref>
                 <IconButton>
                   <ReadMoreIcon />
                 </IconButton>
@@ -195,7 +193,7 @@ const TxList = ({ list }: { list: State['txList'] }) => {
                   <Stack>
                     <Tooltip placement="top" title={tx.hash}>
                       <Box>
-                        <NextLink href={`/tx/${tx.hash}`}>
+                        <NextLink href={`/tx/${tx.hash}`} passHref>
                           <Button
                             color="secondary"
                             href={`/tx/${tx.hash}`}
@@ -222,7 +220,7 @@ const TxList = ({ list }: { list: State['txList'] }) => {
                       </Typography>
                       <Tooltip placement="top" title={tx.from}>
                         <Box>
-                          <NextLink href={`/account/${tx.from}`}>
+                          <NextLink href={`/account/${tx.from}`} passHref>
                             <Button
                               color="secondary"
                               href={`/account/${tx.from}`}
@@ -242,7 +240,7 @@ const TxList = ({ list }: { list: State['txList'] }) => {
                       </Typography>
                       <Tooltip placement="top" title={tx.to}>
                         <Box>
-                          <NextLink href={`/account/${tx.to}`}>
+                          <NextLink href={`/account/${tx.to}`} passHref>
                             <Button
                               color="secondary"
                               href={`/account/${tx.to}`}
@@ -301,17 +299,24 @@ const Home = (initState: State) => {
   )
 
   return (
-    <Container sx={{ py: 6 }}>
-      <Statistic {...home.statistic} />
-      <Stack direction={{ xs: 'column', sm: 'column', md: 'column', lg: 'row' }} spacing={2} sx={{ pt: 6 }}>
-        <Paper sx={{ width: '100%', lg: { width: '50%', mr: 2 } }}>
-          <BlockList list={home.blockList} />
-        </Paper>
-        <Paper sx={{ width: '100%', lg: { width: '50%', ml: 2 } }}>
-          <TxList list={home.txList} />
-        </Paper>
-      </Stack>
-    </Container>
+    <Box sx={{ pb: 6, bgcolor: 'primary.light' }}>
+      <Container>
+        <Stack direction="row" sx={{ py: 3 }}>
+          <Statistic {...home.statistic} />
+          <video autoPlay loop style={{ maxWidth: '70%', width: 'auto', height: '100%' }}>
+            <source src={IS_MAINNET ? '/home-video.mp4' : '/testnet-home-video.mp4'} />
+          </video>
+        </Stack>
+        <Stack direction={{ xs: 'column', sm: 'column', md: 'column', lg: 'row' }} spacing={2} sx={{ pt: 6 }}>
+          <Paper sx={{ width: '100%', lg: { width: '50%', mr: 2 } }}>
+            <BlockList list={home.blockList} />
+          </Paper>
+          <Paper sx={{ width: '100%', lg: { width: '50%', ml: 2 } }}>
+            <TxList list={home.txList} />
+          </Paper>
+        </Stack>
+      </Container>
+    </Box>
   )
 }
 
