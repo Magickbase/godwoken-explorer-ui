@@ -21,6 +21,7 @@ import {
   Divider,
   Paper,
   IconButton,
+  Badge,
 } from '@mui/material'
 import {
   LineWeightOutlined as BlockHeightIcon,
@@ -187,7 +188,16 @@ const TxList = ({ list }: { list: State['txList'] }) => {
           <Divider variant={idx ? 'middle' : 'fullWidth'} />
           <ListItem>
             <ListItemIcon>
-              <Avatar sx={{ bgcolor: '#cfd8dc' }}>Tx</Avatar>
+              <Badge
+                color="warning"
+                variant="dot"
+                invisible={tx.polyjuice_status !== 'failed'}
+                overlap="circular"
+                badgeContent=""
+                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+              >
+                <Avatar sx={{ bgcolor: '#cfd8dc' }}>Tx</Avatar>
+              </Badge>
             </ListItemIcon>
             <ListItemText
               primary={
