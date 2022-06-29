@@ -20,7 +20,7 @@ export namespace GraphQLSchema {
     PolyjuiceContract = 'POLYJUICE_CONTRACT',
     PolyjuiceCreator = 'POLYJUICE_CREATOR',
     Udt = 'UDT',
-    Uknown = 'UKNOWN',
+    Unknown = 'UNKNOWN',
   }
 
   export enum PolyjuiceStatus {
