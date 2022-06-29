@@ -118,7 +118,10 @@ const AssetList = ({ list = [] }: { list: UdtList }) => {
                   <Stack direction="row" alignItems="center">
                     <Avatar
                       src={item.udt.icon}
-                      sx={{ bgcolor: nameToColor(item.udt.name), textTransform: 'capitalize' }}
+                      sx={{
+                        bgcolor: item.udt.icon ? '#f0f0f0' : nameToColor(item.udt.name),
+                        textTransform: 'capitalize',
+                      }}
                     >
                       {item.udt.name?.[0] ?? '?'}
                     </Avatar>

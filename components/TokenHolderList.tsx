@@ -42,7 +42,7 @@ const TokenHolderList: React.FC<{
                   </TableCell>
                   <TableCell title={item.balance}>{new BigNumber(item.balance ?? '0').toFormat()}</TableCell>
                   <TableCell title={item.percentage}>{`${item.percentage}%`}</TableCell>
-                  <TableCell title={`${item.txCount}`}> {item.txCount.toLocaleString('en')} </TableCell>
+                  <TableCell title={`${item.txCount}`}> {item.txCount?.toLocaleString('en') ?? '0'} </TableCell>
                 </TableRow>
               ))
             ) : (

@@ -53,7 +53,10 @@ export const pretreat = async <T>(res: Response) => {
 export namespace API {
   type Timestamp = number // second from server
   export namespace Home {
-    type Tx = Record<'hash' | 'from' | 'to' | 'type', string> & { success: boolean; timestamp: Timestamp }
+    type Tx = Record<'hash' | 'from' | 'to' | 'type' | 'polyjuice_status', string> & {
+      success: boolean
+      timestamp: Timestamp
+    }
     export interface Raw {
       block_list: Array<Record<'hash' | 'number' | 'tx_count', string> & { timestamp: Timestamp }>
       tx_list: Array<Tx>
