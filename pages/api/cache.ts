@@ -23,4 +23,4 @@ export default async (_req: NextApiRequest, res: NextApiResponse) => {
   res.status(200).json(cache)
 }
 
-setInterval(updateCache, 3000)
+setInterval(updateCache, 1000)
