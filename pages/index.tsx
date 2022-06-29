@@ -38,10 +38,10 @@ const formatAddress = (addr: string) => {
 }
 
 const statisticGroups = [
-  { key: 'blockHeight', prefix: '# ' },
+  { key: 'blockHeight' },
   { key: 'averageBlockTime', suffix: ' s ' },
   { key: 'txCount' },
-  { key: 'tps', suffix: ' txs/s' },
+  { key: 'tps', suffix: ' Txs/s' },
   { key: 'accountCount' },
 ]
 
@@ -62,17 +62,24 @@ const Statistic = ({ blockCount, txCount, tps, accountCount, averageBlockTime }:
           item
           key={field.key}
           xs={12}
-          md={i === 1 ? 8 : 4}
+          md={6}
+          lg={i === 1 ? 8 : 4}
           display="flex"
           justifyContent="left"
           alignItems="center"
         >
           <Stack direction="column" alignItems="left" justifyContent="center">
-            <Typography variant="body2" noWrap sx={{ textTransform: 'capitalize' }}>
+            <Typography
+              variant="body1"
+              color="secondary"
+              noWrap
+              sx={{ textTransform: 'capitalize', fontWeight: '500' }}
+            >
               {t(field.key)}
             </Typography>
-            <Typography variant="body1" noWrap>
-              {`${field.prefix || ''}${stats[field.key]}${field.suffix || ''}`}
+            <Typography variant="body1" noWrap fontSize={32} color="primary" sx={{ fontWeight: 500 }}>
+              {`${stats[field.key]}`}
+              <Typography component="span" fontSize={16} fontWeight={500}>{`${field.suffix || ''}`}</Typography>
             </Typography>
           </Stack>
         </Grid>
