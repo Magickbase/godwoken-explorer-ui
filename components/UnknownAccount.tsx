@@ -7,7 +7,7 @@ const User = ({ nonce }: { nonce: number }) => {
   const fields = [
     {
       label: t(`type`),
-      value: <Typography variant="body2">Uknown</Typography>,
+      value: <Typography variant="body2">Unknown</Typography>,
     },
     { label: t('nonce'), value: <Typography variant="body2">{nonce.toLocaleString('en')}</Typography> },
   ]

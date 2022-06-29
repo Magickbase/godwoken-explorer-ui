@@ -20,7 +20,7 @@ interface AccountBase {
 }
 
 interface UnknownUser extends AccountBase {
-  type: GraphQLSchema.AccountType.Uknown
+  type: GraphQLSchema.AccountType.Unknown
 }
 
 interface EthUser extends AccountBase {
@@ -132,7 +132,7 @@ export const fetchAccountOverview = (variables: Variables) =>
     data =>
       data.account ??
       ({
-        type: GraphQLSchema.AccountType.Uknown,
+        type: GraphQLSchema.AccountType.Unknown,
         eth_address: variables['eth_address'] ?? null,
         script_hash: variables['script_hash'] ?? '',
         transaction_count: 0,
@@ -204,7 +204,7 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({ account, balance, dep
           {account.type === GraphQLSchema.AccountType.Udt && account.udt ? (
             <SUDT udt={account.udt} script={account.script} script_hash={account.script_hash} />
           ) : null}
-          {account.type === GraphQLSchema.AccountType.Uknown ? <UnknownAccount nonce={account.nonce} /> : null}
+          {account.type === GraphQLSchema.AccountType.Unknown ? <UnknownAccount nonce={account.nonce} /> : null}
         </Grid>
       </Grid>
     </Paper>
