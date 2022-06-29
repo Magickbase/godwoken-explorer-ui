@@ -14,9 +14,8 @@ import {
   InputBase,
   SxProps,
 } from '@mui/material'
-import Image from 'next/image'
 import { styled } from '@mui/material/styles'
-import { ParsedEventLog, IMG_URL } from 'utils'
+import { ParsedEventLog } from 'utils'
 import TruncatedAddress from './TruncatedAddress'
 
 const argsFormatReducer = (state, action) => {
@@ -60,7 +59,7 @@ export const ArgsValueDisplay = ({
         {hexValue}
       </Typography>
     ) : argType === 'address' ? (
-      <TruncatedAddress address={decodedValue} leading={30} size="normal" />
+      <TruncatedAddress address={decodedValue} leading={30} />
     ) : (
       <Typography fontSize={14} variant="body2" className="mono-font">
         {decodedValue}
@@ -155,7 +154,6 @@ const TxLogsListItem = ({ item }: { item: ParsedEventLog }) => {
           <TruncatedAddress
             address={item.addressHash}
             leading={30}
-            size="normal"
             sx={{ whiteSpace: 'normal', wordBreak: 'break-word', overflowWrap: 'break-word' }}
           />
         </Box>

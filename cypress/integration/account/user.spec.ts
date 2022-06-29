@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-context('User Account Page', () => {
+context.skip('User Account Page', () => {
   before(() => {
     cy.fixture('accountIds').then(ids => cy.visit(`/en-US/account/${ids.user}`))
   })
