@@ -27,6 +27,7 @@ import SubpageHead from 'components/SubpageHead'
 import TxList, { TxListProps, fetchTxList } from 'components/TxList'
 import BridgedRecordList from 'components/BridgedRecordList'
 import PageTitle from 'components/PageTitle'
+import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
 import {
   fetchBlock,
   handleApiError,
@@ -74,6 +75,11 @@ const Block = (initState: State) => {
     },
     [setBlock, block.number],
   )
+
+  const downloadItems = [
+    { label: t('transactionRecords'), href: DOWNLOAD_HREF_LIST.blockTxList(block.hash) },
+    { label: t('bridgedRecords'), href: DOWNLOAD_HREF_LIST.blockBridgeRecordList(block.number.toString()) },
+  ]
 
   const handleHashCopy = async () => {
     await handleCopy(block.hash)
@@ -256,7 +262,10 @@ const Block = (initState: State) => {
     <>
       <SubpageHead subtitle={title} />
       <Container sx={{ py: 6 }}>
-        <PageTitle>{title}</PageTitle>
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <PageTitle>{title}</PageTitle>
+          <DownloadMenu items={downloadItems} />
+        </Stack>
         <Stack spacing={2}>
           <Paper>
             <List sx={{ textTransform: 'capitalize' }}>

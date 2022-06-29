@@ -26,6 +26,7 @@ import ERC20TransferList from 'components/ERC20TransferList'
 import BridgedRecordList from 'components/BridgedRecordList'
 import TokenHolderList from 'components/TokenHolderList'
 import Address from 'components/AddressInHalfPanel'
+import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
 import {
   handleApiError,
   fetchToken,
@@ -59,6 +60,15 @@ const Token = ({ token, transferList, bridgedRecordList, tokenHolderList }: Prop
     push,
     query: { tab = 'transfers' },
   } = useRouter()
+
+  const downloadItems = [
+    { label: t('transferRecords'), href: DOWNLOAD_HREF_LIST.udtTransferList(token.address) },
+    token.type === 'bridge'
+      ? { label: t('bridgedRecords'), href: DOWNLOAD_HREF_LIST.udtBridgeRecordList(token.id.toString()) }
+      : null,
+    { label: t('tokenHolders'), href: DOWNLOAD_HREF_LIST.udtHolderList(token.id.toString()) },
+  ].map(i => i)
+
   const tokenInfo = [
     { label: 'decimal', value: <Typography variant="body2">{token.decimal || '-'}</Typography> },
     { label: 'type', value: <Typography variant="body2">{t(token.type)}</Typography> },
@@ -118,26 +128,30 @@ const Token = ({ token, transferList, bridgedRecordList, tokenHolderList }: Prop
     <>
       <SubpageHead subtitle={`${t('token')} ${token.name || token.symbol || '-'}`} />
       <Container sx={{ py: 6 }}>
-        <PageTitle>
-          <Stack direction="row" alignItems="center">
-            <Avatar
-              src={token.icon ?? null}
-              sx={{ bgcolor: token.icon ? '#f0f0f0' : nameToColor(token.name ?? ''), mr: 2 }}
-            >
-              {token.name?.[0] ?? '?'}
-            </Avatar>
-            <Typography variant="h5" fontWeight="inherit">
-              {token.name || '-'}
-            </Typography>
-            {token.symbol ? (
-              <Typography
-                fontWeight="inherit"
-                color="primary.light"
-                whiteSpace="pre"
-              >{` (${token.symbol})`}</Typography>
-            ) : null}
-          </Stack>
-        </PageTitle>
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <PageTitle>
+            <Stack direction="row" alignItems="center">
+              <Avatar
+                src={token.icon ?? null}
+                sx={{ bgcolor: token.icon ? '#f0f0f0' : nameToColor(token.name ?? ''), mr: 2 }}
+              >
+                {token.name?.[0] ?? '?'}
+              </Avatar>
+              <Typography variant="h5" fontWeight="inherit">
+                {token.name || '-'}
+              </Typography>
+              {token.symbol ? (
+                <Typography
+                  fontWeight="inherit"
+                  color="primary.light"
+                  whiteSpace="pre"
+                >{` (${token.symbol})`}</Typography>
+              ) : null}
+            </Stack>
+          </PageTitle>
+
+          <DownloadMenu items={downloadItems} />
+        </Stack>
         <Stack spacing={2}>
           <Paper>
             <Grid container spacing={2}>
