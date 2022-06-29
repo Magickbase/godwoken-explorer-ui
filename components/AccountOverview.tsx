@@ -8,6 +8,7 @@ import MetaContract from 'components/MetaContract'
 import SmartContract from 'components/SmartContract'
 import Polyjuice from 'components/Polyjuice'
 import SUDT from 'components/SUDT'
+import UnknownAccount from 'components/UnknownAccount'
 import { GCKB_DECIMAL, GraphQLSchema, client } from 'utils'
 
 export type BasicScript = Record<'args' | 'code_hash' | 'hash_type', string>
@@ -16,6 +17,10 @@ interface AccountBase {
   script_hash: string
   transaction_count: number
   nonce: number
+}
+
+interface UnknownUser extends AccountBase {
+  type: GraphQLSchema.AccountType.Unknown
 }
 
 interface EthUser extends AccountBase {
@@ -70,7 +75,7 @@ export interface MetaContract extends AccountBase {
 }
 
 export type AccountOverviewProps = {
-  account: EthUser | EthAddrReg | PolyjuiceCreator | PolyjuiceContract | Udt | MetaContract
+  account: EthUser | EthAddrReg | PolyjuiceCreator | PolyjuiceContract | Udt | MetaContract | UnknownUser
   balance: string
   deployerAddr?: string
 }
@@ -131,7 +136,17 @@ const deployAddrQuery = gql`
 type Variables = { address: string } | { script_hash: string }
 
 export const fetchAccountOverview = (variables: Variables) =>
-  client.request<Omit<AccountOverviewProps, 'balance'>>(accountOverviewQuery, variables).then(data => data.account)
+  client.request<Omit<AccountOverviewProps, 'balance'>>(accountOverviewQuery, variables).then(
+    data =>
+      data.account ??
+      ({
+        type: GraphQLSchema.AccountType.Unknown,
+        eth_address: variables['eth_address'] ?? null,
+        script_hash: variables['script_hash'] ?? '',
+        transaction_count: 0,
+        nonce: 0,
+      } as UnknownUser),
+  )
 
 export const fetchAccountBalance = (variables: { address_hashes: Array<string> } | { script_hashes: Array<string> }) =>
   Promise.all([
@@ -204,6 +219,7 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({ account, balance, dep
           {account.type === GraphQLSchema.AccountType.Udt && account.udt ? (
             <SUDT udt={account.udt} script={account.script} script_hash={account.script_hash} />
           ) : null}
+          {account.type === GraphQLSchema.AccountType.Unknown ? <UnknownAccount nonce={account.nonce} /> : null}
         </Grid>
       </Grid>
     </Paper>
