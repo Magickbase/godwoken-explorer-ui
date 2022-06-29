@@ -8,7 +8,8 @@
     "UDT": "桥接资产账户",
     "POLYJUICE_CREATOR": "Polyjuice Creator 账户",
     "META_CONTRACT": "Meta 合约账户",
-    "ETH_ADDR_REG": "Eth 地址注册账户"
+    "ETH_ADDR_REG": "Eth 地址注册账户",
+    "UNKNOWN": "未知账户"
   },
   "id": "账户 id",
   "nonce": "nonce",

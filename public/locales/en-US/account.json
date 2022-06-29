@@ -8,7 +8,8 @@
     "UDT": "Bridged Token Account",
     "POLYJUICE_CREATOR": "Polyjuice Creator Account",
     "META_CONTRACT": "Meta Contract Account",
-    "ETH_ADDR_REG": "Eth Addr Reg"
+    "ETH_ADDR_REG": "Eth Addr Reg",
+    "UNKNOWN": "Unknown"
   },
   "id": "account id",
   "nonce": "nonce",
