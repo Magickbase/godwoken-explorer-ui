@@ -77,7 +77,7 @@ const Agera = ({ Component, pageProps }: AppProps) => {
         <ErrorBoundary>
           {loading ? (
             <LinearProgress
-              color="secondary"
+              color="primary"
               variant="determinate"
               value={loading}
               sx={{

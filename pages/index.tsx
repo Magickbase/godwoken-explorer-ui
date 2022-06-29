@@ -27,6 +27,7 @@ import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { Typography } from '@mui/material'
 import { timeDistance, handleApiError, useWS, getHomeRes, formatInt, CHANNEL, IS_MAINNET } from 'utils'
+import Search from 'components/Search'
 
 type State = API.Home.Parsed
 
@@ -70,16 +71,18 @@ const Statistic = ({ blockCount, txCount, tps, accountCount, averageBlockTime }:
         >
           <Stack direction="column" alignItems="left" justifyContent="center">
             <Typography
-              variant="body1"
+              fontSize={{ xs: 12, md: 16 }}
               color="secondary"
               noWrap
               sx={{ textTransform: 'capitalize', fontWeight: '500' }}
             >
               {t(field.key)}
             </Typography>
-            <Typography variant="body1" noWrap fontSize={32} color="primary" sx={{ fontWeight: 500 }}>
+            <Typography variant="body1" noWrap fontSize={{ xs: 18, md: 32 }} color="primary" sx={{ fontWeight: 500 }}>
               {`${stats[field.key]}`}
-              <Typography component="span" fontSize={16} fontWeight={500}>{`${field.suffix || ''}`}</Typography>
+              <Typography component="span" fontSize={{ xs: 12, md: 16 }} fontWeight={500}>{`${
+                field.suffix || ''
+              }`}</Typography>
             </Typography>
           </Stack>
         </Grid>
@@ -306,14 +309,19 @@ const Home = (initState: State) => {
   )
 
   return (
-    <Box sx={{ pb: 6, bgcolor: 'primary.light' }}>
+    <Box sx={{ pb: 6 }}>
+      <Box sx={{ bgcolor: 'primary.light' }}>
+        <Container>
+          <Search />
+          <Stack direction="row" sx={{ py: 3 }}>
+            <Statistic {...home.statistic} />
+            <video autoPlay loop style={{ maxWidth: '70%', width: 'auto', height: '100%' }}>
+              <source src={IS_MAINNET ? '/home-video.mp4' : '/testnet-home-video.mp4'} />
+            </video>
+          </Stack>
+        </Container>
+      </Box>
       <Container>
-        <Stack direction="row" sx={{ py: 3 }}>
-          <Statistic {...home.statistic} />
-          <video autoPlay loop style={{ maxWidth: '70%', width: 'auto', height: '100%' }}>
-            <source src={IS_MAINNET ? '/home-video.mp4' : '/testnet-home-video.mp4'} />
-          </video>
-        </Stack>
         <Stack direction={{ xs: 'column', sm: 'column', md: 'column', lg: 'row' }} spacing={2} sx={{ pt: 6 }}>
           <Paper sx={{ width: '100%', lg: { width: '50%', mr: 2 } }}>
             <BlockList list={home.blockList} />

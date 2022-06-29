@@ -1,64 +1,35 @@
 import { useRef, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
-import { InputBase, IconButton, Divider, alpha, styled } from '@mui/material'
-import { Search as SearchIcon, Translate as TranslateIcon, MoreVert as MoreIcon } from '@mui/icons-material'
-import { EXPLORER_TITLE, IMG_URL, SEARCH_FIELDS, handleSearchKeyPress } from 'utils'
-
-const SearchStyled = styled('div')(({ theme }) => ({
-  'position': 'relative',
-  'borderRadius': theme.shape.borderRadius,
-  'backgroundColor': alpha(theme.palette.common.white, 0.15),
-  '&:hover': {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
-  },
-  'width': '100%',
-  [theme.breakpoints.up('sm')]: {
-    marginLeft: theme.spacing(1),
-    width: 'auto',
-  },
-}))
-
-const SearchIconWrapper = styled('div')(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: '100%',
-  position: 'absolute',
-  pointerEvents: 'none',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-}))
+import { InputBase, InputAdornment, styled } from '@mui/material'
+import { IMG_URL, SEARCH_FIELDS, handleSearchKeyPress } from 'utils'
+import Image from 'next/image'
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  'color': 'inherit',
+  'width': '100%',
+  'height': '56px',
+  'padding': theme.spacing(1, 2),
+  'marginTop': theme.spacing(2),
+  'borderRadius': '16px',
+  'color': 'secondary.light',
+  'backgroundColor': '#ffffff',
+  'fontWeight': 500,
+  [theme.breakpoints.down('sm')]: {
+    height: 40,
+    borderRadius: '8px',
+    padding: theme.spacing(1),
+  },
   '& .MuiInputBase-input': {
-    padding: theme.spacing(1, 1, 1, 0),
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create('width'),
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-      'width': '25ch',
-      '&:focus': {
-        width: '30ch',
-      },
-    },
-    [theme.breakpoints.up('md')]: {
-      'width': '30ch',
-      '&:focus': {
-        width: '40ch',
-      },
-    },
-    [theme.breakpoints.up('lg')]: {
-      'width': '40ch',
-      '&:focus': {
-        width: '66ch',
-      },
+    height: '100%',
+    paddingLeft: theme.spacing(2),
+    [theme.breakpoints.down('sm')]: {
+      paddingLeft: theme.spacing(1),
     },
   },
 }))
 
 const Search = () => {
-  const [t, { language }] = useTranslation('common')
+  const [t] = useTranslation('common')
   const {
     push,
     query: { search: searchInQuery },
@@ -82,19 +53,27 @@ const Search = () => {
   }, [searchInQuery, searchRef])
 
   return (
-    <SearchStyled sx={{ ml: 2 }}>
-      <SearchIconWrapper>
-        <SearchIcon />
-      </SearchIconWrapper>
-      <StyledInputBase
-        placeholder={SEARCH_FIELDS}
-        autoFocus
-        title={SEARCH_FIELDS}
-        inputProps={{ 'aria-label': 'search' }}
-        onKeyPress={handleSearch}
-        inputRef={searchRef}
-      />
-    </SearchStyled>
+    <StyledInputBase
+      placeholder={SEARCH_FIELDS}
+      autoFocus
+      title={SEARCH_FIELDS}
+      onKeyPress={handleSearch}
+      inputRef={searchRef}
+      style={{ fontSize: 14 }}
+      inputProps={{ 'aria-label': 'search' }}
+      startAdornment={
+        <InputAdornment position="start">
+          <Image
+            src={`${IMG_URL}search-icon.svg`}
+            loading="lazy"
+            width="20"
+            height="20"
+            layout="fixed"
+            alt="search-icon"
+          />
+        </InputAdornment>
+      }
+    />
   )
 }
 

@@ -12,14 +12,31 @@ const Layout = ({ children }) => {
       <Header />
       <main>
         {process.env.NEXT_PUBLIC_CHAIN_TYPE !== 'mainnet' ? (
-          <Alert sx={{ display: 'flex', justifyContent: 'center', borderRadius: 0, bgcolor: 'info.main' }}>
+          <Alert
+            severity="info"
+            sx={{
+              'display': 'flex',
+              'justifyContent': 'center',
+              'borderRadius': 0,
+              'bgcolor': 'info.main',
+              'color': '#333333',
+              'fontSize': { xs: 12, md: 14 },
+              'padding': '6px 14px',
+              '& .MuiAlert-icon': {
+                color: '#000000',
+                mr: { xs: 0.5, md: 1 },
+                fontSize: { xs: 12, md: 20 },
+                py: { xs: 1.25, md: 1 },
+              },
+            }}
+          >
             {t(`testnetAnnotation`)}
             <Link
               href={`https://${process.env.NEXT_PUBLIC_MAINNET_EXPLORER_HOSTNAME}/${language}`}
               target="_blank"
               rel="noopener noreferrer"
-              ml={1}
-              sx={{ fontWeight: 700, color: '#4C2CE4' }}
+              ml={0.5}
+              sx={{ fontWeight: 700, color: '#4C2CE4', textDecorationColor: '#4C2CE4' }}
             >
               GwScan
             </Link>
