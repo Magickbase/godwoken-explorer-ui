@@ -53,12 +53,18 @@ const TxList = (initState: State) => {
 }
 
 export const getServerSideProps: GetServerSideProps<State> = async ({ locale, res, query }) => {
-  const { page_size = SIZES[1], before = null, after = null } = query
+  const { page_size = SIZES[1], before = null, after = null, block_from = null, block_to = null } = query
 
   try {
     const pageSize = Number.isNaN(+page_size) ? +SIZES[1] : +page_size
     const [txList, lng] = await Promise.all([
-      fetchTxList({ limit: pageSize as number, before: before as string | null, after: after as string | null }),
+      fetchTxList({
+        limit: pageSize as number,
+        before: before as string | null,
+        after: after as string | null,
+        start_block_number: block_from ? +block_from : null,
+        end_block_number: block_to ? +block_to : null,
+      }),
       serverSideTranslations(locale, ['common', 'list']),
     ])
     return { props: { ...lng, txList, pageSize } }
