@@ -1,12 +1,11 @@
 import NextLink from 'next/link'
-import Image from 'next/image'
 import Box from '@mui/material/Box'
 import Link from '@mui/material/Link'
 import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
 import Button from '@mui/material/Button'
 import { styled } from '@mui/material/styles'
-import { CKB_EXPLORER_URL, EXPLORER_TITLE, IMG_URL, NERVINA_GITHUB_URL, NERVOS_URL } from 'utils'
+import { CKB_EXPLORER_URL, EXPLORER_TITLE, NERVINA_GITHUB_URL, NERVOS_URL } from 'utils'
 import { Fragment } from 'react'
 import Logo from './Logo'
 

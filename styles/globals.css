@@ -43,5 +43,5 @@ input[type='number']::-webkit-outer-spin-button {
 @font-face {
   font-family: 'DIN Pro';
   font-weight: 900;
-  src: local(''), url('../assets/D-DIN-PRO-900-Heavy.otf') format('opentype');
+  src: local(''), url('../assets/fonts/D-DIN-PRO-900-Heavy.otf') format('opentype');
 }

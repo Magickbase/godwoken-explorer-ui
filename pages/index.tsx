@@ -57,7 +57,7 @@ const Statistic = ({ blockCount, txCount, tps, accountCount, averageBlockTime }:
   }
 
   return (
-    <Grid container spacing={2}>
+    <Grid container spacing={2} sx={{ maxWidth: '50%' }}>
       {statisticGroups.map((field, i) => (
         <Grid
           item
@@ -313,9 +313,9 @@ const Home = (initState: State) => {
       <Box sx={{ bgcolor: 'primary.light' }}>
         <Container>
           <Search />
-          <Stack direction="row" sx={{ py: 3 }}>
+          <Stack direction="row" sx={{ py: 3 }} justifyContent="space-between">
             <Statistic {...home.statistic} />
-            <video autoPlay loop style={{ maxWidth: '70%', width: 'auto', height: '100%' }}>
+            <video autoPlay loop style={{ maxWidth: '70%', width: '45%', height: '100%' }}>
               <source src={IS_MAINNET ? '/home-video.mp4' : '/testnet-home-video.mp4'} />
             </video>
           </Stack>

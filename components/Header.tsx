@@ -25,8 +25,8 @@ import { styled } from '@mui/material/styles'
 import { Language as LanguageIcon, KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material'
 import { EXPLORER_TITLE, fetchVersion } from 'utils'
 import Logo from './Logo'
-import CloseIcon from '../assets/close.svg'
-import MobileMenuIcon from '../assets/mobile-menu.svg'
+import CloseIcon from '../assets/icons/close.svg'
+import MobileMenuIcon from '../assets/icons/mobile-menu.svg'
 
 const TOKEN_TYPE_LIST = ['bridge', 'native']
 const LOCALE_LIST = ['en-US', 'zh-CN']
