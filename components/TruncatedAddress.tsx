@@ -17,7 +17,7 @@ const TruncatedAddress = ({
   <Tooltip title={address} placement="top" sx={sx}>
     <Box fontSize={size === 'small' ? 12 : 14}>
       <NextLink href={`/account/${address}`}>
-        <Link href={`/account/${address}`} underline="none" color="secondary" className="mono-font">
+        <Link href={`/account/${address}`} underline="none" color="secondary" className="mono-font" whiteSpace="nowrap">
           {[
             GraphQLSchema.AccountType.EthAddrReg,
             GraphQLSchema.AccountType.MetaContract,
