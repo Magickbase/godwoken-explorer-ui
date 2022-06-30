@@ -114,7 +114,7 @@ const BlockList = ({ list }: { list: State['blockList'] }) => {
       }
       dense
     >
-      {list.map((block, idx) => (
+      {list?.map((block, idx) => (
         <Box key={block.hash}>
           <Divider variant={idx ? 'middle' : 'fullWidth'} />
           <ListItem>
@@ -190,7 +190,7 @@ const TxList = ({ list }: { list: State['txList'] }) => {
       }
       dense
     >
-      {list.map((tx, idx) => (
+      {list?.map((tx, idx) => (
         <Box key={tx.hash}>
           <Divider variant={idx ? 'middle' : 'fullWidth'} />
           <ListItem>

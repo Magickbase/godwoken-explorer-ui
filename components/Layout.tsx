@@ -1,11 +1,16 @@
-import { Alert, Link } from '@mui/material'
+import { Alert, Container, Link } from '@mui/material'
 import { useTranslation } from 'next-i18next'
+import { useRouter } from 'next/router'
 import Head from 'components/Head'
 import Header from 'components/Header'
 import Footer from 'components/Footer'
+import Search from 'components/Search'
 
 const Layout = ({ children }) => {
   const [t, { language }] = useTranslation('common')
+  const { asPath } = useRouter()
+  const isHome = asPath === '/'
+
   return (
     <>
       <Head />
@@ -42,6 +47,11 @@ const Layout = ({ children }) => {
             </Link>
           </Alert>
         ) : null}
+        {!isHome && (
+          <Container>
+            <Search />
+          </Container>
+        )}
         {children}
       </main>
       <Footer />

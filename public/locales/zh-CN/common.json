@@ -4,7 +4,7 @@
   "search": "搜索",
   "back": "返回",
   "notFoundMessage": "未能找到任何与 \"{{search}}\" 有关的记录。\n\n请确认您的输入属于以下一项:",
-  "pageNotFound": "404 | 找不到此页",
+  "pageNotFound": "此页面不存在",
   "prev": "上一页",
   "next": "下一页",
   "home": "首页",
