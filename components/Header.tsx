@@ -90,7 +90,7 @@ const Header = () => {
   } = useRouter()
   const searchRef = useRef<HTMLInputElement | null>(null)
 
-  const CHAIN_TYPE_LIST = !version?.startsWith('0.') ? ['testnet'] : ['mainnet', 'testnet']
+  const CHAIN_TYPE_LIST = ['mainnet', 'testnet']
 
   const handleSearch = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     handleSearchKeyPress(e, push)
