@@ -156,7 +156,7 @@ const ContractEventListItem = ({
               ) : null,
             )}
           {item.data && (
-            <Stack direction="row" alignItems="center">
+            <Stack direction="column" alignItems="center">
               {unindexedInputs.length ? (
                 <>
                   <FormControl sx={{ my: 1, mr: 1 }} size="small">
