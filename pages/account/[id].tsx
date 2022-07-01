@@ -3,6 +3,7 @@ import { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import BigNumber from 'bignumber.js'
 import { Alert, Stack, Container, Paper, IconButton, Divider, Tabs, Tab, Typography, Snackbar } from '@mui/material'
 import { ContentCopyOutlined as CopyIcon } from '@mui/icons-material'
 import SubpageHead from 'components/SubpageHead'
@@ -34,6 +35,8 @@ import {
   ParsedEventLog,
   TabNotFoundException,
   NotFoundException,
+  API_ENDPOINT,
+  CKB_DECIMAL,
 } from 'utils'
 import PageTitle from 'components/PageTitle'
 
@@ -196,7 +199,7 @@ export const getServerSideProps: GetServerSideProps<State, { id: string }> = asy
     }
     const q = isEthAddress(id) ? { address: id } : { script_hash: id }
 
-    const [account, balance, lng] = await Promise.all([
+    const [account, _balance, lng] = await Promise.all([
       fetchAccountOverview(q),
       fetchAccountBalance(q.address ? { address_hashes: [q.address] } : { script_hashes: [q.script_hash] }),
       serverSideTranslations(locale, ['common', 'account', 'list']),
@@ -206,6 +209,11 @@ export const getServerSideProps: GetServerSideProps<State, { id: string }> = asy
     if (!account) {
       throw new NotFoundException()
     }
+
+    const balance = await fetch(`${API_ENDPOINT}/accounts/${account.eth_address}`)
+      .then(r => r.json())
+      .then(a => new BigNumber(a.ckb).multipliedBy(new BigNumber(CKB_DECIMAL)).toString())
+      .catch(() => _balance)
 
     const txList =
       tab === 'transactions' && (q.address || q.script_hash)

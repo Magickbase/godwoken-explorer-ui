@@ -251,7 +251,11 @@ const Tx = (initState: State) => {
     tx.gasPrice
       ? {
           label: 'gasPrice',
-          value: <Typography variant="body2">{new BigNumber(tx.gasPrice).toFormat() + ' CKB'}</Typography>,
+          value: (
+            <Typography variant="body2" sx={{ textTransform: 'none' }}>
+              {new BigNumber(tx.gasPrice).toFormat() + ' pCKB'}
+            </Typography>
+          ),
         }
       : null,
     tx.gasUsed
@@ -270,8 +274,8 @@ const Tx = (initState: State) => {
       ? {
           label: 'fee',
           value: (
-            <Typography variant="body2">
-              {new BigNumber(tx.gasUsed).times(new BigNumber(tx.gasPrice)).toFormat() + ' CKB'}
+            <Typography variant="body2" sx={{ textTransform: 'none' }}>
+              {new BigNumber(tx.gasUsed).times(new BigNumber(tx.gasPrice)).toFormat() + ' pCKB'}
             </Typography>
           ),
         }

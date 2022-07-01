@@ -184,8 +184,8 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({ account, balance, dep
               <ListItemText
                 primary={t(`ckbBalance`)}
                 secondary={
-                  <Typography variant="body2">
-                    {new BigNumber(balance || '0').dividedBy(GCKB_DECIMAL).toFormat() + ' CKB'}
+                  <Typography variant="body2" sx={{ textTransform: 'none' }}>
+                    {new BigNumber(balance || '0').dividedBy(GCKB_DECIMAL).toFormat() + ' pCKB'}
                   </Typography>
                 }
               />
