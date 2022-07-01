@@ -126,7 +126,7 @@ const Token = ({ token, transferList, bridgedRecordList, tokenHolderList }: Prop
             >
               {token.name?.[0] ?? '?'}
             </Avatar>
-            <Typography variant="h5" fontWeight="inherit">
+            <Typography variant="h5" fontWeight="inherit" sx={{ textTransform: 'none' }}>
               {token.name || '-'}
             </Typography>
             {token.symbol ? (
@@ -134,6 +134,7 @@ const Token = ({ token, transferList, bridgedRecordList, tokenHolderList }: Prop
                 fontWeight="inherit"
                 color="primary.light"
                 whiteSpace="pre"
+                sx={{ textTransform: 'none' }}
               >{` (${token.symbol})`}</Typography>
             ) : null}
           </Stack>

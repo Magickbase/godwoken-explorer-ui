@@ -98,7 +98,7 @@ const TokenList = ({ meta, tokens, type }: State) => {
                           </Avatar>
                           <NextLink href={`/token/${token.id}`}>
                             <Link href={`/token/${token.id}`} underline="none" color="secondary" ml={2}>
-                              {`${token.name || '-'}${token.symbol ? '(' + token.symbol + ')' : ''}`}
+                              {token.name || '-'}
                             </Link>
                           </NextLink>
                         </Stack>
