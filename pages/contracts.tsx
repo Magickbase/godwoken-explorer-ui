@@ -65,7 +65,7 @@ const ContractList = (initState: State) => {
                     </TableCell>
                     <TableCell component="th">{t(`compiler`)}</TableCell>
                     <TableCell component="th">{t(`compiler_version`)}</TableCell>
-                    <TableCell component="th">{`${t(`balance`)} (CKB)`}</TableCell>
+                    <TableCell component="th" sx={{ textTransform: 'none' }}>{`${t(`balance`)} (pCKB)`}</TableCell>
                     <TableCell component="th">{t(`tx_count`)}</TableCell>
                   </TableRow>
                 </TableHead>

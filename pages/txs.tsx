@@ -76,7 +76,9 @@ const TxList = () => {
                       <TableCell sx={{ display: { xs: 'table-cell', md: 'none' } }} component="th">
                         {t('transfer')}
                       </TableCell>
-                      <TableCell component="th" sx={{ whiteSpace: 'nowrap' }}>{`${t('value')} (CKB)`}</TableCell>
+                      <TableCell component="th" sx={{ whiteSpace: 'nowrap', textTransform: 'none' }}>{`${t(
+                        'value',
+                      )} (pCKB)`}</TableCell>
                       <TableCell component="th">{t('type')}</TableCell>
                     </TableRow>
                   </TableHead>
