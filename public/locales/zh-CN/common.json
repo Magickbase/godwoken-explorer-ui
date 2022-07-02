@@ -33,6 +33,7 @@
     "show": "显示",
     "records": "条记录"
   },
+  "all": "全部",
   "view_all_blocks": "查看所有区块",
   "view_all_transactions": "查看所有交易"
 }

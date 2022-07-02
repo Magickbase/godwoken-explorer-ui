@@ -40,7 +40,13 @@ const Custom404 = () => {
       >
         <Stack sx={{ px: { xs: 2, md: 16 }, textAlign: 'center' }} alignItems="center">
           <SvgIcon
-            sx={{ width: { xs: 66, md: 96 }, height: { xs: 66, md: 96 } }}
+            sx={{
+              'width': { xs: 66, md: 96 },
+              'height': { xs: 66, md: 96 },
+              '& g path': {
+                fill: search && 'none',
+              },
+            }}
             component={search ? SearchEmptyIcon : NotFoundIcon}
             color="primary"
             viewBox="0 0 96 96"

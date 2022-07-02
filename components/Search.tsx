@@ -55,7 +55,6 @@ const Search = () => {
   return (
     <StyledInputBase
       placeholder={SEARCH_FIELDS}
-      autoFocus
       title={SEARCH_FIELDS}
       onKeyPress={handleSearch}
       inputRef={searchRef}

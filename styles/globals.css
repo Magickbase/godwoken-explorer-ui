@@ -1,6 +1,7 @@
 :root {
   --header-height: 64px;
   --footer-height: 200px;
+  --search-height: 72px;
   --bg-color: #f5f5f544;
 }
 
@@ -15,7 +16,7 @@ body.loading * {
 }
 main,
 .full-height {
-  min-height: calc(100vh - var(--footer-height) - var(--header-height));
+  min-height: calc(100vh - var(--footer-height) - var(--header-height) - var(--search-height));
 }
 a {
   text-decoration: none;
@@ -23,7 +24,7 @@ a {
 }
 
 .mono-font {
-  font-family: 'Roboto Mono', monospace, 'Courier New' !important;
+  font-family: 'JetBrains Mono', monospace, 'Courier New' !important;
 }
 
 input[type='number']::-webkit-inner-spin-button,
