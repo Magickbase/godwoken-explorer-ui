@@ -1,4 +1,4 @@
-import { GetServerSideProps } from 'next'
+import type { GetStaticProps } from 'next'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
@@ -181,7 +181,7 @@ const BlockList = () => {
   )
 }
 
-export const getStaticProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   const lng = await serverSideTranslations(locale, ['common', 'list'])
   return { props: lng }
 }
