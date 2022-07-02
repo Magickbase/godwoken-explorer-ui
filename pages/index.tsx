@@ -1,8 +1,8 @@
 import type { API } from 'utils/api/utils'
-import { gql } from 'graphql-request'
+import type { GetStaticProps } from 'next'
 import type { Cache } from 'pages/api/cache'
 import { useState, useEffect } from 'react'
-import { GetServerSideProps } from 'next'
+import { gql } from 'graphql-request'
 import NextLink from 'next/link'
 import { useQuery } from 'react-query'
 import {
@@ -461,7 +461,7 @@ const Home = () => {
   )
 }
 
-export const getStaticProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   const lng = await serverSideTranslations(locale, ['common', 'block', 'tx', 'statistic'])
   return { props: lng }
 }
