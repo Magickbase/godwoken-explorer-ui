@@ -99,7 +99,7 @@ const TokenList = () => {
                   Array.from({ length: 20 }).map((_, idx) => (
                     <TableRow key={idx}>
                       <TableCell colSpan={headers.length}>
-                        <Skeleton height={40} />
+                        <Skeleton animation="wave" height={40} />
                       </TableCell>
                     </TableRow>
                   ))
