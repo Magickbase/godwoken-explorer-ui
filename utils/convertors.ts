@@ -20,7 +20,7 @@ export const formatDatetime = (datetime: number) => {
   return dayjs(datetime).format('YYYY/MM/DD HH:mm:ss')
 }
 
-export const timeDistance = (time: number, locale?: 'zh-CN' | 'en-US' | string) => {
+export const timeDistance = (time: number | string, locale?: 'zh-CN' | 'en-US' | string) => {
   dayjs.locale(locale?.toLowerCase())
   return dayjs(time).fromNow()
 }

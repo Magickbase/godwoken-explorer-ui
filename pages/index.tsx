@@ -1,4 +1,5 @@
 import type { API } from 'utils/api/utils'
+import { gql } from 'graphql-request'
 import type { Cache } from 'pages/api/cache'
 import { useState, useEffect } from 'react'
 import { GetServerSideProps } from 'next'
@@ -22,8 +23,8 @@ import {
   Divider,
   Paper,
   IconButton,
-  Badge,
   Skeleton,
+  Typography,
 } from '@mui/material'
 import {
   LineWeightOutlined as BlockHeightIcon,
@@ -35,8 +36,7 @@ import {
 } from '@mui/icons-material'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { Typography } from '@mui/material'
-import { timeDistance, useWS, getHomeRes, formatInt, CHANNEL } from 'utils'
+import { timeDistance, formatInt, client, GraphQLSchema } from 'utils'
 
 type State = API.Home.Parsed
 
@@ -54,6 +54,58 @@ const statisticGroups = [
   { key: 'tps', icon: <TpsIcon />, suffix: ' txs/s' },
   { key: 'accountCount', icon: <AccountCountIcon /> },
 ]
+
+const queryHomeLists = gql`
+  query {
+    transactions(input: { limit: 10 }) {
+      entries {
+        eth_hash
+        hash
+        block {
+          timestamp
+        }
+        from_account {
+          eth_address
+          script_hash
+          type
+        }
+        to_account {
+          eth_address
+          script_hash
+          type
+        }
+        polyjuice {
+          status
+        }
+        type
+      }
+    }
+    blocks {
+      number
+      hash
+      timestamp
+      status
+      transaction_count
+    }
+  }
+`
+
+interface HomeLists {
+  blocks: Array<Pick<GraphQLSchema.Block, 'hash' | 'number' | 'status' | 'transaction_count' | 'timestamp'>>
+  transactions: {
+    entries: Array<{
+      block: Pick<GraphQLSchema.Block, 'timestamp'>
+      eth_hash: string
+      hash: string
+      type: GraphQLSchema.TransactionType
+      from_account: Pick<GraphQLSchema.Account, 'eth_address' | 'script_hash' | 'type'>
+      to_account: Pick<GraphQLSchema.Account, 'eth_address' | 'script_hash' | 'type'>
+      polyjuice: Pick<GraphQLSchema.Polyjuice, 'status'>
+    }>
+  }
+}
+
+export const fetchHomeLists = () => client.request<HomeLists>(queryHomeLists)
 
 const Statistic: React.FC<State['statistic'] & { isLoading: boolean }> = ({
   blockCount,
@@ -97,7 +149,7 @@ const Statistic: React.FC<State['statistic'] & { isLoading: boolean }> = ({
   )
 }
 
-const BlockList: React.FC<{ list: State['blockList']; isLoading: boolean }> = ({ list, isLoading }) => {
+const BlockList: React.FC<{ list: HomeLists['blocks']; isLoading: boolean }> = ({ list, isLoading }) => {
   const [t, { language }] = useTranslation(['block', 'common'])
   return (
     <List
@@ -158,7 +210,7 @@ const BlockList: React.FC<{ list: State['blockList']; isLoading: boolean }> = ({
                           </NextLink>
                         </Box>
                         <Typography variant="body2" display="flex" alignItems="center">
-                          {formatInt(block.txCount)} TXs
+                          {formatInt(block.transaction_count ?? 0)} TXs
                         </Typography>
                       </Stack>
                       <Stack direction="row" justifyContent="space-between">
@@ -181,8 +233,8 @@ const BlockList: React.FC<{ list: State['blockList']; isLoading: boolean }> = ({
                           color="rgba(0,0,0,0.6)"
                         >
                           <time
-                            dateTime={new Date(+block.timestamp).toISOString()}
-                            title={new Date(+block.timestamp).toISOString()}
+                            dateTime={new Date(block.timestamp).toISOString()}
+                            title={new Date(block.timestamp).toISOString()}
                           >
                             {timeDistance(block.timestamp, language)}
                           </time>
@@ -199,7 +251,7 @@ const BlockList: React.FC<{ list: State['blockList']; isLoading: boolean }> = ({
   )
 }
 
-const TxList: React.FC<{ list: State['txList']; isLoading: boolean }> = ({ list, isLoading }) => {
+const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: boolean }> = ({ list, isLoading }) => {
   const [t, { language }] = useTranslation('tx')
   return (
     <List
@@ -242,38 +294,29 @@ const TxList: React.FC<{ list: State['txList']; isLoading: boolean }> = ({ list,
             </Box>
           ))
         : list.map((tx, idx) => (
-            <Box key={tx.hash}>
+            <Box key={tx.eth_hash}>
               <Divider variant={idx ? 'middle' : 'fullWidth'} />
               <ListItem>
                 <ListItemIcon>
-                  <Badge
-                    color="warning"
-                    variant="dot"
-                    invisible={tx.polyjuice_status !== 'failed'}
-                    overlap="circular"
-                    badgeContent=""
-                    anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-                  >
-                    <Avatar sx={{ bgcolor: '#cfd8dc' }}>Tx</Avatar>
-                  </Badge>
+                  <Avatar sx={{ bgcolor: '#cfd8dc' }}>Tx</Avatar>
                 </ListItemIcon>
                 <ListItemText
                   primary={
                     <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" minHeight={73}>
                       <Stack>
-                        <Tooltip placement="top" title={tx.hash}>
+                        <Tooltip placement="top" title={tx.eth_hash}>
                           <Box>
-                            <NextLink href={`/tx/${tx.hash}`}>
+                            <NextLink href={`/tx/${tx.eth_hash}`}>
                               <Button
                                 color="secondary"
-                                href={`/tx/${tx.hash}`}
+                                href={`/tx/${tx.eth_hash}`}
                                 component={Link}
                                 className="mono-font"
                                 sx={{
                                   textTransform: 'lowercase',
                                   whiteSpace: 'nowrap',
                                 }}
-                              >{`${tx.hash.slice(0, 8)}...${tx.hash.slice(-8)}`}</Button>
+                              >{`${tx.eth_hash.slice(0, 8)}...${tx.eth_hash.slice(-8)}`}</Button>
                             </NextLink>
                           </Box>
                         </Tooltip>
@@ -285,8 +328,8 @@ const TxList: React.FC<{ list: State['txList']; isLoading: boolean }> = ({ list,
                           ml={1}
                           color="rgba(0,0,0,0.6)"
                         >
-                          <time dateTime={new Date(+tx.timestamp).toISOString()} title={t('timestamp')}>
-                            {timeDistance(tx.timestamp, language)}
+                          <time dateTime={new Date(tx.block.timestamp).toISOString()} title={t('timestamp')}>
+                            {timeDistance(tx.block.timestamp, language)}
                           </time>
                         </Box>
                       </Stack>
@@ -295,17 +338,25 @@ const TxList: React.FC<{ list: State['txList']; isLoading: boolean }> = ({ list,
                           <Typography variant="body2" sx={{ textTransform: 'capitalize' }} noWrap>
                             {`${t('from')}:`}
                           </Typography>
-                          <Tooltip placement="top" title={tx.from}>
+                          <Tooltip placement="top" title={tx.from_account.eth_address || tx.from_account.script_hash}>
                             <Box>
-                              <NextLink href={`/account/${tx.from}`}>
+                              <NextLink
+                                href={`/account/${tx.from_account.eth_address || tx.from_account?.script_hash}`}
+                              >
                                 <Button
                                   color="secondary"
-                                  href={`/account/${tx.from}`}
+                                  href={`/account/${tx.from_account.eth_address || tx.from_account.script_hash}`}
                                   component={Link}
                                   className="mono-font"
                                   sx={{ textTransform: 'lowercase' }}
                                 >
-                                  {formatAddress(tx.from)}
+                                  {[
+                                    GraphQLSchema.AccountType.EthAddrReg,
+                                    GraphQLSchema.AccountType.MetaContract,
+                                    GraphQLSchema.AccountType.PolyjuiceCreator,
+                                  ].includes(tx.from_account.type)
+                                    ? tx.from_account.type.replace(/_/g, ' ')
+                                    : formatAddress(tx.from_account.eth_address || tx.from_account.script_hash)}
                                 </Button>
                               </NextLink>
                             </Box>
@@ -315,17 +366,23 @@ const TxList: React.FC<{ list: State['txList']; isLoading: boolean }> = ({ list,
                           <Typography variant="body2" sx={{ textTransform: 'capitalize' }} noWrap>
                             {`${t('to')}:`}
                           </Typography>
-                          <Tooltip placement="top" title={tx.to}>
+                          <Tooltip placement="top" title={tx.to_account.eth_address || tx.to_account.script_hash}>
                             <Box>
-                              <NextLink href={`/account/${tx.to}`}>
+                              <NextLink href={`/account/${tx.to_account.eth_address || tx.to_account.script_hash}`}>
                                 <Button
                                   color="secondary"
-                                  href={`/account/${tx.to}`}
+                                  href={`/account/${tx.to_account.eth_address || tx.to_account.script_hash}`}
                                   component={Link}
                                   className="mono-font"
                                   sx={{ textTransform: 'lowercase' }}
                                 >
-                                  {formatAddress(tx.to)}
+                                  {[
+                                    GraphQLSchema.AccountType.EthAddrReg,
+                                    GraphQLSchema.AccountType.MetaContract,
+                                    GraphQLSchema.AccountType.PolyjuiceCreator,
+                                  ].includes(tx.to_account.type)
+                                    ? tx.to_account.type.replace(/_/g, ' ')
+                                    : formatAddress(tx.to_account.eth_address || tx.to_account.script_hash)}
                                 </Button>
                               </NextLink>
                             </Box>
@@ -334,7 +391,10 @@ const TxList: React.FC<{ list: State['txList']; isLoading: boolean }> = ({ list,
                       </Stack>
                       <Stack
                         direction={{ xs: 'row', sm: 'column' }}
-                        justifyContent={{ xs: 'space-between', sm: tx.success ? 'start' : 'space-between' }}
+                        justifyContent={{
+                          xs: 'space-between',
+                          sm: tx.polyjuice?.status !== 'FAILED' ? 'start' : 'space-between',
+                        }}
                         alignItems="end"
                       >
                         <Chip
@@ -344,7 +404,9 @@ const TxList: React.FC<{ list: State['txList']; isLoading: boolean }> = ({ list,
                           size="small"
                           sx={{ textTransform: 'capitalize' }}
                         />
-                        {tx.success ? null : <ErrorIcon color="warning" sx={{ mb: { sx: 0, sm: 1 } }} />}
+                        {tx.polyjuice?.status !== 'FAILED' ? null : (
+                          <ErrorIcon color="warning" sx={{ mb: { sx: 0, sm: 1 } }} />
+                        )}
                       </Stack>
                     </Stack>
                   }
@@ -359,45 +421,40 @@ const TxList: React.FC<{ list: State['txList']; isLoading: boolean }> = ({ list,
 
 const Home = () => {
   const [home, setHome] = useState<State | null>(null)
+  const [lists, setLists] = useState<{
+    blocks: HomeLists['blocks']
+    transactions: HomeLists['transactions']['entries']
+  }>({ blocks: [], transactions: [] })
 
-  const { data } = useQuery('cache', () =>
-    fetch('/api/cache')
-      .then(res => res.json())
-      .then((res: Cache) => res.home),
-  )
+  const { data } = useQuery<Cache>('cache', () => fetch('/api/cache').then(res => res.json()), {
+    refetchInterval: 5000,
+  })
 
   useEffect(() => {
     if (data) {
-      setHome(data)
+      if (data.home) {
+        setHome(data.home)
+      }
+      if (data.homeLists) {
+        setLists({
+          blocks: data.homeLists.blocks,
+          transactions: data.homeLists.transactions.entries,
+        })
+      }
     }
   }, [data])
 
-  useWS(
-    CHANNEL.HOME,
-    (init: API.Home.Raw) => setHome(getHomeRes(init)),
-    (update: API.Home.Raw) => {
-      const { blockList, statistic, txList } = getHomeRes(update)
-      const MAX_COUNT = 10
-      setHome(state => ({
-        statistic,
-        blockList: [...blockList, ...state.blockList].sort((b1, b2) => b2.timestamp - b1.timestamp).slice(0, MAX_COUNT),
-        txList: [...txList, ...state.txList].sort((t1, t2) => t2.timestamp - t1.timestamp).slice(0, MAX_COUNT),
-      }))
-    },
-    [setHome],
-  )
-
-  const isLoading = !home
+  const isLoading = !data
 
   return (
     <Container sx={{ py: 6 }}>
       <Statistic {...home?.statistic} isLoading={isLoading} />
       <Stack direction={{ xs: 'column', sm: 'column', md: 'column', lg: 'row' }} spacing={2} sx={{ pt: 6 }}>
         <Paper sx={{ width: '100%', lg: { width: '50%', mr: 2 } }}>
-          <BlockList list={home?.blockList ?? []} isLoading={isLoading} />
+          <BlockList list={lists.blocks} isLoading={isLoading} />
         </Paper>
         <Paper sx={{ width: '100%', lg: { width: '50%', ml: 2 } }}>
-          <TxList list={home?.txList ?? []} isLoading={isLoading} />
+          <TxList list={lists.transactions} isLoading={isLoading} />
         </Paper>
       </Stack>
     </Container>
