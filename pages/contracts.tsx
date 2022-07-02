@@ -34,11 +34,11 @@ const ContractList = () => {
   } = useRouter()
 
   const title = t('contract_list_title')
-  const { isLoading, data } = useQuery(['contracts', page, page_size], () =>
-    fetchContractList({ page: page as string, page_size: page_size as string }),
+  const { isLoading, data } = useQuery(
+    ['contracts', page, page_size],
+    () => fetchContractList({ page: page as string, page_size: page_size as string }),
+    { refetchInterval: 10000 },
   )
-
-  //       fetchContractList({ page: page as string, page_size: page_size as string }),
 
   return (
     <>

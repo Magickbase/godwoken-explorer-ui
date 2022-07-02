@@ -45,7 +45,13 @@ const TokenList = () => {
     { key: 'holderCount' },
   ]
 
-  const { isLoading, data } = useQuery(['tokens', page], () => fetchTokenList({ page: page as string }))
+  const { isLoading, data } = useQuery(
+    ['tokens', type, page],
+    () => fetchTokenList({ page: page as string, type: type as string }),
+    {
+      refetchInterval: 10000,
+    },
+  )
 
   const title = t(`${type}-udt-list`)
   return (

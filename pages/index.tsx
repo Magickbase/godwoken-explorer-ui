@@ -251,6 +251,12 @@ const BlockList: React.FC<{ list: HomeLists['blocks']; isLoading: boolean }> = (
   )
 }
 
+const SPECIAL_ADDR_TYPES = [
+  GraphQLSchema.AccountType.EthAddrReg,
+  GraphQLSchema.AccountType.MetaContract,
+  GraphQLSchema.AccountType.PolyjuiceCreator,
+]
+
 const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: boolean }> = ({ list, isLoading }) => {
   const [t, { language }] = useTranslation('tx')
   return (
@@ -293,128 +299,120 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
               </ListItem>
             </Box>
           ))
-        : list.map((tx, idx) => (
-            <Box key={tx.eth_hash}>
-              <Divider variant={idx ? 'middle' : 'fullWidth'} />
-              <ListItem>
-                <ListItemIcon>
-                  <Avatar sx={{ bgcolor: '#cfd8dc' }}>Tx</Avatar>
-                </ListItemIcon>
-                <ListItemText
-                  primary={
-                    <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" minHeight={73}>
-                      <Stack>
-                        <Tooltip placement="top" title={tx.eth_hash}>
-                          <Box>
-                            <NextLink href={`/tx/${tx.eth_hash}`}>
-                              <Button
-                                color="secondary"
-                                href={`/tx/${tx.eth_hash}`}
-                                component={Link}
-                                className="mono-font"
-                                sx={{
-                                  textTransform: 'lowercase',
-                                  whiteSpace: 'nowrap',
-                                }}
-                              >{`${tx.eth_hash.slice(0, 8)}...${tx.eth_hash.slice(-8)}`}</Button>
-                            </NextLink>
+        : list.map((tx, idx) => {
+            const from = tx.from_account.eth_address || tx.from_account.script_hash
+            const to = tx.to_account.eth_address || tx.to_account.script_hash
+            const isSpecialFrom = SPECIAL_ADDR_TYPES.includes(tx.from_account.type)
+            const isSpecialTo = SPECIAL_ADDR_TYPES.includes(tx.to_account.type)
+            return (
+              <Box key={tx.eth_hash}>
+                <Divider variant={idx ? 'middle' : 'fullWidth'} />
+                <ListItem>
+                  <ListItemIcon>
+                    <Avatar sx={{ bgcolor: '#cfd8dc' }}>Tx</Avatar>
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={
+                      <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" minHeight={73}>
+                        <Stack>
+                          <Tooltip placement="top" title={tx.eth_hash}>
+                            <Box>
+                              <NextLink href={`/tx/${tx.eth_hash}`}>
+                                <Button
+                                  color="secondary"
+                                  href={`/tx/${tx.eth_hash}`}
+                                  component={Link}
+                                  className="mono-font"
+                                  sx={{
+                                    textTransform: 'lowercase',
+                                    whiteSpace: 'nowrap',
+                                  }}
+                                >{`${tx.eth_hash.slice(0, 8)}...${tx.eth_hash.slice(-8)}`}</Button>
+                              </NextLink>
+                            </Box>
+                          </Tooltip>
+                          <Box
+                            alignItems="bottom"
+                            fontWeight={400}
+                            fontSize="0.875rem"
+                            pt={1}
+                            ml={1}
+                            color="rgba(0,0,0,0.6)"
+                          >
+                            <time dateTime={new Date(tx.block.timestamp).toISOString()} title={t('timestamp')}>
+                              {timeDistance(tx.block.timestamp, language)}
+                            </time>
                           </Box>
-                        </Tooltip>
-                        <Box
-                          alignItems="bottom"
-                          fontWeight={400}
-                          fontSize="0.875rem"
-                          pt={1}
-                          ml={1}
-                          color="rgba(0,0,0,0.6)"
+                        </Stack>
+                        <Stack sx={{ pl: { xs: 1, sm: 0 } }}>
+                          <Stack direction="row" justifyContent="space-between" alignItems="center">
+                            <Typography variant="body2" sx={{ textTransform: 'capitalize' }} noWrap>
+                              {`${t('from')}:`}
+                            </Typography>
+                            <Tooltip placement="top" title={from}>
+                              <Box>
+                                <NextLink href={`/account/${from}`}>
+                                  <Button
+                                    color="secondary"
+                                    href={`/account/${from}`}
+                                    component={Link}
+                                    className="mono-font"
+                                    sx={{ whiteSpace: 'nowrap', fontSize: isSpecialFrom ? 'small' : 'normal' }}
+                                  >
+                                    {isSpecialFrom ? tx.from_account.type.replace(/_/g, ' ') : formatAddress(from)}
+                                  </Button>
+                                </NextLink>
+                              </Box>
+                            </Tooltip>
+                          </Stack>
+                          <Stack direction="row" justifyContent="space-between" alignItems="center">
+                            <Typography variant="body2" sx={{ textTransform: 'capitalize' }} noWrap>
+                              {`${t('to')}:`}
+                            </Typography>
+                            <Tooltip placement="top" title={to}>
+                              <Box>
+                                <NextLink href={`/account/${to}`}>
+                                  <Button
+                                    color="secondary"
+                                    href={`/account/${to}`}
+                                    component={Link}
+                                    className="mono-font"
+                                    sx={{ whiteSpace: 'nowrap', fontSize: isSpecialTo ? 'small' : 'normal' }}
+                                  >
+                                    {isSpecialTo ? tx.to_account.type.replace(/_/g, ' ') : formatAddress(to)}
+                                  </Button>
+                                </NextLink>
+                              </Box>
+                            </Tooltip>
+                          </Stack>
+                        </Stack>
+                        <Stack
+                          direction={{ xs: 'row', sm: 'column' }}
+                          justifyContent={{
+                            xs: 'space-between',
+                            sm: tx.polyjuice?.status !== 'FAILED' ? 'start' : 'space-between',
+                          }}
+                          alignItems="end"
                         >
-                          <time dateTime={new Date(tx.block.timestamp).toISOString()} title={t('timestamp')}>
-                            {timeDistance(tx.block.timestamp, language)}
-                          </time>
-                        </Box>
-                      </Stack>
-                      <Stack sx={{ pl: { xs: 1, sm: 0 } }}>
-                        <Stack direction="row" justifyContent="space-between" alignItems="center">
-                          <Typography variant="body2" sx={{ textTransform: 'capitalize' }} noWrap>
-                            {`${t('from')}:`}
-                          </Typography>
-                          <Tooltip placement="top" title={tx.from_account.eth_address || tx.from_account.script_hash}>
-                            <Box>
-                              <NextLink
-                                href={`/account/${tx.from_account.eth_address || tx.from_account?.script_hash}`}
-                              >
-                                <Button
-                                  color="secondary"
-                                  href={`/account/${tx.from_account.eth_address || tx.from_account.script_hash}`}
-                                  component={Link}
-                                  className="mono-font"
-                                  sx={{ textTransform: 'lowercase' }}
-                                >
-                                  {[
-                                    GraphQLSchema.AccountType.EthAddrReg,
-                                    GraphQLSchema.AccountType.MetaContract,
-                                    GraphQLSchema.AccountType.PolyjuiceCreator,
-                                  ].includes(tx.from_account.type)
-                                    ? tx.from_account.type.replace(/_/g, ' ')
-                                    : formatAddress(tx.from_account.eth_address || tx.from_account.script_hash)}
-                                </Button>
-                              </NextLink>
-                            </Box>
-                          </Tooltip>
-                        </Stack>
-                        <Stack direction="row" justifyContent="space-between" alignItems="center">
-                          <Typography variant="body2" sx={{ textTransform: 'capitalize' }} noWrap>
-                            {`${t('to')}:`}
-                          </Typography>
-                          <Tooltip placement="top" title={tx.to_account.eth_address || tx.to_account.script_hash}>
-                            <Box>
-                              <NextLink href={`/account/${tx.to_account.eth_address || tx.to_account.script_hash}`}>
-                                <Button
-                                  color="secondary"
-                                  href={`/account/${tx.to_account.eth_address || tx.to_account.script_hash}`}
-                                  component={Link}
-                                  className="mono-font"
-                                  sx={{ textTransform: 'lowercase' }}
-                                >
-                                  {[
-                                    GraphQLSchema.AccountType.EthAddrReg,
-                                    GraphQLSchema.AccountType.MetaContract,
-                                    GraphQLSchema.AccountType.PolyjuiceCreator,
-                                  ].includes(tx.to_account.type)
-                                    ? tx.to_account.type.replace(/_/g, ' ')
-                                    : formatAddress(tx.to_account.eth_address || tx.to_account.script_hash)}
-                                </Button>
-                              </NextLink>
-                            </Box>
-                          </Tooltip>
+                          <Chip
+                            label={tx.type.replace(/_/g, ' ')}
+                            color="primary"
+                            variant="outlined"
+                            size="small"
+                            sx={{ textTransform: 'capitalize' }}
+                          />
+                          {tx.polyjuice?.status !== 'FAILED' ? null : (
+                            <ErrorIcon color="warning" sx={{ mb: { sx: 0, sm: 1 } }} />
+                          )}
                         </Stack>
                       </Stack>
-                      <Stack
-                        direction={{ xs: 'row', sm: 'column' }}
-                        justifyContent={{
-                          xs: 'space-between',
-                          sm: tx.polyjuice?.status !== 'FAILED' ? 'start' : 'space-between',
-                        }}
-                        alignItems="end"
-                      >
-                        <Chip
-                          label={tx.type.replace(/_/g, ' ')}
-                          color="primary"
-                          variant="outlined"
-                          size="small"
-                          sx={{ textTransform: 'capitalize' }}
-                        />
-                        {tx.polyjuice?.status !== 'FAILED' ? null : (
-                          <ErrorIcon color="warning" sx={{ mb: { sx: 0, sm: 1 } }} />
-                        )}
-                      </Stack>
-                    </Stack>
-                  }
-                  primaryTypographyProps={{ component: 'div' }}
-                />
-              </ListItem>
-            </Box>
-          ))}
+                    }
+                    primaryTypographyProps={{ component: 'div' }}
+                  />
+                </ListItem>
+              </Box>
+            )
+          })}
     </List>
   )
 }
