@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-context('Header', () => {
+context.skip('Header', () => {
   before(() => cy.visit('/en-US'))
 
   it('should have a logo', () => {

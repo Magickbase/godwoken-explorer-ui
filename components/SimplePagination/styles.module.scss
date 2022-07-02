@@ -1,0 +1,15 @@
+.container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  height: 4rem;
+}
+.prev {
+  svg {
+    transform: rotate(0.5turn);
+  }
+}
+.prev,
+.next {
+  margin-right: 1.5rem;
+}

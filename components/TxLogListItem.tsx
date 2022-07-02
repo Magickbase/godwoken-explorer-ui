@@ -14,9 +14,8 @@ import {
   InputBase,
   SxProps,
 } from '@mui/material'
-import Image from 'next/image'
 import { styled } from '@mui/material/styles'
-import { ParsedEventLog, IMG_URL } from 'utils'
+import { ParsedEventLog } from 'utils'
 import TruncatedAddress from './TruncatedAddress'
 
 const argsFormatReducer = (state, action) => {
@@ -24,6 +23,7 @@ const argsFormatReducer = (state, action) => {
     case 'topic0':
     case 'topic1':
     case 'topic2':
+    case 'topic3':
     case 'data':
       return { ...state, [action.type]: action.payload }
     default: {
@@ -60,7 +60,7 @@ export const ArgsValueDisplay = ({
         {hexValue}
       </Typography>
     ) : argType === 'address' ? (
-      <TruncatedAddress address={decodedValue} leading={30} size="normal" />
+      <TruncatedAddress address={decodedValue} leading={30} />
     ) : (
       <Typography fontSize={14} variant="body2" className="mono-font">
         {decodedValue}
@@ -85,6 +85,8 @@ const TxLogsListItem = ({ item }: { item: ParsedEventLog }) => {
     data: 'decoded',
   })
   const { name: eventName, inputs: eventInputs } = item.parsedLog?.eventFragment ?? { name: null, inputs: [] }
+  const unindexedInputs = eventInputs.filter(input => input.indexed === false)
+  const unindexedParsedArgs = item.parsedLog?.args.filter(arg => typeof arg !== 'string')
 
   const ArgsFormatSelector = ({ type, arg }: { type: 'select' | 'button'; arg: string }) => {
     const handleChange = event => {
@@ -155,7 +157,6 @@ const TxLogsListItem = ({ item }: { item: ParsedEventLog }) => {
           <TruncatedAddress
             address={item.addressHash}
             leading={30}
-            size="normal"
             sx={{ whiteSpace: 'normal', wordBreak: 'break-word', overflowWrap: 'break-word' }}
           />
         </Box>
@@ -251,25 +252,36 @@ const TxLogsListItem = ({ item }: { item: ParsedEventLog }) => {
             )}
           </Stack>
         </Box>
-        <Box key="data" sx={{ display: 'flex', width: '100%' }}>
-          <Typography fontSize={14} variant="body2" sx={{ flex: '0 0 60px', mr: 3, textAlign: 'right' }}>
-            {t('data')}
-          </Typography>
-          <Box sx={{ display: 'flex', width: '100%', background: '#FAFAFA', p: 2, borderRadius: 2 }}>
-            {item.parsedLog && argsFormatState.data === 'decoded' ? (
-              <Typography fontSize={14} component="span">
-                {eventInputs[2].name + ':'}
-              </Typography>
-            ) : null}
-            <ArgsValueDisplay
-              format={argsFormatState.data}
-              argType={eventInputs[2]?.type}
-              hexValue={item.data}
-              decodedValue={item.parsedLog?.args[2].hex ?? item.data}
-            />
-            {item.parsedLog ? <ArgsFormatSelector type="button" arg="data" /> : null}
+        {item.data && (
+          <Box key="data" sx={{ display: 'flex', width: '100%' }}>
+            <Typography fontSize={14} variant="body2" sx={{ flex: '0 0 60px', mr: 3, textAlign: 'right' }}>
+              {t('data')}
+            </Typography>
+
+            <Stack sx={{ width: '100%', background: '#FAFAFA', p: 2, borderRadius: 2 }}>
+              {item.data
+                .slice(2)
+                .split(/(.{64})/)
+                .filter(str => str.length > 0)
+                .map((data, i) => (
+                  <Box sx={{ display: 'flex' }} key={i}>
+                    {item.parsedLog && argsFormatState.data === 'decoded' ? (
+                      <Typography fontSize={14} component="span">
+                        {unindexedInputs[i].name + ':'}
+                      </Typography>
+                    ) : null}
+                    <ArgsValueDisplay
+                      format={argsFormatState.data}
+                      argType={unindexedInputs[i]?.type}
+                      hexValue={data}
+                      decodedValue={unindexedParsedArgs ? unindexedParsedArgs[i]?.hex : data}
+                    />
+                  </Box>
+                ))}
+              {item.parsedLog ? <ArgsFormatSelector type="button" arg="data" /> : null}
+            </Stack>
           </Box>
-        </Box>
+        )}
       </Box>
     </Box>
   )

@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-context('Search', () => {
+context.skip('Search', () => {
   const ROOT_SELECTOR = `form[class^=search_container]`
   const MOBILE_VIEWPORT = 'iphone-6'
   describe('home page', () => {

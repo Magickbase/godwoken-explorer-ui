@@ -18,7 +18,7 @@ function Logo(props: SvgIconProps) {
   }, [setVersion])
 
   return (
-    <Box sx={{ width: 100 }}>
+    <Box sx={{ width: 102 }}>
       <SvgIcon {...props} sx={{ height: 16 }} component={LogoSvg} viewBox="0 0 27 16" />
       <Typography
         component="span"
@@ -32,7 +32,7 @@ function Logo(props: SvgIconProps) {
         component="span"
         fontFamily="DIN Pro"
         fontStyle="italic"
-        sx={{ fontSize: { xs: '7.33px', md: '8px' } }}
+        sx={{ fontSize: { xs: '10px', md: '12px' }, fontVariant: 'all-petite-caps' }}
       >
         V{version}
       </Typography>

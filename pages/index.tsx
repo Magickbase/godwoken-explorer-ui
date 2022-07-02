@@ -19,7 +19,9 @@ import {
   Divider,
   Paper,
   Typography,
+  Badge,
 } from '@mui/material'
+import { useTheme } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded'
 import { useTranslation } from 'next-i18next'
@@ -214,7 +216,8 @@ const BlockList = ({ list }: { list: State['blockList'] }) => {
 
 const TxList = ({ list }: { list: State['txList'] }) => {
   const [t, { language }] = useTranslation('tx')
-  const matches = useMediaQuery(theme => theme.breakpoints.up('md'))
+  const theme = useTheme()
+  const matches = useMediaQuery(theme.breakpoints.up('md'))
   return (
     <ListContainer title={t(`latestTxs`)} link="/txs" tooltip={t(`view_all_transactions`, { ns: 'common' })}>
       {list?.map((tx, idx) => (
@@ -222,17 +225,26 @@ const TxList = ({ list }: { list: State['txList'] }) => {
           {idx !== 0 && <Divider variant="middle" color="#f0f0f0" sx={{ borderColor: 'transparent' }} />}
           <ListItem>
             <ListItemIcon sx={{ minWidth: 36 }}>
-              <Avatar
-                sx={{
-                  bgcolor: IS_MAINNET ? '#f6f3ff' : '#f3f8ff',
-                  color: 'secondary.light',
-                  width: { xs: 36, md: 56 },
-                  height: { xs: 36, md: 56 },
-                  fontSize: { xs: 14, md: 16 },
-                }}
+              <Badge
+                color="warning"
+                variant="dot"
+                invisible={tx.polyjuice_status !== 'failed'}
+                overlap="circular"
+                badgeContent=""
+                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
               >
-                Tx
-              </Avatar>
+                <Avatar
+                  sx={{
+                    bgcolor: IS_MAINNET ? '#f6f3ff' : '#f3f8ff',
+                    color: 'secondary.light',
+                    width: { xs: 36, md: 56 },
+                    height: { xs: 36, md: 56 },
+                    fontSize: { xs: 14, md: 16 },
+                  }}
+                >
+                  Tx
+                </Avatar>
+              </Badge>
             </ListItemIcon>
             <ListItemText
               primary={

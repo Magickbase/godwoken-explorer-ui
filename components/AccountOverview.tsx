@@ -8,6 +8,7 @@ import MetaContract from 'components/MetaContract'
 import SmartContract from 'components/SmartContract'
 import Polyjuice from 'components/Polyjuice'
 import SUDT from 'components/SUDT'
+import UnknownAccount from 'components/UnknownAccount'
 import { GCKB_DECIMAL, GraphQLSchema, client } from 'utils'
 
 export type BasicScript = Record<'args' | 'code_hash' | 'hash_type', string>
@@ -16,6 +17,10 @@ interface AccountBase {
   script_hash: string
   transaction_count: number
   nonce: number
+}
+
+interface UnknownUser extends AccountBase {
+  type: GraphQLSchema.AccountType.Unknown
 }
 
 interface EthUser extends AccountBase {
@@ -70,7 +75,7 @@ export interface MetaContract extends AccountBase {
 }
 
 export type AccountOverviewProps = {
-  account: EthUser | EthAddrReg | PolyjuiceCreator | PolyjuiceContract | Udt | MetaContract
+  account: EthUser | EthAddrReg | PolyjuiceCreator | PolyjuiceContract | Udt | MetaContract | UnknownUser
   balance: string
   deployerAddr?: string
 }
@@ -110,6 +115,14 @@ const accountBalanceQuery = gql`
   }
 `
 
+const newAccountBalanceQuery = gql`
+  query ($address_hashes: [String], $script_hashes: [String]) {
+    account_current_bridged_udts_of_ckb(input: { address_hashes: $address_hashes, script_hashes: $script_hashes }) {
+      value
+    }
+  }
+`
+
 const deployAddrQuery = gql`
   query ($eth_hash: String!) {
     transaction(input: { eth_hash: $eth_hash }) {
@@ -123,12 +136,29 @@ const deployAddrQuery = gql`
 type Variables = { address: string } | { script_hash: string }
 
 export const fetchAccountOverview = (variables: Variables) =>
-  client.request<Omit<AccountOverviewProps, 'balance'>>(accountOverviewQuery, variables).then(data => data.account)
+  client.request<Omit<AccountOverviewProps, 'balance'>>(accountOverviewQuery, variables).then(
+    data =>
+      data.account ??
+      ({
+        type: GraphQLSchema.AccountType.Unknown,
+        eth_address: variables['eth_address'] ?? null,
+        script_hash: variables['script_hash'] ?? '',
+        transaction_count: 0,
+        nonce: 0,
+      } as UnknownUser),
+  )
 
 export const fetchAccountBalance = (variables: { address_hashes: Array<string> } | { script_hashes: Array<string> }) =>
-  client
-    .request<{ account_ckbs: Array<{ balance: string }> }>(accountBalanceQuery, variables)
-    .then(data => data.account_ckbs[0]?.balance ?? '0')
+  Promise.all([
+    client
+      .request<{ account_ckbs: Array<{ balance: string }> }>(accountBalanceQuery, variables)
+      .then(data => data.account_ckbs[0]?.balance)
+      .catch(() => null),
+    client
+      .request<{ account_current_bridged_udts_of_ckb: Array<{ value: string }> }>(newAccountBalanceQuery, variables)
+      .then(data => data.account_current_bridged_udts_of_ckb[0]?.value)
+      .catch(() => null),
+  ]).then(([b1, b2]) => b1 || b2 || '0')
 
 export const fetchDeployAddress = (variables: { eth_hash: string }) =>
   client
@@ -164,7 +194,7 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({ account, balance, dep
               <ListItemText
                 primary={t(`txCount`)}
                 secondary={
-                  <Typography variant="body2">{new BigNumber(account.transaction_count).toFormat()}</Typography>
+                  <Typography variant="body2">{new BigNumber(account.transaction_count ?? 0).toFormat()}</Typography>
                 }
               />
             </ListItem>
@@ -189,6 +219,7 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({ account, balance, dep
           {account.type === GraphQLSchema.AccountType.Udt && account.udt ? (
             <SUDT udt={account.udt} script={account.script} script_hash={account.script_hash} />
           ) : null}
+          {account.type === GraphQLSchema.AccountType.Unknown ? <UnknownAccount nonce={account.nonce} /> : null}
         </Grid>
       </Grid>
     </Paper>
