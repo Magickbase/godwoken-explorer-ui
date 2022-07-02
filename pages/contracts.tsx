@@ -73,7 +73,7 @@ const ContractList = () => {
                     Array.from({ length: +page_size }).map((_, idx) => (
                       <TableRow key={idx}>
                         <TableCell colSpan={6}>
-                          <Skeleton />
+                          <Skeleton animation="wave" />
                         </TableCell>
                       </TableRow>
                     ))
@@ -133,7 +133,7 @@ const ContractList = () => {
             <Stack direction="row" justifyContent="space-between" alignItems="center">
               <PageSize pageSize={+page_size} />
               {isLoading ? (
-                <Skeleton width="20px" />
+                <Skeleton animation="wave" width="20px" />
               ) : (
                 <Pagination total={data?.meta.totalPage * +page_size} page={+page} pageSize={+page_size} />
               )}
