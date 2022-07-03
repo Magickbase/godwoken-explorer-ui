@@ -52,6 +52,7 @@ import {
   formatInt,
   handleCopy,
   fetchEventLogsListByType,
+  handleApiError,
   CKB_EXPLORER_URL,
   CHANNEL,
   CKB_DECIMAL,
@@ -489,17 +490,12 @@ export const getStaticProps: GetStaticProps<State, { hash: string }> = async ({ 
 
   try {
     const [tx, lng] = await Promise.all([fetchTx(hash), await serverSideTranslations(locale, ['common', 'tx', 'list'])])
-    if (!tx) {
+    if (!tx?.hash) {
       throw new NotFoundException()
     }
     return { props: { ...tx, ...lng } }
   } catch (err) {
-    return {
-      redirect: {
-        destination: `/${locale}/404'?query=${hash}}`,
-        permanent: false,
-      },
-    }
+    return handleApiError(err, null, locale, hash)
   }
 }
 export default Tx
