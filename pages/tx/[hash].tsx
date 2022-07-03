@@ -47,12 +47,10 @@ import TxLogsList from 'components/TxLogsList'
 import {
   formatDatetime,
   fetchTx,
-  handleApiError,
   useWS,
   getTxRes,
   formatInt,
   handleCopy,
-  TabNotFoundException,
   fetchEventLogsListByType,
   CKB_EXPLORER_URL,
   CHANNEL,
@@ -79,7 +77,7 @@ const Tx = (initState: State) => {
   const [t] = useTranslation('tx')
 
   const { isLoading: isTransferListLoading, data: transferList } = useQuery(
-    ['tx-transfer-list', before, after, address_from, address_to],
+    ['tx-transfer-list', hash, before, after, address_from, address_to],
     () =>
       fetchTransferList({
         transaction_hash: hash as string,
@@ -95,7 +93,7 @@ const Tx = (initState: State) => {
   )
 
   const { isLoading: isLogListLoading, data: logsList } = useQuery(
-    ['tx-log-list'],
+    ['tx-log-list', hash],
     () => fetchEventLogsListByType('txs', hash as string),
     {
       enabled: tab === 'logs',
