@@ -1,9 +1,10 @@
+import type { GetStaticProps, GetStaticPaths } from 'next'
 import { useEffect, useState } from 'react'
-import { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { useQuery } from 'react-query'
 import {
   Alert,
   Container,
@@ -20,6 +21,7 @@ import {
   Divider,
   IconButton,
   Snackbar,
+  Skeleton,
 } from '@mui/material'
 import { OpenInNew as OpenInNewIcon, ContentCopyOutlined as CopyIcon } from '@mui/icons-material'
 import BigNumber from 'bignumber.js'
@@ -39,7 +41,6 @@ import {
   fetchBridgedRecordList,
   getBridgedRecordListRes,
   handleCopy,
-  TabNotFoundException,
 } from 'utils'
 
 type RawBlock = Parameters<typeof getBlockRes>[0]
@@ -56,12 +57,34 @@ const Block = (initState: State) => {
   const [t, { language }] = useTranslation('block')
   const {
     push,
-    query: { tab = 'transactions' },
+    query: { tab = 'transactions', before = null, after = null, page = '1' },
   } = useRouter()
 
   useEffect(() => {
     setBlock(initState)
   }, [setBlock, initState])
+
+  const { isLoading: isTxListLoading, data: txList } = useQuery(
+    ['block-tx-list', block.number, before, after],
+    () =>
+      fetchTxList({
+        start_block_number: block.number,
+        end_block_number: block.number,
+        before: before as string | null,
+        after: after as string | null,
+      }),
+    {
+      enabled: tab === 'transactions' && !!block.hash,
+    },
+  )
+
+  const { isLoading: isBridgeListLoading, data: bridgedRecordList } = useQuery(
+    ['block-bridge-list', block.number, page],
+    () => fetchBridgedRecordList({ block_number: block.number.toString(), page: page as string }),
+    {
+      enabled: tab === 'bridged' && !!block.hash,
+    },
+  )
 
   useWS(
     `${CHANNEL.BLOCK_INFO}${block.number}`,
@@ -70,7 +93,7 @@ const Block = (initState: State) => {
     },
     (rawUpdate: RawBlock) => {
       const update = getBlockRes(rawUpdate)
-      setBlock(prev => ({ ...prev, ...update }))
+      setBlock(prev => ({ ...prev, layer1: update.layer1, finalizeState: update.finalizeState }))
     },
     [setBlock, block.number],
   )
@@ -286,9 +309,19 @@ const Block = (initState: State) => {
               ))}
             </Tabs>
             <Divider />
-            {tab === 'transactions' && block.txList ? <TxList transactions={block.txList} /> : null}
-            {tab === 'bridged' && block.bridgedRecordList ? (
-              <BridgedRecordList list={block.bridgedRecordList} showUser />
+            {tab === 'transactions' ? (
+              !isTxListLoading && txList ? (
+                <TxList transactions={txList} />
+              ) : (
+                <Skeleton animation="wave" />
+              )
+            ) : null}
+            {tab === 'bridged' ? (
+              !isBridgeListLoading && bridgedRecordList ? (
+                <BridgedRecordList list={bridgedRecordList} showUser />
+              ) : (
+                <Skeleton animation="wave" />
+              )
             ) : null}
           </Paper>
         </Stack>
@@ -311,37 +344,21 @@ const Block = (initState: State) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<State> = async ({ locale, res, params, query }) => {
-  const { id } = params
-  const { tab = tabs[0], before = null, after = null } = query
-  try {
-    if (typeof tab !== 'string' || !tabs.includes(tab)) {
-      throw new TabNotFoundException()
-    }
+export const getStaticPaths: GetStaticPaths = () => ({
+  paths: [],
+  fallback: 'blocking',
+})
 
+export const getStaticProps: GetStaticProps<State, { id: string }> = async ({ locale, params }) => {
+  try {
     const [block, lng] = await Promise.all([
-      fetchBlock(id as string),
+      fetchBlock(params.id),
       serverSideTranslations(locale, ['common', 'block', 'list']),
     ])
 
-    const txList =
-      tab === 'transactions' && block.hash
-        ? await fetchTxList({
-            start_block_number: block.number,
-            end_block_number: block.number,
-            before: before as string | null,
-            after: after as string | null,
-          })
-        : null
-
-    const bridgedRecordList =
-      tab === 'bridged' && block.hash
-        ? await fetchBridgedRecordList({ block_number: block.number.toString(), page: query.page as string })
-        : null
-
-    return { props: { ...block, ...lng, txList, bridgedRecordList } }
+    return { props: { ...block, ...lng } }
   } catch (err) {
-    return handleApiError(err, res, locale, id.toString())
+    return handleApiError(err, null, locale, params.id)
   }
 }
 
