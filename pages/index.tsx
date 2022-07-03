@@ -357,7 +357,11 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
                                     href={`/account/${from}`}
                                     component={Link}
                                     className="mono-font"
-                                    sx={{ whiteSpace: 'nowrap', fontSize: isSpecialFrom ? 'small' : 'normal' }}
+                                    sx={{
+                                      whiteSpace: 'nowrap',
+                                      fontSize: isSpecialFrom ? 'small' : 'normal',
+                                      textTransform: isSpecialFrom ? 'uppercase' : 'lowercase',
+                                    }}
                                   >
                                     {isSpecialFrom ? tx.from_account.type.replace(/_/g, ' ') : formatAddress(from)}
                                   </Button>
@@ -377,7 +381,11 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
                                     href={`/account/${to}`}
                                     component={Link}
                                     className="mono-font"
-                                    sx={{ whiteSpace: 'nowrap', fontSize: isSpecialTo ? 'small' : 'normal' }}
+                                    sx={{
+                                      whiteSpace: 'nowrap',
+                                      fontSize: isSpecialTo ? 'small' : 'normal',
+                                      textTransform: isSpecialTo ? 'uppercase' : 'lowercase',
+                                    }}
                                   >
                                     {isSpecialTo ? tx.to_account.type.replace(/_/g, ' ') : formatAddress(to)}
                                   </Button>
