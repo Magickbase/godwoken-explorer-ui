@@ -47,13 +47,12 @@ import TxLogsList from 'components/TxLogsList'
 import {
   formatDatetime,
   fetchTx,
-  handleApiError,
   useWS,
   getTxRes,
   formatInt,
   handleCopy,
-  TabNotFoundException,
   fetchEventLogsListByType,
+  handleApiError,
   CKB_EXPLORER_URL,
   CHANNEL,
   CKB_DECIMAL,
@@ -79,7 +78,7 @@ const Tx = (initState: State) => {
   const [t] = useTranslation('tx')
 
   const { isLoading: isTransferListLoading, data: transferList } = useQuery(
-    ['tx-transfer-list', before, after, address_from, address_to],
+    ['tx-transfer-list', hash, before, after, address_from, address_to],
     () =>
       fetchTransferList({
         transaction_hash: hash as string,
@@ -95,7 +94,7 @@ const Tx = (initState: State) => {
   )
 
   const { isLoading: isLogListLoading, data: logsList } = useQuery(
-    ['tx-log-list'],
+    ['tx-log-list', hash],
     () => fetchEventLogsListByType('txs', hash as string),
     {
       enabled: tab === 'logs',
@@ -491,17 +490,12 @@ export const getStaticProps: GetStaticProps<State, { hash: string }> = async ({ 
 
   try {
     const [tx, lng] = await Promise.all([fetchTx(hash), await serverSideTranslations(locale, ['common', 'tx', 'list'])])
-    if (!tx) {
+    if (!tx?.hash) {
       throw new NotFoundException()
     }
     return { props: { ...tx, ...lng } }
   } catch (err) {
-    return {
-      redirect: {
-        destination: `/${locale}/404'?query=${hash}}`,
-        permanent: false,
-      },
-    }
+    return handleApiError(err, null, locale, hash)
   }
 }
 export default Tx
