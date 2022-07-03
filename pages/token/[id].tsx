@@ -1,7 +1,8 @@
-import { GetServerSideProps } from 'next'
+import type { GetStaticProps, GetStaticPaths } from 'next'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useRouter } from 'next/router'
+import { useQuery } from 'react-query'
 import {
   Container,
   Stack,
@@ -17,6 +18,7 @@ import {
   Avatar,
   Typography,
   Link,
+  Skeleton,
 } from '@mui/material'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import BigNumber from 'bignumber.js'
@@ -31,34 +33,42 @@ import {
   fetchToken,
   fetchERC20TransferList,
   nameToColor,
-  getERC20TransferListRes,
-  getBridgedRecordListRes,
   fetchBridgedRecordList,
-  getTokenHolderListRes,
   fetchTokenHolderList,
 } from 'utils'
-import { PageNonPositiveException, PageOverflowException, TabNotFoundException } from 'utils/exceptions'
 import type { API } from 'utils/api/utils'
-
-type ParsedTransferList = ReturnType<typeof getERC20TransferListRes>
-type ParsedbridgedRecordList = ReturnType<typeof getBridgedRecordListRes>
-type ParsedTokenHolderList = ReturnType<typeof getTokenHolderListRes>
 
 const tabs = ['transfers', 'bridged', 'holders']
 
 type Props = {
   token: API.Token.Parsed
-  transferList?: ParsedTransferList
-  bridgedRecordList?: ParsedbridgedRecordList
-  tokenHolderList?: ParsedTokenHolderList
 }
 
-const Token = ({ token, transferList, bridgedRecordList, tokenHolderList }: Props) => {
+const Token: React.FC<Props> = ({ token }) => {
   const [t] = useTranslation('tokens')
   const {
     push,
-    query: { tab = 'transfers' },
+    query: { tab = 'transfers', page = '1' },
   } = useRouter()
+
+  const { isLoading: isTransferListLoading, data: transferList } = useQuery(
+    ['token-transfer-list', token.address, page],
+    () => fetchERC20TransferList({ udt_address: token.address, page: page as string }),
+    { enabled: tab === tabs[0] && !!token.address },
+  )
+
+  const { isLoading: isBridgedListLoading, data: bridgedRecordList } = useQuery(
+    ['token-bridged-list', token.id, page],
+    () => fetchBridgedRecordList({ udt_id: token.id.toString(), page: page as string }),
+    { enabled: tab === tabs[1] && !!token.id },
+  )
+
+  const { isLoading: isHolderListLoading, data: holderList } = useQuery(
+    ['token-holder-list', token.id, page],
+    () => fetchTokenHolderList({ udt_id: token.id.toString(), page: page as string }),
+    { enabled: tab === tabs[2] && !!token.id },
+  )
+
   const tokenInfo = [
     { label: 'decimal', value: <Typography variant="body2">{token.decimal || '-'}</Typography> },
     { label: 'type', value: <Typography variant="body2">{t(token.type)}</Typography> },
@@ -109,7 +119,6 @@ const Token = ({ token, transferList, bridgedRecordList, tokenHolderList }: Prop
       label: token.type === 'bridge' ? 'circulatingSupply' : 'totalSupply',
       value: <Typography variant="body2">{token.supply ? new BigNumber(token.supply).toFormat() : '-'}</Typography>,
     },
-    // {label: 'value', value: token.supply ?? '-'},
     { label: 'holderCount', value: <Typography variant="body2">{token.holderCount || '-'}</Typography> },
     { label: 'transferCount', value: <Typography variant="body2">{token.transferCount || '-'}</Typography> },
   ]
@@ -183,9 +192,27 @@ const Token = ({ token, transferList, bridgedRecordList, tokenHolderList }: Prop
               ))}
             </Tabs>
             <Divider />
-            {tab === tabs[0] && transferList ? <ERC20TransferList list={transferList} /> : null}
-            {tab === tabs[1] && bridgedRecordList ? <BridgedRecordList list={bridgedRecordList} showUser /> : null}
-            {tab === tabs[2] && tokenHolderList ? <TokenHolderList list={tokenHolderList} /> : null}
+            {tab === tabs[0] ? (
+              !isTransferListLoading && transferList ? (
+                <ERC20TransferList list={transferList} />
+              ) : (
+                <Skeleton animation="wave" />
+              )
+            ) : null}
+            {tab === tabs[1] ? (
+              !isBridgedListLoading && bridgedRecordList ? (
+                <BridgedRecordList list={bridgedRecordList} showUser />
+              ) : (
+                <Skeleton animation="wave" />
+              )
+            ) : null}
+            {tab === tabs[2] ? (
+              !isHolderListLoading && holderList ? (
+                <TokenHolderList list={holderList} />
+              ) : (
+                <Skeleton animation="wave" />
+              )
+            ) : null}
           </Paper>
         </Stack>
       </Container>
@@ -193,69 +220,25 @@ const Token = ({ token, transferList, bridgedRecordList, tokenHolderList }: Prop
   )
 }
 
-export const getServerSideProps: GetServerSideProps<Props, { id: string }> = async ({ locale, res, params, query }) => {
+export const getStaticPaths: GetStaticPaths = () => ({
+  paths: [],
+  fallback: 'blocking',
+})
+
+export const getStaticProps: GetStaticProps<Props, { id: string }> = async ({ locale, params }) => {
   const { id } = params
-  const { page, tab = tabs[0] } = query
 
   try {
-    if (typeof tab !== 'string' || !tabs.includes(tab)) {
-      throw new TabNotFoundException()
-    }
-
     const [token, lng] = await Promise.all([
       fetchToken(id),
       serverSideTranslations(locale, ['common', 'tokens', 'list']),
     ])
-    const transferList =
-      tab === tabs[0] && token.address
-        ? await fetchERC20TransferList({ udt_address: token.address, page: page as string })
-        : null
-
-    const bridgedRecordList =
-      tab === tabs[1] && token.id
-        ? await fetchBridgedRecordList({ udt_id: token.id.toString(), page: page as string })
-        : null
-
-    const tokenHolderList =
-      tab === tabs[2] && token.id
-        ? await fetchTokenHolderList({ udt_id: token.id.toString(), page: page as string })
-        : null
-    // const totalPage = Math.ceil(+transferListRes.totalCount / 10)
-    // if (totalPage < +page) {
-    //   throw new PageOverflowException(totalPage)
-    // }
 
     return {
-      props: {
-        token,
-        transferList,
-        bridgedRecordList,
-        tokenHolderList,
-        ...lng,
-      },
+      props: { token, ...lng },
     }
   } catch (err) {
-    switch (true) {
-      case err instanceof PageNonPositiveException: {
-        return {
-          redirect: {
-            destination: `/${locale}/token/${id}`,
-            permanent: false,
-          },
-        }
-      }
-      case err instanceof PageOverflowException: {
-        return {
-          redirect: {
-            destination: `/${locale}/token/${id}?page=${err.page}`,
-            permanent: false,
-          },
-        }
-      }
-      default: {
-        return handleApiError(err, res, locale)
-      }
-    }
+    return handleApiError(err, null, locale)
   }
 }
 
