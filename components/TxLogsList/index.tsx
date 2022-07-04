@@ -23,7 +23,7 @@ const TxLogsList = ({ list }: { list: ParsedEventLog[] }) => {
         const indexedCount = log.parsedLog?.eventFragment.inputs.filter(i => i.indexed).length ?? 0
         const dataList = log.data
           ?.slice(2)
-          .match(/\w{64}/)
+          .match(/\w{64}/g)
           .map((frag, i) => {
             const parsed =
               log.parsedLog?.eventFragment.inputs[i + indexedCount]?.type === 'address'
@@ -34,7 +34,7 @@ const TxLogsList = ({ list }: { list: ParsedEventLog[] }) => {
 
         return (
           <div key={log.id} className={styles.logItem}>
-            <div className={styles.logIndex}>{i + 1}</div>
+            <div className={styles.logIndex}>{list.length - 1 - i}</div>
             <div style={{ flex: 1 }}>
               <div className={styles.contractAddr}>
                 <div className={styles.field}>{t(`address`)}</div>

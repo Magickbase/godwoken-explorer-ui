@@ -55,7 +55,7 @@ const ContractEventListItem = ({ item }: { item: ParsedEventLog; setSearchText: 
   const indexedCount = item.parsedLog?.eventFragment.inputs.filter(i => i.indexed).length ?? 0
   const dataList = item.data
     ?.slice(2)
-    .match(/\w{64}/)
+    .match(/\w{64}/g)
     .map((frag, i) => {
       const parsed =
         item.parsedLog?.eventFragment.inputs[i + indexedCount]?.type === 'address'
