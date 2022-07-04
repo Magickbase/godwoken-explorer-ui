@@ -76,7 +76,6 @@ const Account = (initState: State) => {
     () => fetchAccountOverview(q),
     {
       refetchInterval: 10000,
-      initialData: accountAndList.account,
     },
   )
 
@@ -161,7 +160,7 @@ const Account = (initState: State) => {
           <AccountOverview
             isOverviewLoading={isOverviewLoading}
             isBalanceLoading={isBalanceLoading}
-            account={overview}
+            account={{ ...accountAndList.account, ...overview }}
             balance={balance ?? ''}
             deployerAddr={accountAndList.deployerAddr}
           />

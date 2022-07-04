@@ -222,8 +222,8 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({
           {account.type === GraphQLSchema.AccountType.MetaContract ? (
             <MetaContract {...(account.script as MetaContract['script'])} />
           ) : null}
-          {account.type === GraphQLSchema.AccountType.EthUser && !isOverviewLoading ? (
-            <User nonce={account.nonce} />
+          {account.type === GraphQLSchema.AccountType.EthUser ? (
+            <User nonce={account.nonce} isLoading={isOverviewLoading} />
           ) : null}
           {account.type === GraphQLSchema.AccountType.EthAddrReg ? <EthAddrReg /> : null}
           {account.type === GraphQLSchema.AccountType.PolyjuiceContract ? (
