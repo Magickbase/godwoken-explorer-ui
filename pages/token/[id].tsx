@@ -1,4 +1,5 @@
 import type { GetStaticProps, GetStaticPaths } from 'next'
+import { useEffect } from 'react'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useRouter } from 'next/router'
@@ -28,14 +29,7 @@ import ERC20TransferList from 'components/ERC20TransferList'
 import BridgedRecordList from 'components/BridgedRecordList'
 import TokenHolderList from 'components/TokenHolderList'
 import Address from 'components/AddressInHalfPanel'
-import {
-  handleApiError,
-  fetchToken,
-  fetchERC20TransferList,
-  nameToColor,
-  fetchBridgedRecordList,
-  fetchTokenHolderList,
-} from 'utils'
+import { fetchToken, fetchERC20TransferList, nameToColor, fetchBridgedRecordList, fetchTokenHolderList } from 'utils'
 import type { API } from 'utils/api/utils'
 
 const tabs = ['transfers', 'bridged', 'holders']
@@ -44,37 +38,58 @@ type Props = {
   token: API.Token.Parsed
 }
 
-const Token: React.FC<Props> = ({ token }) => {
-  const [t] = useTranslation('tokens')
+const Token: React.FC<Props> = () => {
+  const [t, { language }] = useTranslation('tokens')
   const {
+    replace,
     push,
-    query: { tab = 'transfers', page = '1' },
+    query: { id, tab = 'transfers', page = '1' },
   } = useRouter()
 
+  const { isLoading: isTokenLoading, data: token } = useQuery(['token', id], () => fetchToken(id.toString()))
+
+  useEffect(() => {
+    if (!isTokenLoading && !token) {
+      replace(`/${language}/404?query=${id}`)
+    }
+  }, [isTokenLoading, token, replace])
+
   const { isLoading: isTransferListLoading, data: transferList } = useQuery(
-    ['token-transfer-list', token.address, page],
-    () => fetchERC20TransferList({ udt_address: token.address, page: page as string }),
-    { enabled: tab === tabs[0] && !!token.address },
+    ['token-transfer-list', token?.address, page],
+    () => fetchERC20TransferList({ udt_address: token?.address, page: page as string }),
+    { enabled: tab === tabs[0] && !!token?.address },
   )
 
   const { isLoading: isBridgedListLoading, data: bridgedRecordList } = useQuery(
-    ['token-bridged-list', token.id, page],
-    () => fetchBridgedRecordList({ udt_id: token.id.toString(), page: page as string }),
-    { enabled: tab === tabs[1] && !!token.id },
+    ['token-bridged-list', id, page],
+    () => fetchBridgedRecordList({ udt_id: id.toString(), page: page as string }),
+    { enabled: tab === tabs[1] },
   )
 
   const { isLoading: isHolderListLoading, data: holderList } = useQuery(
-    ['token-holder-list', token.id, page],
-    () => fetchTokenHolderList({ udt_id: token.id.toString(), page: page as string }),
-    { enabled: tab === tabs[2] && !!token.id },
+    ['token-holder-list', id, page],
+    () => fetchTokenHolderList({ udt_id: id.toString(), page: page as string }),
+    { enabled: tab === tabs[2] },
   )
 
   const tokenInfo = [
-    { label: 'decimal', value: <Typography variant="body2">{token.decimal || '-'}</Typography> },
-    { label: 'type', value: <Typography variant="body2">{t(token.type)}</Typography> },
+    {
+      label: 'decimal',
+      value: token ? <Typography variant="body2">{token.decimal || '-'}</Typography> : <Skeleton animation="wave" />,
+    },
+    {
+      label: 'type',
+      value: token ? <Typography variant="body2">{t(token.type)}</Typography> : <Skeleton animation="wave" />,
+    },
     {
       label: 'contract',
-      value: token.address ? <Address address={token.address} /> : <Typography variant="body2">-</Typography>,
+      value: !token ? (
+        <Skeleton animation="wave" />
+      ) : token.address ? (
+        <Address address={token.address} />
+      ) : (
+        <Typography variant="body2">-</Typography>
+      ),
     },
     // {
     //   label: 'layer1Lock',
@@ -86,7 +101,7 @@ const Token: React.FC<Props> = ({ token }) => {
     // },
     {
       label: 'officialSite',
-      value: (
+      value: token ? (
         <Typography variant="body2">
           {token.officialSite ? (
             <Link
@@ -107,38 +122,62 @@ const Token: React.FC<Props> = ({ token }) => {
             '-'
           )}
         </Typography>
+      ) : (
+        <Skeleton animation="wave" />
       ),
     },
     {
       label: 'description',
-      value: <Typography variant="body2">{token.description || '-'}</Typography>,
+      value: token ? (
+        <Typography variant="body2">{token.description || '-'}</Typography>
+      ) : (
+        <Skeleton animation="wave" />
+      ),
     },
   ]
   const tokenData = [
     {
-      label: token.type === 'bridge' ? 'circulatingSupply' : 'totalSupply',
-      value: <Typography variant="body2">{token.supply ? new BigNumber(token.supply).toFormat() : '-'}</Typography>,
+      label: token?.type === 'bridge' ? 'circulatingSupply' : 'totalSupply',
+      value: !token ? (
+        <Skeleton animation="wave" />
+      ) : (
+        <Typography variant="body2">{token.supply ? new BigNumber(token.supply).toFormat() : '-'}</Typography>
+      ),
     },
-    { label: 'holderCount', value: <Typography variant="body2">{token.holderCount || '-'}</Typography> },
-    { label: 'transferCount', value: <Typography variant="body2">{token.transferCount || '-'}</Typography> },
+    {
+      label: 'holderCount',
+      value: token ? (
+        <Typography variant="body2">{token.holderCount || '-'}</Typography>
+      ) : (
+        <Skeleton animation="wave" />
+      ),
+    },
+    {
+      label: 'transferCount',
+      value: token ? (
+        <Typography variant="body2">{token.transferCount || '-'}</Typography>
+      ) : (
+        <Skeleton animation="wave" />
+      ),
+    },
   ]
 
   return (
     <>
-      <SubpageHead subtitle={`${t('token')} ${token.name || token.symbol || '-'}`} />
+      <SubpageHead subtitle={`${t('token')} ${token?.name || token?.symbol || '-'}`} />
       <Container sx={{ py: 6 }}>
         <PageTitle>
           <Stack direction="row" alignItems="center">
             <Avatar
-              src={token.icon ?? null}
-              sx={{ bgcolor: token.icon ? '#f0f0f0' : nameToColor(token.name ?? ''), mr: 2 }}
+              src={token?.icon ?? null}
+              sx={{ bgcolor: token?.icon ? '#f0f0f0' : nameToColor(token?.name ?? ''), mr: 2 }}
             >
-              {token.name?.[0] ?? '?'}
+              {token?.name?.[0] ?? '?'}
             </Avatar>
             <Typography variant="h5" fontWeight="inherit" sx={{ textTransform: 'none' }}>
-              {token.name || '-'}
+              {!token ? <Skeleton animation="wave" width="30px" /> : token.name || '-'}
             </Typography>
-            {token.symbol ? (
+            {token?.symbol ? (
               <Typography
                 fontWeight="inherit"
                 color="primary.light"
@@ -225,21 +264,9 @@ export const getStaticPaths: GetStaticPaths = () => ({
   fallback: 'blocking',
 })
 
-export const getStaticProps: GetStaticProps<Props, { id: string }> = async ({ locale, params }) => {
-  const { id } = params
-
-  try {
-    const [token, lng] = await Promise.all([
-      fetchToken(id),
-      serverSideTranslations(locale, ['common', 'tokens', 'list']),
-    ])
-
-    return {
-      props: { token, ...lng },
-    }
-  } catch (err) {
-    return handleApiError(err, null, locale)
-  }
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+  const lng = await serverSideTranslations(locale, ['common', 'tokens', 'list'])
+  return { props: lng }
 }
 
 export default Token
