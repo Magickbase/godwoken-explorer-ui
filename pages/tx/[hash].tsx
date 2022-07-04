@@ -44,6 +44,7 @@ import PageTitle from 'components/PageTitle'
 import Address from 'components/AddressInHalfPanel'
 import TransferList, { fetchTransferList } from 'components/SimpleERC20TransferList'
 import TxLogsList from 'components/TxLogsList'
+import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
 import {
   formatDatetime,
   fetchTx,
@@ -76,6 +77,8 @@ const Tx = (initState: State) => {
     query: { hash, tab = 'erc20', before = null, after = null, address_from = null, address_to = null },
   } = useRouter()
   const [t] = useTranslation('tx')
+
+  const downloadItems = [{ label: t('ERC20Records'), href: DOWNLOAD_HREF_LIST.txTransferList(tx.hash) }]
 
   const { isLoading: isTransferListLoading, data: transferList } = useQuery(
     ['tx-transfer-list', hash, before, after, address_from, address_to],
@@ -325,7 +328,10 @@ const Tx = (initState: State) => {
     <>
       <SubpageHead subtitle={`${title} ${tx.hash}`} />
       <Container sx={{ pb: 6 }}>
-        <PageTitle>{title}</PageTitle>
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <PageTitle>{title}</PageTitle>
+          <DownloadMenu items={downloadItems} />
+        </Stack>
         <Stack spacing={2}>
           <Paper>
             <Grid container>
