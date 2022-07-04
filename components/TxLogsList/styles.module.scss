@@ -34,6 +34,9 @@
   &:not(:last-child) {
     border-bottom: 1px solid #f0f0f0;
   }
+  @media screen and (max-width: 600px) {
+    flex-direction: column;
+  }
 }
 
 .logIndex {
@@ -54,6 +57,10 @@
   display: flex;
   align-items: center;
   height: 40px;
+  a {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 .field {
   flex-basis: 100px;
@@ -113,5 +120,15 @@
   }
   .dataItem {
     margin: 16px;
+  }
+}
+@media screen and (max-width: 600px) {
+  .topics,
+  .data {
+    flex-direction: column;
+    .field {
+      justify-content: flex-start;
+      flex-basis: auto;
+    }
   }
 }
