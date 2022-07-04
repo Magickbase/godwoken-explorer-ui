@@ -1,7 +1,5 @@
 import type { API } from 'utils/api/utils'
 import type { GetStaticProps } from 'next'
-import type { Cache } from 'pages/api/cache'
-import { useState, useEffect } from 'react'
 import { gql } from 'graphql-request'
 import NextLink from 'next/link'
 import { useQuery } from 'react-query'
@@ -36,7 +34,7 @@ import {
 } from '@mui/icons-material'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { timeDistance, formatInt, client, GraphQLSchema } from 'utils'
+import { fetchHome, timeDistance, formatInt, client, GraphQLSchema } from 'utils'
 
 type State = API.Home.Parsed
 
@@ -425,42 +423,25 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
   )
 }
 
+const INTERVAL = 5000
+
 const Home = () => {
-  const [home, setHome] = useState<State | null>(null)
-  const [lists, setLists] = useState<{
-    blocks: HomeLists['blocks']
-    transactions: HomeLists['transactions']['entries']
-  }>({ blocks: [], transactions: [] })
-
-  const { data } = useQuery<Cache>('cache', () => fetch('/api/cache').then(res => res.json()), {
-    refetchInterval: 5000,
+  const { isLoading: isStaticsLoading, data: staticsData } = useQuery('home', () => fetchHome(), {
+    refetchInterval: INTERVAL,
   })
-
-  useEffect(() => {
-    if (data) {
-      if (data.home) {
-        setHome(data.home)
-      }
-      if (data.homeLists) {
-        setLists({
-          blocks: data.homeLists.blocks,
-          transactions: data.homeLists.transactions.entries,
-        })
-      }
-    }
-  }, [data])
-
-  const isLoading = !data
+  const { isLoading: isListsLoading, data: lists } = useQuery('home-lists', () => fetchHomeLists(), {
+    refetchInterval: INTERVAL,
+  })
 
   return (
     <Container sx={{ py: 6 }}>
-      <Statistic {...home?.statistic} isLoading={isLoading} />
+      <Statistic {...staticsData?.statistic} isLoading={isStaticsLoading} />
       <Stack direction={{ xs: 'column', sm: 'column', md: 'column', lg: 'row' }} spacing={2} sx={{ pt: 6 }}>
         <Paper sx={{ width: '100%', lg: { width: '50%', mr: 2 } }}>
-          <BlockList list={lists.blocks} isLoading={isLoading} />
+          <BlockList list={lists?.blocks ?? []} isLoading={isListsLoading} />
         </Paper>
         <Paper sx={{ width: '100%', lg: { width: '50%', ml: 2 } }}>
-          <TxList list={lists.transactions} isLoading={isLoading} />
+          <TxList list={lists?.transactions.entries ?? []} isLoading={isListsLoading} />
         </Paper>
       </Stack>
     </Container>
