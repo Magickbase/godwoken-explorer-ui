@@ -46,6 +46,7 @@ import {
   CKB_DECIMAL,
 } from 'utils'
 import PageTitle from 'components/PageTitle'
+import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
 
 type State = AccountOverviewProps
 const tabs = ['transactions', 'erc20', 'bridged', 'assets', 'contract', 'events']
@@ -133,6 +134,18 @@ const Account = (initState: State) => {
     { enabled: tab === 'assets' && !!(q.address || q.script_hash) },
   )
 
+  /* is script hash supported? */
+  const downloadItems = accountAndList.account.eth_address
+    ? [
+        { label: t('transactionRecords'), href: DOWNLOAD_HREF_LIST.accountTxList(accountAndList.account.eth_address) },
+        { label: t('ERC20Records'), href: DOWNLOAD_HREF_LIST.accountTransferList(accountAndList.account.eth_address) },
+        {
+          label: t('bridgedRecords'),
+          href: DOWNLOAD_HREF_LIST.accountBridgeRecordList(accountAndList.account.eth_address),
+        },
+      ]
+    : []
+
   const handleAddressCopy = async () => {
     await handleCopy(id)
     setIsCopied(true)
@@ -145,17 +158,20 @@ const Account = (initState: State) => {
     <>
       <SubpageHead subtitle={title} />
       <Container sx={{ py: 6 }}>
-        <PageTitle>
-          <Stack direction="row" alignItems="center">
-            <Typography variant="inherit" overflow="hidden" textOverflow="ellipsis" noWrap>
-              {title}
-            </Typography>
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <PageTitle>
+            <Stack direction="row" alignItems="center">
+              <Typography variant="inherit" overflow="hidden" textOverflow="ellipsis" noWrap>
+                {title}
+              </Typography>
 
-            <IconButton aria-label="copy" onClick={handleAddressCopy}>
-              <CopyIcon fontSize="inherit" />
-            </IconButton>
-          </Stack>
-        </PageTitle>
+              <IconButton aria-label="copy" onClick={handleAddressCopy}>
+                <CopyIcon fontSize="inherit" />
+              </IconButton>
+            </Stack>
+          </PageTitle>
+          <DownloadMenu items={downloadItems} />
+        </Stack>
         <Stack spacing={2}>
           <AccountOverview
             isOverviewLoading={isOverviewLoading}
