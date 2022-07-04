@@ -76,6 +76,7 @@ export interface MetaContract extends AccountBase {
 
 export type AccountOverviewProps = {
   account: EthUser | EthAddrReg | PolyjuiceCreator | PolyjuiceContract | Udt | MetaContract | UnknownUser
+  isOverviewLoading?: boolean
   isBalanceLoading?: boolean
   balance: string
   deployerAddr?: string
@@ -166,7 +167,13 @@ export const fetchDeployAddress = (variables: { eth_hash: string }) =>
     .request<{ transaction: { from_account: Pick<GraphQLSchema.Account, 'eth_address'> } }>(deployAddrQuery, variables)
     .then(data => data.transaction.from_account.eth_address)
 
-const AccountOverview: React.FC<AccountOverviewProps> = ({ account, balance, deployerAddr, isBalanceLoading }) => {
+const AccountOverview: React.FC<AccountOverviewProps> = ({
+  account,
+  balance,
+  deployerAddr,
+  isBalanceLoading,
+  isOverviewLoading,
+}) => {
   const [t] = useTranslation(['account', 'common'])
   return (
     <Paper>
@@ -200,7 +207,11 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({ account, balance, dep
                 primary={t(`txCount`)}
                 secondary={
                   <Typography variant="body2">
-                    {new BigNumber(Math.max(account.nonce ?? 0, account.transaction_count ?? 0)).toFormat()}
+                    {isOverviewLoading ? (
+                      <Skeleton animation="wave" />
+                    ) : (
+                      new BigNumber(Math.max(account.nonce ?? 0, account.transaction_count ?? 0)).toFormat()
+                    )}
                   </Typography>
                 }
               />
@@ -211,7 +222,9 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({ account, balance, dep
           {account.type === GraphQLSchema.AccountType.MetaContract ? (
             <MetaContract {...(account.script as MetaContract['script'])} />
           ) : null}
-          {account.type === GraphQLSchema.AccountType.EthUser ? <User nonce={account.nonce} /> : null}
+          {account.type === GraphQLSchema.AccountType.EthUser && !isOverviewLoading ? (
+            <User nonce={account.nonce} />
+          ) : null}
           {account.type === GraphQLSchema.AccountType.EthAddrReg ? <EthAddrReg /> : null}
           {account.type === GraphQLSchema.AccountType.PolyjuiceContract ? (
             <SmartContract

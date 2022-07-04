@@ -71,11 +71,12 @@ const Account = (initState: State) => {
 
   const q = isEthAddress(id) ? { address: id } : { script_hash: id }
 
-  const { isLoading: _isOverviewLoading, data: overview } = useQuery(
+  const { isLoading: isOverviewLoading, data: overview } = useQuery(
     ['account-overview', id],
     () => fetchAccountOverview(q),
     {
       refetchInterval: 10000,
+      initialData: accountAndList.account,
     },
   )
 
@@ -89,10 +90,6 @@ const Account = (initState: State) => {
       refetchInterval: 10000,
     },
   )
-
-  useEffect(() => {
-    setAccountAndList(prev => ({ ...prev, ...overview, balance }))
-  }, [setAccountAndList, overview, balance])
 
   const { isLoading: isTxListLoading, data: txList } = useQuery(
     ['account-tx-list', id, before, after, block_from, block_to],
@@ -162,9 +159,10 @@ const Account = (initState: State) => {
         </PageTitle>
         <Stack spacing={2}>
           <AccountOverview
+            isOverviewLoading={isOverviewLoading}
             isBalanceLoading={isBalanceLoading}
-            account={accountAndList.account}
-            balance={accountAndList.balance}
+            account={overview}
+            balance={balance ?? ''}
             deployerAddr={accountAndList.deployerAddr}
           />
           <Paper>
