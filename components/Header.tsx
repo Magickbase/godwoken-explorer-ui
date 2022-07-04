@@ -75,6 +75,12 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }))
 
+const CHAIN_LINKS = [
+  { label: 'mainnet_v1', href: 'https://v1.gwscan.com' },
+  { label: 'testnet_v1', href: 'https://v1.testnet.gwscan.com' },
+  { label: 'mainnet_v0', href: 'https://gwscan.com' },
+  { label: 'testnet_v0', href: 'https://pudge.gwscan.com' },
+]
 const TOKEN_TYPE_LIST = ['bridge', 'native']
 const LOCALE_LIST = ['zh-CN', 'en-US']
 
@@ -200,17 +206,23 @@ const Header = () => {
       >
         {t(`chainType`)}
       </Typography>
-      {CHAIN_TYPE_LIST.map(chain => {
-        const url = `https://${
-          chain === 'mainnet'
-            ? process.env.NEXT_PUBLIC_MAINNET_EXPLORER_HOSTNAME
-            : process.env.NEXT_PUBLIC_TESTNET_EXPLORER_HOSTNAME
-        }/${language}`
+      {CHAIN_LINKS.map(chain => {
+        const url = `${chain.href}/${language}`
+        const [label, version] = chain.label.split('_')
         return (
-          <MenuItem key={chain} onClick={handleMenuListClose} sx={{ p: 0 }}>
+          <MenuItem key={chain.label} onClick={handleMenuListClose} sx={{ p: 0 }}>
             <NextLink href={url}>
-              <Link href={url} title={t(chain)} underline="none" sx={{ width: '100%', padding: '6px 16px' }}>
-                {t(chain)}
+              <Link
+                href={url}
+                title={`${t(label)} ${version}`}
+                underline="none"
+                display="flex"
+                justifyContent="space-between"
+                minWidth="105px"
+                sx={{ width: '100%', padding: '6px 16px' }}
+              >
+                <span>{t(label)}</span>
+                <span>{version}</span>
               </Link>
             </NextLink>
           </MenuItem>
