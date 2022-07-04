@@ -75,6 +75,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }))
 
+const CHAIN_TYPE_LIST = ['mainnet', 'testnet']
 const TOKEN_TYPE_LIST = ['bridge', 'native']
 const LOCALE_LIST = ['zh-CN', 'en-US']
 const CHAIN_LINKS = [
