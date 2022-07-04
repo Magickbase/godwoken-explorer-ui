@@ -2,7 +2,7 @@ import { ServerResponse } from 'http'
 import { NotFoundException } from './exceptions'
 import { fetchSearch } from './api'
 
-export const handleApiError = (err: Error, res: ServerResponse, locale: string, query?: string) => {
+export const handleApiError = (err: Error, _res: ServerResponse | null, locale: string, query?: string) => {
   // return {
   //   redirect: {
   //     destination: `/notification`,
@@ -10,7 +10,6 @@ export const handleApiError = (err: Error, res: ServerResponse, locale: string, 
   //   },
   // }
   if (err instanceof NotFoundException) {
-    res.statusCode = 404
     return {
       redirect: {
         destination: `/${locale}/404${query ? '?query=' + query : ''}`,
@@ -19,7 +18,6 @@ export const handleApiError = (err: Error, res: ServerResponse, locale: string, 
     }
   } else {
     console.warn(err.message)
-    res.statusCode = 302
     return {
       redirect: {
         destination: `/error?message=${err.message}`,

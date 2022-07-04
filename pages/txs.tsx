@@ -1,4 +1,4 @@
-import { GetServerSideProps } from 'next'
+import type { GetStaticProps } from 'next'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
@@ -85,7 +85,10 @@ const TxList = () => {
                   <TableBody>
                     {Array.from({ length: +page_size }).map((_, idx) => (
                       <TableRow key={idx}>
-                        <TableCell colSpan={8}>
+                        <TableCell colSpan={7} sx={{ display: { xs: 'table-cell', md: 'none' } }}>
+                          <Skeleton animation="wave" height={25} />
+                        </TableCell>
+                        <TableCell colSpan={8} sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                           <Skeleton animation="wave" height={25} />
                         </TableCell>
                       </TableRow>
@@ -134,7 +137,7 @@ const TxList = () => {
   )
 }
 
-export const getStaticProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   const lng = await serverSideTranslations(locale, ['common', 'list'])
   return { props: lng }
 }
