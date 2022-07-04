@@ -29,7 +29,9 @@ import ERC20TransferList from 'components/ERC20TransferList'
 import BridgedRecordList from 'components/BridgedRecordList'
 import TokenHolderList from 'components/TokenHolderList'
 import Address from 'components/AddressInHalfPanel'
+import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
 import { fetchToken, fetchERC20TransferList, nameToColor, fetchBridgedRecordList, fetchTokenHolderList } from 'utils'
+
 import type { API } from 'utils/api/utils'
 
 const tabs = ['transfers', 'bridged', 'holders']
@@ -47,6 +49,16 @@ const Token: React.FC<Props> = () => {
   } = useRouter()
 
   const { isLoading: isTokenLoading, data: token } = useQuery(['token', id], () => fetchToken(id.toString()))
+
+  const downloadItems = token
+    ? [
+        { label: t('transferRecords'), href: DOWNLOAD_HREF_LIST.udtTransferList(token.address) },
+        token.type === 'bridge'
+          ? { label: t('bridgedRecords'), href: DOWNLOAD_HREF_LIST.udtBridgeRecordList(token.id.toString()) }
+          : null,
+        // { label: t('tokenHolders'), href: DOWNLOAD_HREF_LIST.udtHolderList(token.id.toString()) }, // TODO: re-enable when API is fixed
+      ].map(i => i)
+    : []
 
   useEffect(() => {
     if (!isTokenLoading && !token) {
@@ -166,27 +178,31 @@ const Token: React.FC<Props> = () => {
     <>
       <SubpageHead subtitle={`${t('token')} ${token?.name || token?.symbol || '-'}`} />
       <Container sx={{ py: 6 }}>
-        <PageTitle>
-          <Stack direction="row" alignItems="center">
-            <Avatar
-              src={token?.icon ?? null}
-              sx={{ bgcolor: token?.icon ? '#f0f0f0' : nameToColor(token?.name ?? ''), mr: 2 }}
-            >
-              {token?.name?.[0] ?? '?'}
-            </Avatar>
-            <Typography variant="h5" fontWeight="inherit" sx={{ textTransform: 'none' }}>
-              {!token ? <Skeleton animation="wave" width="30px" /> : token.name || '-'}
-            </Typography>
-            {token?.symbol ? (
-              <Typography
-                fontWeight="inherit"
-                color="primary.light"
-                whiteSpace="pre"
-                sx={{ textTransform: 'none' }}
-              >{` (${token.symbol})`}</Typography>
-            ) : null}
-          </Stack>
-        </PageTitle>
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <PageTitle>
+            <Stack direction="row" alignItems="center">
+              <Avatar
+                src={token?.icon ?? null}
+                sx={{ bgcolor: token?.icon ? '#f0f0f0' : nameToColor(token?.name ?? ''), mr: 2 }}
+              >
+                {token?.name?.[0] ?? '?'}
+              </Avatar>
+              <Typography variant="h5" fontWeight="inherit" sx={{ textTransform: 'none' }}>
+                {!token ? <Skeleton animation="wave" width="30px" /> : token.name || '-'}
+              </Typography>
+              {token?.symbol ? (
+                <Typography
+                  fontWeight="inherit"
+                  color="primary.light"
+                  whiteSpace="pre"
+                  sx={{ textTransform: 'none' }}
+                >{` (${token.symbol})`}</Typography>
+              ) : null}
+            </Stack>
+          </PageTitle>
+
+          <DownloadMenu items={downloadItems} />
+        </Stack>
         <Stack spacing={2}>
           <Paper>
             <Grid container spacing={2}>
