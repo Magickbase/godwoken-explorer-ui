@@ -199,7 +199,9 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({ account, balance, dep
               <ListItemText
                 primary={t(`txCount`)}
                 secondary={
-                  <Typography variant="body2">{new BigNumber(account.transaction_count ?? 0).toFormat()}</Typography>
+                  <Typography variant="body2">
+                    {new BigNumber(Math.max(account.nonce ?? 0, account.transaction_count ?? 0)).toFormat()}
+                  </Typography>
                 }
               />
             </ListItem>

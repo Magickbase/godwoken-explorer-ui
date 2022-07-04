@@ -1,5 +1,5 @@
 import type { GetStaticProps, GetStaticPaths } from 'next'
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
@@ -26,87 +26,65 @@ import {
 import { OpenInNew as OpenInNewIcon, ContentCopyOutlined as CopyIcon } from '@mui/icons-material'
 import BigNumber from 'bignumber.js'
 import SubpageHead from 'components/SubpageHead'
-import TxList, { TxListProps, fetchTxList } from 'components/TxList'
+import TxList, { fetchTxList } from 'components/TxList'
 import BridgedRecordList from 'components/BridgedRecordList'
 import PageTitle from 'components/PageTitle'
-import {
-  fetchBlock,
-  handleApiError,
-  formatDatetime,
-  useWS,
-  getBlockRes,
-  CKB_EXPLORER_URL,
-  CHANNEL,
-  formatInt,
-  fetchBridgedRecordList,
-  getBridgedRecordListRes,
-  handleCopy,
-} from 'utils'
-
-type RawBlock = Parameters<typeof getBlockRes>[0]
-type ParsedBlock = ReturnType<typeof getBlockRes>
-type ParsedBridgedRecordList = ReturnType<typeof getBridgedRecordListRes>
+import { fetchBlock, formatDatetime, CKB_EXPLORER_URL, formatInt, fetchBridgedRecordList, handleCopy } from 'utils'
 
 const tabs = ['transactions', 'bridged']
 
-type State = ParsedBlock & Partial<{ txList: TxListProps['transactions']; bridgedRecordList: ParsedBridgedRecordList }>
-
-const Block = (initState: State) => {
-  const [block, setBlock] = useState(initState)
+const Block = () => {
   const [isCopied, setIsCopied] = useState(false)
   const [t, { language }] = useTranslation('block')
   const {
+    replace,
     push,
-    query: { tab = 'transactions', before = null, after = null, page = '1' },
+    query: { id, tab = 'transactions', before = null, after = null, page = '1' },
   } = useRouter()
 
+  const { isLoading: isBlockLoading, data: block } = useQuery(['block', id], () => fetchBlock(id as string), {
+    refetchInterval: 10000,
+  })
+
   useEffect(() => {
-    setBlock(initState)
-  }, [setBlock, initState])
+    if (!isBlockLoading && !block?.hash) {
+      replace(`/${language}/404?query=${id}`)
+    }
+  }, [isBlockLoading, block, replace])
 
   const { isLoading: isTxListLoading, data: txList } = useQuery(
-    ['block-tx-list', block.number, before, after],
+    ['block-tx-list', block?.number, before, after],
     () =>
       fetchTxList({
-        start_block_number: block.number,
-        end_block_number: block.number,
+        start_block_number: block?.number,
+        end_block_number: block?.number,
         before: before as string | null,
         after: after as string | null,
       }),
     {
-      enabled: tab === 'transactions' && !!block.hash,
+      enabled: tab === 'transactions' && !!block?.hash,
     },
   )
 
   const { isLoading: isBridgeListLoading, data: bridgedRecordList } = useQuery(
-    ['block-bridge-list', block.number, page],
-    () => fetchBridgedRecordList({ block_number: block.number.toString(), page: page as string }),
+    ['block-bridge-list', block?.number, page],
+    () => fetchBridgedRecordList({ block_number: block?.number.toString(), page: page as string }),
     {
-      enabled: tab === 'bridged' && !!block.hash,
+      enabled: tab === 'bridged' && !!block?.hash,
     },
-  )
-
-  useWS(
-    `${CHANNEL.BLOCK_INFO}${block.number}`,
-    (init: RawBlock) => {
-      // setBlock(prev => ({ ...prev, ...getBlockRes(init) }))
-    },
-    (rawUpdate: RawBlock) => {
-      const update = getBlockRes(rawUpdate)
-      setBlock(prev => ({ ...prev, layer1: update.layer1, finalizeState: update.finalizeState }))
-    },
-    [setBlock, block.number],
   )
 
   const handleHashCopy = async () => {
-    await handleCopy(block.hash)
-    setIsCopied(true)
+    if (block) {
+      await handleCopy(block.hash)
+      setIsCopied(true)
+    }
   }
 
   const fields = [
     {
       label: 'hash',
-      value: (
+      value: block ? (
         <Stack direction="row" alignItems="center">
           <Tooltip title={block.hash} placement="top">
             <Typography
@@ -123,13 +101,15 @@ const Block = (initState: State) => {
             <CopyIcon fontSize="inherit" />
           </IconButton>
         </Stack>
+      ) : (
+        <Skeleton animation="wave" />
       ),
     },
     {
       label: 'timestamp',
       value: (
         <Typography variant="body2">
-          {block.timestamp > 0 ? (
+          {block?.timestamp > 0 ? (
             <time dateTime={new Date(block.timestamp).toISOString()} title={t('timestamp')}>
               {formatDatetime(block.timestamp)}
             </time>
@@ -141,7 +121,7 @@ const Block = (initState: State) => {
     },
     {
       label: 'layer1Info',
-      value: block.layer1 ? (
+      value: block?.layer1 ? (
         <Stack sx={{ whiteSpace: 'nowrap', flexDirection: { xs: 'column', md: 'row' } }} color="#000000de">
           {language === 'zh-CN' ? (
             <>
@@ -230,33 +210,47 @@ const Block = (initState: State) => {
       label: 'finalizeState',
       value: (
         <Typography variant="body2" sx={{ textTransform: 'capitalize' }}>
-          {t(block.finalizeState)}
+          {block ? t(block.finalizeState) : <Skeleton animation="wave" />}
         </Typography>
       ),
     },
     {
       label: 'txCount',
-      value: <Typography variant="body2">{formatInt(block.txCount)}</Typography>,
+      value: (
+        <Typography variant="body2">{block ? formatInt(block.txCount) : <Skeleton animation="wave" />}</Typography>
+      ),
     },
     {
       label: 'aggregator',
-      value: <Typography variant="body2">{block.miner.hash}</Typography>,
+      value: <Typography variant="body2">{block ? block.miner.hash : <Skeleton animation="wave" />}</Typography>,
     },
     {
       label: 'size',
-      value: <Typography variant="body2">{new BigNumber(block.size || '0').toFormat() + ' bytes'}</Typography>,
+      value: (
+        <Typography variant="body2">
+          {block ? new BigNumber(block.size || '0').toFormat() + ' bytes' : <Skeleton animation="wave" />}
+        </Typography>
+      ),
     },
     {
       label: 'gasUsed',
-      value: <Typography variant="body2">{new BigNumber(block.gas.used).toFormat()}</Typography>,
+      value: (
+        <Typography variant="body2">
+          {block ? new BigNumber(block.gas.used).toFormat() : <Skeleton animation="wave" />}
+        </Typography>
+      ),
     },
     {
       label: 'gasLimit',
-      value: <Typography variant="body2">{new BigNumber(block.gas.limit).toFormat()}</Typography>,
+      value: (
+        <Typography variant="body2">
+          {block ? new BigNumber(block.gas.limit).toFormat() : <Skeleton animation="wave" />}
+        </Typography>
+      ),
     },
     {
       label: 'parentHash',
-      value: (
+      value: block ? (
         <Tooltip title={block.parentHash} placement="top">
           <Typography
             variant="body2"
@@ -271,10 +265,12 @@ const Block = (initState: State) => {
             </NextLink>
           </Typography>
         </Tooltip>
+      ) : (
+        <Skeleton animation="wave" />
       ),
     },
   ]
-  const title = `${t('block')} # ${formatInt(block.number)}`
+  const title = `${t('block')} # ${block ? formatInt(block.number) : ''}`
   return (
     <>
       <SubpageHead subtitle={title} />
@@ -301,6 +297,9 @@ const Block = (initState: State) => {
                   key={label}
                   label={label}
                   onClick={e => {
+                    if (!block) {
+                      return
+                    }
                     e.stopPropagation()
                     e.preventDefault()
                     push(`/block/${block.hash}?tab=${tabs[idx]}`, undefined, { scroll: false })
@@ -349,17 +348,9 @@ export const getStaticPaths: GetStaticPaths = () => ({
   fallback: 'blocking',
 })
 
-export const getStaticProps: GetStaticProps<State, { id: string }> = async ({ locale, params }) => {
-  try {
-    const [block, lng] = await Promise.all([
-      fetchBlock(params.id),
-      serverSideTranslations(locale, ['common', 'block', 'list']),
-    ])
-
-    return { props: { ...block, ...lng } }
-  } catch (err) {
-    return handleApiError(err, null, locale, params.id)
-  }
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+  const lng = await serverSideTranslations(locale, ['common', 'block', 'list'])
+  return { props: lng }
 }
 
 export default Block
