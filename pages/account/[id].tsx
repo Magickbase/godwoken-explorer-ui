@@ -28,8 +28,8 @@ import AccountOverview, {
   PolyjuiceContract,
 } from 'components/AccountOverview'
 import ERC20TransferList from 'components/ERC20TransferList'
-import AssetList, { fetchUdtList, UdtList } from 'components/UdtList'
-import TxList, { TxListProps, fetchTxList } from 'components/TxList'
+import AssetList, { fetchUdtList } from 'components/UdtList'
+import TxList, { fetchTxList } from 'components/TxList'
 import BridgedRecordList from 'components/BridgedRecordList'
 import ContractInfo from 'components/ContractInfo'
 import ContractEventsList from 'components/ContractEventsList'
@@ -41,7 +41,6 @@ import {
   fetchEventLogsListByType,
   isEthAddress,
   GraphQLSchema,
-  ParsedEventLog,
   NotFoundException,
   API_ENDPOINT,
   CKB_DECIMAL,
@@ -72,6 +71,32 @@ const Account = (initState: State) => {
   }, [setAccountAndList, initState])
 
   const q = isEthAddress(id) ? { address: id } : { script_hash: id }
+
+  const { isLoading: _isOverviewLoading, data: overview } = useQuery(
+    ['account-overview', id],
+    () => fetchAccountOverview(q),
+    {
+      refetchInterval: 10000,
+    },
+  )
+
+  const { isLoading: isBalanceLoading, data: balance } = useQuery(
+    ['account-balance', id],
+    () =>
+      fetch(`${API_ENDPOINT}/accounts/${id}`)
+        .then(r => r.json())
+        .then(a => new BigNumber(a.ckb).multipliedBy(new BigNumber(CKB_DECIMAL)).toString()),
+    {
+      refetchInterval: 10000,
+    },
+  )
+
+  console.log(balance)
+
+  useEffect(() => {
+    setAccountAndList(prev => ({ ...prev, ...overview, balance }))
+  }, [setAccountAndList, overview, balance])
+
   const { isLoading: isTxListLoading, data: txList } = useQuery(
     ['account-tx-list', id, before, after, block_from, block_to],
     () =>
@@ -140,6 +165,7 @@ const Account = (initState: State) => {
         </PageTitle>
         <Stack spacing={2}>
           <AccountOverview
+            isBalanceLoading={isBalanceLoading}
             account={accountAndList.account}
             balance={accountAndList.balance}
             deployerAddr={accountAndList.deployerAddr}

@@ -1,7 +1,7 @@
 import { gql } from 'graphql-request'
 import { useTranslation } from 'next-i18next'
 import BigNumber from 'bignumber.js'
-import { Paper, List, ListItem, ListItemText, Divider, Grid, ListSubheader, Typography } from '@mui/material'
+import { Paper, List, ListItem, ListItemText, Divider, Grid, ListSubheader, Typography, Skeleton } from '@mui/material'
 import User from 'components/User'
 import EthAddrReg from './EthAddrReg'
 import MetaContract from 'components/MetaContract'
@@ -76,6 +76,7 @@ export interface MetaContract extends AccountBase {
 
 export type AccountOverviewProps = {
   account: EthUser | EthAddrReg | PolyjuiceCreator | PolyjuiceContract | Udt | MetaContract | UnknownUser
+  isBalanceLoading?: boolean
   balance: string
   deployerAddr?: string
 }
@@ -165,7 +166,7 @@ export const fetchDeployAddress = (variables: { eth_hash: string }) =>
     .request<{ transaction: { from_account: Pick<GraphQLSchema.Account, 'eth_address'> } }>(deployAddrQuery, variables)
     .then(data => data.transaction.from_account.eth_address)
 
-const AccountOverview: React.FC<AccountOverviewProps> = ({ account, balance, deployerAddr }) => {
+const AccountOverview: React.FC<AccountOverviewProps> = ({ account, balance, deployerAddr, isBalanceLoading }) => {
   const [t] = useTranslation(['account', 'common'])
   return (
     <Paper>
@@ -185,7 +186,11 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({ account, balance, dep
                 primary={t(`ckbBalance`)}
                 secondary={
                   <Typography variant="body2" sx={{ textTransform: 'none' }}>
-                    {new BigNumber(balance || '0').dividedBy(GCKB_DECIMAL).toFormat() + ' pCKB'}
+                    {isBalanceLoading ? (
+                      <Skeleton animation="wave" />
+                    ) : (
+                      new BigNumber(balance || '0').dividedBy(GCKB_DECIMAL).toFormat() + ' pCKB'
+                    )}
                   </Typography>
                 }
               />
