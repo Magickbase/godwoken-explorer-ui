@@ -58,7 +58,6 @@ const Account = (initState: State) => {
   const {
     push,
     query: { tab = 'transactions', before = null, after = null, block_from = null, block_to = null, page = '1' },
-    // const { tab = tabs[0], } = query
   } = useRouter()
   const [accountAndList, setAccountAndList] = useState(initState)
   const [isCopied, setIsCopied] = useState(false)
@@ -90,8 +89,6 @@ const Account = (initState: State) => {
       refetchInterval: 10000,
     },
   )
-
-  console.log(balance)
 
   useEffect(() => {
     setAccountAndList(prev => ({ ...prev, ...overview, balance }))
