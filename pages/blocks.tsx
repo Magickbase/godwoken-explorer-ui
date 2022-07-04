@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
-import { GetServerSideProps } from 'next'
+import type { GetStaticProps } from 'next'
+import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { useQuery } from 'react-query'
 import {
   Container,
   Paper,
@@ -16,34 +17,79 @@ import {
   TableCell,
   Link,
   Stack,
+  Skeleton,
 } from '@mui/material'
 import PageTitle from 'components/PageTitle'
 import SubpageHead from 'components/SubpageHead'
 import Pagination from 'components/Pagination'
 import PageSize, { SIZES } from 'components/PageSize'
 import BlockStateIcon from 'components/BlockStateIcon'
-import {
-  fetchBlockList,
-  getBlockListRes,
-  handleApiError,
-  PageNonPositiveException,
-  PageSizeException,
-  timeDistance,
-  validatePageQuery,
-} from 'utils'
+import { fetchBlockList, timeDistance } from 'utils'
 
-type ParsedBlockList = ReturnType<typeof getBlockListRes>
-type State = { blockList: ParsedBlockList; pageSize: number }
-
-const BlockList = (initState: State) => {
-  const [{ blockList, pageSize }, setBlockList] = useState(initState)
+const BlockList = () => {
   const [t, { language }] = useTranslation(['list', 'common'])
+  const {
+    query: { page = '1', page_size = SIZES[1] },
+  } = useRouter()
 
-  useEffect(() => {
-    setBlockList(initState)
-  }, [initState])
+  const { isLoading, data: blockList } = useQuery(['blocks', page, page_size], () =>
+    fetchBlockList({ page: page as string, page_size: page_size as string }),
+  )
 
   const title = t('block_list_title')
+
+  if (isLoading || !blockList) {
+    return (
+      <>
+        <SubpageHead subtitle={title} />
+        <Container sx={{ px: 1, py: 2 }}>
+          <PageTitle>
+            <Typography variant="inherit" display="inline" pr={1}>
+              {title}
+            </Typography>
+          </PageTitle>
+          <Paper>
+            <Box sx={{ px: 1, py: 2 }}>
+              <Stack direction="row" justifyContent="space-between" alignItems="center" py={1}>
+                <Skeleton animation="wave" width={50} height={24} />
+                <Skeleton animation="wave" width={50} height={24} />
+              </Stack>
+              <TableContainer>
+                <Table size="small" sx={{ fontSize: { xs: 12, md: 14 } }}>
+                  <TableHead sx={{ textTransform: 'capitalize' }}>
+                    <TableRow>
+                      <TableCell component="th">{t(`block_number`)}</TableCell>
+                      <TableCell component="th">{t(`age`)}</TableCell>
+                      <TableCell component="th">{t(`tx_count`)}</TableCell>
+                      <TableCell component="th" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
+                        {t(`gas_used`)}
+                      </TableCell>
+                      <TableCell component="th" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
+                        {t(`gas_limit`)}
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {Array.from({ length: +page_size }).map((_, idx) => (
+                      <TableRow key={idx}>
+                        <TableCell colSpan={5}>
+                          <Skeleton animation="wave" height={20} />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              <Stack direction="row" justifyContent="space-between" alignItems="center" py={1}>
+                <Skeleton animation="wave" width={50} height={24} />
+                <Skeleton animation="wave" width={50} height={24} />
+              </Stack>
+            </Box>
+          </Paper>
+        </Container>
+      </>
+    )
+  }
 
   return (
     <>
@@ -64,7 +110,7 @@ const BlockList = (initState: State) => {
                     from: blockList.blocks[blockList.blocks.length - 1].number,
                   })}
                 </Typography>
-                <Pagination total={blockList.totalPage * pageSize} page={blockList.page} pageSize={pageSize} />
+                <Pagination total={blockList.totalPage * +page_size} page={blockList.page} pageSize={+page_size} />
               </Stack>
             ) : null}
             <TableContainer>
@@ -125,8 +171,8 @@ const BlockList = (initState: State) => {
               </Table>
             </TableContainer>
             <Stack direction="row" justifyContent="space-between" alignItems="center">
-              <PageSize pageSize={pageSize} />
-              <Pagination total={blockList.totalPage * pageSize} page={blockList.page} pageSize={pageSize} />
+              <PageSize pageSize={+page_size} />
+              <Pagination total={blockList.totalPage * +page_size} page={blockList.page} pageSize={+page_size} />
             </Stack>
           </Box>
         </Paper>
@@ -135,34 +181,9 @@ const BlockList = (initState: State) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<State> = async ({ locale, res, query }) => {
-  const { page, page_size = SIZES[1] } = query
-
-  try {
-    validatePageQuery(page as string, { size: page_size as string, sizes: SIZES })
-
-    const [blockList, lng] = await Promise.all([
-      fetchBlockList({ page: page as string, page_size: page_size as string }),
-      serverSideTranslations(locale, ['common', 'list']),
-    ])
-
-    return { props: { ...lng, blockList, pageSize: +page_size } }
-  } catch (err) {
-    switch (true) {
-      case err instanceof PageNonPositiveException:
-      case err instanceof PageSizeException: {
-        return {
-          redirect: {
-            destination: `/${locale}/blocks`,
-            permanent: false,
-          },
-        }
-      }
-      default: {
-        return handleApiError(err, res, locale)
-      }
-    }
-  }
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+  const lng = await serverSideTranslations(locale, ['common', 'list'])
+  return { props: lng }
 }
 
 export default BlockList

@@ -1,7 +1,9 @@
-import type { GetServerSideProps } from 'next'
+import type { GetStaticProps, GetStaticPaths } from 'next'
+import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { useQuery } from 'react-query'
 import {
   Avatar,
   Container,
@@ -17,24 +19,24 @@ import {
   TableBody,
   TableCell,
   Typography,
+  Skeleton,
 } from '@mui/material'
 import BigNumber from 'bignumber.js'
 import SubpageHead from 'components/SubpageHead'
 import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined'
 import Pagination from 'components/Pagination'
-import { fetchTokenList, handleApiError, nameToColor, PAGE_SIZE } from 'utils'
-import { PageNonPositiveException, PageOverflowException, TypeNotFoundException } from 'utils/exceptions'
-import type { API } from 'utils/api/utils'
-
-type State = API.Tokens.Parsed & { type: 'native' | 'bridge' }
+import { fetchTokenList, nameToColor, PAGE_SIZE } from 'utils'
 
 const BRIDGED_TOKEN_TEMPLATE_URL =
   'https://github.com/nervina-labs/godwoken_explorer/issues/new?assignees=Keith-CY&labels=Token+Registration&template=register-a-new-bridged-token.yml&title=%5BBridged+Token%5D+%2A%2AToken+Name%2A%2A'
 const NATIVE_TOKEN_TEMPLATE_URL =
   'https://github.com/nervina-labs/godwoken_explorer/issues/new?assignees=Keith-CY&labels=Token+Registration&template=register-a-new-native-erc20-token.yml&title=%5BNative+ERC20+Token%5D+%2A%2AToken+Name%2A%2A'
 
-const TokenList = ({ meta, tokens, type }: State) => {
+const TokenList = () => {
   const [t] = useTranslation(['tokens', 'common'])
+  const {
+    query: { page = '1', type },
+  } = useRouter()
 
   const headers = [
     { key: 'token' },
@@ -42,6 +44,14 @@ const TokenList = ({ meta, tokens, type }: State) => {
     { key: type === 'bridge' ? 'circulatingSupply' : 'totalSupply' },
     { key: 'holderCount' },
   ]
+
+  const { isLoading, data } = useQuery(
+    ['tokens', type, page],
+    () => fetchTokenList({ page: page as string, type: type as string }),
+    {
+      refetchInterval: 10000,
+    },
+  )
 
   const title = t(`${type}-udt-list`)
   return (
@@ -85,8 +95,16 @@ const TokenList = ({ meta, tokens, type }: State) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {tokens.length ? (
-                  tokens.map(token => (
+                {isLoading ? (
+                  Array.from({ length: 20 }).map((_, idx) => (
+                    <TableRow key={idx}>
+                      <TableCell colSpan={headers.length}>
+                        <Skeleton animation="wave" height={40} />
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : data.tokens.length ? (
+                  data.tokens.map(token => (
                     <TableRow key={token.id.toString()}>
                       <TableCell>
                         <Stack direction="row" alignItems="center">
@@ -98,7 +116,7 @@ const TokenList = ({ meta, tokens, type }: State) => {
                           </Avatar>
                           <NextLink href={`/token/${token.id}`}>
                             <Link href={`/token/${token.id}`} underline="none" color="secondary" ml={2}>
-                              {`${token.name || '-'}${token.symbol ? '(' + token.symbol + ')' : ''}`}
+                              {token.name || '-'}
                             </Link>
                           </NextLink>
                         </Stack>
@@ -152,72 +170,21 @@ const TokenList = ({ meta, tokens, type }: State) => {
               </TableBody>
             </Table>
           </TableContainer>
-          <Pagination page={meta.current} total={meta.total * PAGE_SIZE} />
+          {data ? <Pagination page={data.meta.current} total={data.meta.total * PAGE_SIZE} /> : null}
         </Paper>
       </Container>
     </>
   )
 }
 
-export const getServerSideProps: GetServerSideProps<State, { type: 'bridge' | 'native' }> = async ({
-  locale,
-  res,
-  query,
-  params,
-}) => {
-  const { type } = params
-  const { page } = query
-  try {
-    if (!['native', 'bridge'].includes(type)) {
-      throw new TypeNotFoundException('native')
-    }
-    if (+page < 1) {
-      throw new PageNonPositiveException()
-    }
-    const q = { type }
-    if (typeof page === 'string' && !Number.isNaN(+page)) {
-      q['page'] = page
-    }
+export const getStaticPaths: GetStaticPaths = () => ({
+  paths: [{ params: { type: 'native' } }, { params: { type: 'bridge' } }],
+  fallback: true,
+})
 
-    const res = await fetchTokenList(q)
-
-    if (res.meta.total < +page) {
-      throw new PageOverflowException(res.meta.total)
-    }
-
-    const lng = await serverSideTranslations(locale, ['common', 'tokens'])
-    return { props: { ...lng, ...res, type } }
-  } catch (err) {
-    switch (true) {
-      case err instanceof TypeNotFoundException: {
-        return {
-          redirect: {
-            destination: `/${locale}/tokens/${err.fallback}`,
-            permanent: false,
-          },
-        }
-      }
-      case err instanceof PageNonPositiveException: {
-        return {
-          redirect: {
-            destination: `/${locale}/tokens/${type}`,
-            permanent: false,
-          },
-        }
-      }
-      case err instanceof PageOverflowException: {
-        return {
-          redirect: {
-            destination: `/${locale}/tokens/${type}?page=${err.page}`,
-            permanent: false,
-          },
-        }
-      }
-      default: {
-        return handleApiError(err, res, locale)
-      }
-    }
-  }
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+  const lng = await serverSideTranslations(locale, ['common', 'tokens'])
+  return { props: lng }
 }
 
 export default TokenList

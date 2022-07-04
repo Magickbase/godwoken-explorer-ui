@@ -1,7 +1,9 @@
-import { GetServerSideProps } from 'next'
+import type { GetStaticProps, GetStaticPaths } from 'next'
+import { useEffect } from 'react'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useRouter } from 'next/router'
+import { useQuery } from 'react-query'
 import {
   Container,
   Stack,
@@ -17,6 +19,7 @@ import {
   Avatar,
   Typography,
   Link,
+  Skeleton,
 } from '@mui/material'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import BigNumber from 'bignumber.js'
@@ -27,54 +30,78 @@ import BridgedRecordList from 'components/BridgedRecordList'
 import TokenHolderList from 'components/TokenHolderList'
 import Address from 'components/AddressInHalfPanel'
 import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
-import {
-  handleApiError,
-  fetchToken,
-  fetchERC20TransferList,
-  nameToColor,
-  getERC20TransferListRes,
-  getBridgedRecordListRes,
-  fetchBridgedRecordList,
-  getTokenHolderListRes,
-  fetchTokenHolderList,
-} from 'utils'
-import { PageNonPositiveException, PageOverflowException, TabNotFoundException } from 'utils/exceptions'
-import type { API } from 'utils/api/utils'
+import { fetchToken, fetchERC20TransferList, nameToColor, fetchBridgedRecordList, fetchTokenHolderList } from 'utils'
 
-type ParsedTransferList = ReturnType<typeof getERC20TransferListRes>
-type ParsedbridgedRecordList = ReturnType<typeof getBridgedRecordListRes>
-type ParsedTokenHolderList = ReturnType<typeof getTokenHolderListRes>
+import type { API } from 'utils/api/utils'
 
 const tabs = ['transfers', 'bridged', 'holders']
 
 type Props = {
   token: API.Token.Parsed
-  transferList?: ParsedTransferList
-  bridgedRecordList?: ParsedbridgedRecordList
-  tokenHolderList?: ParsedTokenHolderList
 }
 
-const Token = ({ token, transferList, bridgedRecordList, tokenHolderList }: Props) => {
-  const [t] = useTranslation('tokens')
+const Token: React.FC<Props> = () => {
+  const [t, { language }] = useTranslation('tokens')
   const {
+    replace,
     push,
-    query: { tab = 'transfers' },
+    query: { id, tab = 'transfers', page = '1' },
   } = useRouter()
 
-  const downloadItems = [
-    { label: t('transferRecords'), href: DOWNLOAD_HREF_LIST.udtTransferList(token.address) },
-    token.type === 'bridge'
-      ? { label: t('bridgedRecords'), href: DOWNLOAD_HREF_LIST.udtBridgeRecordList(token.id.toString()) }
-      : null,
-    { label: t('tokenHolders'), href: DOWNLOAD_HREF_LIST.udtHolderList(token.id.toString()) },
-  ].map(i => i)
+  const { isLoading: isTokenLoading, data: token } = useQuery(['token', id], () => fetchToken(id.toString()))
+
+  const downloadItems = token
+    ? [
+        { label: t('transferRecords'), href: DOWNLOAD_HREF_LIST.udtTransferList(token.address) },
+        token.type === 'bridge'
+          ? { label: t('bridgedRecords'), href: DOWNLOAD_HREF_LIST.udtBridgeRecordList(token.id.toString()) }
+          : null,
+        // { label: t('tokenHolders'), href: DOWNLOAD_HREF_LIST.udtHolderList(token.id.toString()) }, // TODO: re-enable when API is fixed
+      ].map(i => i)
+    : []
+
+  useEffect(() => {
+    if (!isTokenLoading && !token) {
+      replace(`/${language}/404?query=${id}`)
+    }
+  }, [isTokenLoading, token, replace])
+
+  const { isLoading: isTransferListLoading, data: transferList } = useQuery(
+    ['token-transfer-list', token?.address, page],
+    () => fetchERC20TransferList({ udt_address: token?.address, page: page as string }),
+    { enabled: tab === tabs[0] && !!token?.address },
+  )
+
+  const { isLoading: isBridgedListLoading, data: bridgedRecordList } = useQuery(
+    ['token-bridged-list', id, page],
+    () => fetchBridgedRecordList({ udt_id: id.toString(), page: page as string }),
+    { enabled: tab === tabs[1] },
+  )
+
+  const { isLoading: isHolderListLoading, data: holderList } = useQuery(
+    ['token-holder-list', id, page],
+    () => fetchTokenHolderList({ udt_id: id.toString(), page: page as string }),
+    { enabled: tab === tabs[2] },
+  )
 
   const tokenInfo = [
-    { label: 'decimal', value: <Typography variant="body2">{token.decimal || '-'}</Typography> },
-    { label: 'type', value: <Typography variant="body2">{t(token.type)}</Typography> },
+    {
+      label: 'decimal',
+      value: token ? <Typography variant="body2">{token.decimal || '-'}</Typography> : <Skeleton animation="wave" />,
+    },
+    {
+      label: 'type',
+      value: token ? <Typography variant="body2">{t(token.type)}</Typography> : <Skeleton animation="wave" />,
+    },
     {
       label: 'contract',
-      value: token.address ? <Address address={token.address} /> : <Typography variant="body2">-</Typography>,
+      value: !token ? (
+        <Skeleton animation="wave" />
+      ) : token.address ? (
+        <Address address={token.address} />
+      ) : (
+        <Typography variant="body2">-</Typography>
+      ),
     },
     // {
     //   label: 'layer1Lock',
@@ -86,7 +113,7 @@ const Token = ({ token, transferList, bridgedRecordList, tokenHolderList }: Prop
     // },
     {
       label: 'officialSite',
-      value: (
+      value: token ? (
         <Typography variant="body2">
           {token.officialSite ? (
             <Link
@@ -107,44 +134,68 @@ const Token = ({ token, transferList, bridgedRecordList, tokenHolderList }: Prop
             '-'
           )}
         </Typography>
+      ) : (
+        <Skeleton animation="wave" />
       ),
     },
     {
       label: 'description',
-      value: <Typography variant="body2">{token.description || '-'}</Typography>,
+      value: token ? (
+        <Typography variant="body2">{token.description || '-'}</Typography>
+      ) : (
+        <Skeleton animation="wave" />
+      ),
     },
   ]
   const tokenData = [
     {
-      label: token.type === 'bridge' ? 'circulatingSupply' : 'totalSupply',
-      value: <Typography variant="body2">{token.supply ? new BigNumber(token.supply).toFormat() : '-'}</Typography>,
+      label: token?.type === 'bridge' ? 'circulatingSupply' : 'totalSupply',
+      value: !token ? (
+        <Skeleton animation="wave" />
+      ) : (
+        <Typography variant="body2">{token.supply ? new BigNumber(token.supply).toFormat() : '-'}</Typography>
+      ),
     },
-    // {label: 'value', value: token.supply ?? '-'},
-    { label: 'holderCount', value: <Typography variant="body2">{token.holderCount || '-'}</Typography> },
-    { label: 'transferCount', value: <Typography variant="body2">{token.transferCount || '-'}</Typography> },
+    {
+      label: 'holderCount',
+      value: token ? (
+        <Typography variant="body2">{token.holderCount || '-'}</Typography>
+      ) : (
+        <Skeleton animation="wave" />
+      ),
+    },
+    {
+      label: 'transferCount',
+      value: token ? (
+        <Typography variant="body2">{token.transferCount || '-'}</Typography>
+      ) : (
+        <Skeleton animation="wave" />
+      ),
+    },
   ]
 
   return (
     <>
-      <SubpageHead subtitle={`${t('token')} ${token.name || token.symbol || '-'}`} />
+      <SubpageHead subtitle={`${t('token')} ${token?.name || token?.symbol || '-'}`} />
       <Container sx={{ py: 6 }}>
         <Stack direction="row" justifyContent="space-between" alignItems="center">
           <PageTitle>
             <Stack direction="row" alignItems="center">
               <Avatar
-                src={token.icon ?? null}
-                sx={{ bgcolor: token.icon ? '#f0f0f0' : nameToColor(token.name ?? ''), mr: 2 }}
+                src={token?.icon ?? null}
+                sx={{ bgcolor: token?.icon ? '#f0f0f0' : nameToColor(token?.name ?? ''), mr: 2 }}
               >
-                {token.name?.[0] ?? '?'}
+                {token?.name?.[0] ?? '?'}
               </Avatar>
-              <Typography variant="h5" fontWeight="inherit">
-                {token.name || '-'}
+              <Typography variant="h5" fontWeight="inherit" sx={{ textTransform: 'none' }}>
+                {!token ? <Skeleton animation="wave" width="30px" /> : token.name || '-'}
               </Typography>
-              {token.symbol ? (
+              {token?.symbol ? (
                 <Typography
                   fontWeight="inherit"
                   color="primary.light"
                   whiteSpace="pre"
+                  sx={{ textTransform: 'none' }}
                 >{` (${token.symbol})`}</Typography>
               ) : null}
             </Stack>
@@ -196,9 +247,27 @@ const Token = ({ token, transferList, bridgedRecordList, tokenHolderList }: Prop
               ))}
             </Tabs>
             <Divider />
-            {tab === tabs[0] && transferList ? <ERC20TransferList list={transferList} /> : null}
-            {tab === tabs[1] && bridgedRecordList ? <BridgedRecordList list={bridgedRecordList} showUser /> : null}
-            {tab === tabs[2] && tokenHolderList ? <TokenHolderList list={tokenHolderList} /> : null}
+            {tab === tabs[0] ? (
+              !isTransferListLoading && transferList ? (
+                <ERC20TransferList list={transferList} />
+              ) : (
+                <Skeleton animation="wave" />
+              )
+            ) : null}
+            {tab === tabs[1] ? (
+              !isBridgedListLoading && bridgedRecordList ? (
+                <BridgedRecordList list={bridgedRecordList} showUser />
+              ) : (
+                <Skeleton animation="wave" />
+              )
+            ) : null}
+            {tab === tabs[2] ? (
+              !isHolderListLoading && holderList ? (
+                <TokenHolderList list={holderList} />
+              ) : (
+                <Skeleton animation="wave" />
+              )
+            ) : null}
           </Paper>
         </Stack>
       </Container>
@@ -206,70 +275,14 @@ const Token = ({ token, transferList, bridgedRecordList, tokenHolderList }: Prop
   )
 }
 
-export const getServerSideProps: GetServerSideProps<Props, { id: string }> = async ({ locale, res, params, query }) => {
-  const { id } = params
-  const { page, tab = tabs[0] } = query
+export const getStaticPaths: GetStaticPaths = () => ({
+  paths: [],
+  fallback: 'blocking',
+})
 
-  try {
-    if (typeof tab !== 'string' || !tabs.includes(tab)) {
-      throw new TabNotFoundException()
-    }
-
-    const [token, lng] = await Promise.all([
-      fetchToken(id),
-      serverSideTranslations(locale, ['common', 'tokens', 'list']),
-    ])
-    const transferList =
-      tab === tabs[0] && token.address
-        ? await fetchERC20TransferList({ udt_address: token.address, page: page as string })
-        : null
-
-    const bridgedRecordList =
-      tab === tabs[1] && token.id
-        ? await fetchBridgedRecordList({ udt_id: token.id.toString(), page: page as string })
-        : null
-
-    const tokenHolderList =
-      tab === tabs[2] && token.id
-        ? await fetchTokenHolderList({ udt_id: token.id.toString(), page: page as string })
-        : null
-    // const totalPage = Math.ceil(+transferListRes.totalCount / 10)
-    // if (totalPage < +page) {
-    //   throw new PageOverflowException(totalPage)
-    // }
-
-    return {
-      props: {
-        token,
-        transferList,
-        bridgedRecordList,
-        tokenHolderList,
-        ...lng,
-      },
-    }
-  } catch (err) {
-    switch (true) {
-      case err instanceof PageNonPositiveException: {
-        return {
-          redirect: {
-            destination: `/${locale}/token/${id}`,
-            permanent: false,
-          },
-        }
-      }
-      case err instanceof PageOverflowException: {
-        return {
-          redirect: {
-            destination: `/${locale}/token/${id}?page=${err.page}`,
-            permanent: false,
-          },
-        }
-      }
-      default: {
-        return handleApiError(err, res, locale)
-      }
-    }
-  }
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+  const lng = await serverSideTranslations(locale, ['common', 'tokens', 'list'])
+  return { props: lng }
 }
 
 export default Token

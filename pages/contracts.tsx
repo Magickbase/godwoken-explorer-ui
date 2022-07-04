@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
-import { GetServerSideProps } from 'next'
+import type { GetStaticProps } from 'next'
+import { useQuery } from 'react-query'
+import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
@@ -17,32 +18,27 @@ import {
   TableCell,
   Link,
   Stack,
+  Skeleton,
 } from '@mui/material'
 import PageTitle from 'components/PageTitle'
 import SubpageHead from 'components/SubpageHead'
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/Pagination'
 import PageSize, { SIZES } from 'components/PageSize'
-import {
-  fetchContractList,
-  getContractListRes,
-  handleApiError,
-  PageNonPositiveException,
-  PageSizeException,
-} from 'utils'
+import { fetchContractList } from 'utils'
 
-type ParsedContractList = ReturnType<typeof getContractListRes>
-type State = { contracts: ParsedContractList['contracts']; page: number; totalPage: number; pageSize: number }
-
-const ContractList = (initState: State) => {
-  const [{ contracts, pageSize, page, totalPage }, setContractList] = useState(initState)
+const ContractList = () => {
   const [t] = useTranslation(['list', 'common'])
-
-  useEffect(() => {
-    setContractList(initState)
-  }, [initState])
+  const {
+    query: { page = '1', page_size = SIZES[2] },
+  } = useRouter()
 
   const title = t('contract_list_title')
+  const { isLoading, data } = useQuery(
+    ['contracts', page, page_size],
+    () => fetchContractList({ page: page as string, page_size: page_size as string }),
+    { refetchInterval: 10000 },
+  )
 
   return (
     <>
@@ -65,13 +61,24 @@ const ContractList = (initState: State) => {
                     </TableCell>
                     <TableCell component="th">{t(`compiler`)}</TableCell>
                     <TableCell component="th">{t(`compiler_version`)}</TableCell>
-                    <TableCell component="th">{`${t(`balance`)} (CKB)`}</TableCell>
+                    <TableCell component="th">
+                      {t(`balance`)}
+                      <span style={{ textTransform: 'none' }}>{`(pCKB)`}</span>
+                    </TableCell>
                     <TableCell component="th">{t(`tx_count`)}</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {totalPage ? (
-                    contracts.map(c => (
+                  {isLoading ? (
+                    Array.from({ length: +page_size }).map((_, idx) => (
+                      <TableRow key={idx}>
+                        <TableCell colSpan={6}>
+                          <Skeleton animation="wave" />
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : data.meta.totalPage ? (
+                    data.contracts.map(c => (
                       <TableRow key={c.id} title={c.address}>
                         <TableCell sx={{ fontSize: 'inherit', display: { xs: 'none', md: 'table-cell' } }}>
                           <Stack direction="row" alignItems="center">
@@ -124,8 +131,12 @@ const ContractList = (initState: State) => {
               </Table>
             </TableContainer>
             <Stack direction="row" justifyContent="space-between" alignItems="center">
-              <PageSize pageSize={pageSize} />
-              <Pagination total={totalPage * pageSize} page={page} pageSize={pageSize} />
+              <PageSize pageSize={+page_size} />
+              {isLoading ? (
+                <Skeleton animation="wave" width="20px" />
+              ) : (
+                <Pagination total={data?.meta.totalPage * +page_size} page={+page} pageSize={+page_size} />
+              )}
             </Stack>
           </Box>
         </Paper>
@@ -134,40 +145,9 @@ const ContractList = (initState: State) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<State> = async ({ locale, res, query }) => {
-  const { page, page_size = SIZES[1] } = query
-
-  try {
-    if (+page < 1) {
-      throw new PageNonPositiveException()
-    }
-
-    if (!SIZES.includes(page_size as string)) {
-      throw new PageSizeException()
-    }
-
-    const [{ contracts, meta }, lng] = await Promise.all([
-      fetchContractList({ page: page as string, page_size: page_size as string }),
-      serverSideTranslations(locale, ['common', 'list']),
-    ])
-
-    return { props: { ...lng, ...meta, contracts } }
-  } catch (err) {
-    switch (true) {
-      case err instanceof PageNonPositiveException:
-      case err instanceof PageSizeException: {
-        return {
-          redirect: {
-            destination: `/${locale}/blocks`,
-            permanent: false,
-          },
-        }
-      }
-      default: {
-        return handleApiError(err, res, locale)
-      }
-    }
-  }
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+  const lng = await serverSideTranslations(locale, ['common', 'list'])
+  return { props: lng }
 }
 
 export default ContractList
