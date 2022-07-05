@@ -1,13 +1,17 @@
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
-import { Tooltip, List, ListItem, ListItemText, ListSubheader, Divider, Typography, Link } from '@mui/material'
+import { Tooltip, List, ListItem, ListItemText, ListSubheader, Divider, Typography, Link, Button } from '@mui/material'
+import { AddModeratorOutlined as RegisterIcon } from '@mui/icons-material'
 import { GraphQLSchema } from 'utils'
+
+const CONTRACT_FORM_URL = `https://github.com/Magickbase/godwoken_explorer/issues/new/choose`
 
 const SmartContract: React.FC<{
   deployer: string
   deployTxHash: string
   udt: Pick<GraphQLSchema.Udt, 'id' | 'name'> | null
-}> = ({ deployer, deployTxHash, udt }) => {
+  isVerified: boolean
+}> = ({ deployer, deployTxHash, udt, isVerified }) => {
   const [t] = useTranslation('account')
   const fields = [
     {
@@ -62,6 +66,26 @@ const SmartContract: React.FC<{
           ),
         }
       : null,
+    {
+      label: t('verify_status'),
+      value: isVerified ? (
+        <Typography variant="body2">{t(`verified`)}</Typography>
+      ) : (
+        <Typography variant="body2">
+          <Link
+            href={CONTRACT_FORM_URL}
+            target="_blank"
+            rel="noreferrer noopener"
+            display="flex"
+            alignItems="center"
+            underline="none"
+            color="secondary"
+          >
+            {t(`unverified`)} <RegisterIcon fontSize="small" />
+          </Link>
+        </Typography>
+      ),
+    },
   ]
 
   return (
