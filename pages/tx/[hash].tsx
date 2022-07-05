@@ -1,9 +1,10 @@
 import { useEffect, useState, useMemo } from 'react'
-import { GetServerSideProps } from 'next'
+import { GetStaticPaths, GetStaticProps } from 'next'
 import { useRouter } from 'next/router'
 import NextLink from 'next/link'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { useQuery } from 'react-query'
 import {
   Alert,
   Accordion,
@@ -27,6 +28,7 @@ import {
   Snackbar,
   Tabs,
   Tab,
+  Skeleton,
 } from '@mui/material'
 import {
   OpenInNew as OpenInNewIcon,
@@ -40,30 +42,30 @@ import BigNumber from 'bignumber.js'
 import SubpageHead from 'components/SubpageHead'
 import PageTitle from 'components/PageTitle'
 import Address from 'components/AddressInHalfPanel'
-import TransferList, { fetchTransferList, TransferListProps } from 'components/SimpleERC20TransferList'
+import TransferList, { fetchTransferList } from 'components/SimpleERC20TransferList'
 import TxLogsList from 'components/TxLogsList'
+import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
 import {
   formatDatetime,
   fetchTx,
-  handleApiError,
   useWS,
   getTxRes,
   formatInt,
   handleCopy,
-  TabNotFoundException,
-  ParsedEventLog,
   fetchEventLogsListByType,
+  handleApiError,
   CKB_EXPLORER_URL,
   CHANNEL,
   CKB_DECIMAL,
   GCKB_DECIMAL,
+  NotFoundException,
 } from 'utils'
 
 type RawTx = Parameters<typeof getTxRes>[0]
 type ParsedTx = ReturnType<typeof getTxRes>
 
 const tabs = ['erc20', 'logs']
-type State = ParsedTx & Partial<{ transferList: TransferListProps['token_transfers']; logsList: ParsedEventLog[] }>
+type State = ParsedTx
 const ADDR_LENGTH = 42
 
 const Tx = (initState: State) => {
@@ -72,9 +74,35 @@ const Tx = (initState: State) => {
   const [isCopied, setIsCopied] = useState(false)
   const {
     push,
-    query: { tab = 'erc20' },
+    query: { hash, tab = 'erc20', before = null, after = null, address_from = null, address_to = null },
   } = useRouter()
   const [t] = useTranslation('tx')
+
+  const downloadItems = [{ label: t('ERC20Records'), href: DOWNLOAD_HREF_LIST.txTransferList(tx.hash) }]
+
+  const { isLoading: isTransferListLoading, data: transferList } = useQuery(
+    ['tx-transfer-list', hash, before, after, address_from, address_to],
+    () =>
+      fetchTransferList({
+        transaction_hash: hash as string,
+        before: before as string | null,
+        after: after as string | null,
+        from_address: address_from as string | null,
+        to_address: address_to as string | null,
+        combine_from_to: false,
+      }),
+    {
+      enabled: tab === 'erc20',
+    },
+  )
+
+  const { isLoading: isLogListLoading, data: logsList } = useQuery(
+    ['tx-log-list', hash],
+    () => fetchEventLogsListByType('txs', hash as string),
+    {
+      enabled: tab === 'logs',
+    },
+  )
 
   const decodedInput = useMemo(() => {
     if (initState.contractAbi && initState.contractAbi.length && initState.input) {
@@ -300,7 +328,10 @@ const Tx = (initState: State) => {
     <>
       <SubpageHead subtitle={`${title} ${tx.hash}`} />
       <Container sx={{ pb: 6 }}>
-        <PageTitle>{title}</PageTitle>
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <PageTitle>{title}</PageTitle>
+          <DownloadMenu items={downloadItems} />
+        </Stack>
         <Stack spacing={2}>
           <Paper>
             <Grid container>
@@ -420,10 +451,20 @@ const Tx = (initState: State) => {
               ))}
             </Tabs>
             <Divider />
-            {tab === 'erc20' && initState.transferList ? (
-              <TransferList token_transfers={initState.transferList} />
+            {tab === 'erc20' ? (
+              transferList || !isTransferListLoading ? (
+                <TransferList token_transfers={transferList} />
+              ) : (
+                <Skeleton animation="wave" />
+              )
             ) : null}
-            {tab === 'logs' && <TxLogsList list={initState.logsList} />}
+            {tab === 'logs' ? (
+              logsList || !isLogListLoading ? (
+                <TxLogsList list={logsList} />
+              ) : (
+                <Skeleton animation="wave" />
+              )
+            ) : null}
           </Paper>
         </Stack>
         <Snackbar
@@ -445,47 +486,22 @@ const Tx = (initState: State) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<State, { hash: string }> = async ({
-  locale,
-  res,
-  params,
-  query,
-}) => {
+export const getStaticPaths: GetStaticPaths = () => ({
+  paths: [],
+  fallback: 'blocking',
+})
+
+export const getStaticProps: GetStaticProps<State, { hash: string }> = async ({ locale, params }) => {
   const { hash } = params
-  const { tab = tabs[0], before = null, after = null, address_from = null, address_to = null } = query
 
   try {
-    if (typeof tab !== 'string' || !tabs.includes(tab)) {
-      throw new TabNotFoundException()
-    }
     const [tx, lng] = await Promise.all([fetchTx(hash), await serverSideTranslations(locale, ['common', 'tx', 'list'])])
-    const transferList =
-      tab === 'erc20'
-        ? await fetchTransferList({
-            transaction_hash: hash,
-            before: before as string | null,
-            after: after as string | null,
-            from_address: address_from as string | null,
-            to_address: address_to as string | null,
-            combine_from_to: false,
-          })
-        : null
-    const logsList = tab === 'logs' ? await fetchEventLogsListByType('txs', hash) : null
-    return { props: { ...tx, ...lng, transferList, logsList } }
-  } catch (err) {
-    switch (true) {
-      case err instanceof TabNotFoundException: {
-        return {
-          redirect: {
-            destination: `/tx/${hash}`,
-            permanent: false,
-          },
-        }
-      }
-      default: {
-        return handleApiError(err, res, locale, hash)
-      }
+    if (!tx?.hash) {
+      throw new NotFoundException()
     }
+    return { props: { ...tx, ...lng } }
+  } catch (err) {
+    return handleApiError(err, null, locale, hash)
   }
 }
 export default Tx

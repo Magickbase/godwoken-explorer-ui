@@ -1,16 +1,13 @@
 import { useState, Dispatch, SetStateAction } from 'react'
-import Image from 'next/image'
-import { useTranslation } from 'next-i18next'
-import { Box, Stack, Typography, Select, MenuItem, FormControl, InputBase, SxProps, Tooltip } from '@mui/material'
+import { Box, Stack, Typography } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp'
 import MuiAccordion, { AccordionProps } from '@mui/material/Accordion'
 import MuiAccordionSummary, { AccordionSummaryProps } from '@mui/material/AccordionSummary'
 import MuiAccordionDetails from '@mui/material/AccordionDetails'
-import { ParsedEventLog, IMG_URL } from 'utils'
+import { ParsedEventLog } from 'utils'
 import TruncatedAddress from './TruncatedAddress'
-import { CustomizedInput, ArgsValueDisplay } from './TxLogListItem'
-import { EventFilterIcon } from './ContractEventsList'
+import LogFieldItem from 'components/LogItemField'
 
 const Accordion = styled((props: AccordionProps) => <MuiAccordion disableGutters elevation={0} square {...props} />)(
   ({ theme }) => ({
@@ -43,26 +40,32 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
   paddingLeft: theme.spacing(2.5),
 }))
 
-const ContractEventListItem = ({
-  item,
-  setSearchText,
-}: {
-  item: ParsedEventLog
-  setSearchText: Dispatch<SetStateAction<string>>
-}) => {
+const ContractEventListItem = ({ item }: { item: ParsedEventLog; setSearchText: Dispatch<SetStateAction<string>> }) => {
   const [expanded, setExpanded] = useState<boolean>(false)
-  const [dataFormat, setDataFormat] = useState<'hex' | 'decoded'>('hex')
-  const [t] = useTranslation('list')
   const { name: eventName, inputs: eventInputs } = item.parsedLog?.eventFragment ?? { name: null, inputs: [] }
-  const unindexedInputs = eventInputs.filter(input => input.indexed === false)
-  const unindexedParsedArgs = item.parsedLog?.args.filter(arg => typeof arg !== 'string')
+
+  const topics = item.topics.map((value, i) => {
+    const parsed =
+      item.parsedLog?.eventFragment.inputs[i - 1]?.type === 'address'
+        ? { type: 'address', hex: item.parsedLog.args[i - 1] }
+        : item.parsedLog?.args[i - 1] ?? undefined
+    return { value, parsed }
+  })
+
+  const indexedCount = item.parsedLog?.eventFragment.inputs.filter(i => i.indexed).length ?? 0
+  const dataList = item.data
+    ?.slice(2)
+    .match(/\w{64}/g)
+    .map((frag, i) => {
+      const parsed =
+        item.parsedLog?.eventFragment.inputs[i + indexedCount]?.type === 'address'
+          ? { type: 'address', hex: item.parsedLog.args[i + indexedCount] }
+          : item.parsedLog?.args[i + indexedCount] ?? undefined
+      return { value: `0x${frag}`, parsed }
+    })
 
   const handleExpand = () => {
     setExpanded(!expanded)
-  }
-
-  const handleToggleButton = e => {
-    setDataFormat(e.target.value)
   }
 
   return (
@@ -83,14 +86,14 @@ const ContractEventListItem = ({
                   <Typography component="span" className="mono-font" fontSize={14}>
                     {input.indexed && `index_topic_${i + 1}  `}
                   </Typography>
-                  <Typography component="span" className="mono-font" fontSize={14} sx={{ color: '#00c9a7' }}>
+                  <Typography component="span" className="mono-font" fontSize={14} sx={{ color: '#23C09B' }}>
                     {`${input.type} `}
                   </Typography>
                   <Typography
                     component="span"
                     className="mono-font"
                     fontSize={14}
-                    sx={{ color: '#de4437' }}
+                    sx={{ color: '#F83F3F' }}
                   >{`${input.name}`}</Typography>
                   {i < eventInputs.length - 1 && (
                     <Typography component="span" className="mono-font" fontSize={14}>
@@ -132,76 +135,34 @@ const ContractEventListItem = ({
           </AccordionDetails>
         </Accordion>
       ) : null}
-      <Stack direction="row" spacing={1}>
-        <EventFilterIcon
-          setSearchText={setSearchText}
-          tooltip={t('filterEventBy', { filter: `Topic0=${item.topics[0]}` })}
-          value={item.topics[0]}
-        />
+      <Stack direction="column" spacing={1}>
         <Stack>
-          <Typography
-            component="span"
-            className="mono-font"
-            fontSize={14}
-            sx={{ color: '#666666' }}
-            noWrap
-          >{`[topic0] ${item.topics[0]}`}</Typography>
-          {item.topics
-            .slice(1)
-            .map((topic, idx) =>
-              topic !== '0x' ? (
-                <Typography key={topic} component="span" className="mono-font" fontSize={14}>{`[topic${
-                  idx + 1
-                }] ${topic}`}</Typography>
-              ) : null,
-            )}
-          {item.data && (
-            <Stack direction="row" alignItems="center">
-              {unindexedInputs.length ? (
-                <>
-                  <FormControl sx={{ my: 1, mr: 1 }} size="small">
-                    <Select
-                      value={dataFormat}
-                      onChange={handleToggleButton}
-                      size="small"
-                      sx={{ width: '64px' }}
-                      renderValue={(v: string) => (
-                        <Typography variant="body2">{v.charAt(0).toUpperCase() + v.slice(1, 3)}</Typography>
-                      )}
-                      input={<CustomizedInput />}
-                    >
-                      <MenuItem value={'decoded'}>Decoded</MenuItem>
-                      <MenuItem value={'hex'}>Hex</MenuItem>
-                    </Select>
-                  </FormControl>
-                  <Image
-                    src={`${IMG_URL}arrow-right-slim.svg`}
-                    loading="lazy"
-                    width="17"
-                    height="17"
-                    layout="fixed"
-                    alt="arrow-right"
-                  />
-                </>
-              ) : (
-                <span style={{ whiteSpace: 'pre', alignSelf: 'flex-start' }}>{`Data:         `}</span>
-              )}
-              {item.data
-                .slice(2)
-                .split(/(.{64})/)
-                .filter(str => str.length > 0)
-                .map((data, i) => (
-                  <ArgsValueDisplay
-                    key={i}
-                    format={dataFormat}
-                    argType={unindexedInputs[i]?.type}
-                    hexValue={data}
-                    decodedValue={unindexedParsedArgs ? unindexedParsedArgs[i]?.hex : data}
-                    sx={{ ml: 1 }}
-                  />
-                ))}
-            </Stack>
+          {topics.map((topic, idx) =>
+            topic.value === '0x' ? null : (
+              <div
+                key={topic.value}
+                style={{
+                  display: 'flex',
+                  color: idx ? '#000' : '#666666',
+                }}
+              >
+                <Typography
+                  component="span"
+                  className="mono-font"
+                  fontSize={14}
+                  my={1}
+                  mr="1ch"
+                  noWrap
+                >{`[topic${idx}]`}</Typography>
+                <LogFieldItem {...topic} />
+              </div>
+            ),
           )}
+        </Stack>
+        <Stack>
+          {dataList.map(topic => (
+            <LogFieldItem key={topic.value} {...topic} />
+          ))}
         </Stack>
       </Stack>
     </Stack>

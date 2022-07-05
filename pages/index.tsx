@@ -1,7 +1,6 @@
 import type { API } from 'utils/api/utils'
-import type { Cache } from 'pages/api/cache'
-import { useState, useEffect } from 'react'
-import { GetServerSideProps } from 'next'
+import type { GetStaticProps } from 'next'
+import { gql } from 'graphql-request'
 import NextLink from 'next/link'
 import { useQuery } from 'react-query'
 import {
@@ -22,8 +21,8 @@ import {
   Divider,
   Paper,
   IconButton,
-  Badge,
   Skeleton,
+  Typography,
 } from '@mui/material'
 import {
   LineWeightOutlined as BlockHeightIcon,
@@ -35,8 +34,7 @@ import {
 } from '@mui/icons-material'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { Typography } from '@mui/material'
-import { timeDistance, useWS, getHomeRes, formatInt, CHANNEL } from 'utils'
+import { fetchHome, timeDistance, formatInt, client, GraphQLSchema } from 'utils'
 
 type State = API.Home.Parsed
 
@@ -54,6 +52,58 @@ const statisticGroups = [
   { key: 'tps', icon: <TpsIcon />, suffix: ' txs/s' },
   { key: 'accountCount', icon: <AccountCountIcon /> },
 ]
+
+const queryHomeLists = gql`
+  query {
+    transactions(input: { limit: 10 }) {
+      entries {
+        eth_hash
+        hash
+        block {
+          timestamp
+        }
+        from_account {
+          eth_address
+          script_hash
+          type
+        }
+        to_account {
+          eth_address
+          script_hash
+          type
+        }
+        polyjuice {
+          status
+        }
+        type
+      }
+    }
+    blocks {
+      number
+      hash
+      timestamp
+      status
+      transaction_count
+    }
+  }
+`
+
+interface HomeLists {
+  blocks: Array<Pick<GraphQLSchema.Block, 'hash' | 'number' | 'status' | 'transaction_count' | 'timestamp'>>
+  transactions: {
+    entries: Array<{
+      block: Pick<GraphQLSchema.Block, 'timestamp'>
+      eth_hash: string
+      hash: string
+      type: GraphQLSchema.TransactionType
+      from_account: Pick<GraphQLSchema.Account, 'eth_address' | 'script_hash' | 'type'>
+      to_account: Pick<GraphQLSchema.Account, 'eth_address' | 'script_hash' | 'type'>
+      polyjuice: Pick<GraphQLSchema.Polyjuice, 'status'>
+    }>
+  }
+}
+
+export const fetchHomeLists = () => client.request<HomeLists>(queryHomeLists)
 
 const Statistic: React.FC<State['statistic'] & { isLoading: boolean }> = ({
   blockCount,
@@ -97,7 +147,7 @@ const Statistic: React.FC<State['statistic'] & { isLoading: boolean }> = ({
   )
 }
 
-const BlockList: React.FC<{ list: State['blockList']; isLoading: boolean }> = ({ list, isLoading }) => {
+const BlockList: React.FC<{ list: HomeLists['blocks']; isLoading: boolean }> = ({ list, isLoading }) => {
   const [t, { language }] = useTranslation(['block', 'common'])
   return (
     <List
@@ -158,7 +208,7 @@ const BlockList: React.FC<{ list: State['blockList']; isLoading: boolean }> = ({
                           </NextLink>
                         </Box>
                         <Typography variant="body2" display="flex" alignItems="center">
-                          {formatInt(block.txCount)} TXs
+                          {formatInt(block.transaction_count ?? 0)} TXs
                         </Typography>
                       </Stack>
                       <Stack direction="row" justifyContent="space-between">
@@ -181,8 +231,8 @@ const BlockList: React.FC<{ list: State['blockList']; isLoading: boolean }> = ({
                           color="rgba(0,0,0,0.6)"
                         >
                           <time
-                            dateTime={new Date(+block.timestamp).toISOString()}
-                            title={new Date(+block.timestamp).toISOString()}
+                            dateTime={new Date(block.timestamp).toISOString()}
+                            title={new Date(block.timestamp).toISOString()}
                           >
                             {timeDistance(block.timestamp, language)}
                           </time>
@@ -199,7 +249,13 @@ const BlockList: React.FC<{ list: State['blockList']; isLoading: boolean }> = ({
   )
 }
 
-const TxList: React.FC<{ list: State['txList']; isLoading: boolean }> = ({ list, isLoading }) => {
+const SPECIAL_ADDR_TYPES = [
+  GraphQLSchema.AccountType.EthAddrReg,
+  GraphQLSchema.AccountType.MetaContract,
+  GraphQLSchema.AccountType.PolyjuiceCreator,
+]
+
+const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: boolean }> = ({ list, isLoading }) => {
   const [t, { language }] = useTranslation('tx')
   return (
     <List
@@ -241,170 +297,158 @@ const TxList: React.FC<{ list: State['txList']; isLoading: boolean }> = ({ list,
               </ListItem>
             </Box>
           ))
-        : list.map((tx, idx) => (
-            <Box key={tx.hash}>
-              <Divider variant={idx ? 'middle' : 'fullWidth'} />
-              <ListItem>
-                <ListItemIcon>
-                  <Badge
-                    color="warning"
-                    variant="dot"
-                    invisible={tx.polyjuice_status !== 'failed'}
-                    overlap="circular"
-                    badgeContent=""
-                    anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-                  >
+        : list.map((tx, idx) => {
+            const from = tx.from_account.eth_address || tx.from_account.script_hash
+            const to = tx.to_account.eth_address || tx.to_account.script_hash
+            const isSpecialFrom = SPECIAL_ADDR_TYPES.includes(tx.from_account.type)
+            const isSpecialTo = SPECIAL_ADDR_TYPES.includes(tx.to_account.type)
+            return (
+              <Box key={tx.eth_hash}>
+                <Divider variant={idx ? 'middle' : 'fullWidth'} />
+                <ListItem>
+                  <ListItemIcon>
                     <Avatar sx={{ bgcolor: '#cfd8dc' }}>Tx</Avatar>
-                  </Badge>
-                </ListItemIcon>
-                <ListItemText
-                  primary={
-                    <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" minHeight={73}>
-                      <Stack>
-                        <Tooltip placement="top" title={tx.hash}>
-                          <Box>
-                            <NextLink href={`/tx/${tx.hash}`}>
-                              <Button
-                                color="secondary"
-                                href={`/tx/${tx.hash}`}
-                                component={Link}
-                                className="mono-font"
-                                sx={{
-                                  textTransform: 'lowercase',
-                                  whiteSpace: 'nowrap',
-                                }}
-                              >{`${tx.hash.slice(0, 8)}...${tx.hash.slice(-8)}`}</Button>
-                            </NextLink>
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={
+                      <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" minHeight={73}>
+                        <Stack>
+                          <Tooltip placement="top" title={tx.eth_hash}>
+                            <Box>
+                              <NextLink href={`/tx/${tx.eth_hash}`}>
+                                <Button
+                                  color="secondary"
+                                  href={`/tx/${tx.eth_hash}`}
+                                  component={Link}
+                                  className="mono-font"
+                                  sx={{
+                                    textTransform: 'lowercase',
+                                    whiteSpace: 'nowrap',
+                                  }}
+                                >{`${tx.eth_hash.slice(0, 8)}...${tx.eth_hash.slice(-8)}`}</Button>
+                              </NextLink>
+                            </Box>
+                          </Tooltip>
+                          <Box
+                            alignItems="bottom"
+                            fontWeight={400}
+                            fontSize="0.875rem"
+                            pt={1}
+                            ml={1}
+                            color="rgba(0,0,0,0.6)"
+                          >
+                            <time dateTime={new Date(tx.block.timestamp).toISOString()} title={t('timestamp')}>
+                              {timeDistance(tx.block.timestamp, language)}
+                            </time>
                           </Box>
-                        </Tooltip>
-                        <Box
-                          alignItems="bottom"
-                          fontWeight={400}
-                          fontSize="0.875rem"
-                          pt={1}
-                          ml={1}
-                          color="rgba(0,0,0,0.6)"
+                        </Stack>
+                        <Stack sx={{ pl: { xs: 1, sm: 0 } }}>
+                          <Stack direction="row" justifyContent="space-between" alignItems="center">
+                            <Typography variant="body2" sx={{ textTransform: 'capitalize' }} noWrap>
+                              {`${t('from')}:`}
+                            </Typography>
+                            <Tooltip placement="top" title={from}>
+                              <Box>
+                                <NextLink href={`/account/${from}`}>
+                                  <Button
+                                    color="secondary"
+                                    href={`/account/${from}`}
+                                    component={Link}
+                                    className="mono-font"
+                                    sx={{
+                                      whiteSpace: 'nowrap',
+                                      fontSize: isSpecialFrom ? 'small' : 'normal',
+                                      textTransform: isSpecialFrom ? 'uppercase' : 'lowercase',
+                                    }}
+                                  >
+                                    {isSpecialFrom ? tx.from_account.type.replace(/_/g, ' ') : formatAddress(from)}
+                                  </Button>
+                                </NextLink>
+                              </Box>
+                            </Tooltip>
+                          </Stack>
+                          <Stack direction="row" justifyContent="space-between" alignItems="center">
+                            <Typography variant="body2" sx={{ textTransform: 'capitalize' }} noWrap>
+                              {`${t('to')}:`}
+                            </Typography>
+                            <Tooltip placement="top" title={to}>
+                              <Box>
+                                <NextLink href={`/account/${to}`}>
+                                  <Button
+                                    color="secondary"
+                                    href={`/account/${to}`}
+                                    component={Link}
+                                    className="mono-font"
+                                    sx={{
+                                      whiteSpace: 'nowrap',
+                                      fontSize: isSpecialTo ? 'small' : 'normal',
+                                      textTransform: isSpecialTo ? 'uppercase' : 'lowercase',
+                                    }}
+                                  >
+                                    {isSpecialTo ? tx.to_account.type.replace(/_/g, ' ') : formatAddress(to)}
+                                  </Button>
+                                </NextLink>
+                              </Box>
+                            </Tooltip>
+                          </Stack>
+                        </Stack>
+                        <Stack
+                          direction={{ xs: 'row', sm: 'column' }}
+                          justifyContent={{
+                            xs: 'space-between',
+                            sm: tx.polyjuice?.status !== 'FAILED' ? 'start' : 'space-between',
+                          }}
+                          alignItems="end"
                         >
-                          <time dateTime={new Date(+tx.timestamp).toISOString()} title={t('timestamp')}>
-                            {timeDistance(tx.timestamp, language)}
-                          </time>
-                        </Box>
-                      </Stack>
-                      <Stack sx={{ pl: { xs: 1, sm: 0 } }}>
-                        <Stack direction="row" justifyContent="space-between" alignItems="center">
-                          <Typography variant="body2" sx={{ textTransform: 'capitalize' }} noWrap>
-                            {`${t('from')}:`}
-                          </Typography>
-                          <Tooltip placement="top" title={tx.from}>
-                            <Box>
-                              <NextLink href={`/account/${tx.from}`}>
-                                <Button
-                                  color="secondary"
-                                  href={`/account/${tx.from}`}
-                                  component={Link}
-                                  className="mono-font"
-                                  sx={{ textTransform: 'lowercase' }}
-                                >
-                                  {formatAddress(tx.from)}
-                                </Button>
-                              </NextLink>
-                            </Box>
-                          </Tooltip>
-                        </Stack>
-                        <Stack direction="row" justifyContent="space-between" alignItems="center">
-                          <Typography variant="body2" sx={{ textTransform: 'capitalize' }} noWrap>
-                            {`${t('to')}:`}
-                          </Typography>
-                          <Tooltip placement="top" title={tx.to}>
-                            <Box>
-                              <NextLink href={`/account/${tx.to}`}>
-                                <Button
-                                  color="secondary"
-                                  href={`/account/${tx.to}`}
-                                  component={Link}
-                                  className="mono-font"
-                                  sx={{ textTransform: 'lowercase' }}
-                                >
-                                  {formatAddress(tx.to)}
-                                </Button>
-                              </NextLink>
-                            </Box>
-                          </Tooltip>
+                          <Chip
+                            label={tx.type.replace(/_/g, ' ')}
+                            color="primary"
+                            variant="outlined"
+                            size="small"
+                            sx={{ textTransform: 'capitalize' }}
+                          />
+                          {tx.polyjuice?.status !== 'FAILED' ? null : (
+                            <ErrorIcon color="warning" sx={{ mb: { sx: 0, sm: 1 } }} />
+                          )}
                         </Stack>
                       </Stack>
-                      <Stack
-                        direction={{ xs: 'row', sm: 'column' }}
-                        justifyContent={{ xs: 'space-between', sm: tx.success ? 'start' : 'space-between' }}
-                        alignItems="end"
-                      >
-                        <Chip
-                          label={tx.type.replace(/_/g, ' ')}
-                          color="primary"
-                          variant="outlined"
-                          size="small"
-                          sx={{ textTransform: 'capitalize' }}
-                        />
-                        {tx.success ? null : <ErrorIcon color="warning" sx={{ mb: { sx: 0, sm: 1 } }} />}
-                      </Stack>
-                    </Stack>
-                  }
-                  primaryTypographyProps={{ component: 'div' }}
-                />
-              </ListItem>
-            </Box>
-          ))}
+                    }
+                    primaryTypographyProps={{ component: 'div' }}
+                  />
+                </ListItem>
+              </Box>
+            )
+          })}
     </List>
   )
 }
 
+const INTERVAL = 5000
+
 const Home = () => {
-  const [home, setHome] = useState<State | null>(null)
-
-  const { data } = useQuery('cache', () =>
-    fetch('/api/cache')
-      .then(res => res.json())
-      .then((res: Cache) => res.home),
-  )
-
-  useEffect(() => {
-    if (data) {
-      setHome(data)
-    }
-  }, [data])
-
-  useWS(
-    CHANNEL.HOME,
-    (init: API.Home.Raw) => setHome(getHomeRes(init)),
-    (update: API.Home.Raw) => {
-      const { blockList, statistic, txList } = getHomeRes(update)
-      const MAX_COUNT = 10
-      setHome(state => ({
-        statistic,
-        blockList: [...blockList, ...state.blockList].sort((b1, b2) => b2.timestamp - b1.timestamp).slice(0, MAX_COUNT),
-        txList: [...txList, ...state.txList].sort((t1, t2) => t2.timestamp - t1.timestamp).slice(0, MAX_COUNT),
-      }))
-    },
-    [setHome],
-  )
-
-  const isLoading = !home
+  const { isLoading: isStaticsLoading, data: staticsData } = useQuery('home', () => fetchHome(), {
+    refetchInterval: INTERVAL,
+  })
+  const { isLoading: isListsLoading, data: lists } = useQuery('home-lists', () => fetchHomeLists(), {
+    refetchInterval: INTERVAL,
+  })
 
   return (
     <Container sx={{ py: 6 }}>
-      <Statistic {...home?.statistic} isLoading={isLoading} />
+      <Statistic {...staticsData?.statistic} isLoading={isStaticsLoading} />
       <Stack direction={{ xs: 'column', sm: 'column', md: 'column', lg: 'row' }} spacing={2} sx={{ pt: 6 }}>
         <Paper sx={{ width: '100%', lg: { width: '50%', mr: 2 } }}>
-          <BlockList list={home?.blockList ?? []} isLoading={isLoading} />
+          <BlockList list={lists?.blocks ?? []} isLoading={isListsLoading} />
         </Paper>
         <Paper sx={{ width: '100%', lg: { width: '50%', ml: 2 } }}>
-          <TxList list={home?.txList ?? []} isLoading={isLoading} />
+          <TxList list={lists?.transactions.entries ?? []} isLoading={isListsLoading} />
         </Paper>
       </Stack>
     </Container>
   )
 }
 
-export const getStaticProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   const lng = await serverSideTranslations(locale, ['common', 'block', 'tx', 'statistic'])
   return { props: lng }
 }

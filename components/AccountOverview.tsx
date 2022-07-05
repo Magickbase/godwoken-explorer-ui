@@ -1,7 +1,7 @@
 import { gql } from 'graphql-request'
 import { useTranslation } from 'next-i18next'
 import BigNumber from 'bignumber.js'
-import { Paper, List, ListItem, ListItemText, Divider, Grid, ListSubheader, Typography } from '@mui/material'
+import { Paper, List, ListItem, ListItemText, Divider, Grid, ListSubheader, Typography, Skeleton } from '@mui/material'
 import User from 'components/User'
 import EthAddrReg from './EthAddrReg'
 import MetaContract from 'components/MetaContract'
@@ -76,6 +76,8 @@ export interface MetaContract extends AccountBase {
 
 export type AccountOverviewProps = {
   account: EthUser | EthAddrReg | PolyjuiceCreator | PolyjuiceContract | Udt | MetaContract | UnknownUser
+  isOverviewLoading?: boolean
+  isBalanceLoading?: boolean
   balance: string
   deployerAddr?: string
 }
@@ -165,7 +167,13 @@ export const fetchDeployAddress = (variables: { eth_hash: string }) =>
     .request<{ transaction: { from_account: Pick<GraphQLSchema.Account, 'eth_address'> } }>(deployAddrQuery, variables)
     .then(data => data.transaction.from_account.eth_address)
 
-const AccountOverview: React.FC<AccountOverviewProps> = ({ account, balance, deployerAddr }) => {
+const AccountOverview: React.FC<AccountOverviewProps> = ({
+  account,
+  balance,
+  deployerAddr,
+  isBalanceLoading,
+  isOverviewLoading,
+}) => {
   const [t] = useTranslation(['account', 'common'])
   return (
     <Paper>
@@ -185,7 +193,11 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({ account, balance, dep
                 primary={t(`ckbBalance`)}
                 secondary={
                   <Typography variant="body2" sx={{ textTransform: 'none' }}>
-                    {new BigNumber(balance || '0').dividedBy(GCKB_DECIMAL).toFormat() + ' pCKB'}
+                    {isBalanceLoading ? (
+                      <Skeleton animation="wave" />
+                    ) : (
+                      new BigNumber(balance || '0').dividedBy(GCKB_DECIMAL).toFormat() + ' pCKB'
+                    )}
                   </Typography>
                 }
               />
@@ -194,7 +206,13 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({ account, balance, dep
               <ListItemText
                 primary={t(`txCount`)}
                 secondary={
-                  <Typography variant="body2">{new BigNumber(account.transaction_count ?? 0).toFormat()}</Typography>
+                  <Typography variant="body2">
+                    {isOverviewLoading ? (
+                      <Skeleton animation="wave" />
+                    ) : (
+                      new BigNumber(Math.max(account.nonce ?? 0, account.transaction_count ?? 0)).toFormat()
+                    )}
+                  </Typography>
                 }
               />
             </ListItem>
@@ -204,7 +222,9 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({ account, balance, dep
           {account.type === GraphQLSchema.AccountType.MetaContract ? (
             <MetaContract {...(account.script as MetaContract['script'])} />
           ) : null}
-          {account.type === GraphQLSchema.AccountType.EthUser ? <User nonce={account.nonce} /> : null}
+          {account.type === GraphQLSchema.AccountType.EthUser ? (
+            <User nonce={account.nonce} isLoading={isOverviewLoading} />
+          ) : null}
           {account.type === GraphQLSchema.AccountType.EthAddrReg ? <EthAddrReg /> : null}
           {account.type === GraphQLSchema.AccountType.PolyjuiceContract ? (
             <SmartContract

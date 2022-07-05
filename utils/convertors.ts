@@ -20,7 +20,7 @@ export const formatDatetime = (datetime: number) => {
   return dayjs(datetime).format('YYYY/MM/DD HH:mm:ss')
 }
 
-export const timeDistance = (time: number, locale?: 'zh-CN' | 'en-US' | string) => {
+export const timeDistance = (time: number | string, locale?: 'zh-CN' | 'en-US' | string) => {
   dayjs.locale(locale?.toLowerCase())
   return dayjs(time).fromNow()
 }
@@ -45,7 +45,7 @@ export const scriptToCkbAddress = (lockScript: CKBComponents.Script) => {
 export const formatInt = (int: string | number) => new BigNumber(int || '0').toFormat()
 
 export const formatAmount = (value: string, udt: Pick<GraphQLSchema.Udt, 'decimal' | 'symbol'>) => {
-  if (!udt?.decimal) return new BigNumber(value).toFormat()
+  if (!udt?.decimal) return new BigNumber(value ?? 0).toFormat()
   const decimal = new BigNumber(10).exponentiatedBy(udt.decimal)
   return `${new BigNumber(value).dividedBy(decimal).toFormat()} ${udt.symbol}`
 }
