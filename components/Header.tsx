@@ -17,6 +17,7 @@ import {
   MenuProps,
   Backdrop,
   SvgIcon,
+  Popover,
 } from '@mui/material'
 import MuiAccordion, { AccordionProps } from '@mui/material/Accordion'
 import MuiAccordionSummary, { AccordionSummaryProps } from '@mui/material/AccordionSummary'
@@ -145,7 +146,7 @@ const Header = () => {
   const handleMenuListClose = () => setAnchorEl(null)
 
   const TokenMenuItems = ({ dense }) => (
-    <MenuList dense={dense}>
+    <MenuList dense={dense} onMouseLeave={handleMenuListClose}>
       {TOKEN_TYPE_LIST.map(type => (
         <MenuItem key={type} onClick={handleMenuListClose} sx={{ p: 0 }}>
           <NextLink href={`/tokens/${type}`} passHref>
@@ -165,7 +166,7 @@ const Header = () => {
   )
 
   const ChainMenuItems = ({ dense }) => (
-    <MenuList dense={dense}>
+    <MenuList dense={dense} onMouseLeave={handleMenuListClose}>
       {CHAIN_TYPE_LIST.map(chain => {
         const url = `https://${
           chain === 'mainnet'
@@ -192,7 +193,7 @@ const Header = () => {
   )
 
   const LocaleMenuItems = ({ dense }) => (
-    <MenuList dense={dense}>
+    <MenuList dense={dense} onMouseLeave={handleMenuListClose}>
       {LOCALE_LIST.map(locale => (
         <MenuItem key={locale} onClick={handleMenuListClose} sx={{ p: 0 }}>
           <NextLink href={asPath} locale={locale} passHref>
@@ -231,7 +232,7 @@ const Header = () => {
           </NextLink>
 
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-            <Button aria-label="home" onClick={handleMenuListOpen} disableRipple sx={{ textTransform: 'none', mx: 2 }}>
+            <Button aria-label="home" disableRipple sx={{ textTransform: 'none', mx: 2 }}>
               <NextLink href={`/`} passHref>
                 <Link href={`/`} title={t(`home`)} underline="none" color="secondary">
                   {t(`home`)}
@@ -243,10 +244,14 @@ const Header = () => {
               aria-haspopup="true"
               aria-expanded={anchorElLabel === 'token-list' ? 'true' : undefined}
               aria-controls={anchorElLabel === 'token-list' ? 'token-list' : undefined}
-              onClick={handleMenuListOpen}
+              onMouseEnter={handleMenuListOpen}
               color="secondary"
               disableRipple
-              sx={{ 'textTransform': 'none', 'mx': 2, '& .MuiButton-endIcon': { m: 0 } }}
+              sx={{
+                'textTransform': 'none',
+                'mx': 2,
+                '& .MuiButton-endIcon': { m: 0 },
+              }}
               endIcon={anchorElLabel === 'token-list' ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
             >
               {t(`token`)}
@@ -266,7 +271,7 @@ const Header = () => {
               aria-haspopup="true"
               aria-expanded={anchorElLabel === 'contract-list' ? 'true' : undefined}
               aria-controls={anchorElLabel === 'contract-list' ? 'contract-list' : undefined}
-              onClick={handleMenuListOpen}
+              onMouseOver={handleMenuListOpen}
               color="secondary"
               disableRipple
               sx={{ textTransform: 'none', mx: 2 }}
@@ -282,7 +287,7 @@ const Header = () => {
               aria-haspopup="true"
               aria-expanded={anchorElLabel === 'more-list' ? 'true' : undefined}
               aria-controls={anchorElLabel === 'more-list' ? 'more-list' : undefined}
-              onClick={handleMenuListOpen}
+              onMouseOver={handleMenuListOpen}
               color="secondary"
               disableRipple
               sx={{ textTransform: 'none', mx: 2 }}
@@ -298,7 +303,7 @@ const Header = () => {
               aria-haspopup="true"
               aria-expanded={anchorElLabel === 'chain-type' ? 'true' : undefined}
               aria-controls={anchorElLabel === 'chain-type' ? 'chain-type' : undefined}
-              onClick={handleMenuListOpen}
+              onMouseOver={handleMenuListOpen}
               color="secondary"
               disableRipple
               sx={{ 'textTransform': 'none', 'mx': 2, '& .MuiButton-endIcon': { m: 0 } }}
@@ -321,7 +326,7 @@ const Header = () => {
               aria-haspopup="true"
               aria-expanded={anchorElLabel === 'i18n' ? 'true' : undefined}
               aria-controls={anchorElLabel === 'i18n' ? 'i18n' : undefined}
-              onClick={handleMenuListOpen}
+              onMouseOver={handleMenuListOpen}
               color="secondary"
               disableRipple
               sx={{ 'textTransform': 'none', 'mx': 2, '& [class^=MuiButton-]': { ml: 0, mr: 0.5 } }}
