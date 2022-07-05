@@ -1,0 +1,134 @@
+.container {
+  font-size: 14px;
+  margin: 24px;
+  .title {
+    color: #333;
+    font-weight: 400;
+  }
+}
+
+.noRecords {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50px;
+}
+
+.topicItem {
+  display: flex;
+  font-size: 14px;
+  font-family: 'Roboto Mono', monospace, 'Courier New' !important;
+  dt {
+    min-width: 50px;
+    text-align: right;
+    text-transform: capitalize;
+    &:after {
+      content: ':';
+    }
+  }
+}
+
+.logItem {
+  display: flex;
+  padding: 32px 0;
+  &:not(:last-child) {
+    border-bottom: 1px solid #f0f0f0;
+  }
+  @media screen and (max-width: 600px) {
+    flex-direction: column;
+  }
+}
+
+.logIndex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #2bd56f;
+  background-color: #f0fcf1;
+  width: 40px;
+  height: 40px;
+  font-size: 16px;
+  border-radius: 50%;
+  margin-right: 24px;
+  flex-shrink: 0;
+}
+
+.contractAddr {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  a {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+.field {
+  flex-basis: 100px;
+  font-size: 16px;
+  color: #333;
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 30px;
+}
+
+.eventSignature {
+  color: #333;
+  display: flex;
+  align-items: center;
+  white-space: pre;
+  height: 40px;
+  & > div {
+    display: flex;
+  }
+}
+.topics {
+  display: flex;
+  padding-top: 10px;
+  .topicList {
+    flex: 1;
+    background: #fafafa;
+    border-radius: 8px;
+  }
+  .topicItem {
+    margin: 16px;
+    &:first-child {
+      color: #000;
+    }
+  }
+
+  .topicIndex {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 20px;
+    height: 24px;
+    font-size: 14px;
+    color: #666;
+    background: #f0f0f0;
+    border-radius: 4px;
+    margin-right: 16px;
+  }
+}
+
+.data {
+  display: flex;
+  padding-top: 24px;
+  .dataList {
+    flex: 1;
+    background: #fafafa;
+    border-radius: 8px;
+  }
+  .dataItem {
+    margin: 16px;
+  }
+}
+@media screen and (max-width: 600px) {
+  .topics,
+  .data {
+    flex-direction: column;
+    .field {
+      justify-content: flex-start;
+      flex-basis: auto;
+    }
+  }
+}
