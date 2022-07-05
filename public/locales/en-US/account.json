@@ -73,5 +73,8 @@
   "response": "Response",
   "query": "Query",
   "events": "Events",
-  "token": "Token"
+  "token": "Token",
+  "verify_status": "verify status",
+  "verified": "verified",
+  "unverified": "verify it"
 }

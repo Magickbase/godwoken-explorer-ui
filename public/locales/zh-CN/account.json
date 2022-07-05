@@ -73,5 +73,8 @@
   "response": "返回值",
   "query": "查询",
   "events": "事件",
-  "token": "代币"
+  "token": "代币",
+  "verify_status": "验证状态",
+  "verified": " 已验证",
+  "unverified": "去验证"
 }
