@@ -231,6 +231,7 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({
               deployer={deployerAddr}
               deployTxHash={account.smart_contract?.deployment_tx_hash}
               udt={account.udt}
+              isVerified={!!account.smart_contract?.abi}
             />
           ) : null}
           {account.type === GraphQLSchema.AccountType.PolyjuiceCreator ? (
