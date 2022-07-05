@@ -57,7 +57,7 @@ const Token: React.FC<Props> = () => {
           ? { label: t('bridgedRecords'), href: DOWNLOAD_HREF_LIST.udtBridgeRecordList(token.id.toString()) }
           : null,
         // { label: t('tokenHolders'), href: DOWNLOAD_HREF_LIST.udtHolderList(token.id.toString()) }, // TODO: re-enable when API is fixed
-      ].map(i => i)
+      ].filter(i => i)
     : []
 
   useEffect(() => {
