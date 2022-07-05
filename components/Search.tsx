@@ -61,7 +61,7 @@ const Search = () => {
       style={{ fontSize: 14 }}
       inputProps={{ 'aria-label': 'search' }}
       startAdornment={
-        <InputAdornment position="start">
+        <InputAdornment position="end" sx={{ width: 20, height: 20, ml: 0 }}>
           <Image
             src={`${IMG_URL}search-icon.svg`}
             loading="lazy"

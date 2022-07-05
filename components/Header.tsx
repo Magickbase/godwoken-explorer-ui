@@ -17,7 +17,6 @@ import {
   MenuProps,
   Backdrop,
   SvgIcon,
-  Popover,
 } from '@mui/material'
 import MuiAccordion, { AccordionProps } from '@mui/material/Accordion'
 import MuiAccordionSummary, { AccordionSummaryProps } from '@mui/material/AccordionSummary'
@@ -244,7 +243,7 @@ const Header = () => {
               aria-haspopup="true"
               aria-expanded={anchorElLabel === 'token-list' ? 'true' : undefined}
               aria-controls={anchorElLabel === 'token-list' ? 'token-list' : undefined}
-              onMouseEnter={handleMenuListOpen}
+              onMouseOver={handleMenuListOpen}
               color="secondary"
               disableRipple
               sx={{

@@ -15,7 +15,6 @@ import {
   Box,
   Stack,
   Button,
-  Tooltip,
   Divider,
   Paper,
   Typography,
@@ -28,6 +27,7 @@ import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { timeDistance, handleApiError, useWS, getHomeRes, formatInt, CHANNEL, IS_MAINNET } from 'utils'
 import Search from 'components/Search'
+import Tooltip from 'components/Tooltip'
 
 type State = API.Home.Parsed
 
@@ -61,7 +61,12 @@ const Statistic = ({ blockCount, txCount, tps, accountCount, averageBlockTime }:
   }
 
   return (
-    <Grid container spacing={3} sx={{ maxWidth: { xs: '35%', md: '50%' }, pb: 2 }}>
+    <Grid
+      container
+      rowSpacing={{ xs: 2, md: 3 }}
+      columnSpacing={{ xs: 1, md: 7 }}
+      sx={{ maxWidth: { xs: '35%', md: '50%' }, pb: 2 }}
+    >
       {statisticGroups.map((field, i) => (
         <Grid
           item
@@ -140,7 +145,7 @@ const BlockList = ({ list }: { list: State['blockList'] }) => {
   return (
     <ListContainer title={t(`latestBlocks`)} link="/blocks" tooltip={t(`view_all_blocks`, { ns: 'common' })}>
       {list?.map((block, idx) => (
-        <Stack key={block.hash}>
+        <Stack key={block.hash} sx={{ '& :hover': { backgroundColor: 'primary.light' } }}>
           {idx !== 0 && <Divider variant="middle" color="#f0f0f0" sx={{ borderColor: 'transparent' }} />}
           <ListItem>
             <ListItemIcon sx={{ minWidth: 36 }}>
@@ -168,17 +173,21 @@ const BlockList = ({ list }: { list: State['blockList'] }) => {
                           color="primary"
                           href={`/block/${block.hash}`}
                           component={Link}
-                          sx={{ fontSize: 14, p: 0, lineHeight: 1.5 }}
+                          sx={{ 'fontSize': 14, 'p': 0, 'lineHeight': 1.5, '&:hover': { backgroundColor: 'unset' } }}
                           disableRipple
                         >
                           {`# ${formatInt(block.number)}`}
                         </Button>
                       </NextLink>
                     </Box>
-                    <Tooltip placement="top" title={block.hash} hidden>
+                    <Tooltip title={block.hash} className="mono-font" hidden>
                       <Box
                         component="span"
-                        sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}
+                        sx={{
+                          'overflow': 'hidden',
+                          'textOverflow': 'ellipsis',
+                          '&:hover': { backgroundColor: 'unset' },
+                        }}
                         className="mono-font"
                         px={1}
                       >
@@ -221,7 +230,7 @@ const TxList = ({ list }: { list: State['txList'] }) => {
   return (
     <ListContainer title={t(`latestTxs`)} link="/txs" tooltip={t(`view_all_transactions`, { ns: 'common' })}>
       {list?.map((tx, idx) => (
-        <Box key={tx.hash}>
+        <Box key={tx.hash} sx={{ '& :hover': { backgroundColor: 'primary.light' } }}>
           {idx !== 0 && <Divider variant="middle" color="#f0f0f0" sx={{ borderColor: 'transparent' }} />}
           <ListItem>
             <ListItemIcon sx={{ minWidth: 36 }}>
@@ -250,8 +259,8 @@ const TxList = ({ list }: { list: State['txList'] }) => {
               primary={
                 <Stack direction="row" alignItems="center" sx={{ height: { xs: 52, md: 88 } }}>
                   <Stack flexGrow={1} px={{ xs: 1, md: 2 }} justifyContent="space-between" height={{ xs: 36, md: 56 }}>
-                    <Tooltip placement="top" title={tx.hash}>
-                      <Box>
+                    <Tooltip title={tx.hash} className="mono-font">
+                      <Box sx={{ width: 'min-content' }}>
                         <NextLink href={`/tx/${tx.hash}`} passHref>
                           <Button
                             color="primary"
@@ -261,11 +270,12 @@ const TxList = ({ list }: { list: State['txList'] }) => {
                             disableRipple
                             fontSize={{ xs: 13, md: 14 }}
                             sx={{
-                              textTransform: 'lowercase',
-                              whiteSpace: 'nowrap',
-                              fontSize: 14,
-                              p: 0,
-                              lineHeight: 1.5,
+                              'textTransform': 'lowercase',
+                              'whiteSpace': 'nowrap',
+                              'fontSize': 14,
+                              'p': 0,
+                              'lineHeight': 1.5,
+                              '&:hover': { backgroundColor: 'unset' },
                             }}
                           >
                             {formatAddress(tx.hash, matches)}
@@ -295,7 +305,7 @@ const TxList = ({ list }: { list: State['txList'] }) => {
                       >
                         {`${t('from')}:`}
                       </Typography>
-                      <Tooltip placement="top" title={tx.from}>
+                      <Tooltip title={tx.from} className="mono-font">
                         <Box>
                           <NextLink href={`/account/${tx.from}`} passHref>
                             <Button
@@ -305,7 +315,12 @@ const TxList = ({ list }: { list: State['txList'] }) => {
                               className="mono-font"
                               disableRipple
                               fontSize={{ xs: 13, md: 14 }}
-                              sx={{ textTransform: 'lowercase', py: 0, px: 1 }}
+                              sx={{
+                                'textTransform': 'lowercase',
+                                'py': 0,
+                                'px': 1,
+                                '&:hover': { backgroundColor: 'unset' },
+                              }}
                             >
                               {formatAddress(tx.from, matches)}
                             </Button>
@@ -322,7 +337,7 @@ const TxList = ({ list }: { list: State['txList'] }) => {
                       >
                         {`${t('to')}:`}
                       </Typography>
-                      <Tooltip placement="top" title={tx.to}>
+                      <Tooltip title={tx.to} className="mono-font">
                         <Box>
                           <NextLink href={`/account/${tx.to}`} passHref>
                             <Button
@@ -332,7 +347,12 @@ const TxList = ({ list }: { list: State['txList'] }) => {
                               className="mono-font"
                               disableRipple
                               fontSize={{ xs: 13, md: 14 }}
-                              sx={{ textTransform: 'lowercase', py: 0, px: 1 }}
+                              sx={{
+                                'textTransform': 'lowercase',
+                                'py': 0,
+                                'px': 1,
+                                '&:hover': { backgroundColor: 'unset' },
+                              }}
                             >
                               {formatAddress(tx.to, matches)}
                             </Button>
@@ -371,13 +391,13 @@ const Home = (initState: State) => {
   )
 
   return (
-    <Box sx={{ pb: 6 }}>
+    <Box sx={{ pb: 11 }}>
       <Box sx={{ bgcolor: 'primary.light' }}>
         <Container>
           <Search />
-          <Stack direction="row" sx={{ pt: 3, pb: 1 }} justifyContent="space-between" alignItems="center">
+          <Stack direction="row" sx={{ pt: 2.5, pb: 1 }} justifyContent="space-between" alignItems="center">
             <Statistic {...home.statistic} />
-            <video autoPlay loop style={{ maxWidth: '78%', minWidth: '48%', height: '100%' }}>
+            <video autoPlay loop style={{ maxWidth: '78%', minWidth: '48%', height: '100%', maxHeight: 444 }}>
               <source src={IS_MAINNET ? '/home-video.mp4' : '/testnet-home-video.mp4'} />
             </video>
           </Stack>
