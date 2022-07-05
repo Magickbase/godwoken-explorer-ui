@@ -146,9 +146,14 @@ const ContractEventListItem = ({ item }: { item: ParsedEventLog; setSearchText: 
                   color: idx ? '#000' : '#666666',
                 }}
               >
-                <Typography component="span" className="mono-font" fontSize={14} my={1} mr="1ch" noWrap>{`[topic${
-                  idx + 1
-                }]`}</Typography>
+                <Typography
+                  component="span"
+                  className="mono-font"
+                  fontSize={14}
+                  my={1}
+                  mr="1ch"
+                  noWrap
+                >{`[topic${idx}]`}</Typography>
                 <LogFieldItem {...topic} />
               </div>
             ),

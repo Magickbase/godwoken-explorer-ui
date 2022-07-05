@@ -58,7 +58,7 @@ const TxLogsList = ({ list }: { list: ParsedEventLog[] }) => {
                     {log.parsedLog.eventFragment.inputs.map((inp, idx) => {
                       return (
                         <div key={inp.name}>
-                          {inp.indexed ? <span>{`index_topic_${idx}`}</span> : null}
+                          {inp.indexed ? <span>{`index_topic_${idx + 1}`}</span> : null}
                           <span style={{ color: '#23C09B', padding: '0 8px' }}>{inp.type}</span>
                           <span style={{ color: '#F83F3F' }}>{inp.name}</span>
                           {idx === log.parsedLog.eventFragment.inputs.length - 1 ? null : ', '}
