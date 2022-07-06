@@ -36,7 +36,7 @@ const DownloadMenu: React.FC<DownloadMenuProps> = ({ items }) => {
   return (
     <div>
       <Tooltip title={t(`up_to_5k_records_will_be_exported`)} placement="bottom">
-        <Button variant="text" onClick={handleOpen} endIcon={<DownloadIcon />}>
+        <Button variant="text" onClick={handleOpen} endIcon={<DownloadIcon />} sx={{ whiteSpace: 'nowrap' }}>
           {t('download')}
         </Button>
       </Tooltip>
