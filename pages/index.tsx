@@ -391,7 +391,7 @@ const Home = (initState: State) => {
   )
 
   return (
-    <Box sx={{ pb: 11 }}>
+    <Box sx={{ pb: { xs: 8, md: 11 } }}>
       <Box sx={{ bgcolor: 'primary.light' }}>
         <Container sx={{ px: { md: 3, lg: 1 } }}>
           <Search />
