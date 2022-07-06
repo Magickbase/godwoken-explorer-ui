@@ -35,8 +35,14 @@ const Custom404 = () => {
     <>
       <SubpageHead subtitle={'404'} />
       <Container
-        className="full-height"
-        sx={{ px: 1, py: 8, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
+        sx={{
+          px: 1,
+          py: 8,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          height: 'calc(100vh - var(--footer-height) - var(--header-height) - var(--search-height))',
+        }}
       >
         <Stack sx={{ px: { xs: 2, md: 16 }, textAlign: 'center' }} alignItems="center">
           <SvgIcon
