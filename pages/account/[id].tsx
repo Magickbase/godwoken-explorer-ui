@@ -77,6 +77,7 @@ const Account = (initState: State) => {
     () => fetchAccountOverview(q),
     {
       refetchInterval: 10000,
+      enabled: !!id,
     },
   )
 
@@ -88,6 +89,7 @@ const Account = (initState: State) => {
         .then(a => new BigNumber(a.ckb).multipliedBy(new BigNumber(CKB_DECIMAL)).toString()),
     {
       refetchInterval: 10000,
+      enabled: !!id,
     },
   )
 
@@ -102,7 +104,7 @@ const Account = (initState: State) => {
         end_block_number: block_to ? +block_to : null,
       }),
     {
-      enabled: tab === 'transactions' && !!(q.address || q.script_hash),
+      enabled: tab === 'transactions' && !!id,
     },
   )
 
@@ -217,8 +219,11 @@ const Account = (initState: State) => {
             </Tabs>
             <Divider />
             {tab === 'transactions' ? (
-              !isTxListLoading && txList ? (
-                <TxList transactions={txList} maxCount="100k" />
+              !isTxListLoading ? (
+                <TxList
+                  transactions={txList ?? { entries: [], metadata: { total_count: 0, before: null, after: null } }}
+                  maxCount="100k"
+                />
               ) : (
                 <Skeleton animation="wave" />
               )
