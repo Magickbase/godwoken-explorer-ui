@@ -35,7 +35,9 @@ const BridgedRecordList: React.FC<{
             <TableRow>
               <TableCell component="th">{t('type')}</TableCell>
               <TableCell component="th">{t('value')} </TableCell>
-              <TableCell component="th">CKB</TableCell>
+              <TableCell component="th" sx={{ textTransform: 'none' }}>
+                pCKB
+              </TableCell>
               <TableCell component="th">{t('age')} </TableCell>
               {showUser ? <TableCell component="th">{t('account')} </TableCell> : null}
               <TableCell component="th">{t('layer1Txn')} </TableCell>
@@ -48,7 +50,9 @@ const BridgedRecordList: React.FC<{
                 <TableRow key={r.layer1.output.hash + r.layer1.output.index}>
                   <TableCell sx={{ whiteSpace: 'nowrap', fontSize: { xs: 12, md: 14 } }}>{t(r.type)}</TableCell>
                   <TableCell sx={{ fontSize: { xs: 12, md: 14 }, whiteSpace: 'nowrap' }}>
-                    {`${new BigNumber(r.value ?? '0').toFormat()} ${r.token.symbol ?? ''}`}
+                    {r.token?.symbol !== 'pCKB'
+                      ? `${new BigNumber(r.value ?? '0').toFormat()} ${r.token.symbol ?? ''}`
+                      : '0'}
                   </TableCell>
                   <TableCell sx={{ fontSize: { xs: 12, md: 14 }, whiteSpace: 'nowrap' }}>
                     {`${new BigNumber(r.capacity ?? '0').dividedBy(CKB_DECIMAL).toFormat()}`}
