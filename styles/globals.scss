@@ -26,7 +26,7 @@ body.loading * {
 
 main,
 .full-height {
-  min-height: calc(100vh - var(--footer-height) - var(--header-height) - var(--search-height));
+  min-height: calc(100vh - var(--footer-height) - var(--header-height));
 }
 
 .main-center {
@@ -57,6 +57,10 @@ input[type='number']::-webkit-outer-spin-button {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
+}
+
+video::-webkit-media-controls {
+  display: none !important;
 }
 
 @media screen and (max-width: 600px) {

@@ -122,7 +122,7 @@ const Header = () => {
 
   const anchorElLabel = anchorEl?.getAttribute('aria-label')
   const { asPath } = useRouter()
-  const isHome = asPath === '/'
+  const isHome = asPath === '/' || asPath === '/zh-CN'
   const CHAIN_TYPE_LIST = !version?.startsWith('0.') ? ['testnet'] : ['mainnet', 'testnet']
 
   useEffect(() => {
@@ -210,7 +210,7 @@ const Header = () => {
       position="sticky"
       sx={{ bgcolor: isHome || anchorElLabel === 'mobile-menu' ? 'primary.light' : '#F8F8FB', boxShadow: 'none' }}
     >
-      <Container>
+      <Container sx={{ px: { md: 3, lg: 1 } }}>
         <Toolbar sx={{ flexGrow: 1 }} disableGutters>
           <NextLink href="/" passHref>
             <Link
@@ -328,7 +328,7 @@ const Header = () => {
               onMouseOver={handleMenuListOpen}
               color="secondary"
               disableRipple
-              sx={{ 'textTransform': 'none', 'mx': 2, '& [class^=MuiButton-]': { ml: 0, mr: 0.5 } }}
+              sx={{ 'textTransform': 'none', 'ml': 2, '& [class^=MuiButton-]': { ml: 0, mr: 0.5 }, 'pr': 0 }}
               startIcon={<LanguageIcon fontSize="small" />}
               endIcon={anchorElLabel === 'i18n' ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
             >

@@ -35,8 +35,8 @@ const formatAddress = (addr: string, bigScreen: boolean = true) => {
   if (bigScreen && addr.length > 16) {
     return `${addr.slice(0, 8)}...${addr.slice(-7)}`
   }
-  if (!bigScreen && addr.length > 10) {
-    return `${addr.slice(0, 5)}...${addr.slice(-5)}`
+  if (!bigScreen && addr.length > 8) {
+    return `${addr.slice(0, 4)}...${addr.slice(-4)}`
   }
 
   return addr
@@ -64,7 +64,7 @@ const Statistic = ({ blockCount, txCount, tps, accountCount, averageBlockTime }:
     <Grid
       container
       rowSpacing={{ xs: 2, md: 3 }}
-      columnSpacing={{ xs: 1, md: 7 }}
+      columnSpacing={{ xs: 1, md: 6 }}
       sx={{ maxWidth: { xs: '35%', md: '50%' }, pb: 2 }}
     >
       {statisticGroups.map((field, i) => (
@@ -73,7 +73,7 @@ const Statistic = ({ blockCount, txCount, tps, accountCount, averageBlockTime }:
           key={field.key}
           xs={12}
           md={6}
-          lg={i === 1 ? 8 : 4}
+          lg={i === 0 || i === 2 ? 4.5 : 3.5}
           display="flex"
           justifyContent="left"
           alignItems="center"
@@ -393,17 +393,17 @@ const Home = (initState: State) => {
   return (
     <Box sx={{ pb: 11 }}>
       <Box sx={{ bgcolor: 'primary.light' }}>
-        <Container>
+        <Container sx={{ px: { md: 3, lg: 1 } }}>
           <Search />
           <Stack direction="row" sx={{ pt: 2.5, pb: 1 }} justifyContent="space-between" alignItems="center">
             <Statistic {...home.statistic} />
-            <video autoPlay loop style={{ maxWidth: '78%', minWidth: '48%', height: '100%', maxHeight: 444 }}>
+            <video autoPlay loop style={{ maxWidth: '78%', minWidth: '45%', height: 'auto', maxHeight: 444 }}>
               <source src={IS_MAINNET ? '/home-video.mp4' : '/testnet-home-video.mp4'} />
             </video>
           </Stack>
         </Container>
       </Box>
-      <Container>
+      <Container sx={{ px: { md: 2, lg: 1 } }}>
         <Stack direction={{ xs: 'column', sm: 'column', md: 'column', lg: 'row' }} spacing={4} sx={{ pt: 6 }}>
           <Box sx={{ width: '100%', lg: { width: '50%', mr: 2 } }}>
             <BlockList list={home.blockList} />

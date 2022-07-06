@@ -9,7 +9,7 @@ import Search from 'components/Search'
 const Layout = ({ children }) => {
   const [t, { language }] = useTranslation('common')
   const { asPath } = useRouter()
-  const isHome = asPath === '/'
+  const isHome = asPath === '/' || asPath === '/zh-CN'
 
   return (
     <>
@@ -48,7 +48,7 @@ const Layout = ({ children }) => {
           </Alert>
         ) : null}
         {!isHome && (
-          <Container>
+          <Container sx={{ px: { md: 2, lg: 0 } }}>
             <Search />
           </Container>
         )}

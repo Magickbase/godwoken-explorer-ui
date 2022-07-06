@@ -44,7 +44,7 @@ const StyledFooter = styled(Box)`
   }
   #footer-logo {
     grid-area: logo;
-    justify-self: end;
+    justify-self: right;
     align-self: center;
   }
   #footer-divider {
@@ -111,7 +111,7 @@ const Footer = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 color: '#fff',
-                pr: { xs: 0, md: 3 },
+                pr: { xs: 0, md: 3, lg: 1 },
               }}
             >
               <Logo sx={{ color: '#fff' }} id="logo" />
@@ -126,7 +126,7 @@ const Footer = () => {
             height: '55px',
             justifyContent: { xs: 'center', md: 'left' },
             alignItems: 'center',
-            pl: { xs: 1, md: 2 },
+            pl: { xs: 1, md: 2, lg: 0 },
           }}
         >
           {links.map((link, i) => (
@@ -170,7 +170,7 @@ const Footer = () => {
           sx={{
             textAlign: { xs: 'center', md: 'left' },
             fontSize: { xs: 12 },
-            pl: { xs: 0, md: 3 },
+            pl: { xs: 1, md: 3, lg: 1 },
             mt: 1,
             opacity: 0.5,
           }}

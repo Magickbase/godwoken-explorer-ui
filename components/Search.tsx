@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import { InputBase, InputAdornment, styled } from '@mui/material'
@@ -36,9 +36,13 @@ const Search = () => {
     asPath,
   } = useRouter()
   const searchRef = useRef<HTMLInputElement | null>(null)
+  const [showClearBtn, setShowClearBtn] = useState(false)
 
   const handleSearch = async (e: React.KeyboardEvent<HTMLInputElement>) => {
-    handleSearchKeyPress(e, push)
+    await handleSearchKeyPress(e, push)
+    if (searchRef.current.value?.length) {
+      setShowClearBtn(true)
+    }
   }
 
   useEffect(() => {
@@ -64,6 +68,25 @@ const Search = () => {
         <InputAdornment position="end" sx={{ width: 20, height: 20, ml: 0 }}>
           <Image
             src={`${IMG_URL}search-icon.svg`}
+            loading="lazy"
+            width="20"
+            height="20"
+            layout="fixed"
+            alt="search-icon"
+          />
+        </InputAdornment>
+      }
+      endAdornment={
+        <InputAdornment
+          position="end"
+          sx={{ width: 20, height: 20, display: showClearBtn ? 'inline' : 'none', cursor: 'pointer' }}
+          onClick={() => {
+            searchRef.current.value = ''
+            setShowClearBtn(false)
+          }}
+        >
+          <Image
+            src={`${IMG_URL}search-clear.svg`}
             loading="lazy"
             width="20"
             height="20"

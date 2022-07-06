@@ -61,7 +61,7 @@ const Custom404 = () => {
                 {t('notFoundMessage', { search })}
               </Typography>
               <Typography variant="body2" fontSize={{ xs: 13, md: 14 }} color="secondary">
-                {SEARCH_FIELDS.toLocaleLowerCase()}
+                {'block hash/txn hash/lockhash/ETH address/token name/token symbol'}
               </Typography>
             </Stack>
           ) : (
