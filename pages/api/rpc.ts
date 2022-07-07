@@ -11,7 +11,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(req.body),
+      body: typeof req.body !== 'object' ? req.body : JSON.stringify(req.body),
     }).then(res => res.json())
     res.status(200).json(r)
   } catch (err: any) {

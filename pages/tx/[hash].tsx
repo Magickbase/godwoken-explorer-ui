@@ -44,6 +44,7 @@ import PageTitle from 'components/PageTitle'
 import Address from 'components/AddressInHalfPanel'
 import TransferList, { fetchTransferList } from 'components/SimpleERC20TransferList'
 import TxLogsList from 'components/TxLogsList'
+import RawTxData from 'components/RawTxData'
 import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
 import {
   formatDatetime,
@@ -64,7 +65,7 @@ import {
 type RawTx = Parameters<typeof getTxRes>[0]
 type ParsedTx = ReturnType<typeof getTxRes>
 
-const tabs = ['erc20', 'logs']
+const tabs = ['erc20', 'logs', 'raw-data']
 type State = ParsedTx
 const ADDR_LENGTH = 42
 
@@ -438,7 +439,7 @@ const Tx = (initState: State) => {
           </Paper>
           <Paper>
             <Tabs value={tabs.indexOf(tab as string)} variant="scrollable" scrollButtons="auto">
-              {['erc20_records', 'logs'].map((label, idx) => (
+              {['erc20_records', 'logs', 'rawData'].map((label, idx) => (
                 <Tab
                   key={label}
                   label={t(label)}
@@ -465,6 +466,7 @@ const Tx = (initState: State) => {
                 <Skeleton animation="wave" />
               )
             ) : null}
+            {tab === 'raw-data' && tx ? <RawTxData hash={tx.hash} /> : null}
           </Paper>
         </Stack>
         <Snackbar

@@ -28,11 +28,12 @@ import BigNumber from 'bignumber.js'
 import SubpageHead from 'components/SubpageHead'
 import TxList, { fetchTxList } from 'components/TxList'
 import BridgedRecordList from 'components/BridgedRecordList'
+import RawBlockData from 'components/RawBlockData'
 import PageTitle from 'components/PageTitle'
 import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
 import { fetchBlock, formatDatetime, CKB_EXPLORER_URL, formatInt, fetchBridgedRecordList, handleCopy } from 'utils'
 
-const tabs = ['transactions', 'bridged']
+const tabs = ['transactions', 'bridged', 'raw-data']
 
 const Block = () => {
   const [isCopied, setIsCopied] = useState(false)
@@ -303,7 +304,7 @@ const Block = () => {
           </Paper>
           <Paper>
             <Tabs value={tabs.indexOf(tab as string)} variant="scrollable" scrollButtons="auto">
-              {[t('transactionRecords'), t(`bridgedRecords`)].map((label, idx) => (
+              {[t('transactionRecords'), t(`bridgedRecords`), t(`rawData`)].map((label, idx) => (
                 <Tab
                   key={label}
                   label={label}
@@ -333,6 +334,7 @@ const Block = () => {
                 <Skeleton animation="wave" />
               )
             ) : null}
+            {tab === 'raw-data' && block ? <RawBlockData no={block.number} /> : null}
           </Paper>
         </Stack>
         <Snackbar

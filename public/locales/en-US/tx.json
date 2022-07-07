@@ -48,5 +48,9 @@
   "name": "Name",
   "viewSource": "View Source",
   "topics": "Topics",
-  "data": "Data"
+  "data": "Data",
+  "rawData": "Raw Data",
+  "txRawData": "Transaction",
+  "txReceiptRawData": "Transaction Receipt",
+  "noData": "No Data"
 }
