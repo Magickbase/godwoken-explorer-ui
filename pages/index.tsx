@@ -63,6 +63,7 @@ const Statistic = ({ blockCount, txCount, tps, accountCount, averageBlockTime }:
   useEffect(() => {
     let startTimestamp = null
     const calclateCurValue = (progress, end, start = 0) => Math.floor(progress * (end - start) + start)
+    let reqId
     const step = timestamp => {
       if (!startTimestamp) startTimestamp = timestamp
       const progress = Math.min((timestamp - startTimestamp) / 2000, 1)
@@ -74,11 +75,11 @@ const Statistic = ({ blockCount, txCount, tps, accountCount, averageBlockTime }:
         averageBlockTime: calclateCurValue(progress, +averageBlockTime),
       })
       if (progress < 1) {
-        requestAnimationFrame(step)
+        reqId = requestAnimationFrame(step)
       }
     }
-    requestAnimationFrame(step)
-    return () => cancelAnimationFrame(step)
+    reqId = requestAnimationFrame(step)
+    return () => cancelAnimationFrame(reqId)
   }, [])
 
   return (
