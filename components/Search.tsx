@@ -6,6 +6,11 @@ import { IMG_URL, SEARCH_FIELDS, handleSearchKeyPress } from 'utils'
 import Image from 'next/image'
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  '& .Mui-focused': {
+    // border: `1px solid red`,
+    border: `1px solid ${theme.palette.primary.main} !important`,
+  },
+  '&:focus': {},
   'width': '100%',
   'height': '56px',
   'padding': theme.spacing(1, 2),
@@ -40,7 +45,12 @@ const Search = () => {
 
   const handleSearch = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     await handleSearchKeyPress(e, push)
-    if (searchRef.current.value?.length) {
+  }
+
+  const handleChange = () => {
+    if (searchRef.current?.value?.length === 0) {
+      setShowClearBtn(false)
+    } else {
       setShowClearBtn(true)
     }
   }
@@ -61,8 +71,9 @@ const Search = () => {
       placeholder={SEARCH_FIELDS}
       title={SEARCH_FIELDS}
       onKeyPress={handleSearch}
+      onChange={handleChange}
       inputRef={searchRef}
-      style={{ fontSize: 14 }}
+      sx={{ fontSize: { xs: 12, md: 14 } }}
       inputProps={{ 'aria-label': 'search' }}
       startAdornment={
         <InputAdornment position="end" sx={{ width: 20, height: 20, ml: 0 }}>

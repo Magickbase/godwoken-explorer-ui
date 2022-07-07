@@ -7,7 +7,6 @@ import { Container, Stack, Typography } from '@mui/material'
 import SvgIcon from '@mui/material/SvgIcon'
 import Link from '@mui/material/Link'
 import SubpageHead from 'components/SubpageHead'
-import { SEARCH_FIELDS } from 'utils'
 import SearchEmptyIcon from '../assets/icons/search-result-empty.svg'
 import NotFoundIcon from '../assets/icons/404.svg'
 
@@ -33,7 +32,7 @@ const Custom404 = () => {
 
   return (
     <>
-      <SubpageHead subtitle={'404'} />
+      <SubpageHead subtitle={''} />
       <Container
         sx={{
           px: 1,

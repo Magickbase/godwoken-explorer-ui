@@ -74,6 +74,7 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
 const StyledMenu = styled((props: MenuProps) => <HoverMenu {...props} />)(({ theme }) => ({
   '& .MuiPaper-root': {
     borderRadius: theme.spacing(1),
+    boxShadow: `0px 4px 9px ${theme.palette.primary.light}`,
   },
   '& .MuiMenuItem-root': {
     '& :hover': {
@@ -246,7 +247,17 @@ const Header = () => {
           </NextLink>
 
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-            <Button aria-label="home" disableRipple sx={{ textTransform: 'none', mx: 2 }}>
+            <Button
+              aria-label="home"
+              disableRipple
+              sx={{
+                'textTransform': 'none',
+                'mx': 2,
+                '&.MuiButtonBase-root:hover': {
+                  bgcolor: 'transparent',
+                },
+              }}
+            >
               <NextLink href={`/`} passHref>
                 <Link href={`/`} title={t(`home`)} underline="none" color="secondary">
                   {t(`home`)}
@@ -260,6 +271,9 @@ const Header = () => {
                 'textTransform': 'none',
                 'mx': 2,
                 '& .MuiButton-endIcon': { m: 0 },
+                '&.MuiButtonBase-root:hover': {
+                  bgcolor: 'transparent',
+                },
               }}
               endIcon={tokenPopover.isOpen ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
               {...bindHover(tokenPopover)}
@@ -269,14 +283,34 @@ const Header = () => {
             <StyledMenu id="token-list" sx={{ display: { xs: 'none', md: 'block' } }} {...bindMenu(tokenPopover)}>
               <TokenMenuItems dense />
             </StyledMenu>
-            <Button color="secondary" disableRipple sx={{ textTransform: 'none', mx: 2 }}>
+            <Button
+              color="secondary"
+              disableRipple
+              sx={{
+                'textTransform': 'none',
+                'mx': 2,
+                '&.MuiButtonBase-root:hover': {
+                  bgcolor: 'transparent',
+                },
+              }}
+            >
               <NextLink href={`/contracts`} passHref>
                 <Link href={`/contracts`} title={t(`contracts`)} underline="none" color="secondary">
                   {t(`contracts`)}
                 </Link>
               </NextLink>
             </Button>
-            <Button color="secondary" disableRipple sx={{ textTransform: 'none', mx: 2 }}>
+            <Button
+              color="secondary"
+              disableRipple
+              sx={{
+                'textTransform': 'none',
+                'mx': 2,
+                '&.MuiButtonBase-root:hover': {
+                  bgcolor: 'transparent',
+                },
+              }}
+            >
               <NextLink href={`/charts`} passHref>
                 <Link href={`/charts`} title={t(`charts`)} underline="none" color="secondary">
                   {t(`charts`)}
@@ -286,7 +320,14 @@ const Header = () => {
             <Button
               color="secondary"
               disableRipple
-              sx={{ 'textTransform': 'none', 'mx': 2, '& .MuiButton-endIcon': { m: 0 } }}
+              sx={{
+                'textTransform': 'none',
+                'mx': 2,
+                '& .MuiButton-endIcon': { m: 0 },
+                '&.MuiButtonBase-root:hover': {
+                  bgcolor: 'transparent',
+                },
+              }}
               endIcon={chainPopover.isOpen ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
               {...bindHover(chainPopover)}
             >
@@ -298,7 +339,15 @@ const Header = () => {
             <Button
               color="secondary"
               disableRipple
-              sx={{ 'textTransform': 'none', 'ml': 2, '& [class^=MuiButton-]': { ml: 0, mr: 0.5 }, 'pr': 0 }}
+              sx={{
+                'textTransform': 'none',
+                'ml': 2,
+                '& [class^=MuiButton-]': { ml: 0, mr: 0.5 },
+                'pr': 0,
+                '&.MuiButtonBase-root:hover': {
+                  bgcolor: 'transparent',
+                },
+              }}
               startIcon={<LanguageIcon fontSize="small" />}
               endIcon={languagePopover.isOpen ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
               {...bindHover(languagePopover)}

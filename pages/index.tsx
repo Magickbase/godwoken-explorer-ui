@@ -85,9 +85,9 @@ const Statistic = ({ blockCount, txCount, tps, accountCount, averageBlockTime }:
   return (
     <Grid
       container
-      rowSpacing={{ xs: 2, md: 3 }}
+      rowSpacing={{ xs: 3, md: 3 }}
       columnSpacing={{ xs: 1, md: 6 }}
-      sx={{ maxWidth: { xs: '35%', md: '50%' }, pb: 2 }}
+      sx={{ maxWidth: { xs: '35%', md: '50%' }, pb: 2, pt: 1 }}
     >
       {statisticGroups.map((field, i) => (
         <Grid
@@ -188,7 +188,12 @@ const BlockList = ({ list }: { list: State['blockList'] }) => {
             <ListItemText
               primary={
                 <Stack direction="row" alignItems="center" sx={{ height: { xs: 52, md: 88 } }}>
-                  <Stack flexGrow={1} px={{ xs: 1, md: 2 }} justifyContent="space-between" height={{ xs: 36, md: 56 }}>
+                  <Stack
+                    flexGrow={1}
+                    px={{ xs: 1, md: 2 }}
+                    justifyContent={{ xs: 'center', md: 'space-between' }}
+                    height={{ xs: 36, md: 56 }}
+                  >
                     <Box>
                       <NextLink href={`/block/${block.hash}`} passHref>
                         <Button
@@ -280,7 +285,12 @@ const TxList = ({ list }: { list: State['txList'] }) => {
             <ListItemText
               primary={
                 <Stack direction="row" alignItems="center" sx={{ height: { xs: 52, md: 88 } }}>
-                  <Stack flexGrow={1} px={{ xs: 1, md: 2 }} justifyContent="space-between" height={{ xs: 36, md: 56 }}>
+                  <Stack
+                    flexGrow={1}
+                    px={{ xs: 1, md: 2 }}
+                    justifyContent={{ xs: 'center', md: 'space-between' }}
+                    height={{ xs: 36, md: 56 }}
+                  >
                     <Tooltip title={tx.hash} className="mono-font">
                       <Box sx={{ width: 'min-content' }}>
                         <NextLink href={`/tx/${tx.hash}`} passHref>
@@ -309,7 +319,7 @@ const TxList = ({ list }: { list: State['txList'] }) => {
                       alignItems="bottom"
                       fontWeight={400}
                       fontSize={{ xs: 12, md: 14 }}
-                      pt={0.5}
+                      pt={0.2}
                       color="secondary.light"
                     >
                       <time dateTime={new Date(+tx.timestamp).toISOString()} title={t('timestamp')}>
@@ -317,7 +327,11 @@ const TxList = ({ list }: { list: State['txList'] }) => {
                       </time>
                     </Box>
                   </Stack>
-                  <Stack height={{ xs: 36, md: 56 }} sx={{ pl: { xs: 1, sm: 0 } }} justifyContent="space-between">
+                  <Stack
+                    height={{ xs: 36, md: 56 }}
+                    sx={{ pl: { xs: 1, sm: 0 } }}
+                    justifyContent={{ xs: 'center', md: 'space-between' }}
+                  >
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
                       <Typography
                         fontSize={{ xs: 12, md: 14 }}
@@ -350,7 +364,7 @@ const TxList = ({ list }: { list: State['txList'] }) => {
                         </Box>
                       </Tooltip>
                     </Stack>
-                    <Stack direction="row" justifyContent="space-between" alignItems="center">
+                    <Stack direction="row" justifyContent={{ xs: 'center', md: 'space-between' }} alignItems="center">
                       <Typography
                         fontSize={{ xs: 12, md: 14 }}
                         sx={{ textTransform: 'capitalize' }}
@@ -415,18 +429,23 @@ const Home = (initState: State) => {
   return (
     <Box sx={{ pb: { xs: 8, md: 11 } }}>
       <Box sx={{ bgcolor: 'primary.light' }}>
-        <Container sx={{ px: { md: 3, lg: 1 } }}>
+        <Container sx={{ px: { md: 3, lg: 1 }, pr: { xs: 0 } }}>
           <Search />
           <Stack direction="row" sx={{ pt: 2.5, pb: 1 }} justifyContent="space-between" alignItems="center">
             <Statistic {...home.statistic} />
-            <video autoPlay loop style={{ maxWidth: '78%', minWidth: '45%', height: 'auto', maxHeight: 444 }}>
+            <video
+              loop
+              autoPlay
+              controls={false}
+              style={{ maxWidth: '78%', width: 'auto', height: 'auto', maxHeight: 444 }}
+            >
               <source src={IS_MAINNET ? '/home-video.mp4' : '/testnet-home-video.mp4'} />
             </video>
           </Stack>
         </Container>
       </Box>
       <Container sx={{ px: { md: 2, lg: 1 } }}>
-        <Stack direction={{ xs: 'column', sm: 'column', md: 'column', lg: 'row' }} spacing={4} sx={{ pt: 6 }}>
+        <Stack direction={{ xs: 'column', sm: 'column', md: 'column', lg: 'row' }} spacing={4} sx={{ pt: 8 }}>
           <Box sx={{ width: '100%', lg: { width: '50%', mr: 2 } }}>
             <BlockList list={home.blockList} />
           </Box>
