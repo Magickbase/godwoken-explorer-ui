@@ -81,12 +81,12 @@ const Account = (initState: State) => {
     },
   )
 
-  const { isLoading: isBalanceLoading, data: balance } = useQuery(
+  const { isLoading: isBalanceLoading, data: balance = '0' } = useQuery(
     ['account-balance', id],
     () =>
       fetch(`${API_ENDPOINT}/accounts/${id}`)
         .then(r => r.json())
-        .then(a => new BigNumber(a.ckb).multipliedBy(new BigNumber(CKB_DECIMAL)).toString()),
+        .then(a => new BigNumber(a.ckb || '0').multipliedBy(new BigNumber(CKB_DECIMAL)).toString()),
     {
       refetchInterval: 10000,
       enabled: !!id,
@@ -179,7 +179,7 @@ const Account = (initState: State) => {
             isOverviewLoading={isOverviewLoading}
             isBalanceLoading={isBalanceLoading}
             account={{ ...accountAndList.account, ...overview }}
-            balance={balance ?? ''}
+            balance={balance}
             deployerAddr={accountAndList.deployerAddr}
           />
           <Paper>
