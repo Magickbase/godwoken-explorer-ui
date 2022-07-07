@@ -18,5 +18,8 @@
   "parentHash": "parent hash",
   "layer1Info": "Layer1 Info",
   "transactionRecords": "Transactions",
-  "bridgedRecords": "Bridged Transfers"
+  "bridgedRecords": "Bridged Transfers",
+  "rawData": "Raw Data",
+  "blockRawData": "Block",
+  "noData": "No Data"
 }

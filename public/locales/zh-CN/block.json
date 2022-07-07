@@ -18,5 +18,8 @@
   "parentHash": "父区块哈希",
   "layer1Info": "Layer1 信息",
   "transactionRecords": "交易记录",
-  "bridgedRecords": "桥接交易记录"
+  "bridgedRecords": "桥接交易记录",
+  "rawData": "原始数据",
+  "blockRawData": "区块",
+  "noData": "没有数据"
 }

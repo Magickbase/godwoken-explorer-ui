@@ -48,5 +48,9 @@
   "name": "名称",
   "viewSource": "查看源码",
   "topics": "Topics",
-  "data": "Data"
+  "data": "Data",
+  "rawData": "原始数据",
+  "txRawData": "交易",
+  "txReceiptRawData": "交易回执",
+  "noData": "没有数据"
 }
