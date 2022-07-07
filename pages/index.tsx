@@ -1,6 +1,6 @@
+import { useEffect, useState } from 'react'
 import type { API } from 'utils/api/utils'
 import type { Cache } from 'pages/api/cache'
-import { useState } from 'react'
 import { GetServerSideProps } from 'next'
 import NextLink from 'next/link'
 import {
@@ -52,13 +52,34 @@ const statisticGroups = [
 
 const Statistic = ({ blockCount, txCount, tps, accountCount, averageBlockTime }: State['statistic']) => {
   const [t] = useTranslation('statistic')
-  const stats = {
-    blockHeight: +blockCount ? (+blockCount - 1).toLocaleString('en') : '-',
-    txCount: (+txCount).toLocaleString('en'),
-    tps: (+tps).toLocaleString('en'),
-    accountCount: (+accountCount).toLocaleString('en'),
-    averageBlockTime,
-  }
+  const [stats, setStats] = useState({
+    blockHeight: '0',
+    txCount: '0',
+    tps: '0',
+    accountCount: '0',
+    averageBlockTime: 0,
+  })
+
+  useEffect(() => {
+    let startTimestamp = null
+    const calclateCurValue = (progress, end, start = 0) => Math.floor(progress * (end - start) + start)
+    const step = timestamp => {
+      if (!startTimestamp) startTimestamp = timestamp
+      const progress = Math.min((timestamp - startTimestamp) / 2000, 1)
+      setStats({
+        blockHeight: calclateCurValue(progress, +blockCount - 1).toLocaleString('en'),
+        txCount: calclateCurValue(progress, +txCount).toLocaleString('en'),
+        tps: calclateCurValue(progress, +tps).toLocaleString('en'),
+        accountCount: calclateCurValue(progress, +accountCount).toLocaleString('en'),
+        averageBlockTime: calclateCurValue(progress, +averageBlockTime),
+      })
+      if (progress < 1) {
+        requestAnimationFrame(step)
+      }
+    }
+    requestAnimationFrame(step)
+    return () => cancelAnimationFrame(step)
+  }, [])
 
   return (
     <Grid
