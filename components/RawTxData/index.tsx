@@ -51,7 +51,7 @@ const RawTxData: React.FC<{ hash: string }> = ({ hash }) => {
 
   return (
     <Stack sx={{ p: '0px 16px 16px 16px' }} spacing={2}>
-      <Typography variant="h6" mt={2}>
+      <Typography variant="h6" mt={2} fontSize={16}>
         {t(`txRawData`)}
       </Typography>
       {tx ? (
@@ -62,7 +62,7 @@ const RawTxData: React.FC<{ hash: string }> = ({ hash }) => {
         t(`noData`)
       )}
 
-      <Typography variant="h6" mt={2}>
+      <Typography variant="h6" mt={2} fontSize={16}>
         {t(`txReceiptRawData`)}
       </Typography>
       {txReceipt ? (

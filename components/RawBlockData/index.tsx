@@ -34,7 +34,7 @@ const RawBlockData: React.FC<{ no: number }> = ({ no }) => {
   )
   return (
     <Stack sx={{ p: '0px 16px 16px 16px' }} spacing={2}>
-      <Typography variant="h6" mt={2}>
+      <Typography variant="h6" mt={2} fontSize={16}>
         {t(`blockRawData`)}
       </Typography>
       {data ? (
