@@ -1,22 +1,18 @@
-import { useRef, useEffect, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
-import { InputBase, InputAdornment, styled } from '@mui/material'
+import { OutlinedInput, InputAdornment, styled, InputBaseProps } from '@mui/material'
 import { IMG_URL, SEARCH_FIELDS, handleSearchKeyPress } from 'utils'
 import Image from 'next/image'
+import { useTheme } from '@mui/material/styles'
 
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  '& .Mui-focused': {
-    // border: `1px solid red`,
-    border: `1px solid ${theme.palette.primary.main} !important`,
-  },
-  '&:focus': {},
+const StyledInputBase = styled((props: InputBaseProps) => <OutlinedInput {...props} />)(({ theme }) => ({
   'width': '100%',
   'height': '56px',
   'padding': theme.spacing(1, 2),
   'marginTop': theme.spacing(2),
   'borderRadius': '16px',
-  'color': 'secondary.light',
+  'color': theme.palette.secondary.light,
   'backgroundColor': '#ffffff',
   'fontWeight': 500,
   [theme.breakpoints.down('sm')]: {
@@ -35,16 +31,19 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 const Search = () => {
   const [t] = useTranslation('common')
-  const {
-    push,
-    query: { search: searchInQuery },
-    asPath,
-  } = useRouter()
+  const { push, asPath } = useRouter()
   const searchRef = useRef<HTMLInputElement | null>(null)
   const [showClearBtn, setShowClearBtn] = useState(false)
+  const isHome = asPath === '/' || asPath === '/zh-CN'
+  const theme = useTheme()
 
   const handleSearch = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     await handleSearchKeyPress(e, push)
+    if (e.key === 'Enter') {
+      searchRef.current?.blur()
+      searchRef.current.value = ''
+      setShowClearBtn(false)
+    }
   }
 
   const handleChange = () => {
@@ -55,17 +54,6 @@ const Search = () => {
     }
   }
 
-  useEffect(() => {
-    if (searchRef.current && typeof searchInQuery === 'string' && searchInQuery) {
-      searchRef.current.value = searchInQuery
-    }
-    return () => {
-      if (searchRef.current) {
-        searchRef.current.value = ''
-      }
-    }
-  }, [searchInQuery, searchRef])
-
   return (
     <StyledInputBase
       placeholder={SEARCH_FIELDS}
@@ -73,8 +61,18 @@ const Search = () => {
       onKeyPress={handleSearch}
       onChange={handleChange}
       inputRef={searchRef}
-      sx={{ fontSize: { xs: 12, md: 14 } }}
-      inputProps={{ 'aria-label': 'search' }}
+      sx={{
+        'fontSize': { xs: 12, md: 14 },
+        '& .MuiOutlinedInput-notchedOutline': {
+          borderWidth: '1px',
+          borderColor: 'white !important',
+        },
+        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+          borderWidth: '1px',
+          borderColor: isHome ? 'white !important' : `${theme.palette.primary.main} !important`,
+        },
+      }}
+      inputProps={{ 'aria-label': 'search', 'maxlength': 100 }}
       startAdornment={
         <InputAdornment position="end" sx={{ width: 20, height: 20, ml: 0 }}>
           <Image

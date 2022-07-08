@@ -319,7 +319,7 @@ const TxList = ({ list }: { list: State['txList'] }) => {
                       alignItems="bottom"
                       fontWeight={400}
                       fontSize={{ xs: 12, md: 14 }}
-                      pt={0.2}
+                      pt={0.5}
                       color="secondary.light"
                     >
                       <time dateTime={new Date(+tx.timestamp).toISOString()} title={t('timestamp')}>
@@ -364,7 +364,7 @@ const TxList = ({ list }: { list: State['txList'] }) => {
                         </Box>
                       </Tooltip>
                     </Stack>
-                    <Stack direction="row" justifyContent={{ xs: 'center', md: 'space-between' }} alignItems="center">
+                    <Stack direction="row" justifyContent="space-between" alignItems="center">
                       <Typography
                         fontSize={{ xs: 12, md: 14 }}
                         sx={{ textTransform: 'capitalize' }}
@@ -429,8 +429,10 @@ const Home = (initState: State) => {
   return (
     <Box sx={{ pb: { xs: 8, md: 11 } }}>
       <Box sx={{ bgcolor: 'primary.light' }}>
-        <Container sx={{ px: { md: 3, lg: 1 }, pr: { xs: 0 } }}>
+        <Container sx={{ px: { md: 3, lg: 1 } }}>
           <Search />
+        </Container>
+        <Container sx={{ px: { md: 3, lg: 1 }, pr: { xs: 0 } }}>
           <Stack direction="row" sx={{ pt: 2.5, pb: 1 }} justifyContent="space-between" alignItems="center">
             <Statistic {...home.statistic} />
             <video
