@@ -33,7 +33,7 @@ const RawTxData: React.FC<{ hash: string }> = ({ hash }) => {
   )
 
   const { isLoading: isTxReceiptLoading, data: txReceipt } = useQuery(
-    ['tx-raw-data', hash],
+    ['tx-receipt-raw-data', hash],
     () =>
       fetch(`/api/rpc`, {
         method: 'POST',
