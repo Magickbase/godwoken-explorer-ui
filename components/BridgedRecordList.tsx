@@ -18,7 +18,7 @@ import BigNumber from 'bignumber.js'
 
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/Pagination'
-import { timeDistance, getBridgedRecordListRes, CKB_EXPLORER_URL, CKB_DECIMAL } from 'utils'
+import { timeDistance, getBridgedRecordListRes, CKB_EXPLORER_URL, CKB_DECIMAL, PCKB_UAN } from 'utils'
 
 type ParsedList = ReturnType<typeof getBridgedRecordListRes>
 
@@ -36,7 +36,7 @@ const BridgedRecordList: React.FC<{
               <TableCell component="th">{t('type')}</TableCell>
               <TableCell component="th">{t('value')} </TableCell>
               <TableCell component="th" sx={{ textTransform: 'none' }}>
-                pCKB
+                {PCKB_UAN}
               </TableCell>
               <TableCell component="th">{t('age')} </TableCell>
               {showUser ? <TableCell component="th">{t('account')} </TableCell> : null}
@@ -50,7 +50,7 @@ const BridgedRecordList: React.FC<{
                 <TableRow key={r.layer1.output.hash + r.layer1.output.index}>
                   <TableCell sx={{ whiteSpace: 'nowrap', fontSize: { xs: 12, md: 14 } }}>{t(r.type)}</TableCell>
                   <TableCell sx={{ fontSize: { xs: 12, md: 14 }, whiteSpace: 'nowrap' }}>
-                    {r.token?.symbol !== 'pCKB'
+                    {r.token?.symbol !== PCKB_UAN
                       ? `${new BigNumber(r.value ?? '0').toFormat()} ${r.token.symbol ?? ''}`
                       : '0'}
                   </TableCell>

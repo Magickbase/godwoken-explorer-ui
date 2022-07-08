@@ -25,7 +25,7 @@ import SubpageHead from 'components/SubpageHead'
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/Pagination'
 import PageSize, { SIZES } from 'components/PageSize'
-import { fetchContractList } from 'utils'
+import { fetchContractList, PCKB_UAN } from 'utils'
 
 const ContractList = () => {
   const [t] = useTranslation(['list', 'common'])
@@ -63,7 +63,7 @@ const ContractList = () => {
                     <TableCell component="th">{t(`compiler_version`)}</TableCell>
                     <TableCell component="th">
                       {t(`balance`)}
-                      <span style={{ textTransform: 'none' }}>{`(pCKB)`}</span>
+                      <span style={{ textTransform: 'none' }}>{`(${PCKB_UAN})`}</span>
                     </TableCell>
                     <TableCell component="th">{t(`tx_count`)}</TableCell>
                   </TableRow>
