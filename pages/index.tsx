@@ -352,9 +352,9 @@ const TxList = ({ list }: { list: State['txList'] }) => {
                               disableRipple
                               fontSize={{ xs: 13, md: 14 }}
                               sx={{
+                                'p': 0,
+                                'pl': 1,
                                 'textTransform': 'lowercase',
-                                'py': 0,
-                                'px': 1,
                                 '&:hover': { backgroundColor: 'unset' },
                               }}
                             >
@@ -384,9 +384,9 @@ const TxList = ({ list }: { list: State['txList'] }) => {
                               disableRipple
                               fontSize={{ xs: 13, md: 14 }}
                               sx={{
+                                'p': 0,
+                                'pl': 1,
                                 'textTransform': 'lowercase',
-                                'py': 0,
-                                'px': 1,
                                 '&:hover': { backgroundColor: 'unset' },
                               }}
                             >
@@ -427,7 +427,7 @@ const Home = (initState: State) => {
   )
 
   return (
-    <Box sx={{ pb: { xs: 8, md: 11 } }}>
+    <Box sx={{ pb: { xs: 5, md: 11 } }}>
       <Box sx={{ bgcolor: 'primary.light' }}>
         <Container sx={{ px: { md: 3, lg: 1 } }}>
           <Search />
@@ -435,19 +435,18 @@ const Home = (initState: State) => {
         <Container sx={{ px: { md: 3, lg: 1 }, pr: { xs: 0 } }}>
           <Stack direction="row" sx={{ pt: 2.5, pb: 1 }} justifyContent="space-between" alignItems="center">
             <Statistic {...home.statistic} />
-            <video
-              loop
-              autoPlay
-              controls={false}
-              style={{ maxWidth: '78%', width: 'auto', height: 'auto', maxHeight: 444 }}
-            >
+            <video playsInline loop autoPlay style={{ maxWidth: '78%', width: 'auto', height: 'auto', maxHeight: 444 }}>
               <source src={IS_MAINNET ? '/home-video.mp4' : '/testnet-home-video.mp4'} />
             </video>
           </Stack>
         </Container>
       </Box>
       <Container sx={{ px: { md: 2, lg: 1 } }}>
-        <Stack direction={{ xs: 'column', sm: 'column', md: 'column', lg: 'row' }} spacing={4} sx={{ pt: 8 }}>
+        <Stack
+          direction={{ xs: 'column', sm: 'column', md: 'column', lg: 'row' }}
+          spacing={4}
+          sx={{ pt: { xs: 3, md: 8 } }}
+        >
           <Box sx={{ width: '100%', lg: { width: '50%', mr: 2 } }}>
             <BlockList list={home.blockList} />
           </Box>

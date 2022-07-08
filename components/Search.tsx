@@ -12,7 +12,7 @@ const StyledInputBase = styled((props: InputBaseProps) => <OutlinedInput {...pro
   'padding': theme.spacing(1, 2),
   'marginTop': theme.spacing(2),
   'borderRadius': '16px',
-  'color': theme.palette.secondary.light,
+  'color': theme.palette.secondary.main,
   'backgroundColor': '#ffffff',
   'fontWeight': 500,
   [theme.breakpoints.down('sm')]: {
@@ -64,12 +64,12 @@ const Search = () => {
       sx={{
         'fontSize': { xs: 12, md: 14 },
         '& .MuiOutlinedInput-notchedOutline': {
-          borderWidth: '1px',
-          borderColor: 'white !important',
+          borderWidth: '0.5px',
+          borderColor: isHome ? 'white !important' : '#f0f0f0 !important',
         },
         '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
           borderWidth: '1px',
-          borderColor: isHome ? 'white !important' : `${theme.palette.primary.main} !important`,
+          borderColor: `${theme.palette.primary.main} !important`,
         },
       }}
       inputProps={{ 'aria-label': 'search', 'maxlength': 100 }}
@@ -78,8 +78,8 @@ const Search = () => {
           <Image
             src={`${IMG_URL}search-icon.svg`}
             loading="lazy"
-            width="20"
-            height="20"
+            width="16"
+            height="16"
             layout="fixed"
             alt="search-icon"
           />
@@ -97,8 +97,8 @@ const Search = () => {
           <Image
             src={`${IMG_URL}search-clear.svg`}
             loading="lazy"
-            width="20"
-            height="20"
+            width="16"
+            height="16"
             layout="fixed"
             alt="search-icon"
           />
