@@ -26,7 +26,7 @@ import TxStatusIcon from './TxStatusIcon'
 import Address from 'components/TruncatedAddress'
 import PageSize from 'components/PageSize'
 import Pagination from 'components/SimplePagination'
-import { timeDistance, GraphQLSchema, TxStatus, client, GCKB_DECIMAL, useFilterMenu } from 'utils'
+import { timeDistance, GraphQLSchema, TxStatus, client, GCKB_DECIMAL, useFilterMenu, PCKB_UAN } from 'utils'
 
 export type TxListProps = {
   transactions: {
@@ -194,7 +194,7 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
               </TableCell>
               <TableCell component="th" sx={{ whiteSpace: 'nowrap', textTransform: 'none' }}>{`${t(
                 'value',
-              )} (pCKB)`}</TableCell>
+              )} (${PCKB_UAN})`}</TableCell>
               <TableCell component="th">{t('type')}</TableCell>
             </TableRow>
           </TableHead>

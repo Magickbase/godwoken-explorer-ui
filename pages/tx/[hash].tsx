@@ -60,6 +60,7 @@ import {
   CKB_DECIMAL,
   GCKB_DECIMAL,
   NotFoundException,
+  PCKB_UAN,
 } from 'utils'
 
 type RawTx = Parameters<typeof getTxRes>[0]
@@ -213,10 +214,10 @@ const Tx = (initState: State) => {
       label: 'value',
       // FIXME: tx.value is formatted incorrectly
       value: (
-        <Typography variant="body2">{`${new BigNumber(tx.value || '0')
+        <Typography variant="body2" sx={{ textTransform: 'none' }}>{`${new BigNumber(tx.value || '0')
           .multipliedBy(CKB_DECIMAL)
           .dividedBy(GCKB_DECIMAL)
-          .toFormat()} CKB`}</Typography>
+          .toFormat()} ${PCKB_UAN}`}</Typography>
       ),
     },
   ]
@@ -282,7 +283,7 @@ const Tx = (initState: State) => {
           label: 'gasPrice',
           value: (
             <Typography variant="body2" sx={{ textTransform: 'none' }}>
-              {new BigNumber(tx.gasPrice).toFormat() + ' pCKB'}
+              {new BigNumber(tx.gasPrice).toFormat() + ` ${PCKB_UAN}`}
             </Typography>
           ),
         }
@@ -304,7 +305,7 @@ const Tx = (initState: State) => {
           label: 'fee',
           value: (
             <Typography variant="body2" sx={{ textTransform: 'none' }}>
-              {new BigNumber(tx.gasUsed).times(new BigNumber(tx.gasPrice)).toFormat() + ' pCKB'}
+              {new BigNumber(tx.gasUsed).times(new BigNumber(tx.gasPrice)).toFormat() + ` ${PCKB_UAN}`}
             </Typography>
           ),
         }
