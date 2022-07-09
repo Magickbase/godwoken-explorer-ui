@@ -9,7 +9,7 @@ import SmartContract from 'components/SmartContract'
 import Polyjuice from 'components/Polyjuice'
 import SUDT from 'components/SUDT'
 import UnknownAccount from 'components/UnknownAccount'
-import { GCKB_DECIMAL, GraphQLSchema, client } from 'utils'
+import { GCKB_DECIMAL, GraphQLSchema, client, PCKB_UAN } from 'utils'
 
 export type BasicScript = Record<'args' | 'code_hash' | 'hash_type', string>
 interface AccountBase {
@@ -196,7 +196,7 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({
                     {isBalanceLoading ? (
                       <Skeleton animation="wave" />
                     ) : (
-                      new BigNumber(balance || '0').dividedBy(GCKB_DECIMAL).toFormat() + ' pCKB'
+                      new BigNumber(balance || '0').dividedBy(GCKB_DECIMAL).toFormat() + ` ${PCKB_UAN}`
                     )}
                   </Typography>
                 }

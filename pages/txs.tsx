@@ -22,6 +22,7 @@ import TxListComp, { fetchTxList } from 'components/TxList'
 import SubpageHead from 'components/SubpageHead'
 import Pagination from 'components/SimplePagination'
 import { SIZES } from 'components/PageSize'
+import { PCKB_UAN } from 'utils'
 
 const TxList = () => {
   const [t] = useTranslation('list')
@@ -78,7 +79,7 @@ const TxList = () => {
                       </TableCell>
                       <TableCell component="th" sx={{ whiteSpace: 'nowrap', textTransform: 'none' }}>{`${t(
                         'value',
-                      )} (pCKB)`}</TableCell>
+                      )} (${PCKB_UAN})`}</TableCell>
                       <TableCell component="th">{t('type')}</TableCell>
                     </TableRow>
                   </TableHead>
