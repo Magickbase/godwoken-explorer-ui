@@ -88,6 +88,7 @@ const Statistic = ({ blockCount, txCount, tps, accountCount, averageBlockTime }:
       rowSpacing={{ xs: 3, md: 3 }}
       columnSpacing={{ xs: 1, md: 6 }}
       sx={{ maxWidth: { xs: '35%', md: '50%' }, pb: 2, pt: 1 }}
+      className="statistic-container"
     >
       {statisticGroups.map((field, i) => (
         <Grid
@@ -155,6 +156,7 @@ const ListContainer = ({ link, title, tooltip, children }) => {
         dense
         component={Paper}
         sx={{ p: 0, mt: 1, borderRadius: { xs: '8px', md: '16px' }, boxShadow: 'none', border: '1px solid #f0f0f0' }}
+        className="list-container"
       >
         {children}
       </List>
@@ -202,6 +204,7 @@ const BlockList = ({ list }: { list: State['blockList'] }) => {
                           component={Link}
                           sx={{ 'fontSize': 14, 'p': 0, 'lineHeight': 1.5, '&:hover': { backgroundColor: 'unset' } }}
                           disableRipple
+                          title="block number"
                         >
                           {`# ${formatInt(block.number)}`}
                         </Button>
@@ -295,6 +298,7 @@ const TxList = ({ list }: { list: State['txList'] }) => {
                       <Box sx={{ width: 'min-content' }}>
                         <NextLink href={`/tx/${tx.hash}`} passHref>
                           <Button
+                            title="tx hash"
                             color="primary"
                             href={`/tx/${tx.hash}`}
                             component={Link}
@@ -345,6 +349,7 @@ const TxList = ({ list }: { list: State['txList'] }) => {
                         <Box>
                           <NextLink href={`/account/${tx.from}`} passHref>
                             <Button
+                              title="from"
                               color="primary"
                               href={`/account/${tx.from}`}
                               component={Link}
@@ -377,6 +382,7 @@ const TxList = ({ list }: { list: State['txList'] }) => {
                         <Box>
                           <NextLink href={`/account/${tx.to}`} passHref>
                             <Button
+                              title="to"
                               color="primary"
                               href={`/account/${tx.to}`}
                               component={Link}
@@ -447,10 +453,10 @@ const Home = (initState: State) => {
           spacing={4}
           sx={{ pt: { xs: 3, md: 8 } }}
         >
-          <Box sx={{ width: '100%', lg: { width: '50%', mr: 2 } }}>
+          <Box sx={{ width: '100%', lg: { width: '50%', mr: 2 } }} className="latest-blocks">
             <BlockList list={home.blockList} />
           </Box>
-          <Box sx={{ width: '100%', lg: { width: '50%', ml: 2 } }}>
+          <Box sx={{ width: '100%', lg: { width: '50%', ml: 2 } }} className="latest-txs">
             <TxList list={home.txList} />
           </Box>
         </Stack>

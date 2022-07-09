@@ -61,6 +61,7 @@ const Search = () => {
       onKeyPress={handleSearch}
       onChange={handleChange}
       inputRef={searchRef}
+      className="search-input"
       sx={{
         'fontSize': { xs: 12, md: 14 },
         '& .MuiOutlinedInput-notchedOutline': {
@@ -100,7 +101,7 @@ const Search = () => {
             width="16"
             height="16"
             layout="fixed"
-            alt="search-icon"
+            alt="search-clear"
           />
         </InputAdornment>
       }
