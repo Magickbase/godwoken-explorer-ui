@@ -1,6 +1,7 @@
 .container {
   font-size: 14px;
   margin: 24px;
+  overflow: scroll;
   .title {
     color: #333;
     font-weight: 400;
@@ -19,6 +20,7 @@
   font-size: 14px;
   font-family: 'Roboto Mono', monospace, 'Courier New' !important;
   dt {
+    width: 100%;
     min-width: 50px;
     text-align: right;
     text-transform: capitalize;
@@ -34,7 +36,7 @@
   &:not(:last-child) {
     border-bottom: 1px solid #f0f0f0;
   }
-  @media screen and (max-width: 600px) {
+  @media screen and (max-width: 900px) {
     flex-direction: column;
   }
 }
@@ -55,8 +57,8 @@
 
 .contractAddr {
   display: flex;
+  min-height: 40px;
   align-items: center;
-  height: 40px;
   a {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -64,20 +66,25 @@
 }
 .field {
   flex-basis: 100px;
+  flex-shrink: 0;
   font-size: 16px;
   color: #333;
   display: flex;
   justify-content: flex-end;
   padding-right: 30px;
+  @media screen and (max-width: 900px) {
+    justify-content: flex-start;
+  }
 }
 
 .eventSignature {
   color: #333;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  min-height: 40px;
   white-space: pre;
-  height: 40px;
   & > div {
+    flex-wrap: wrap;
     display: flex;
   }
 }
@@ -100,6 +107,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-shrink: 0;
     width: 20px;
     height: 24px;
     font-size: 14px;
@@ -122,7 +130,7 @@
     margin: 16px;
   }
 }
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 900px) {
   .topics,
   .data {
     flex-direction: column;
