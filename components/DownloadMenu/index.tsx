@@ -13,7 +13,7 @@ export const DOWNLOAD_HREF_LIST = {
     `${API_ENDPOINT}/deposit_withdrawals?${new URLSearchParams({ eth_address, export: 'true' })}`,
   accountTransferList: (eth_address: string) =>
     `${API_ENDPOINT}/transfers?${new URLSearchParams({ eth_address, export: 'true' })}`,
-  udtHolderList: (udt_id: string) => `${API_ENDPOINT}/account_udts/${new URLSearchParams({ udt_id, export: 'true' })}`,
+  udtHolderList: (udt_id: string) => `${API_ENDPOINT}/account_udts?${new URLSearchParams({ udt_id, export: 'true' })}`,
   udtBridgeRecordList: (udt_id: string) =>
     `${API_ENDPOINT}/deposit_withdrawals?${new URLSearchParams({ udt_id, export: 'true' })}`,
   udtTransferList: (udt_address: string) =>
