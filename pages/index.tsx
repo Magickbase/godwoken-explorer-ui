@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import type { API } from 'utils/api/utils'
 import type { Cache } from 'pages/api/cache'
 import { GetServerSideProps } from 'next'
@@ -416,6 +416,11 @@ const TxList = ({ list }: { list: State['txList'] }) => {
 
 const Home = (initState: State) => {
   const [home, setHome] = useState(initState)
+  const vidRef = useRef(null)
+
+  useEffect(() => {
+    vidRef.current.play()
+  }, [])
 
   useWS(
     CHANNEL.HOME,
@@ -441,7 +446,14 @@ const Home = (initState: State) => {
         <Container sx={{ px: { md: 3, lg: 1 }, pr: { xs: 0 } }}>
           <Stack direction="row" sx={{ pt: 2.5, pb: 1 }} justifyContent="space-between" alignItems="center">
             <Statistic {...home.statistic} />
-            <video playsInline loop autoPlay style={{ maxWidth: '78%', width: 'auto', height: 'auto', maxHeight: 444 }}>
+            <video
+              ref={vidRef}
+              playsInline
+              autoPlay
+              loop
+              muted
+              style={{ maxWidth: '78%', width: 'auto', height: 'auto', maxHeight: 444 }}
+            >
               <source src={IS_MAINNET ? '/home-video.mp4' : '/testnet-home-video.mp4'} />
             </video>
           </Stack>
