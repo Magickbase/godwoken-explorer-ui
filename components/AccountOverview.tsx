@@ -150,17 +150,32 @@ export const fetchAccountOverview = (variables: Variables) =>
       } as UnknownUser),
   )
 
-export const fetchAccountBalance = (variables: { address_hashes: Array<string> } | { script_hashes: Array<string> }) =>
-  Promise.all([
-    client
-      .request<{ account_ckbs: Array<{ balance: string }> }>(accountBalanceQuery, variables)
-      .then(data => data.account_ckbs[0]?.balance)
-      .catch(() => null),
-    client
-      .request<{ account_current_bridged_udts_of_ckb: Array<{ value: string }> }>(newAccountBalanceQuery, variables)
-      .then(data => data.account_current_bridged_udts_of_ckb[0]?.value)
-      .catch(() => null),
-  ]).then(([b1, b2]) => b1 || b2 || '0')
+// export const fetchAccountBalance = (variables: { address_hashes: Array<string> } | { script_hashes: Array<string> }) =>
+//   Promise.all([
+//     client
+//       .request<{ account_ckbs: Array<{ balance: string }> }>(accountBalanceQuery, variables)
+//       .then(data => data.account_ckbs[0]?.balance)
+//       .catch(() => null),
+//     client
+//       .request<{ account_current_bridged_udts_of_ckb: Array<{ value: string }> }>(newAccountBalanceQuery, variables)
+//       .then(data => data.account_current_bridged_udts_of_ckb[0]?.value)
+//       .catch(() => null),
+//   ]).then(([b1, b2]) => b1 || b2 || '0')
+export const fetchAccountBalance = (address: string) =>
+  fetch(`/api/rpc`, {
+    method: 'POST',
+    body: JSON.stringify({
+      id: 1,
+      jsonrpc: '2.0',
+      method: 'eth_getBalance',
+      params: [address, 'latest'],
+    }),
+  })
+    .then(res => res.json())
+    .then(res => {
+      return new BigNumber(res.result).toFormat({ groupSeparator: '' })
+    })
+    .catch(() => '0')
 
 export const fetchDeployAddress = (variables: { eth_hash: string }) =>
   client
