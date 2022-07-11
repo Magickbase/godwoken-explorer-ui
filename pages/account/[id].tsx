@@ -83,10 +83,7 @@ const Account = (initState: State) => {
 
   const { isLoading: isBalanceLoading, data: balance = '0' } = useQuery(
     ['account-balance', id],
-    () =>
-      fetch(`${API_ENDPOINT}/accounts/${id}`)
-        .then(r => r.json())
-        .then(a => new BigNumber(a.ckb || '0').multipliedBy(new BigNumber(CKB_DECIMAL)).toString()),
+    () => fetchAccountBalance(id),
     {
       refetchInterval: 10000,
       enabled: !!id,
@@ -296,9 +293,8 @@ export const getStaticProps: GetStaticProps<State, { id: string }> = async ({ lo
   try {
     const q = isEthAddress(id) ? { address: id } : { script_hash: id }
 
-    const [account, _balance, lng] = await Promise.all([
+    const [account, lng] = await Promise.all([
       fetchAccountOverview(q),
-      fetchAccountBalance(q.address ? { address_hashes: [q.address] } : { script_hashes: [q.script_hash] }),
       serverSideTranslations(locale, ['common', 'account', 'list']),
       null,
     ])
@@ -310,7 +306,7 @@ export const getStaticProps: GetStaticProps<State, { id: string }> = async ({ lo
     const balance = await fetch(`${API_ENDPOINT}/accounts/${account.eth_address}`)
       .then(r => r.json())
       .then(a => new BigNumber(a.ckb).multipliedBy(new BigNumber(CKB_DECIMAL)).toString())
-      .catch(() => _balance)
+      .catch(() => '0')
 
     const deployerAddr =
       isSmartContractAccount(account) && account.smart_contract?.deployment_tx_hash
