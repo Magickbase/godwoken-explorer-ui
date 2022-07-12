@@ -76,5 +76,7 @@
   "token": "Token",
   "verify_status": "verify status",
   "verified": "verified",
-  "unverified": "verify it"
+  "unverified": "verify it",
+  "anonymous_param": "anonymous parameter",
+  "anonymous_response": "anonymous response"
 }

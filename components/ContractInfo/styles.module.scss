@@ -1,0 +1,49 @@
+.container {
+  fieldset {
+    position: relative;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+
+    label {
+      font-size: 0.8rem;
+      margin: 4px 0px;
+    }
+    input {
+      outline: none;
+      flex: 1;
+      box-shadow: none;
+      border: 1px solid #0000001f;
+      padding: 12px 8px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      background-color: transparent;
+      align-self: stretch;
+      margin: 0;
+    }
+    input[readOnly] {
+      border: 1px solid #f0f0f0;
+    }
+  }
+  .openInNew {
+    position: absolute;
+    top: 37px;
+    right: 5px;
+    color: #ccc;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    transition: color 0.3s linear;
+    svg {
+      pointer-events: none;
+    }
+    &:hover {
+      color: #0c0c0c;
+    }
+  }
+}
