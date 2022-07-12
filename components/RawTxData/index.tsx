@@ -1,6 +1,7 @@
 import { Stack, Typography, TextareaAutosize, Skeleton } from '@mui/material'
 import { useQuery } from 'react-query'
 import { useTranslation } from 'next-i18next'
+import { provider } from 'utils'
 
 const textareaStyle: React.CSSProperties = {
   padding: '8px',
@@ -15,38 +16,13 @@ const textareaStyle: React.CSSProperties = {
 
 const RawTxData: React.FC<{ hash: string }> = ({ hash }) => {
   const [t] = useTranslation('tx')
-  const { isLoading: isTxLoading, data: tx } = useQuery(
-    ['tx-raw-data', hash],
-    () =>
-      fetch(`/api/rpc`, {
-        method: 'POST',
-        body: JSON.stringify({
-          id: 1,
-          jsonrpc: '2.0',
-          method: 'eth_getTransactionByHash',
-          params: [hash],
-        }),
-      }).then(res => res.json()),
-    {
-      enabled: !!hash,
-    },
-  )
-
+  const { isLoading: isTxLoading, data: tx } = useQuery(['tx-raw-data', hash], () => provider.getTransaction(hash), {
+    enabled: !!hash,
+  })
   const { isLoading: isTxReceiptLoading, data: txReceipt } = useQuery(
     ['tx-receipt-raw-data', hash],
-    () =>
-      fetch(`/api/rpc`, {
-        method: 'POST',
-        body: JSON.stringify({
-          id: 1,
-          jsonrpc: '2.0',
-          method: 'eth_getTransactionReceipt',
-          params: [hash],
-        }),
-      }).then(res => res.json()),
-    {
-      enabled: !!hash,
-    },
+    () => provider.getTransactionReceipt(hash),
+    { enabled: !!hash },
   )
 
   return (
@@ -55,7 +31,7 @@ const RawTxData: React.FC<{ hash: string }> = ({ hash }) => {
         {t(`txRawData`)}
       </Typography>
       {tx ? (
-        <TextareaAutosize defaultValue={JSON.stringify(tx?.result, null, 2)} readOnly style={textareaStyle} />
+        <TextareaAutosize defaultValue={JSON.stringify(tx, null, 2)} readOnly style={textareaStyle} />
       ) : isTxLoading ? (
         <Skeleton variant="rectangular" animation="wave" height="80ch" />
       ) : (
@@ -66,7 +42,7 @@ const RawTxData: React.FC<{ hash: string }> = ({ hash }) => {
         {t(`txReceiptRawData`)}
       </Typography>
       {txReceipt ? (
-        <TextareaAutosize defaultValue={JSON.stringify(txReceipt?.result, null, 2)} readOnly style={textareaStyle} />
+        <TextareaAutosize defaultValue={JSON.stringify(txReceipt, null, 2)} readOnly style={textareaStyle} />
       ) : isTxReceiptLoading ? (
         <Skeleton variant="rectangular" animation="wave" height="80ch" />
       ) : (
