@@ -23,6 +23,7 @@ import {
   tabUnstyledClasses,
 } from '@mui/material'
 import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material'
+import { provider } from 'utils'
 
 const grey = {
   50: '#fafafa',
@@ -100,7 +101,6 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
 
   const [contract, viewMethods] = useMemo(() => {
     try {
-      const provider = new ethers.providers.JsonRpcProvider('/api/rpc')
       if (Array.isArray(abi)) {
         const c = new ethers.Contract(address, abi, provider)
         const vMethods = {}

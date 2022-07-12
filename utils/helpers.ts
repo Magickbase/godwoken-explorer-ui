@@ -1,4 +1,5 @@
-import { utils } from 'ethers'
+import { utils, providers } from 'ethers'
+import { NODE_URL } from './constants'
 
 export const isEthAddress = (hash: string) => {
   try {
@@ -10,3 +11,5 @@ export const isEthAddress = (hash: string) => {
   }
   return false
 }
+
+export const provider = new providers.JsonRpcProvider(NODE_URL)
