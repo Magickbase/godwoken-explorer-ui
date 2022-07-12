@@ -449,9 +449,13 @@ const Home = (initState: State) => {
             <video
               ref={vidRef}
               playsInline
+              webkit-playsinline="true"
               autoPlay
               loop
               muted
+              preload="auto"
+              x5-video-player-type="h5"
+              x5-video-player-fullscreen="true"
               style={{ maxWidth: '78%', width: 'auto', height: 'auto', maxHeight: 444 }}
             >
               <source src={IS_MAINNET ? '/home-video.mp4' : '/testnet-home-video.mp4'} />
