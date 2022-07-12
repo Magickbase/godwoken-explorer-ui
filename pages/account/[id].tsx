@@ -220,6 +220,7 @@ const Account = (initState: State) => {
                 <TxList
                   transactions={txList ?? { entries: [], metadata: { total_count: 0, before: null, after: null } }}
                   maxCount="100k"
+                  viewer={id}
                 />
               ) : (
                 <Skeleton animation="wave" />
@@ -227,7 +228,7 @@ const Account = (initState: State) => {
             ) : null}
             {tab === 'erc20' ? (
               !isTransferListLoading && transferList ? (
-                <ERC20TransferList list={transferList} />
+                <ERC20TransferList list={transferList} viewer={id} />
               ) : (
                 <Skeleton animation="wave" />
               )
