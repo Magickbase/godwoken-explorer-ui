@@ -26,6 +26,7 @@ import TxStatusIcon from './TxStatusIcon'
 import Address from 'components/TruncatedAddress'
 import PageSize from 'components/PageSize'
 import Pagination from 'components/SimplePagination'
+import TransferDirection from 'components/TransferDirection'
 import { timeDistance, GraphQLSchema, TxStatus, client, GCKB_DECIMAL, useFilterMenu, PCKB_UAN } from 'utils'
 
 export type TxListProps = {
@@ -134,10 +135,11 @@ const getBlockStatus = (block: Pick<GraphQLSchema.Block, 'status'> | null): TxSt
 }
 
 const FILTER_KEYS = ['block_from', 'block_to'] as const
-const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> = ({
+const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number; viewer?: string }> = ({
   transactions: { entries, metadata },
   maxCount,
   pageSize,
+  viewer,
 }) => {
   const [t, { language }] = useTranslation('list')
   const {
@@ -287,11 +289,12 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
                         </Stack>
                       </Stack>
                     </TableCell>
-                    <TableCell sx={{ fontSize: { xs: 12, md: 14 }, whiteSpace: 'nowrap' }}>{`${new BigNumber(
-                      item.polyjuice?.value ?? 0,
-                    )
-                      .dividedBy(GCKB_DECIMAL)
-                      .toFormat()}`}</TableCell>
+                    <TableCell sx={{ fontSize: { xs: 12, md: 14 } }}>
+                      <div style={{ display: 'flex', whiteSpace: 'nowrap' }}>
+                        <TransferDirection from={from} to={to} viewer={viewer ?? ''} />
+                        {`${new BigNumber(item.polyjuice?.value ?? 0).dividedBy(GCKB_DECIMAL).toFormat()}`}
+                      </div>
+                    </TableCell>
                     <TableCell>
                       <Chip
                         label={item.type.replace(/_/g, ' ')}
