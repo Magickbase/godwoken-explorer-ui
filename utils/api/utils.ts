@@ -1,5 +1,5 @@
 import { GwHashException, NotFoundException } from '../exceptions'
-export { API_ENDPOINT, NODE_URL } from '../constants'
+export { API_ENDPOINT } from '../constants'
 export enum HttpStatus {
   NotFound = 404,
 }
