@@ -2,6 +2,7 @@ import type { PolyjuiceContract as PolyjuiceContractProps } from '../AccountOver
 import { useState, useMemo, useEffect } from 'react'
 import { styled } from '@mui/system'
 import { useTranslation } from 'next-i18next'
+import NextLink from 'next/link'
 import { ethers } from 'ethers'
 import {
   Box,
@@ -18,6 +19,7 @@ import {
   Divider,
   Button,
   CircularProgress,
+  Link,
   buttonUnstyledClasses,
   tabUnstyledClasses,
 } from '@mui/material'
@@ -133,6 +135,7 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
 }) => {
   const [tabIdx, setTabIdx] = useState(0)
   const [signer, setSigner] = useState<ethers.providers.JsonRpcSigner | null>(null)
+  const [addr, setAddr] = useState<string | null>(null)
   const [t] = useTranslation('account')
 
   useEffect(() => {
@@ -146,6 +149,9 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
         const signer = mm.getSigner()
         if (signer) {
           setSigner(signer)
+          signer.getAddress().then(a => setAddr(a))
+        } else {
+          setAddr(null)
         }
       })
     }
@@ -355,6 +361,23 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
 
         {tabIdx === 2 && contract ? (
           <Stack sx={{ p: '0px 16px 16px 16px' }} spacing={2}>
+            {addr ? (
+              <div style={{ whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+                <span style={{ marginRight: '4px' }}>{t(`connected_addr`)}</span>
+                <NextLink href={`/account/${addr}`}>
+                  <Link
+                    href={`/account/${addr}`}
+                    underline="none"
+                    color="secondary"
+                    className="mono-font"
+                    whiteSpace="nowrap"
+                    fontSize="14px"
+                  >
+                    {addr}
+                  </Link>
+                </NextLink>
+              </div>
+            ) : null}
             {writeMethodSignatures.map(signature => {
               const { inputs = [], outputs = [] } = contract.interface.functions[signature] ?? {}
               return (

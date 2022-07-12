@@ -78,5 +78,6 @@
   "verified": "verified",
   "unverified": "verify it",
   "anonymous_param": "anonymous parameter",
-  "anonymous_response": "anonymous response"
+  "anonymous_response": "anonymous response",
+  "connected_addr": "Connected Address:"
 }
