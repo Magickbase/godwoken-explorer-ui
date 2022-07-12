@@ -9,7 +9,7 @@ import SmartContract from 'components/SmartContract'
 import Polyjuice from 'components/Polyjuice'
 import SUDT from 'components/SUDT'
 import UnknownAccount from 'components/UnknownAccount'
-import { GCKB_DECIMAL, GraphQLSchema, client, PCKB_UAN } from 'utils'
+import { GCKB_DECIMAL, GraphQLSchema, client, PCKB_UAN, provider } from 'utils'
 
 export type BasicScript = Record<'args' | 'code_hash' | 'hash_type', string>
 interface AccountBase {
@@ -161,21 +161,7 @@ export const fetchAccountOverview = (variables: Variables) =>
 //       .then(data => data.account_current_bridged_udts_of_ckb[0]?.value)
 //       .catch(() => null),
 //   ]).then(([b1, b2]) => b1 || b2 || '0')
-export const fetchAccountBalance = (address: string) =>
-  fetch(`/api/rpc`, {
-    method: 'POST',
-    body: JSON.stringify({
-      id: 1,
-      jsonrpc: '2.0',
-      method: 'eth_getBalance',
-      params: [address, 'latest'],
-    }),
-  })
-    .then(res => res.json())
-    .then(res => {
-      return new BigNumber(res.result).toFormat({ groupSeparator: '' })
-    })
-    .catch(() => '0')
+export const fetchAccountBalance = (address: string) => provider.getBalance(address).then(res => res.toString())
 
 export const fetchDeployAddress = (variables: { eth_hash: string }) =>
   client
