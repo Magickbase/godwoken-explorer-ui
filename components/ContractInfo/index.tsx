@@ -386,9 +386,11 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
                         </Divider>
                         <fieldset>
                           <label>Txn Hash</label>
-                          <input name="response" readOnly />
-                          <div className={styles.openInNew}>
-                            <OpenInNewIcon />
+                          <div className={styles.writeRes}>
+                            <input name="response" readOnly />
+                            <div className={styles.openInNew}>
+                              <OpenInNewIcon />
+                            </div>
                           </div>
                         </fieldset>
                       </Stack>
