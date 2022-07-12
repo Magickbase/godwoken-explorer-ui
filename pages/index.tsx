@@ -420,6 +420,13 @@ const Home = (initState: State) => {
 
   useEffect(() => {
     vidRef.current.play()
+    document.addEventListener(
+      'WeixinJSBridgeReady',
+      () => {
+        vidRef.current.play()
+      },
+      false,
+    )
   }, [])
 
   useWS(
