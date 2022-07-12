@@ -449,7 +449,7 @@ const Home = (initState: State) => {
             <video
               ref={vidRef}
               playsInline
-              webkit-playsinline
+              webkit-playsinline="true"
               loop
               muted
               preload="auto"
