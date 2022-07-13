@@ -162,8 +162,13 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
       }
     }
 
-    const handleAccountsChanged = () => {
-      requestAccounts()
+    const handleAccountsChanged = (accounts: Array<string>) => {
+      if (accounts.length) {
+        requestAccounts()
+      } else {
+        setSigner(null)
+        setAddr(null)
+      }
     }
 
     if (tabIdx === 2) {
@@ -243,8 +248,9 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
         const resList = Array.isArray(result) ? result : [result]
         resList.map((res, i) => (resInputList[i] ? (resInputList[i].value = res.toString()) : null))
       }
-    } catch (err) {
-      window.alert(err.message)
+    } catch (err: any) {
+      const message = err.data?.message ?? err.message
+      window.alert(message)
     } finally {
       btn.disabled = false
       if (loading) {
