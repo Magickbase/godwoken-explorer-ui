@@ -89,7 +89,7 @@ const Search = () => {
       endAdornment={
         <InputAdornment
           position="end"
-          sx={{ width: 20, height: 20, display: showClearBtn ? 'inline' : 'none', cursor: 'pointer' }}
+          sx={{ width: 20, height: 20, display: showClearBtn ? 'inline-flex' : 'none', cursor: 'pointer' }}
           onClick={() => {
             searchRef.current.value = ''
             setShowClearBtn(false)
