@@ -2,9 +2,9 @@
   "page": "page",
   "goTo": "Go to",
   "search": "search",
-  "back": "back",
+  "back": "Go Back",
   "notFoundMessage": "Your input \"{{search}}\" did not match any record.\n\nPlease make sure your input contains only one of the following items:",
-  "pageNotFound": "404 | This page could not be found",
+  "pageNotFound": "The requested page does not exist",
   "prev": "Prev",
   "next": "Next",
   "home": "Home",
@@ -33,6 +33,7 @@
     "show": "Show",
     "records": "records"
   },
+  "all": "All",
   "view_all_blocks": "View all blocks",
   "view_all_transactions": "View all transactions"
 }

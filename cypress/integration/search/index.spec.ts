@@ -1,44 +1,21 @@
 /// <reference types="cypress" />
 
-context.skip('Search', () => {
-  const ROOT_SELECTOR = `form[class^=search_container]`
-  const MOBILE_VIEWPORT = 'iphone-6'
+context('Search', () => {
+  const ROOT_SELECTOR = `.search-input`
+  const MOBILE_VIEWPORT = 'iphone-x'
   describe('home page', () => {
     before(() => cy.visit('/en-US'))
-    describe('desktop', () => {
-      describe('by default', () => {
-        it('should be placed beneath the header', () => {
-          cy.get(ROOT_SELECTOR)
-            .should('have.attr', 'attr-position', 'home')
-            .and('have.attr', 'attr-display', 'false')
-            .and(form => {
-              expect(form.position().top).to.eq(96)
-            })
-        })
-
-        it('should have a submit button', () => {
-          cy.get(`${ROOT_SELECTOR} button[type=submit]`).should('not.have.css', 'display', 'none')
-        })
-
-        it('should hide the search icon in header', () => {
-          cy.get(`${ROOT_SELECTOR} div[class^=search_toggle]`).should('have.css', 'display', 'none')
-        })
+    describe('by default', () => {
+      it('should contain search input', () => {
+        cy.get(ROOT_SELECTOR).should('be.visible')
       })
 
-      describe('after scrolling 60px', () => {
-        it('should be placed in the header', () => {
-          cy.scrollTo(0, 60)
-          cy.get(ROOT_SELECTOR)
-            .should('have.attr', 'attr-position', 'header')
-            .and('have.attr', 'attr-display', 'false')
-            .and(form => {
-              expect(form.position().top).to.eq(10)
-            })
-        })
+      it('should show icon when type input', () => {
+        cy.get(`${ROOT_SELECTOR} input`).type('test').get(`${ROOT_SELECTOR} img[alt=search-clear]`).should('be.visible')
+      })
 
-        it('should hide the submit button', () => {
-          cy.get(`${ROOT_SELECTOR} button[type=submit]`).should('have.css', 'display', 'none')
-        })
+      it('should hide icon when no text in input', () => {
+        cy.get(`${ROOT_SELECTOR} input`).clear().get(`${ROOT_SELECTOR} img[alt=search-clear]`).should('not.be.visible')
       })
     })
 
@@ -48,28 +25,22 @@ context.skip('Search', () => {
       })
 
       describe('by default', () => {
-        it('should be placed beneath the header', () => {
-          cy.get(ROOT_SELECTOR)
-            .should('have.attr', 'attr-position', 'header')
-            .and('have.attr', 'attr-display', 'false')
-            .and(form => {
-              expect(form.position().top).to.eq(69)
-            })
-          it('should have a submit button', () => {
-            cy.get(`${ROOT_SELECTOR} button[type=submit]`).should('not.have.css', 'display', 'none')
-          })
+        it('should contain search input', () => {
+          cy.get(ROOT_SELECTOR).should('be.visible')
         })
-      })
 
-      describe('after scrolling 60px', () => {
-        it('should turn into a search icon', () => {
-          cy.scrollTo(0, 60)
-          cy.get(ROOT_SELECTOR)
-            .should('have.attr', 'attr-position', 'header')
-            .and('have.attr', 'attr-display', 'false')
-            .and('have.css', 'max-height', '0px')
+        it('should show icon when type input', () => {
+          cy.get(`${ROOT_SELECTOR} input`)
+            .type('test')
+            .get(`${ROOT_SELECTOR} img[alt=search-clear]`)
+            .should('be.visible')
+        })
 
-          cy.get(`${ROOT_SELECTOR} div[class^=search_toggle]`).should('not.have.css', 'display', 'none')
+        it('should hide icon when no text in input', () => {
+          cy.get(`${ROOT_SELECTOR} input`)
+            .clear()
+            .get(`${ROOT_SELECTOR} img[alt=search-clear]`)
+            .should('not.be.visible')
         })
       })
     })
@@ -78,18 +49,8 @@ context.skip('Search', () => {
   describe('block page', () => {
     before(() => cy.visit('/en-US/block/1'))
     describe('desktop', () => {
-      it('should be placed in the header', () => {
-        cy.get(ROOT_SELECTOR).should(form => {
-          expect(form.position().top).to.eq(10)
-        })
-      })
-
-      it('should hide the submit button', () => {
-        cy.get(`${ROOT_SELECTOR} button[type=submit]`).should('have.css', 'display', 'none')
-      })
-
-      it('should hide the search icon in header', () => {
-        cy.get(`${ROOT_SELECTOR} div[class^=search_toggle]`).should('have.css', 'display', 'none')
+      it('should contain search input', () => {
+        cy.get(ROOT_SELECTOR).should('be.visible')
       })
     })
 
@@ -98,13 +59,8 @@ context.skip('Search', () => {
         cy.viewport(MOBILE_VIEWPORT)
       })
 
-      it('should turn into a search icon', () => {
-        cy.get(ROOT_SELECTOR)
-          .should('have.attr', 'attr-position', 'header')
-          .and('have.attr', 'attr-display', 'false')
-          .and('have.css', 'max-height', '0px')
-
-        cy.get(`${ROOT_SELECTOR} div[class^=search_toggle]`).should('not.have.css', 'display', 'none')
+      it('should contain search input', () => {
+        cy.get(ROOT_SELECTOR).should('be.visible')
       })
     })
   })
@@ -112,18 +68,8 @@ context.skip('Search', () => {
   describe('account page', () => {
     before(() => cy.visit('/en-US/account/2'))
     describe('desktop', () => {
-      it('should be placed in the header', () => {
-        cy.get(ROOT_SELECTOR).should(form => {
-          expect(form.position().top).to.eq(10)
-        })
-      })
-
-      it('should hide the submit button', () => {
-        cy.get(`${ROOT_SELECTOR} button[type=submit]`).should('have.css', 'display', 'none')
-      })
-
-      it('should hide the search icon in header', () => {
-        cy.get(`${ROOT_SELECTOR} div[class^=search_toggle]`).should('have.css', 'display', 'none')
+      it('should contain search input', () => {
+        cy.get(ROOT_SELECTOR).should('be.visible')
       })
     })
 
@@ -132,13 +78,8 @@ context.skip('Search', () => {
         cy.viewport(MOBILE_VIEWPORT)
       })
 
-      it('should turn into a search icon', () => {
-        cy.get(ROOT_SELECTOR)
-          .should('have.attr', 'attr-position', 'header')
-          .and('have.attr', 'attr-display', 'false')
-          .and('have.css', 'max-height', '0px')
-
-        cy.get(`${ROOT_SELECTOR} div[class^=search_toggle]`).should('not.have.css', 'display', 'none')
+      it('should contain search input', () => {
+        cy.get(ROOT_SELECTOR).should('be.visible')
       })
     })
   })
@@ -150,41 +91,34 @@ context.skip('Search', () => {
       cy.get(`a[title='block number']:first`)
         .then(block => {
           const hash = block.attr('href').slice('/block/'.length)
-          const number = block.text().replace(/,/g, '')
+          const number = block.text().replace(/[# ,]/g, '')
           return { hash, number }
         })
         .should(({ hash, number }) => {
           cy.get(`${ROOT_SELECTOR} input`).type(hash)
-          cy.get(ROOT_SELECTOR).submit()
-          cy.location('pathname').should('eq', `/block/${number}`)
+          cy.get(ROOT_SELECTOR).type('{enter}')
+          cy.url().should('contain', `/block/${number}`)
           cy.location('search').should('eq', `?search=${hash}`)
         })
     })
 
     it('should redirect to transaction page when keyword is a tx hash', () => {
       cy.get(`a[title='tx hash']:first`)
-        .then(tx => tx.text())
-        .should(hash => {
+        .then(tx => tx.parent())
+        .invoke('attr', 'aria-label')
+        .then(hash => {
           cy.get(`${ROOT_SELECTOR} input`).type(hash)
-          cy.get(ROOT_SELECTOR).submit()
-          cy.location('pathname').should('eq', `/tx/${hash}`)
+          cy.get(ROOT_SELECTOR).type('{enter}')
+          cy.url().should('contain', `/tx/${hash}`)
           cy.location('search').should('eq', `?search=${hash}`)
         })
-    })
-
-    it(`should redirect to account page when keyword is a account id`, () => {
-      const ACCOUNT_ID = '2'
-      cy.get(`${ROOT_SELECTOR} input`).type(ACCOUNT_ID)
-      cy.get(ROOT_SELECTOR).submit()
-      cy.location('pathname').should('to.eq', `/account/${ACCOUNT_ID}`)
-      cy.location('search').should('eq', `?search=${ACCOUNT_ID}`)
     })
 
     it('404', () => {
       const INVALID_SEARCH = 'unknown'
       cy.get(`${ROOT_SELECTOR} input`).type(INVALID_SEARCH)
-      cy.get(ROOT_SELECTOR).submit()
-      cy.location('pathname').should('to.eq', `/404`)
+      cy.get(ROOT_SELECTOR).type('{enter}')
+      cy.url().should('contain', `/404`)
       cy.location('search').should('eq', `?search=${INVALID_SEARCH}`)
     })
 

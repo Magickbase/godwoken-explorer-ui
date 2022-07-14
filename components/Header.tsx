@@ -25,8 +25,10 @@ import { styled } from '@mui/material/styles'
 import { Language as LanguageIcon, KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material'
 import { EXPLORER_TITLE, fetchVersion } from 'utils'
 import Logo from './Logo'
-import CloseIcon from '../assets/close.svg'
-import MobileMenuIcon from '../assets/mobile-menu.svg'
+import CloseIcon from '../assets/icons/close.svg'
+import MobileMenuIcon from '../assets/icons/mobile-menu.svg'
+import { usePopupState, bindHover, bindMenu } from 'material-ui-popup-state/hooks'
+import HoverMenu from 'material-ui-popup-state/HoverMenu'
 
 const TOKEN_TYPE_LIST = ['bridge', 'native']
 const LOCALE_LIST = ['en-US', 'zh-CN']
@@ -69,9 +71,10 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
   },
 }))
 
-const StyledMenu = styled((props: MenuProps) => <Menu {...props} />)(({ theme }) => ({
+const StyledMenu = styled((props: MenuProps) => <HoverMenu {...props} />)(({ theme }) => ({
   '& .MuiPaper-root': {
     borderRadius: theme.spacing(1),
+    boxShadow: `0px 4px 9px ${theme.palette.primary.light}`,
   },
   '& .MuiMenuItem-root': {
     '& :hover': {
@@ -122,8 +125,21 @@ const Header = () => {
 
   const anchorElLabel = anchorEl?.getAttribute('aria-label')
   const { asPath } = useRouter()
-  const isHome = asPath === '/'
+  const isHome = asPath === '/' || asPath === '/zh-CN'
   const CHAIN_TYPE_LIST = !version?.startsWith('0.') ? ['testnet'] : ['mainnet', 'testnet']
+
+  const tokenPopover = usePopupState({
+    variant: 'popover',
+    popupId: 'tokenPopover',
+  })
+  const chainPopover = usePopupState({
+    variant: 'popover',
+    popupId: 'chainPopover',
+  })
+  const languagePopover = usePopupState({
+    variant: 'popover',
+    popupId: 'languagePopover',
+  })
 
   useEffect(() => {
     fetchVersion()
@@ -145,7 +161,7 @@ const Header = () => {
   const handleMenuListClose = () => setAnchorEl(null)
 
   const TokenMenuItems = ({ dense }) => (
-    <MenuList dense={dense}>
+    <MenuList dense={dense} onClick={tokenPopover.close}>
       {TOKEN_TYPE_LIST.map(type => (
         <MenuItem key={type} onClick={handleMenuListClose} sx={{ p: 0 }}>
           <NextLink href={`/tokens/${type}`} passHref>
@@ -165,7 +181,7 @@ const Header = () => {
   )
 
   const ChainMenuItems = ({ dense }) => (
-    <MenuList dense={dense}>
+    <MenuList dense={dense} onClick={chainPopover.close}>
       {CHAIN_TYPE_LIST.map(chain => {
         const url = `https://${
           chain === 'mainnet'
@@ -192,7 +208,7 @@ const Header = () => {
   )
 
   const LocaleMenuItems = ({ dense }) => (
-    <MenuList dense={dense}>
+    <MenuList dense={dense} onClick={languagePopover.close}>
       {LOCALE_LIST.map(locale => (
         <MenuItem key={locale} onClick={handleMenuListClose} sx={{ p: 0 }}>
           <NextLink href={asPath} locale={locale} passHref>
@@ -210,7 +226,7 @@ const Header = () => {
       position="sticky"
       sx={{ bgcolor: isHome || anchorElLabel === 'mobile-menu' ? 'primary.light' : '#F8F8FB', boxShadow: 'none' }}
     >
-      <Container>
+      <Container sx={{ px: { md: 3, lg: 1 } }}>
         <Toolbar sx={{ flexGrow: 1 }} disableGutters>
           <NextLink href="/" passHref>
             <Link
@@ -231,7 +247,17 @@ const Header = () => {
           </NextLink>
 
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-            <Button aria-label="home" onClick={handleMenuListOpen} disableRipple sx={{ textTransform: 'none', mx: 2 }}>
+            <Button
+              aria-label="home"
+              disableRipple
+              sx={{
+                'textTransform': 'none',
+                'mx': 2,
+                '&.MuiButtonBase-root:hover': {
+                  bgcolor: 'transparent',
+                },
+              }}
+            >
               <NextLink href={`/`} passHref>
                 <Link href={`/`} title={t(`home`)} underline="none" color="secondary">
                   {t(`home`)}
@@ -239,37 +265,34 @@ const Header = () => {
               </NextLink>
             </Button>
             <Button
-              aria-label="token-list"
-              aria-haspopup="true"
-              aria-expanded={anchorElLabel === 'token-list' ? 'true' : undefined}
-              aria-controls={anchorElLabel === 'token-list' ? 'token-list' : undefined}
-              onClick={handleMenuListOpen}
               color="secondary"
               disableRipple
-              sx={{ 'textTransform': 'none', 'mx': 2, '& .MuiButton-endIcon': { m: 0 } }}
-              endIcon={anchorElLabel === 'token-list' ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+              sx={{
+                'textTransform': 'none',
+                'mx': 2,
+                '& .MuiButton-endIcon': { m: 0 },
+                '&.MuiButtonBase-root:hover': {
+                  bgcolor: 'transparent',
+                },
+              }}
+              endIcon={tokenPopover.isOpen ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+              {...bindHover(tokenPopover)}
             >
               {t(`token`)}
             </Button>
-            <StyledMenu
-              id="token-list"
-              anchorEl={anchorEl}
-              open={anchorElLabel === 'token-list'}
-              onClose={handleMenuListClose}
-              MenuListProps={{ 'aria-labelledby': 'token-item' }}
-              sx={{ display: { xs: 'none', md: 'block' } }}
-            >
+            <StyledMenu id="token-list" sx={{ display: { xs: 'none', md: 'block' } }} {...bindMenu(tokenPopover)}>
               <TokenMenuItems dense />
             </StyledMenu>
             <Button
-              aria-label="contract-list"
-              aria-haspopup="true"
-              aria-expanded={anchorElLabel === 'contract-list' ? 'true' : undefined}
-              aria-controls={anchorElLabel === 'contract-list' ? 'contract-list' : undefined}
-              onClick={handleMenuListOpen}
               color="secondary"
               disableRipple
-              sx={{ textTransform: 'none', mx: 2 }}
+              sx={{
+                'textTransform': 'none',
+                'mx': 2,
+                '&.MuiButtonBase-root:hover': {
+                  bgcolor: 'transparent',
+                },
+              }}
             >
               <NextLink href={`/contracts`} passHref>
                 <Link href={`/contracts`} title={t(`contracts`)} underline="none" color="secondary">
@@ -278,14 +301,15 @@ const Header = () => {
               </NextLink>
             </Button>
             <Button
-              aria-label="more-list"
-              aria-haspopup="true"
-              aria-expanded={anchorElLabel === 'more-list' ? 'true' : undefined}
-              aria-controls={anchorElLabel === 'more-list' ? 'more-list' : undefined}
-              onClick={handleMenuListOpen}
               color="secondary"
               disableRipple
-              sx={{ textTransform: 'none', mx: 2 }}
+              sx={{
+                'textTransform': 'none',
+                'mx': 2,
+                '&.MuiButtonBase-root:hover': {
+                  bgcolor: 'transparent',
+                },
+              }}
             >
               <NextLink href={`/charts`} passHref>
                 <Link href={`/charts`} title={t(`charts`)} underline="none" color="secondary">
@@ -294,50 +318,43 @@ const Header = () => {
               </NextLink>
             </Button>
             <Button
-              aria-label="chain-type"
-              aria-haspopup="true"
-              aria-expanded={anchorElLabel === 'chain-type' ? 'true' : undefined}
-              aria-controls={anchorElLabel === 'chain-type' ? 'chain-type' : undefined}
-              onClick={handleMenuListOpen}
               color="secondary"
               disableRipple
-              sx={{ 'textTransform': 'none', 'mx': 2, '& .MuiButton-endIcon': { m: 0 } }}
-              endIcon={anchorElLabel === 'chain-type' ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+              sx={{
+                'textTransform': 'none',
+                'mx': 2,
+                '& .MuiButton-endIcon': { m: 0 },
+                '&.MuiButtonBase-root:hover': {
+                  bgcolor: 'transparent',
+                },
+              }}
+              endIcon={chainPopover.isOpen ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+              {...bindHover(chainPopover)}
             >
               {t(process.env.NEXT_PUBLIC_CHAIN_TYPE || CHAIN_TYPE_LIST[1])}
             </Button>
-            <StyledMenu
-              id="chain-type"
-              anchorEl={anchorEl}
-              open={anchorElLabel === 'chain-type'}
-              onClose={handleMenuListClose}
-              MenuListProps={{ 'aria-labelledby': 'chain-type' }}
-              sx={{ display: { xs: 'none', md: 'block' } }}
-            >
+            <StyledMenu id="chain-type" sx={{ display: { xs: 'none', md: 'block' } }} {...bindMenu(chainPopover)}>
               <ChainMenuItems dense />
             </StyledMenu>
             <Button
-              aria-label="i18n"
-              aria-haspopup="true"
-              aria-expanded={anchorElLabel === 'i18n' ? 'true' : undefined}
-              aria-controls={anchorElLabel === 'i18n' ? 'i18n' : undefined}
-              onClick={handleMenuListOpen}
               color="secondary"
               disableRipple
-              sx={{ 'textTransform': 'none', 'mx': 2, '& [class^=MuiButton-]': { ml: 0, mr: 0.5 } }}
+              sx={{
+                'textTransform': 'none',
+                'ml': 2,
+                '& [class^=MuiButton-]': { ml: 0, mr: 0.5 },
+                'pr': 0,
+                '&.MuiButtonBase-root:hover': {
+                  bgcolor: 'transparent',
+                },
+              }}
               startIcon={<LanguageIcon fontSize="small" />}
-              endIcon={anchorElLabel === 'i18n' ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+              endIcon={languagePopover.isOpen ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+              {...bindHover(languagePopover)}
             >
               {language === 'zh-CN' ? '中文' : 'Eng'}
             </Button>
-            <StyledMenu
-              id="i18n"
-              anchorEl={anchorEl}
-              open={anchorElLabel === 'i18n'}
-              onClose={handleMenuListClose}
-              MenuListProps={{ 'aria-labelledby': 'locale' }}
-              sx={{ display: { xs: 'none', md: 'block' } }}
-            >
+            <StyledMenu id="i18n" sx={{ display: { xs: 'none', md: 'block' } }} {...bindMenu(languagePopover)}>
               <LocaleMenuItems dense />
             </StyledMenu>
           </Box>

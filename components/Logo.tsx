@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Box, Typography } from '@mui/material'
 import SvgIcon, { SvgIconProps } from '@mui/material/SvgIcon'
-import LogoSvg from '../assets/nervina-logo.svg'
+import LogoSvg from '../assets/icons/nervina-logo.svg'
 import { EXPLORER_TITLE, fetchVersion } from 'utils'
 
 function Logo(props: SvgIconProps) {

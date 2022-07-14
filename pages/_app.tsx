@@ -12,6 +12,7 @@ import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
 import '@fontsource/material-icons'
+import '@fontsource/jetbrains-mono'
 
 const Agera = ({ Component, pageProps }: AppProps) => {
   const [loading, setLoading] = useState(0)
@@ -77,7 +78,7 @@ const Agera = ({ Component, pageProps }: AppProps) => {
         <ErrorBoundary>
           {loading ? (
             <LinearProgress
-              color="secondary"
+              color="primary"
               variant="determinate"
               value={loading}
               sx={{

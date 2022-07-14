@@ -19,7 +19,7 @@ export const IMG_URL = '/icons/'
 export const PAGE_SIZE = 20
 export const CKB_DECIMAL = new BigNumber(10 ** 8)
 export const GCKB_DECIMAL = new BigNumber(10 ** 18)
-export const SEARCH_FIELDS = 'block hash/txn hash/lockhash/ETH address/token name/token symbol'
+export const SEARCH_FIELDS = 'Block Hash/Txn Hash/Lockhash/ETH Address/Token Name/Token Symbol'
 export const MAINNET_HOSTNAME = process.env.NEXT_PUBLIC_MAINNET_EXPLORER_HOSTNAME
 export const TESTNET_HOSTNAME = process.env.NEXT_PUBLIC_TESTNET_EXPLORER_HOSTNAME
 
