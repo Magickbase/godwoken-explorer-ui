@@ -115,7 +115,13 @@ const TokenList = () => {
                             {token.name?.[0] ?? '?'}
                           </Avatar>
                           <NextLink href={`/token/${token.id}`}>
-                            <Link href={`/token/${token.id}`} underline="none" color="secondary" ml={2}>
+                            <Link
+                              href={`/token/${token.id}`}
+                              underline="none"
+                              color="secondary"
+                              ml={2}
+                              whiteSpace="nowrap"
+                            >
                               {token.name || '-'}
                             </Link>
                           </NextLink>
