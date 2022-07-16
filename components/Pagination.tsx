@@ -29,9 +29,9 @@ const Pagination: React.FC<{ total: number; page: number; pageSize?: number }> =
   }
 
   return (
-    <Box my={1} mr={1} sx={{ textAlign: 'right' }}>
+    <Box mr={1} sx={{ textAlign: 'right' }}>
       {page === 1 ? null : (
-        <NextLink href={prevPage}>
+        <NextLink href={prevPage} passHref>
           <Link href={prevPage} underline="none" fontSize={14} color="secondary">
             {t(`prev`)}
           </Link>
@@ -49,7 +49,7 @@ const Pagination: React.FC<{ total: number; page: number; pageSize?: number }> =
         ))}
       </select>
       {totalPage > page ? (
-        <NextLink href={nextPage}>
+        <NextLink href={nextPage} passHref>
           <Link href={nextPage} underline="none" fontSize={14} color="secondary">
             {t(`next`)}
           </Link>

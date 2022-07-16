@@ -224,7 +224,17 @@ const Header = () => {
   return (
     <AppBar
       position="sticky"
-      sx={{ bgcolor: isHome || anchorElLabel === 'mobile-menu' ? 'primary.light' : '#F8F8FB', boxShadow: 'none' }}
+      sx={{
+        bgcolor: isHome || anchorElLabel === 'mobile-menu' ? 'primary.light' : '#F8F8FB',
+        boxShadow: {
+          sm: isHome
+            ? 'none'
+            : process.env.NEXT_PUBLIC_CHAIN_TYPE !== 'mainnet'
+            ? 'none'
+            : '0px 1px 2px rgba(0, 0, 0, 0.05)',
+          xs: 'none',
+        },
+      }}
     >
       <Container sx={{ px: { md: 3, lg: 1 } }}>
         <Toolbar sx={{ flexGrow: 1 }} disableGutters>

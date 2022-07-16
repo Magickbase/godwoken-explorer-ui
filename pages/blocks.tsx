@@ -5,7 +5,6 @@ import NextLink from 'next/link'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import {
   Container,
-  Paper,
   Typography,
   Box,
   TableContainer,
@@ -48,88 +47,108 @@ const BlockList = (initState: State) => {
   return (
     <>
       <SubpageHead subtitle={title} />
-      <Container sx={{ px: 1, py: 2 }}>
+      <Container sx={{ px: { xs: 2, sm: 3, md: 2, lg: 0 }, pb: { xs: 5.5, md: 11 } }}>
         <PageTitle>
           <Typography variant="inherit" display="inline" pr={1}>
             {title}
           </Typography>
         </PageTitle>
-        <Paper>
-          <Box sx={{ px: 1, py: 2 }}>
-            {blockList.blocks.length >= 2 ? (
-              <Stack direction="row" justifyContent="sapce-between" alignItems="center">
-                <Typography variant="inherit" flex="1">
-                  {t(`block_from_to`, {
-                    to: blockList.blocks[0].number,
-                    from: blockList.blocks[blockList.blocks.length - 1].number,
-                  })}
-                </Typography>
-                <Pagination total={blockList.totalPage * pageSize} page={blockList.page} pageSize={pageSize} />
-              </Stack>
-            ) : null}
-            <TableContainer>
-              <Table size="small" sx={{ fontSize: { xs: 12, md: 14 } }}>
-                <TableHead sx={{ textTransform: 'capitalize' }}>
-                  <TableRow>
-                    <TableCell component="th">{t(`block_number`)}</TableCell>
-                    <TableCell component="th">{t(`age`)}</TableCell>
-                    <TableCell component="th">{t(`tx_count`)}</TableCell>
-                    <TableCell component="th" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
-                      {t(`gas_used`)}
-                    </TableCell>
-                    <TableCell component="th" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
-                      {t(`gas_limit`)}
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {blockList.totalPage ? (
-                    blockList.blocks.map(b => (
-                      <TableRow key={b.hash}>
-                        <TableCell sx={{ fontSize: 'inherit' }}>
-                          <Stack direction="row" alignItems="center">
-                            <BlockStateIcon state={b.finalizeState} />
-                            <NextLink href={`block/${b.hash}`}>
-                              <Link href={`block/${b.hash}`} underline="none" color="secondary">
-                                {b.number.toLocaleString('en')}
-                              </Link>
-                            </NextLink>
-                          </Stack>
-                        </TableCell>
-                        <TableCell sx={{ whiteSpace: 'nowrap', fontSize: 'inherit' }}>
-                          {b.timestamp > 0 ? (
-                            <time dateTime={new Date(b.timestamp).toISOString()}>
-                              {timeDistance(b.timestamp, language)}
-                            </time>
-                          ) : (
-                            t('pending')
-                          )}
-                        </TableCell>
-                        <TableCell sx={{ fontSize: 'inherit' }}>{b.txCount.toLocaleString('en')}</TableCell>
-                        <TableCell sx={{ fontSize: 'inherit', display: { xs: 'none', sm: 'table-cell' } }}>
-                          {(+b.gas.used).toLocaleString('en')}
-                        </TableCell>
-                        <TableCell sx={{ fontSize: 'inherit', display: { xs: 'none', sm: 'table-cell' } }}>
-                          {(+b.gas.limit).toLocaleString('en')}
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={5} align="center">
-                        {t(`no_records`)}
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
-            <Stack direction="row" justifyContent="space-between" alignItems="center">
-              <PageSize pageSize={pageSize} />
+        <Box
+          sx={{
+            borderRadius: {
+              xs: 2,
+              sm: 4,
+            },
+            border: {
+              xs: '0.5px solid #F0F0F0',
+              md: '1px solid #F0F0F0',
+            },
+            px: { xs: 1.5, md: 3 },
+            pt: { xs: 2, md: 3 },
+            pb: 2,
+            mt: { xs: 2, md: 3 },
+            bgcolor: '#fff',
+          }}
+        >
+          {blockList.blocks.length >= 2 ? (
+            <Stack direction="row" flexWrap="wrap" justifyContent="sapce-between" alignItems="center">
+              <Typography
+                variant="inherit"
+                color="secondary"
+                flex="1 0 300px"
+                fontWeight={500}
+                fontSize={{ xs: 14, md: 16 }}
+              >
+                {t(`block_from_to`, {
+                  to: blockList.blocks[0].number,
+                  from: blockList.blocks[blockList.blocks.length - 1].number,
+                })}
+              </Typography>
               <Pagination total={blockList.totalPage * pageSize} page={blockList.page} pageSize={pageSize} />
             </Stack>
-          </Box>
-        </Paper>
+          ) : null}
+          <TableContainer>
+            <Table size="small" sx={{ fontSize: { xs: 12, md: 14 } }}>
+              <TableHead sx={{ textTransform: 'capitalize' }}>
+                <TableRow>
+                  <TableCell component="th">{t(`block_number`)}</TableCell>
+                  <TableCell component="th">{t(`age`)}</TableCell>
+                  <TableCell component="th">{t(`tx_count`)}</TableCell>
+                  <TableCell component="th" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
+                    {t(`gas_used`)}
+                  </TableCell>
+                  <TableCell component="th" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
+                    {t(`gas_limit`)}
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {blockList.totalPage ? (
+                  blockList.blocks.map(b => (
+                    <TableRow key={b.hash}>
+                      <TableCell sx={{ fontSize: 'inherit' }}>
+                        <Stack direction="row" alignItems="center">
+                          <BlockStateIcon state={b.finalizeState} />
+                          <NextLink href={`block/${b.hash}`}>
+                            <Link href={`block/${b.hash}`} underline="none" color="secondary">
+                              {b.number.toLocaleString('en')}
+                            </Link>
+                          </NextLink>
+                        </Stack>
+                      </TableCell>
+                      <TableCell sx={{ whiteSpace: 'nowrap', fontSize: 'inherit' }}>
+                        {b.timestamp > 0 ? (
+                          <time dateTime={new Date(b.timestamp).toISOString()}>
+                            {timeDistance(b.timestamp, language)}
+                          </time>
+                        ) : (
+                          t('pending')
+                        )}
+                      </TableCell>
+                      <TableCell sx={{ fontSize: 'inherit' }}>{b.txCount.toLocaleString('en')}</TableCell>
+                      <TableCell sx={{ fontSize: 'inherit', display: { xs: 'none', sm: 'table-cell' } }}>
+                        {(+b.gas.used).toLocaleString('en')}
+                      </TableCell>
+                      <TableCell sx={{ fontSize: 'inherit', display: { xs: 'none', sm: 'table-cell' } }}>
+                        {(+b.gas.limit).toLocaleString('en')}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={5} align="center">
+                      {t(`no_records`)}
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <Stack direction="row" justifyContent="space-between" alignItems="center">
+            <PageSize pageSize={pageSize} />
+            <Pagination total={blockList.totalPage * pageSize} page={blockList.page} pageSize={pageSize} />
+          </Stack>
+        </Box>
       </Container>
     </>
   )

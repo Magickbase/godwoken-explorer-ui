@@ -48,7 +48,20 @@ const Layout = ({ children }) => {
           </Alert>
         ) : null}
         {!isHome && (
-          <Container sx={{ px: { md: 2, lg: 0 } }}>
+          <Container
+            sx={{
+              px: { md: 2, lg: 0 },
+              pb: 2,
+              boxShadow: {
+                xs: '0px 1px 2px rgba(0, 0, 0, 0.05)',
+                sm: 'none',
+              },
+              bgcolor: {
+                xs: '#f8f8fb',
+                sm: 'var(--bf-color)',
+              },
+            }}
+          >
             <Search />
           </Container>
         )}
