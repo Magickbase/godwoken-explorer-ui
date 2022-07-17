@@ -1,10 +1,9 @@
 import { useRef, useState } from 'react'
 import { useRouter } from 'next/router'
-import { useTranslation } from 'next-i18next'
-import { OutlinedInput, InputAdornment, styled, InputBaseProps } from '@mui/material'
-import { IMG_URL, SEARCH_FIELDS, handleSearchKeyPress } from 'utils'
 import Image from 'next/image'
+import { OutlinedInput, InputAdornment, styled, InputBaseProps } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
+import { IMG_URL, SEARCH_FIELDS, handleSearchKeyPress } from 'utils'
 
 const StyledInputBase = styled((props: InputBaseProps) => <OutlinedInput {...props} />)(({ theme }) => ({
   'width': '100%',
@@ -30,7 +29,6 @@ const StyledInputBase = styled((props: InputBaseProps) => <OutlinedInput {...pro
 }))
 
 const Search = () => {
-  const [t] = useTranslation('common')
   const { push, asPath } = useRouter()
   const searchRef = useRef<HTMLInputElement | null>(null)
   const [showClearBtn, setShowClearBtn] = useState(false)
@@ -56,6 +54,7 @@ const Search = () => {
 
   return (
     <StyledInputBase
+      autoFocus
       placeholder={SEARCH_FIELDS}
       title={SEARCH_FIELDS}
       onKeyPress={handleSearch}
@@ -73,7 +72,7 @@ const Search = () => {
           borderColor: `${theme.palette.primary.main} !important`,
         },
       }}
-      inputProps={{ 'aria-label': 'search', 'maxlength': 100 }}
+      inputProps={{ 'aria-label': 'search', 'maxLength': 100 }}
       startAdornment={
         <InputAdornment position="end" sx={{ width: 20, height: 20, ml: 0 }}>
           <Image

@@ -1,7 +1,7 @@
 import { useTranslation } from 'next-i18next'
-import { List, ListItem, ListItemText, ListSubheader, Divider, Typography } from '@mui/material'
+import { List, ListItem, ListItemText, ListSubheader, Divider, Typography, Skeleton } from '@mui/material'
 
-const User = ({ nonce }: { nonce: number }) => {
+const User = ({ nonce, isLoading }: { nonce: number; isLoading: boolean }) => {
   const [t] = useTranslation('account')
 
   const fields = [
@@ -9,7 +9,14 @@ const User = ({ nonce }: { nonce: number }) => {
       label: t(`type`),
       value: <Typography variant="body2">User</Typography>,
     },
-    { label: t('nonce'), value: <Typography variant="body2">{nonce.toLocaleString('en')}</Typography> },
+    {
+      label: t('nonce'),
+      value: isLoading ? (
+        <Skeleton animation="wave" />
+      ) : (
+        <Typography variant="body2">{nonce.toLocaleString('en')}</Typography>
+      ),
+    },
   ]
 
   return (
