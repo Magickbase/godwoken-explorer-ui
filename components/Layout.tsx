@@ -26,7 +26,7 @@ const Layout = ({ children }) => {
               'bgcolor': 'info.main',
               'color': '#333333',
               'fontSize': { xs: 12, md: 14 },
-              'padding': '6px 14px',
+              'padding': '6px 10px',
               '& .MuiAlert-icon': {
                 color: '#000000',
                 mr: { xs: 0.5, md: 1 },

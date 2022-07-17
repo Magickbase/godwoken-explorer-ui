@@ -15,7 +15,10 @@ import {
   TableCell,
   Link,
   Stack,
+  tableCellClasses,
 } from '@mui/material'
+import { styled, useTheme } from '@mui/material/styles'
+import useMediaQuery from '@mui/material/useMediaQuery'
 import PageTitle from 'components/PageTitle'
 import SubpageHead from 'components/SubpageHead'
 import Pagination from 'components/Pagination'
@@ -34,9 +37,39 @@ import {
 type ParsedBlockList = ReturnType<typeof getBlockListRes>
 type State = { blockList: ParsedBlockList; pageSize: number }
 
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.root}`]: {
+    color: theme.palette.secondary.main,
+    fontWeight: 400,
+    width: 1 / 5,
+    [theme.breakpoints.down('sm')]: {
+      minWidth: 120,
+    },
+  },
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: '#fafafa',
+    color: theme.palette.secondary.light,
+    whiteSpace: 'nowrap',
+    height: 48,
+    [theme.breakpoints.down('sm')]: {
+      height: 32,
+    },
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+    height: 64,
+    [theme.breakpoints.down('sm')]: {
+      fontSize: 12,
+      height: 52,
+    },
+  },
+}))
+
 const BlockList = (initState: State) => {
   const [{ blockList, pageSize }, setBlockList] = useState(initState)
   const [t, { language }] = useTranslation(['list', 'common'])
+  const theme = useTheme()
+  const matches = useMediaQuery(theme.breakpoints.up('sm'))
 
   useEffect(() => {
     setBlockList(initState)
@@ -63,7 +96,6 @@ const BlockList = (initState: State) => {
               xs: '0.5px solid #F0F0F0',
               md: '1px solid #F0F0F0',
             },
-            px: { xs: 1.5, md: 3 },
             pt: { xs: 2, md: 3 },
             pb: 2,
             mt: { xs: 2, md: 3 },
@@ -71,7 +103,14 @@ const BlockList = (initState: State) => {
           }}
         >
           {blockList.blocks.length >= 2 ? (
-            <Stack direction="row" flexWrap="wrap" justifyContent="sapce-between" alignItems="center">
+            <Stack
+              direction="row"
+              flexWrap="wrap"
+              justifyContent="sapce-between"
+              alignItems="center"
+              mb={{ xs: 1.5, md: 3 }}
+              px={{ xs: 1.5, md: 3 }}
+            >
               <Typography
                 variant="inherit"
                 color="secondary"
@@ -87,26 +126,27 @@ const BlockList = (initState: State) => {
               <Pagination total={blockList.totalPage * pageSize} page={blockList.page} pageSize={pageSize} />
             </Stack>
           ) : null}
+
           <TableContainer>
-            <Table size="small" sx={{ fontSize: { xs: 12, md: 14 } }}>
+            <Table>
               <TableHead sx={{ textTransform: 'capitalize' }}>
                 <TableRow>
-                  <TableCell component="th">{t(`block_number`)}</TableCell>
-                  <TableCell component="th">{t(`age`)}</TableCell>
-                  <TableCell component="th">{t(`tx_count`)}</TableCell>
-                  <TableCell component="th" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
-                    {t(`gas_used`)}
-                  </TableCell>
-                  <TableCell component="th" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
+                  <StyledTableCell component="th">{t(`block_number`)}</StyledTableCell>
+                  <StyledTableCell component="th">{t(`age`)}</StyledTableCell>
+                  <StyledTableCell component="th" sx={{ minWidth: { xs: 120, md: 220 } }}>
+                    {t(`tx_count`)}
+                  </StyledTableCell>
+                  <StyledTableCell component="th">{t(`gas_used`)}</StyledTableCell>
+                  <StyledTableCell component="th" sx={{ textAlign: 'end' }}>
                     {t(`gas_limit`)}
-                  </TableCell>
+                  </StyledTableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {blockList.totalPage ? (
                   blockList.blocks.map(b => (
-                    <TableRow key={b.hash}>
-                      <TableCell sx={{ fontSize: 'inherit' }}>
+                    <TableRow key={b.hash} sx={{ height: 64 }}>
+                      <StyledTableCell sx={{ fontSize: 'inherit' }}>
                         <Stack direction="row" alignItems="center">
                           <BlockStateIcon state={b.finalizeState} />
                           <NextLink href={`block/${b.hash}`}>
@@ -115,8 +155,8 @@ const BlockList = (initState: State) => {
                             </Link>
                           </NextLink>
                         </Stack>
-                      </TableCell>
-                      <TableCell sx={{ whiteSpace: 'nowrap', fontSize: 'inherit' }}>
+                      </StyledTableCell>
+                      <StyledTableCell sx={{ whiteSpace: 'nowrap', fontSize: 'inherit' }}>
                         {b.timestamp > 0 ? (
                           <time dateTime={new Date(b.timestamp).toISOString()}>
                             {timeDistance(b.timestamp, language)}
@@ -124,28 +164,39 @@ const BlockList = (initState: State) => {
                         ) : (
                           t('pending')
                         )}
-                      </TableCell>
-                      <TableCell sx={{ fontSize: 'inherit' }}>{b.txCount.toLocaleString('en')}</TableCell>
-                      <TableCell sx={{ fontSize: 'inherit', display: { xs: 'none', sm: 'table-cell' } }}>
+                      </StyledTableCell>
+                      <StyledTableCell sx={{ fontSize: 'inherit' }}>{b.txCount.toLocaleString('en')}</StyledTableCell>
+                      <StyledTableCell sx={{ fontSize: 'inherit' }}>
                         {(+b.gas.used).toLocaleString('en')}
-                      </TableCell>
-                      <TableCell sx={{ fontSize: 'inherit', display: { xs: 'none', sm: 'table-cell' } }}>
+                      </StyledTableCell>
+                      <StyledTableCell sx={{ fontSize: 'inherit', textAlign: 'end' }}>
                         {(+b.gas.limit).toLocaleString('en')}
-                      </TableCell>
+                      </StyledTableCell>
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={5} align="center">
+                    <StyledTableCell colSpan={5} align="center">
                       {t(`no_records`)}
-                    </TableCell>
+                    </StyledTableCell>
                   </TableRow>
                 )}
               </TableBody>
             </Table>
           </TableContainer>
-          <Stack direction="row" justifyContent="space-between" alignItems="center">
+
+          <Stack
+            direction="row"
+            flexWrap="wrap"
+            justifyContent="space-between"
+            alignItems="center"
+            mt={{ xs: 2, md: 2 }}
+            px={{ xs: 1.5, md: 3 }}
+          >
             <PageSize pageSize={pageSize} />
+            <Typography color="secondary.light" fontSize={{ xs: 12, md: 14 }}>
+              {t('showLatestRecords', { ns: 'common', number: matches ? '500k' : '100k' })}
+            </Typography>
             <Pagination total={blockList.totalPage * pageSize} page={blockList.page} pageSize={pageSize} />
           </Stack>
         </Box>

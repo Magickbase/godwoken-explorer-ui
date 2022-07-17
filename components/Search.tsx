@@ -76,7 +76,7 @@ const Search = () => {
           borderColor: `${theme.palette.primary.main} !important`,
         },
       }}
-      inputProps={{ 'aria-label': 'search', 'maxlength': 100 }}
+      inputProps={{ 'aria-label': 'search', 'maxLength': 100 }}
       startAdornment={
         <InputAdornment position="end" sx={{ width: 20, height: 20, ml: 0 }}>
           <Image
