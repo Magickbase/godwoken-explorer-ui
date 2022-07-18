@@ -41,7 +41,8 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.root}`]: {
     color: theme.palette.secondary.main,
     fontWeight: 400,
-    width: 1 / 5,
+    width: '20%',
+    padding: 8,
     [theme.breakpoints.down('sm')]: {
       minWidth: 120,
     },
@@ -51,16 +52,16 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     color: theme.palette.secondary.light,
     whiteSpace: 'nowrap',
     height: 48,
+    fontSize: 14,
     [theme.breakpoints.down('sm')]: {
+      fontSize: 12,
       height: 32,
     },
   },
   [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
     height: 64,
     [theme.breakpoints.down('sm')]: {
-      fontSize: 12,
-      height: 52,
+      height: 52.5,
     },
   },
 }))
@@ -131,13 +132,18 @@ const BlockList = (initState: State) => {
             <Table>
               <TableHead sx={{ textTransform: 'capitalize' }}>
                 <TableRow>
-                  <StyledTableCell component="th">{t(`block_number`)}</StyledTableCell>
+                  <StyledTableCell component="th" sx={{ pl: { xs: '12px !important', md: '24px !important' } }}>
+                    {t(`block_number`)}
+                  </StyledTableCell>
                   <StyledTableCell component="th">{t(`age`)}</StyledTableCell>
-                  <StyledTableCell component="th" sx={{ minWidth: { xs: 120, md: 220 } }}>
+                  <StyledTableCell component="th" sx={{ minWidth: { md: 260 } }}>
                     {t(`tx_count`)}
                   </StyledTableCell>
                   <StyledTableCell component="th">{t(`gas_used`)}</StyledTableCell>
-                  <StyledTableCell component="th" sx={{ textAlign: 'end' }}>
+                  <StyledTableCell
+                    component="th"
+                    sx={{ textAlign: 'end', pr: { xs: '12px !important', md: '24px !important' } }}
+                  >
                     {t(`gas_limit`)}
                   </StyledTableCell>
                 </TableRow>
@@ -145,18 +151,18 @@ const BlockList = (initState: State) => {
               <TableBody>
                 {blockList.totalPage ? (
                   blockList.blocks.map(b => (
-                    <TableRow key={b.hash} sx={{ height: 64 }}>
-                      <StyledTableCell sx={{ fontSize: 'inherit' }}>
+                    <TableRow key={b.hash}>
+                      <StyledTableCell sx={{ pl: { xs: '12px !important', md: '24px !important' } }}>
                         <Stack direction="row" alignItems="center">
-                          <BlockStateIcon state={b.finalizeState} />
-                          <NextLink href={`block/${b.hash}`}>
-                            <Link href={`block/${b.hash}`} underline="none" color="secondary">
+                          <NextLink href={`block/${b.hash}`} passHref>
+                            <Link href={`block/${b.hash}`} underline="none" color="primary">
                               {b.number.toLocaleString('en')}
                             </Link>
                           </NextLink>
+                          <BlockStateIcon state={b.finalizeState} />
                         </Stack>
                       </StyledTableCell>
-                      <StyledTableCell sx={{ whiteSpace: 'nowrap', fontSize: 'inherit' }}>
+                      <StyledTableCell sx={{ whiteSpace: 'nowrap' }}>
                         {b.timestamp > 0 ? (
                           <time dateTime={new Date(b.timestamp).toISOString()}>
                             {timeDistance(b.timestamp, language)}
@@ -165,11 +171,9 @@ const BlockList = (initState: State) => {
                           t('pending')
                         )}
                       </StyledTableCell>
-                      <StyledTableCell sx={{ fontSize: 'inherit' }}>{b.txCount.toLocaleString('en')}</StyledTableCell>
-                      <StyledTableCell sx={{ fontSize: 'inherit' }}>
-                        {(+b.gas.used).toLocaleString('en')}
-                      </StyledTableCell>
-                      <StyledTableCell sx={{ fontSize: 'inherit', textAlign: 'end' }}>
+                      <StyledTableCell>{b.txCount.toLocaleString('en')}</StyledTableCell>
+                      <StyledTableCell>{(+b.gas.used).toLocaleString('en')}</StyledTableCell>
+                      <StyledTableCell sx={{ textAlign: 'end', pr: { xs: '12px !important', md: '24px !important' } }}>
                         {(+b.gas.limit).toLocaleString('en')}
                       </StyledTableCell>
                     </TableRow>

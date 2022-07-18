@@ -57,7 +57,7 @@ const PageSize: React.FC<{ pageSize: number }> = ({ pageSize }) => {
           '& .MuiSelect-select:focus': { backgroundColor: 'unset' },
           '& .MuiSelect-select': {
             flex: '0 1 16px',
-            py: { xs: '2px', md: '0' },
+            py: { xs: '2px', md: 0 },
             pl: { xs: '2px', md: '4px' },
             pr: '0px !important',
           },
@@ -83,7 +83,7 @@ const PageSize: React.FC<{ pageSize: number }> = ({ pageSize }) => {
         }}
       >
         {SIZES.map(s => (
-          <MenuItem key={s} value={s} sx={{ justifyContent: 'center' }}>
+          <MenuItem key={s} value={s} sx={{ justifyContent: 'center', fontSize: { xs: 13, md: 14 } }}>
             {s}
           </MenuItem>
         ))}
