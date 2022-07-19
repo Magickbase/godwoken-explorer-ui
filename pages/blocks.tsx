@@ -43,6 +43,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     fontWeight: 400,
     width: '20%',
     padding: 8,
+    borderColor: '#f0f0f0',
     [theme.breakpoints.down('sm')]: {
       minWidth: 120,
     },
@@ -131,7 +132,7 @@ const BlockList = (initState: State) => {
           <TableContainer>
             <Table>
               <TableHead sx={{ textTransform: 'capitalize' }}>
-                <TableRow>
+                <TableRow sx={{ borderTop: '1px solid #f0f0f0' }}>
                   <StyledTableCell component="th" sx={{ pl: { xs: '12px !important', md: '24px !important' } }}>
                     {t(`block_number`)}
                   </StyledTableCell>
