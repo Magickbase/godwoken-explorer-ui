@@ -38,6 +38,32 @@ const udtListQuery = gql`
         symbol
       }
     }
+`
+
+const newUdtListQuery = gql`
+  query ($address_hashes: [String], $script_hashes: [String]) {
+    account_current_bridged_udts(input: { address_hashes: $address_hashes, script_hashes: $script_hashes }) {
+      value
+      udt {
+        id
+        type
+        name
+        icon
+        decimal
+        symbol
+      }
+    }
+    account_current_udts(input: { address_hashes: $address_hashes, script_hashes: $script_hashes }) {
+      value
+      udt {
+        id
+        type
+        name
+        icon
+        decimal
+        symbol
+      }
+    }
   }
 `
 
@@ -47,10 +73,21 @@ type Variables = EthAccountUdtListVariables | GwAccountUdtListVariables
 
 const CKB_UDT_ID = '1'
 export const fetchUdtList = (variables: Variables) =>
-  client
-    .request<{ account_udts: UdtList }>(udtListQuery, variables)
-    .then(data => data.account_udts.filter(u => u.udt.id !== CKB_UDT_ID && +u.value > 0))
-    .catch(() => [])
+  Promise.all([
+    client
+      .request<{ account_udts: UdtList }>(udtListQuery, variables)
+      .then(data => data.account_udts.filter(u => u.udt.id !== CKB_UDT_ID))
+      .catch(() => null),
+    client
+      .request<{ account_current_bridged_udts: NewUdtList; account_current_udts: NewUdtList }>(
+        newUdtListQuery,
+        variables,
+      )
+      .then(data =>
+        [...data.account_current_bridged_udts, ...data.account_current_udts].filter(u => u.udt.id !== CKB_UDT_ID),
+      )
+      .catch(() => null),
+  ]).then(([l1, l2]) => l1 || l2 || [])
 
 const AssetList = ({ list = [] }: { list: UdtList }) => {
   const [t] = useTranslation('account')
