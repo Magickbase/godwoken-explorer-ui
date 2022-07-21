@@ -73,5 +73,11 @@
   "response": "返回值",
   "query": "查询",
   "events": "事件",
-  "token": "代币"
+  "token": "代币",
+  "verify_status": "验证状态",
+  "verified": " 已验证",
+  "unverified": "去验证",
+  "anonymous_param": "匿名参数",
+  "anonymous_response": " 匿名返回值",
+  "connected_addr": " 已连接地址:"
 }

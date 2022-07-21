@@ -1,4 +1,10 @@
 .container {
+  .title {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
   .blockHash {
     word-break: break-all;
     span {

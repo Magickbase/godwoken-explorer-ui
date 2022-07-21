@@ -15,7 +15,7 @@
   </a>
 </p>
 
-This is a [godwoken explorer ui](https://github.com/nervina-labs/godwoken-explorer-ui) project works with a [back-end](https://github.com/nervina-labs/godwoken_explorer) project to sync and display data from [godwoken](https://github.com/nervosnetwork/godwoken/), a layer 2 for nervos [CKB](https://github.com/nervosnetwork/ckb/) project.
+This is a [godwoken explorer ui](https://github.com/Magickbase/godwoken-explorer-ui) project works with a [back-end](https://github.com/Magickbase/godwoken_explorer) project to sync and display data from [godwoken](https://github.com/nervosnetwork/godwoken/), a layer 2 for nervos [CKB](https://github.com/nervosnetwork/ckb/) project.
 
 ## Getting Started
 
@@ -31,8 +31,8 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 or:
 
-[![Edit on CodeSandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/nervina-labs/godwoken-explorer-ui/)
+[![Edit on CodeSandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/Magickbase/godwoken-explorer-ui/)
 
 ## Deploy on Vercel
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https://github.com/nervina-labs/godwoken-explorer-ui&project-name=Godwoken-Explorer&repository-name=godwoken-explorer-ui)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https://github.com/Magickbase/godwoken-explorer-ui&project-name=Godwoken-Explorer&repository-name=godwoken-explorer-ui)

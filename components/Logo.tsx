@@ -28,14 +28,16 @@ function Logo(props: SvgIconProps) {
       >
         {EXPLORER_TITLE}
       </Typography>
-      <Typography
-        component="span"
-        fontFamily="DIN Pro"
-        fontStyle="italic"
-        sx={{ fontSize: { xs: '10px', md: '12px' }, fontVariant: 'all-petite-caps' }}
-      >
-        V{version}
-      </Typography>
+      {version ? (
+        <Typography
+          component="span"
+          fontFamily="DIN Pro"
+          fontStyle="italic"
+          sx={{ fontSize: { xs: '10px', md: '12px' }, fontVariant: 'all-petite-caps' }}
+        >
+          V{version}
+        </Typography>
+      ) : null}
     </Box>
   )
 }

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { QueryClientProvider, QueryClient } from 'react-query'
 import { LinearProgress, ThemeProvider, CssBaseline } from '@mui/material'
 import { useRouter } from 'next/router'
 import Layout from 'components/Layout'
@@ -13,6 +14,8 @@ import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
 import '@fontsource/material-icons'
 import '@fontsource/jetbrains-mono'
+
+const queryClient = new QueryClient()
 
 const Agera = ({ Component, pageProps }: AppProps) => {
   const [loading, setLoading] = useState(0)
@@ -90,7 +93,9 @@ const Agera = ({ Component, pageProps }: AppProps) => {
               }}
             />
           ) : null}
-          <Component {...pageProps} />
+          <QueryClientProvider client={queryClient}>
+            <Component {...pageProps} />
+          </QueryClientProvider>
         </ErrorBoundary>
       </Layout>
     </ThemeProvider>

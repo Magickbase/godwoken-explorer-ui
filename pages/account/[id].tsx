@@ -1,9 +1,23 @@
+import type { GetStaticPaths, GetStaticProps } from 'next'
 import { useEffect, useState } from 'react'
-import { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { Alert, Stack, Container, Paper, IconButton, Divider, Tabs, Tab, Typography, Snackbar } from '@mui/material'
+import { useQuery } from 'react-query'
+import BigNumber from 'bignumber.js'
+import {
+  Alert,
+  Stack,
+  Container,
+  Paper,
+  IconButton,
+  Divider,
+  Tabs,
+  Tab,
+  Typography,
+  Snackbar,
+  Skeleton,
+} from '@mui/material'
 import { ContentCopyOutlined as CopyIcon } from '@mui/icons-material'
 import SubpageHead from 'components/SubpageHead'
 import AccountOverview, {
@@ -14,40 +28,27 @@ import AccountOverview, {
   PolyjuiceContract,
 } from 'components/AccountOverview'
 import ERC20TransferList from 'components/ERC20TransferList'
-import AssetList, { fetchUdtList, UdtList } from 'components/UdtList'
-import TxList, { TxListProps, fetchTxList } from 'components/TxList'
+import AssetList, { fetchUdtList } from 'components/UdtList'
+import TxList, { fetchTxList } from 'components/TxList'
 import BridgedRecordList from 'components/BridgedRecordList'
 import ContractInfo from 'components/ContractInfo'
 import ContractEventsList from 'components/ContractEventsList'
 import {
   handleCopy,
-  // useWS,
-  // getAccountRes,
   handleApiError,
-  getERC20TransferListRes,
   fetchERC20TransferList,
-  getBridgedRecordListRes,
   fetchBridgedRecordList,
   fetchEventLogsListByType,
   isEthAddress,
   GraphQLSchema,
-  ParsedEventLog,
-  TabNotFoundException,
   NotFoundException,
+  API_ENDPOINT,
+  CKB_DECIMAL,
 } from 'utils'
 import PageTitle from 'components/PageTitle'
+import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
 
-type ParsedTransferList = ReturnType<typeof getERC20TransferListRes>
-type ParsedBridgedRecordList = ReturnType<typeof getBridgedRecordListRes>
-
-type State = AccountOverviewProps &
-  Partial<{
-    txList: TxListProps['transactions']
-    transferList: ParsedTransferList
-    bridgedRecordList: ParsedBridgedRecordList
-    udtList: UdtList
-    eventsList: ParsedEventLog[]
-  }>
+type State = AccountOverviewProps
 const tabs = ['transactions', 'erc20', 'bridged', 'assets', 'contract', 'events']
 
 const isSmartContractAccount = (account: AccountOverviewProps['account']): account is PolyjuiceContract => {
@@ -57,7 +58,7 @@ const isSmartContractAccount = (account: AccountOverviewProps['account']): accou
 const Account = (initState: State) => {
   const {
     push,
-    query: { tab = 'transactions' },
+    query: { tab = 'transactions', before = null, after = null, block_from = null, block_to = null, page = '1' },
   } = useRouter()
   const [accountAndList, setAccountAndList] = useState(initState)
   const [isCopied, setIsCopied] = useState(false)
@@ -69,17 +70,80 @@ const Account = (initState: State) => {
     setAccountAndList(initState)
   }, [setAccountAndList, initState])
 
-  // TODO: update balance and tx count actively
-  // useWS(
-  //   account.id ? `${CHANNEL.ACCOUNT_INFO}${account.id}` : ``,
-  //   (init: API.Account.Raw) => {
-  //     setAccount(prev => ({ ...prev, ...getAccountRes(init) }))
-  //   },
-  //   (update: API.Account.Raw) => {
-  //     setAccount(prev => ({ ...prev, ...getAccountRes(update) }))
-  //   },
-  //   [setAccount, account.ethAddr],
-  // )
+  const q = isEthAddress(id) ? { address: id } : { script_hash: id }
+
+  const { isLoading: isOverviewLoading, data: overview } = useQuery(
+    ['account-overview', id],
+    () => fetchAccountOverview(q),
+    {
+      refetchInterval: 10000,
+      enabled: !!id,
+    },
+  )
+
+  const { isLoading: isBalanceLoading, data: balance = '0' } = useQuery(
+    ['account-balance', id],
+    () => fetchAccountBalance(id),
+    {
+      refetchInterval: 10000,
+      enabled: !!id,
+    },
+  )
+
+  const { isLoading: isTxListLoading, data: txList } = useQuery(
+    ['account-tx-list', id, before, after, block_from, block_to],
+    () =>
+      fetchTxList({
+        ...q,
+        before: before as string,
+        after: after as string,
+        start_block_number: block_from ? +block_from : null,
+        end_block_number: block_to ? +block_to : null,
+      }),
+    {
+      enabled: tab === 'transactions' && !!id,
+    },
+  )
+
+  const { isLoading: isTransferListLoading, data: transferList } = useQuery(
+    ['account-transfer-list', q.address, page],
+    () =>
+      fetchERC20TransferList({
+        eth_address: q.address,
+        page: page as string,
+      }),
+    { enabled: tab === 'erc20' && !!q.address },
+  )
+
+  const { isLoading: isBridgedListLoading, data: bridgedRecordList } = useQuery(
+    ['account-bridged-list', q.address, page],
+    () => fetchBridgedRecordList({ eth_address: q.address, page: page as string }),
+    { enabled: tab === 'bridged' && !!q.address },
+  )
+
+  const { isLoading: isEventListLoading, data: eventsList } = useQuery(
+    ['account-event-list', q.address],
+    () => fetchEventLogsListByType('accounts', q.address),
+    { enabled: tab === 'events' && !!q.address },
+  )
+
+  const { isLoading: isUdtListLoading, data: udtList } = useQuery(
+    ['account-udt-list', id],
+    () => fetchUdtList(q.address ? { address_hashes: [id] } : { script_hashes: [id] }),
+    { enabled: tab === 'assets' && !!(q.address || q.script_hash) },
+  )
+
+  /* is script hash supported? */
+  const downloadItems = accountAndList.account.eth_address
+    ? [
+        { label: t('transactionRecords'), href: DOWNLOAD_HREF_LIST.accountTxList(accountAndList.account.eth_address) },
+        { label: t('ERC20Records'), href: DOWNLOAD_HREF_LIST.accountTransferList(accountAndList.account.eth_address) },
+        {
+          label: t('bridgedRecords'),
+          href: DOWNLOAD_HREF_LIST.accountBridgeRecordList(accountAndList.account.eth_address),
+        },
+      ]
+    : []
 
   const handleAddressCopy = async () => {
     await handleCopy(id)
@@ -93,21 +157,26 @@ const Account = (initState: State) => {
     <>
       <SubpageHead subtitle={title} />
       <Container sx={{ py: 6 }}>
-        <PageTitle>
-          <Stack direction="row" alignItems="center">
-            <Typography variant="inherit" overflow="hidden" textOverflow="ellipsis" noWrap>
-              {title}
-            </Typography>
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <PageTitle>
+            <Stack direction="row" alignItems="center">
+              <Typography variant="inherit" overflow="hidden" textOverflow="ellipsis" noWrap>
+                {title}
+              </Typography>
 
-            <IconButton aria-label="copy" onClick={handleAddressCopy}>
-              <CopyIcon fontSize="inherit" />
-            </IconButton>
-          </Stack>
-        </PageTitle>
+              <IconButton aria-label="copy" onClick={handleAddressCopy}>
+                <CopyIcon fontSize="inherit" />
+              </IconButton>
+            </Stack>
+          </PageTitle>
+          <DownloadMenu items={downloadItems} />
+        </Stack>
         <Stack spacing={2}>
           <AccountOverview
-            account={accountAndList.account}
-            balance={accountAndList.balance}
+            isOverviewLoading={isOverviewLoading}
+            isBalanceLoading={isBalanceLoading}
+            account={{ ...accountAndList.account, ...overview }}
+            balance={balance}
             deployerAddr={accountAndList.deployerAddr}
           />
           <Paper>
@@ -146,16 +215,38 @@ const Account = (initState: State) => {
               )}
             </Tabs>
             <Divider />
-            {tab === 'transactions' && accountAndList.txList ? (
-              <TxList transactions={accountAndList.txList} maxCount="100k" />
+            {tab === 'transactions' ? (
+              !isTxListLoading ? (
+                <TxList
+                  transactions={txList ?? { entries: [], metadata: { total_count: 0, before: null, after: null } }}
+                  maxCount="100k"
+                  viewer={id}
+                />
+              ) : (
+                <Skeleton animation="wave" />
+              )
             ) : null}
-            {tab === 'erc20' && accountAndList.transferList ? (
-              <ERC20TransferList list={accountAndList.transferList} />
+            {tab === 'erc20' ? (
+              !isTransferListLoading && transferList ? (
+                <ERC20TransferList list={transferList} viewer={id} />
+              ) : (
+                <Skeleton animation="wave" />
+              )
             ) : null}
-            {tab === 'bridged' && accountAndList.bridgedRecordList ? (
-              <BridgedRecordList list={accountAndList.bridgedRecordList} />
+            {tab === 'bridged' ? (
+              !isBridgedListLoading && bridgedRecordList ? (
+                <BridgedRecordList list={bridgedRecordList} />
+              ) : (
+                <Skeleton animation="wave" />
+              )
             ) : null}
-            {tab === 'assets' && accountAndList.udtList ? <AssetList list={accountAndList.udtList} /> : null}
+            {tab === 'assets' ? (
+              !isUdtListLoading && udtList ? (
+                <AssetList list={udtList} />
+              ) : (
+                <Skeleton animation="wave" />
+              )
+            ) : null}
             {tab === 'contract' &&
             isSmartContractAccount(accountAndList.account) &&
             accountAndList.account.smart_contract?.abi ? (
@@ -164,7 +255,13 @@ const Account = (initState: State) => {
                 contract={accountAndList.account.smart_contract}
               />
             ) : null}
-            {tab === 'events' && <ContractEventsList list={accountAndList.eventsList} />}
+            {tab === 'events' ? (
+              !isEventListLoading && eventsList ? (
+                <ContractEventsList list={eventsList} />
+              ) : (
+                <Skeleton animation="wave" />
+              )
+            ) : null}
           </Paper>
         </Stack>
         <Snackbar
@@ -186,19 +283,19 @@ const Account = (initState: State) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps<State, { id: string }> = async ({ locale, res, params, query }) => {
+export const getStaticPaths: GetStaticPaths = () => ({
+  paths: [],
+  fallback: 'blocking',
+})
+
+export const getStaticProps: GetStaticProps<State, { id: string }> = async ({ locale, params }) => {
   const { id } = params
-  const { tab = tabs[0], before = null, after = null, block_from = null, block_to = null } = query
 
   try {
-    if (typeof tab !== 'string' || !tabs.includes(tab)) {
-      throw new TabNotFoundException()
-    }
     const q = isEthAddress(id) ? { address: id } : { script_hash: id }
 
-    const [account, balance, lng] = await Promise.all([
+    const [account, lng] = await Promise.all([
       fetchAccountOverview(q),
-      fetchAccountBalance(q.address ? { address_hashes: [q.address] } : { script_hashes: [q.script_hash] }),
       serverSideTranslations(locale, ['common', 'account', 'list']),
       null,
     ])
@@ -207,53 +304,19 @@ export const getServerSideProps: GetServerSideProps<State, { id: string }> = asy
       throw new NotFoundException()
     }
 
-    const txList =
-      tab === 'transactions' && (q.address || q.script_hash)
-        ? await fetchTxList({
-            ...q,
-            before: before as string,
-            after: after as string,
-            start_block_number: block_from ? +block_from : null,
-            end_block_number: block_to ? +block_to : null,
-          })
-        : null
-
-    const transferList =
-      tab === 'erc20' && q.address
-        ? await fetchERC20TransferList({ eth_address: q.address, page: query.page as string })
-        : null
-    const bridgedRecordList =
-      tab === 'bridged' && q.address
-        ? await fetchBridgedRecordList({ eth_address: q.address, page: query.page as string })
-        : null
-    const eventsList = tab === 'events' && q.address ? await fetchEventLogsListByType('accounts', q.address) : null
-    const udtList =
-      tab === 'assets' && (q.address || q.script_hash)
-        ? await fetchUdtList(q.address ? { address_hashes: [id] } : { script_hashes: [id] })
-        : null
+    const balance = await fetch(`${API_ENDPOINT}/accounts/${account.eth_address}`)
+      .then(r => r.json())
+      .then(a => new BigNumber(a.ckb).multipliedBy(new BigNumber(CKB_DECIMAL)).toString())
+      .catch(() => '0')
 
     const deployerAddr =
       isSmartContractAccount(account) && account.smart_contract?.deployment_tx_hash
         ? await fetchDeployAddress({ eth_hash: account.smart_contract.deployment_tx_hash })
         : null
 
-    return {
-      props: { ...lng, account, deployerAddr, balance, txList, transferList, bridgedRecordList, udtList, eventsList },
-    }
+    return { props: { ...lng, account, deployerAddr, balance } }
   } catch (err) {
-    switch (true) {
-      case err instanceof TabNotFoundException: {
-        return {
-          redirect: {
-            destination: `/account/${id}?tab=transactions`,
-            permanent: false,
-          },
-        }
-      }
-      default: {
-        return handleApiError(err, res, locale, id)
-      }
-    }
+    return handleApiError(err, null, locale, id)
   }
 }
 export default Account

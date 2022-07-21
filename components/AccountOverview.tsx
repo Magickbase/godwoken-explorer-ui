@@ -1,7 +1,7 @@
 import { gql } from 'graphql-request'
 import { useTranslation } from 'next-i18next'
 import BigNumber from 'bignumber.js'
-import { Paper, List, ListItem, ListItemText, Divider, Grid, ListSubheader, Typography } from '@mui/material'
+import { Paper, List, ListItem, ListItemText, Divider, Grid, ListSubheader, Typography, Skeleton } from '@mui/material'
 import User from 'components/User'
 import EthAddrReg from './EthAddrReg'
 import MetaContract from 'components/MetaContract'
@@ -9,7 +9,7 @@ import SmartContract from 'components/SmartContract'
 import Polyjuice from 'components/Polyjuice'
 import SUDT from 'components/SUDT'
 import UnknownAccount from 'components/UnknownAccount'
-import { GCKB_DECIMAL, GraphQLSchema, client } from 'utils'
+import { GCKB_DECIMAL, GraphQLSchema, client, PCKB_UAN, provider } from 'utils'
 
 export type BasicScript = Record<'args' | 'code_hash' | 'hash_type', string>
 interface AccountBase {
@@ -76,6 +76,8 @@ export interface MetaContract extends AccountBase {
 
 export type AccountOverviewProps = {
   account: EthUser | EthAddrReg | PolyjuiceCreator | PolyjuiceContract | Udt | MetaContract | UnknownUser
+  isOverviewLoading?: boolean
+  isBalanceLoading?: boolean
   balance: string
   deployerAddr?: string
 }
@@ -148,24 +150,31 @@ export const fetchAccountOverview = (variables: Variables) =>
       } as UnknownUser),
   )
 
-export const fetchAccountBalance = (variables: { address_hashes: Array<string> } | { script_hashes: Array<string> }) =>
-  Promise.all([
-    client
-      .request<{ account_ckbs: Array<{ balance: string }> }>(accountBalanceQuery, variables)
-      .then(data => data.account_ckbs[0]?.balance)
-      .catch(() => null),
-    client
-      .request<{ account_current_bridged_udts_of_ckb: Array<{ value: string }> }>(newAccountBalanceQuery, variables)
-      .then(data => data.account_current_bridged_udts_of_ckb[0]?.value)
-      .catch(() => null),
-  ]).then(([b1, b2]) => b1 || b2 || '0')
+// export const fetchAccountBalance = (variables: { address_hashes: Array<string> } | { script_hashes: Array<string> }) =>
+//   Promise.all([
+//     client
+//       .request<{ account_ckbs: Array<{ balance: string }> }>(accountBalanceQuery, variables)
+//       .then(data => data.account_ckbs[0]?.balance)
+//       .catch(() => null),
+//     client
+//       .request<{ account_current_bridged_udts_of_ckb: Array<{ value: string }> }>(newAccountBalanceQuery, variables)
+//       .then(data => data.account_current_bridged_udts_of_ckb[0]?.value)
+//       .catch(() => null),
+//   ]).then(([b1, b2]) => b1 || b2 || '0')
+export const fetchAccountBalance = (address: string) => provider.getBalance(address).then(res => res.toString())
 
 export const fetchDeployAddress = (variables: { eth_hash: string }) =>
   client
     .request<{ transaction: { from_account: Pick<GraphQLSchema.Account, 'eth_address'> } }>(deployAddrQuery, variables)
     .then(data => data.transaction.from_account.eth_address)
 
-const AccountOverview: React.FC<AccountOverviewProps> = ({ account, balance, deployerAddr }) => {
+const AccountOverview: React.FC<AccountOverviewProps> = ({
+  account,
+  balance,
+  deployerAddr,
+  isBalanceLoading,
+  isOverviewLoading,
+}) => {
   const [t] = useTranslation(['account', 'common'])
   return (
     <Paper>
@@ -184,8 +193,12 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({ account, balance, dep
               <ListItemText
                 primary={t(`ckbBalance`)}
                 secondary={
-                  <Typography variant="body2">
-                    {new BigNumber(balance || '0').dividedBy(GCKB_DECIMAL).toFormat() + ' CKB'}
+                  <Typography variant="body2" sx={{ textTransform: 'none' }}>
+                    {isBalanceLoading ? (
+                      <Skeleton animation="wave" />
+                    ) : (
+                      new BigNumber(balance || '0').dividedBy(GCKB_DECIMAL).toFormat() + ` ${PCKB_UAN}`
+                    )}
                   </Typography>
                 }
               />
@@ -194,7 +207,13 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({ account, balance, dep
               <ListItemText
                 primary={t(`txCount`)}
                 secondary={
-                  <Typography variant="body2">{new BigNumber(account.transaction_count ?? 0).toFormat()}</Typography>
+                  <Typography variant="body2">
+                    {isOverviewLoading ? (
+                      <Skeleton animation="wave" />
+                    ) : (
+                      new BigNumber(Math.max(account.nonce ?? 0, account.transaction_count ?? 0)).toFormat()
+                    )}
+                  </Typography>
                 }
               />
             </ListItem>
@@ -204,13 +223,16 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({ account, balance, dep
           {account.type === GraphQLSchema.AccountType.MetaContract ? (
             <MetaContract {...(account.script as MetaContract['script'])} />
           ) : null}
-          {account.type === GraphQLSchema.AccountType.EthUser ? <User nonce={account.nonce} /> : null}
+          {account.type === GraphQLSchema.AccountType.EthUser ? (
+            <User nonce={account.nonce} isLoading={isOverviewLoading} />
+          ) : null}
           {account.type === GraphQLSchema.AccountType.EthAddrReg ? <EthAddrReg /> : null}
           {account.type === GraphQLSchema.AccountType.PolyjuiceContract ? (
             <SmartContract
               deployer={deployerAddr}
               deployTxHash={account.smart_contract?.deployment_tx_hash}
               udt={account.udt}
+              isVerified={!!account.smart_contract?.abi}
             />
           ) : null}
           {account.type === GraphQLSchema.AccountType.PolyjuiceCreator ? (

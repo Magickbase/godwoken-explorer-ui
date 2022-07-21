@@ -18,12 +18,14 @@ import TxStatusIcon from './TxStatusIcon'
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/Pagination'
 import { timeDistance, getERC20TransferListRes } from 'utils'
+import TransferDirection from './TransferDirection'
 
 type ParsedTransferList = ReturnType<typeof getERC20TransferListRes>
 
 const TransferList: React.FC<{
   list: ParsedTransferList
-}> = ({ list }) => {
+  viewer?: string
+}> = ({ list, viewer }) => {
   const [t, { language }] = useTranslation('list')
   return (
     <Box sx={{ px: 1, py: 2 }}>
@@ -117,10 +119,13 @@ const TransferList: React.FC<{
                       </Stack>
                     </Stack>
                   </TableCell>
-                  <TableCell sx={{ fontSize: { xs: 12, md: 14 }, whiteSpace: 'nowrap' }}>
-                    {item.transferValue
-                      ? `${new BigNumber(item.transferValue).toFormat()} ${item.udtSymbol ?? ''}`
-                      : null}
+                  <TableCell sx={{ fontSize: { xs: 12, md: 14 } }}>
+                    <div style={{ display: 'flex', whiteSpace: 'nowrap' }}>
+                      <TransferDirection from={item.from} to={item.to} viewer={viewer ?? ''} />
+                      {item.transferValue
+                        ? `${new BigNumber(item.transferValue).toFormat()} ${item.udtSymbol ?? ''}`
+                        : null}
+                    </div>
                   </TableCell>
                 </TableRow>
               ))
