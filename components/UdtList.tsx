@@ -16,7 +16,7 @@ import {
 import { client, formatAmount, nameToColor, GraphQLSchema } from 'utils'
 
 export type UdtList = Array<{
-  balance: string
+  value: string
   udt: Pick<GraphQLSchema.Udt, 'id' | 'type' | 'name' | 'decimal' | 'icon' | 'symbol'>
 }>
 
@@ -28,34 +28,6 @@ type NewUdtList = Array<{
 const udtListQuery = gql`
   query ($address_hashes: [String], $script_hashes: [String]) {
     account_udts(input: { address_hashes: $address_hashes, script_hashes: $script_hashes }) {
-      balance
-      udt {
-        id
-        type
-        name
-        icon
-        decimal
-        symbol
-      }
-    }
-  }
-`
-
-const newUdtListQuery = gql`
-  query ($address_hashes: [String], $script_hashes: [String]) {
-    account_current_bridged_udts(input: { address_hashes: $address_hashes, script_hashes: $script_hashes }) {
-      value
-      udt {
-        id
-        type
-        name
-        icon
-        decimal
-        symbol
-      }
-    }
-
-    account_current_udts(input: { address_hashes: $address_hashes, script_hashes: $script_hashes }) {
       value
       udt {
         id
@@ -68,29 +40,17 @@ const newUdtListQuery = gql`
     }
   }
 `
+
 type EthAccountUdtListVariables = Record<'address_hashes', Array<string>>
 type GwAccountUdtListVariables = Record<'script_hashes', Array<string>>
 type Variables = EthAccountUdtListVariables | GwAccountUdtListVariables
 
 const CKB_UDT_ID = '1'
 export const fetchUdtList = (variables: Variables) =>
-  Promise.all([
-    client
-      .request<{ account_udts: UdtList }>(udtListQuery, variables)
-      .then(data => data.account_udts.filter(u => u.udt.id !== CKB_UDT_ID))
-      .catch(() => null),
-    client
-      .request<{ account_current_bridged_udts: NewUdtList; account_current_udts: NewUdtList }>(
-        newUdtListQuery,
-        variables,
-      )
-      .then(data =>
-        [...data.account_current_bridged_udts, ...data.account_current_udts]
-          .filter(u => u.udt.id !== CKB_UDT_ID)
-          .map(u => ({ ...u, balance: u.value })),
-      )
-      .catch(() => null),
-  ]).then(([l1, l2]) => l1 || l2 || [])
+  client
+    .request<{ account_udts: UdtList }>(udtListQuery, variables)
+    .then(data => data.account_udts.filter(u => u.udt.id !== CKB_UDT_ID && +u.value > 0))
+    .catch(() => [])
 
 const AssetList = ({ list = [] }: { list: UdtList }) => {
   const [t] = useTranslation('account')
@@ -137,7 +97,7 @@ const AssetList = ({ list = [] }: { list: UdtList }) => {
                 </TableCell>
                 <TableCell align="right">
                   <Box overflow="hidden" textOverflow="ellipsis" maxWidth={{ xs: '30vw', sm: '100%' }} ml="auto">
-                    {formatAmount(item.balance, item.udt)}
+                    {formatAmount(item.value, item.udt)}
                   </Box>
                 </TableCell>
               </TableRow>
