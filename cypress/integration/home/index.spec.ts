@@ -10,7 +10,7 @@ context('Home Page', () => {
   })
 
   describe('statistic', () => {
-    const ROOT_SELECTOR = `.statistic-container`
+    const ROOT_SELECTOR = `#statistic-container`
     it('should have blocks field', () => {
       cy.get(`${ROOT_SELECTOR}`).should('contain.text', 'blocks')
     })
