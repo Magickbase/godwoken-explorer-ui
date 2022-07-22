@@ -118,6 +118,9 @@ const AssetList = ({ list = [] }: { list: UdtList }) => {
                       sx={{
                         bgcolor: item.udt.icon ? '#f0f0f0' : nameToColor(item.udt.name),
                         textTransform: 'capitalize',
+                        img: {
+                          objectFit: 'fill',
+                        },
                       }}
                     >
                       {item.udt.name?.[0] ?? '?'}
