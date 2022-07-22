@@ -110,7 +110,10 @@ const TokenList = () => {
                         <Stack direction="row" alignItems="center">
                           <Avatar
                             src={token.icon ?? null}
-                            sx={{ bgcolor: token.icon ? '#f0f0f0' : nameToColor(token.name) }}
+                            sx={{
+                              bgcolor: token.icon ? '#f0f0f0' : nameToColor(token.name),
+                              img: { objectFit: 'fill' },
+                            }}
                           >
                             {token.name?.[0] ?? '?'}
                           </Avatar>

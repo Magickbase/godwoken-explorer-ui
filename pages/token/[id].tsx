@@ -187,7 +187,11 @@ const Token: React.FC<Props> = () => {
             <Stack direction={{ xs: 'column', sm: 'row' }} alignItems={{ xs: 'flex-start', sm: 'center' }}>
               <Avatar
                 src={token?.icon ?? null}
-                sx={{ bgcolor: token?.icon ? '#f0f0f0' : nameToColor(token?.name ?? ''), mr: 2 }}
+                sx={{
+                  bgcolor: token?.icon ? '#f0f0f0' : nameToColor(token?.name ?? ''),
+                  mr: 2,
+                  img: { objectFit: 'fill' },
+                }}
               >
                 {token?.name?.[0] ?? '?'}
               </Avatar>
