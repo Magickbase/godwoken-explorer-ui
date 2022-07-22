@@ -16,7 +16,7 @@ import {
 import { client, formatAmount, nameToColor, GraphQLSchema } from 'utils'
 
 export type UdtList = Array<{
-  balance: string
+  value: string
   udt: Pick<GraphQLSchema.Udt, 'id' | 'type' | 'name' | 'decimal' | 'icon' | 'symbol'>
 }>
 
@@ -28,7 +28,7 @@ type NewUdtList = Array<{
 const udtListQuery = gql`
   query ($address_hashes: [String], $script_hashes: [String]) {
     account_udts(input: { address_hashes: $address_hashes, script_hashes: $script_hashes }) {
-      balance
+      value
       udt {
         id
         type
@@ -38,7 +38,6 @@ const udtListQuery = gql`
         symbol
       }
     }
-  }
 `
 
 const newUdtListQuery = gql`
@@ -54,7 +53,6 @@ const newUdtListQuery = gql`
         symbol
       }
     }
-
     account_current_udts(input: { address_hashes: $address_hashes, script_hashes: $script_hashes }) {
       value
       udt {
@@ -68,6 +66,7 @@ const newUdtListQuery = gql`
     }
   }
 `
+
 type EthAccountUdtListVariables = Record<'address_hashes', Array<string>>
 type GwAccountUdtListVariables = Record<'script_hashes', Array<string>>
 type Variables = EthAccountUdtListVariables | GwAccountUdtListVariables
@@ -85,9 +84,7 @@ export const fetchUdtList = (variables: Variables) =>
         variables,
       )
       .then(data =>
-        [...data.account_current_bridged_udts, ...data.account_current_udts]
-          .filter(u => u.udt.id !== CKB_UDT_ID)
-          .map(u => ({ ...u, balance: u.value })),
+        [...data.account_current_bridged_udts, ...data.account_current_udts].filter(u => u.udt.id !== CKB_UDT_ID),
       )
       .catch(() => null),
   ]).then(([l1, l2]) => l1 || l2 || [])
@@ -137,7 +134,7 @@ const AssetList = ({ list = [] }: { list: UdtList }) => {
                 </TableCell>
                 <TableCell align="right">
                   <Box overflow="hidden" textOverflow="ellipsis" maxWidth={{ xs: '30vw', sm: '100%' }} ml="auto">
-                    {formatAmount(item.balance, item.udt)}
+                    {formatAmount(item.value, item.udt)}
                   </Box>
                 </TableCell>
               </TableRow>

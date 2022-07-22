@@ -98,6 +98,64 @@ const txListQuery = gql`
     }
   }
 `
+
+const newTxListQuery = gql`
+  query (
+    $address: HashAddress
+    $script_hash: HashFull
+    $before: String
+    $after: String
+    $limit: Int
+    $start_block_number: Int
+    $end_block_number: Int
+  ) {
+    transactions(
+      input: {
+        from_eth_address: $address
+        to_eth_address: $address
+        from_script_hash: $script_hash
+        to_script_hash: $script_hash
+        before: $before
+        after: $after
+        limit: $limit
+        start_block_number: $start_block_number
+        end_block_number: $end_block_number
+        combine_from_to: true
+      }
+    ) {
+      entries {
+        hash
+        eth_hash
+        block {
+          hash
+          number
+          status
+          timestamp
+        }
+        from_account {
+          type
+          eth_address
+          script_hash
+        }
+        to_account {
+          type
+          eth_address
+          script_hash
+        }
+        polyjuice {
+          value
+          status
+        }
+        type
+      }
+      metadata {
+        total_count
+        after
+        before
+      }
+    }
+  }
+`
 interface Cursor {
   limit?: number
   before: string
@@ -115,10 +173,21 @@ interface BlockTxListVariables extends Nullable<Cursor> {}
 type Variables = Cursor | EthAccountTxListVariables | GwAccountTxListVariables | BlockTxListVariables
 
 export const fetchTxList = (variables: Variables) =>
-  client
-    .request<TxListProps>(txListQuery, variables)
-    .then(data => data.transactions)
-    .catch(() => ({ entries: [], metadata: { before: null, after: null, total_count: 0 } }))
+  Promise.all([
+    client
+      .request<TxListProps>(txListQuery, variables)
+      .then(data => data.transactions)
+      .catch(() => null),
+    client
+      .request<TxListProps>(newTxListQuery, variables)
+      .then(data => data.transactions)
+      .catch(() => null),
+  ]).then(([txList, newTxList]) => {
+    if (!txList && !newTxList) {
+      return { entries: [], metadata: { before: null, after: null, total_count: 0 } }
+    }
+    return txList || newTxList
+  })
 
 const getBlockStatus = (block: Pick<GraphQLSchema.Block, 'status'> | null): TxStatus => {
   switch (block?.status) {
