@@ -597,7 +597,14 @@ const Home = () => {
               webkit-playsinline="true"
               x5-video-player-type="h5"
               x5-video-player-fullscreen="true"
-              style={{ maxWidth: '78%', width: 'auto', height: 'auto', maxHeight: 444, objectFit: 'cover' }}
+              style={{
+                maxWidth: '78%',
+                width: 'auto',
+                height: 'auto',
+                maxHeight: 444,
+                objectFit: 'cover',
+                mixBlendMode: 'darken',
+              }}
               poster={`${VIDEO_NAME}.png`}
               src={`${VIDEO_NAME}.mp4`}
             />
