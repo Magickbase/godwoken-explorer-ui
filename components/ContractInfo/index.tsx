@@ -224,7 +224,10 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
     const resInputList = form.querySelectorAll<HTMLInputElement>('input[name=response]')
     const openInNew = form.querySelector<HTMLDivElement>(`.${styles.openInNew}`)
     const signature = form.dataset['signature']
-    const method = contract[contract.interface.functions[signature].name]
+    const isCallStatic = form.dataset['callStatic']
+    const method = isCallStatic
+      ? contract.callStatic[contract.interface.functions[signature].name]
+      : contract[contract.interface.functions[signature].name]
     const params = Array.from(paramInputList).map(i => i.value)
 
     if (!method) return
@@ -313,6 +316,73 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
                   </AccordionSummary>
                   <AccordionDetails>
                     <form onSubmit={handleMethodCall} data-signature={signature}>
+                      {inputs.length ? (
+                        <Divider>
+                          <Typography variant="body2">Parameters</Typography>
+                        </Divider>
+                      ) : null}
+
+                      <Stack spacing={2}>
+                        {inputs.map((input, i: number) => {
+                          return (
+                            <fieldset key={input.name + i}>
+                              <label>{`${input.name ?? t('anonymous_param')}: ${input.type}`}</label>
+                              <input name="parameter" />
+                            </fieldset>
+                          )
+                        })}
+                        <Divider>
+                          <Typography variant="body2">Response</Typography>
+                        </Divider>
+                        {outputs.map((output, i: number) => {
+                          return (
+                            <fieldset key={output.name + i}>
+                              <label>{`${output.name ?? t('anonymous_response')}: ${output.type}`}</label>
+                              <input name="response" readOnly />
+                            </fieldset>
+                          )
+                        })}
+                      </Stack>
+                      <Box sx={{ textAlign: 'right', marginTop: '16px' }}>
+                        <Button type="submit" variant="contained" size="small">
+                          Query
+                          <CircularProgress
+                            className="contract-loading"
+                            size={24}
+                            sx={{
+                              display: 'none',
+                              position: 'absolute',
+                              top: '50%',
+                              left: '50%',
+                              marginTop: '-12px',
+                              marginLeft: '-12px',
+                            }}
+                          />
+                        </Button>
+                      </Box>
+                    </form>
+                  </AccordionDetails>
+                </Accordion>
+              )
+            })}
+            {writeMethodSignatures.length ? (
+              <Divider>
+                <Typography variant="body2" my={4}>
+                  Call Static
+                </Typography>
+              </Divider>
+            ) : null}
+            {writeMethodSignatures.map(signature => {
+              const { inputs = [], outputs = [] } = contract.interface.functions[signature] ?? {}
+              return (
+                <Accordion key={signature} sx={{ boxShadow: 'none', border: '1px solid #ddd' }}>
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                    <Typography variant="body2">{`${signature}: ${outputs
+                      .map(output => output.type)
+                      .join(', ')}`}</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <form onSubmit={handleMethodCall} data-call-static="true" data-signature={signature}>
                       {inputs.length ? (
                         <Divider>
                           <Typography variant="body2">Parameters</Typography>
