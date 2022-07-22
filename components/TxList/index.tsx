@@ -11,7 +11,8 @@ import HashLink from 'components/HashLink'
 import Address from 'components/TruncatedAddress'
 import PageSize from 'components/PageSize'
 import Pagination from 'components/SimplePagination'
-import { timeDistance, GraphQLSchema, TxStatus, client, GCKB_DECIMAL, useFilterMenu } from 'utils'
+import TransferDirection from 'components/TransferDirection'
+import { timeDistance, GraphQLSchema, TxStatus, client, GCKB_DECIMAL, useFilterMenu, PCKB_UAN } from 'utils'
 import TxType from 'components/TxType'
 
 export type TxListProps = {
@@ -27,6 +28,7 @@ export type TxListProps = {
     }>
     metadata: GraphQLSchema.PageMetadata
   }
+  viewer?: string
 }
 
 const txListQuery = gql`
@@ -124,6 +126,7 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
   transactions: { entries, metadata },
   maxCount,
   pageSize,
+  viewer,
 }) => {
   const [t, { language }] = useTranslation('list')
   const {
@@ -168,7 +171,7 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
             <th>{t('age')}</th>
             <th>{t('from')}</th>
             <th>{t('to')}</th>
-            <th>{`${t('value')} (CKB)`}</th>
+            <th>{`${t('value')} (${PCKB_UAN})`}</th>
             <th style={{ textAlign: 'right' }}>{t('type')}</th>
           </tr>
         </thead>
@@ -220,7 +223,12 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
                   <td>
                     <Address address={to} type={item.to_account.type} />
                   </td>
-                  <td>{`${new BigNumber(item.polyjuice?.value ?? 0).dividedBy(GCKB_DECIMAL).toFormat()}`}</td>
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      <TransferDirection from={from} to={to} viewer={viewer ?? ''} />
+                      {`${new BigNumber(item.polyjuice?.value ?? 0).dividedBy(GCKB_DECIMAL).toFormat()}`}
+                    </div>
+                  </td>
                   <td>
                     <TxType type={item.type} />
                   </td>
