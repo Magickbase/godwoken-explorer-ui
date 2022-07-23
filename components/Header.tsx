@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
@@ -23,18 +23,24 @@ import MuiAccordionSummary, { AccordionSummaryProps } from '@mui/material/Accord
 import MuiAccordionDetails from '@mui/material/AccordionDetails'
 import { styled } from '@mui/material/styles'
 import { Language as LanguageIcon, KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material'
-import { EXPLORER_TITLE, fetchVersion } from 'utils'
+import { EXPLORER_TITLE } from 'utils'
 import Logo from './Logo'
 import CloseIcon from '../assets/icons/close.svg'
 import MobileMenuIcon from '../assets/icons/mobile-menu.svg'
 import { usePopupState, bindHover, bindMenu } from 'material-ui-popup-state/hooks'
 import HoverMenu from 'material-ui-popup-state/HoverMenu'
 
+const CHAIN_LINKS = [
+  { label: 'mainnet_v1', href: 'https://v1.gwscan.com' },
+  { label: 'testnet_v1', href: 'https://v1.testnet.gwscan.com' },
+  { label: 'mainnet_v0', href: 'https://gwscan.com' },
+  { label: 'testnet_v0', href: 'https://pudge.gwscan.com' },
+]
 const TOKEN_TYPE_LIST = ['bridge', 'native']
-const LOCALE_LIST = ['en-US', 'zh-CN']
+const LOCALE_LIST = ['zh-CN', 'en-US']
 
 const Accordion = styled((props: AccordionProps) => <MuiAccordion disableGutters elevation={0} square {...props} />)(
-  ({ theme }) => ({
+  () => ({
     '&:not(:last-child)': {
       borderBottom: 0,
     },
@@ -119,14 +125,13 @@ const MobileMenu = styled((props: MenuProps) => (
 
 const Header = () => {
   const [t, { language }] = useTranslation('common')
-  const [version, setVersion] = useState<string | null>(null)
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
   const [expanded, setExpanded] = useState<string | false>('')
 
   const anchorElLabel = anchorEl?.getAttribute('aria-label')
   const { asPath } = useRouter()
   const isHome = asPath === '/' || asPath === '/zh-CN'
-  const CHAIN_TYPE_LIST = !version?.startsWith('0.') ? ['testnet'] : ['mainnet', 'testnet']
+  const CHAIN_TYPE_LIST = ['mainnet', 'testnet']
 
   const tokenPopover = usePopupState({
     variant: 'popover',
@@ -141,17 +146,7 @@ const Header = () => {
     popupId: 'languagePopover',
   })
 
-  useEffect(() => {
-    fetchVersion()
-      .then(versions => {
-        setVersion(versions.godwokenVersion?.split(' ')[0])
-      })
-      .catch(() => {
-        /* ignore */
-      })
-  }, [setVersion])
-
-  const handleMobileMenuChange = (panel: string) => (e: React.SyntheticEvent, newExpanded: boolean) => {
+  const handleMobileMenuChange = (panel: string) => (_: React.SyntheticEvent, newExpanded: boolean) => {
     setExpanded(newExpanded ? panel : false)
   }
 
@@ -182,23 +177,22 @@ const Header = () => {
 
   const ChainMenuItems = ({ dense }) => (
     <MenuList dense={dense} onClick={chainPopover.close}>
-      {CHAIN_TYPE_LIST.map(chain => {
-        const url = `https://${
-          chain === 'mainnet'
-            ? process.env.NEXT_PUBLIC_MAINNET_EXPLORER_HOSTNAME
-            : process.env.NEXT_PUBLIC_TESTNET_EXPLORER_HOSTNAME
-        }/${language}`
+      {CHAIN_LINKS.map(chain => {
+        const url = `${chain.href}/${language}`
+        const [label, version] = chain.label.split('_')
         return (
-          <MenuItem key={chain} onClick={handleMenuListClose} sx={{ p: 0 }}>
+          <MenuItem key={chain.label} onClick={handleMenuListClose} sx={{ p: 0 }}>
             <NextLink href={url} passHref>
               <Link
                 href={url}
-                title={t(chain)}
+                title={`${t(label)} ${version}`}
                 underline="none"
+                justifyContent="space-between"
                 sx={{ width: '100%', padding: '6px 16px' }}
                 color="secondary"
               >
-                {t(chain)}
+                <span>{t(label)}</span>
+                <span>{version}</span>
               </Link>
             </NextLink>
           </MenuItem>

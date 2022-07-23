@@ -36,5 +36,7 @@
   "showLatestRecords": "Showing The Last {{number}} Records",
   "all": "All",
   "view_all_blocks": "View all blocks",
-  "view_all_transactions": "View all transactions"
+  "view_all_transactions": "View all transactions",
+  "download": "download",
+  "up_to_5k_records_will_be_exported": "Up to 5,000 records will be downloaded"
 }

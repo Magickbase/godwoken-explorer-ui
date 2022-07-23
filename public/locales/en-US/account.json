@@ -73,5 +73,11 @@
   "response": "Response",
   "query": "Query",
   "events": "Events",
-  "token": "Token"
+  "token": "Token",
+  "verify_status": "verify status",
+  "verified": "verified",
+  "unverified": "verify it",
+  "anonymous_param": "anonymous parameter",
+  "anonymous_response": "anonymous response",
+  "connected_addr": "Connected Address:"
 }

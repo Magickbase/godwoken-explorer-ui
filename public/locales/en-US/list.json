@@ -25,7 +25,7 @@
   "gas_limit": "gas limit",
   "rank": "rank",
   "address": "address",
-  "balance": "balance",
+  "balance": "Balance",
   "percentage": "percentage",
   "txCount": "Txns",
   "contract_name": "contract name",

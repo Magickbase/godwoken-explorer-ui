@@ -1,0 +1,26 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75em;
+  text-transform: uppercase;
+  width: 35px;
+  letter-spacing: 0.5px;
+  border-radius: 8px;
+  font-family: Helvetica, Arial, sans-serif;
+  margin-right: 4px;
+  user-select: none;
+
+  &[data-type='out'] {
+    color: #d98856;
+    background: #fff8ef;
+  }
+  &[data-type='in'] {
+    color: #2fc7e0;
+    background: #f0fbf8;
+  }
+  &[data-type='self'] {
+    color: #645760;
+    background: #e0e0e0;
+  }
+}
