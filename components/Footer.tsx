@@ -5,14 +5,17 @@ import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
 import Button from '@mui/material/Button'
 import { styled } from '@mui/material/styles'
-import { CKB_EXPLORER_URL, EXPLORER_TITLE, NERVINA_GITHUB_URL, NERVOS_URL } from 'utils'
+import { CKB_EXPLORER_URL, EXPLORER_TITLE, NERVINA_GITHUB_URL, NERVOS_URL, IS_MAINNET } from 'utils'
 import { Fragment } from 'react'
 import Logo from './Logo'
+
+const BRIDGE_URL = IS_MAINNET ? 'https://bridge.godwoken.io/#/v1' : 'https://testnet.bridge.godwoken.io/#/v1'
 
 const links = [
   { label: 'Nervos', url: NERVOS_URL },
   { label: 'GitHub', url: NERVINA_GITHUB_URL },
   { label: 'CKB Explorer', url: CKB_EXPLORER_URL },
+  { label: 'Bridge', url: BRIDGE_URL },
 ]
 
 const StyledFooter = styled(Box)`

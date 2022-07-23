@@ -133,14 +133,16 @@ const Account = (initState: State) => {
     { enabled: tab === 'assets' && !!(q.address || q.script_hash) },
   )
 
+  const account = overview ?? accountAndList.account
+
   /* is script hash supported? */
-  const downloadItems = accountAndList.account.eth_address
+  const downloadItems = account.eth_address
     ? [
-        { label: t('transactionRecords'), href: DOWNLOAD_HREF_LIST.accountTxList(accountAndList.account.eth_address) },
-        { label: t('ERC20Records'), href: DOWNLOAD_HREF_LIST.accountTransferList(accountAndList.account.eth_address) },
+        { label: t('transactionRecords'), href: DOWNLOAD_HREF_LIST.accountTxList(account.eth_address) },
+        { label: t('ERC20Records'), href: DOWNLOAD_HREF_LIST.accountTransferList(account.eth_address) },
         {
           label: t('bridgedRecords'),
-          href: DOWNLOAD_HREF_LIST.accountBridgeRecordList(accountAndList.account.eth_address),
+          href: DOWNLOAD_HREF_LIST.accountBridgeRecordList(account.eth_address),
         },
       ]
     : []
@@ -150,8 +152,8 @@ const Account = (initState: State) => {
     setIsCopied(true)
   }
 
-  const title = `${t('accountType.' + accountAndList.account.type)} ${id}`
-  const accountType = accountAndList.account.type
+  const title = `${t('accountType.' + account.type)} ${id}`
+  const accountType = account.type
 
   return (
     <>
@@ -175,7 +177,7 @@ const Account = (initState: State) => {
           <AccountOverview
             isOverviewLoading={isOverviewLoading}
             isBalanceLoading={isBalanceLoading}
-            account={{ ...accountAndList.account, ...overview }}
+            account={account}
             balance={balance}
             deployerAddr={accountAndList.deployerAddr}
           />
@@ -193,8 +195,8 @@ const Account = (initState: State) => {
                   ? t('userDefinedAssets')
                   : null,
                 [GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType) &&
-                isSmartContractAccount(accountAndList.account) &&
-                accountAndList.account.smart_contract?.abi
+                isSmartContractAccount(account) &&
+                account.smart_contract?.abi
                   ? t('contract')
                   : null,
                 [GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType) ? t('events') : null,
@@ -247,13 +249,8 @@ const Account = (initState: State) => {
                 <Skeleton animation="wave" />
               )
             ) : null}
-            {tab === 'contract' &&
-            isSmartContractAccount(accountAndList.account) &&
-            accountAndList.account.smart_contract?.abi ? (
-              <ContractInfo
-                address={accountAndList.account.eth_address}
-                contract={accountAndList.account.smart_contract}
-              />
+            {tab === 'contract' && isSmartContractAccount(account) && account.smart_contract?.abi ? (
+              <ContractInfo address={account.eth_address} contract={account.smart_contract} />
             ) : null}
             {tab === 'events' ? (
               !isEventListLoading && eventsList ? (

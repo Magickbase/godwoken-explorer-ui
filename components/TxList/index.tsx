@@ -33,8 +33,8 @@ export type TxListProps = {
 
 const txListQuery = gql`
   query (
-    $address: String
-    $script_hash: String
+    $address: HashAddress
+    $script_hash: HashFull
     $before: String
     $after: String
     $limit: Int
@@ -43,13 +43,16 @@ const txListQuery = gql`
   ) {
     transactions(
       input: {
-        address: $address
-        script_hash: $script_hash
+        from_eth_address: $address
+        to_eth_address: $address
+        from_script_hash: $script_hash
+        to_script_hash: $script_hash
         before: $before
         after: $after
         limit: $limit
         start_block_number: $start_block_number
         end_block_number: $end_block_number
+        combine_from_to: true
       }
     ) {
       entries {
