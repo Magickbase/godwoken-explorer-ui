@@ -177,10 +177,14 @@ const Token: React.FC<Props> = () => {
   return (
     <>
       <SubpageHead subtitle={`${t('token')} ${token?.name || token?.symbol || '-'}`} />
-      <Container sx={{ py: 6 }}>
-        <Stack direction="row" justifyContent="space-between" alignItems="center">
+      <Container sx={{ py: { xs: 2, md: 6 } }}>
+        <Stack
+          direction={{ xs: 'column', md: 'row' }}
+          justifyContent="space-between"
+          alignItems={{ xs: 'flex-start', md: 'center' }}
+        >
           <PageTitle>
-            <Stack direction="row" alignItems="center">
+            <Stack direction={{ xs: 'column', sm: 'row' }} alignItems={{ xs: 'flex-start', sm: 'center' }}>
               <Avatar
                 src={token?.icon ?? null}
                 sx={{
@@ -191,7 +195,11 @@ const Token: React.FC<Props> = () => {
               >
                 {token?.name?.[0] ?? '?'}
               </Avatar>
-              <Typography variant="h5" fontWeight="inherit" sx={{ textTransform: 'none' }}>
+              <Typography
+                variant="h5"
+                fontWeight="inherit"
+                sx={{ textTransform: 'none', fontSize: { xs: '0.875rem', md: '1.5rem' } }}
+              >
                 {!token ? <Skeleton animation="wave" width="30px" /> : token.name || '-'}
               </Typography>
               {token?.symbol ? (
@@ -199,7 +207,7 @@ const Token: React.FC<Props> = () => {
                   fontWeight="inherit"
                   color="primary.light"
                   whiteSpace="pre"
-                  sx={{ textTransform: 'none' }}
+                  sx={{ textTransform: 'none', fontSize: { xs: '0.875rem', md: '1rem' } }}
                 >{` (${token.symbol})`}</Typography>
               ) : null}
             </Stack>
