@@ -15,7 +15,8 @@
     border-bottom: 1px solid var(--border-color);
   }
 
-  a {
+  a,
+  span {
     position: relative;
     display: flex;
     align-items: center;

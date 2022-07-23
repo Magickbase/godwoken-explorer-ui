@@ -1,4 +1,5 @@
-import { Tooltip, SxProps } from '@mui/material'
+import { SxProps } from '@mui/material'
+import Tooltip from 'components/Tooltip'
 import HashLink from './HashLink'
 import { GraphQLSchema } from 'utils'
 const TruncatedAddress = ({
