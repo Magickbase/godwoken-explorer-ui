@@ -15,19 +15,21 @@ export const CustomTooltip: React.FC<any> = props => {
         }}
       >
         <div style={{ color: '#666' }}>{`${label}`}</div>
-        {payload.map(({ name, value }) => (
-          <li key={name} style={{ color: theme.palette.secondary.main, paddingLeft: 12 }}>{`${name}: ${value}`}</li>
-        ))}
+        <ul>
+          {payload.map(({ name, value }, idx) => (
+            <li key={name} style={{ color: idx === 0 ? theme.palette.primary.main : '#28b959' }}>
+              <span style={{ fontSize: isMobile ? 13 : 14 }}>{`${name}: ${value}`}</span>
+            </li>
+          ))}
+        </ul>
       </div>
     )
   }
-
   return null
 }
 
 export const CustomYLabel: React.FC<any> = ({ value, theme, isMobile, align = 'left' }) => {
   const y = align === 'left' ? (isMobile ? '6%' : '10%') : isMobile ? '90%' : '254%'
-
   return (
     <text
       x={isMobile ? '-165' : '-205'}

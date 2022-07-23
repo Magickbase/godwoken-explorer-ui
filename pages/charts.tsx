@@ -105,7 +105,7 @@ const Charts = (initState: State) => {
               <Paper
                 elevation={0}
                 sx={{
-                  height: { xs: 376, md: 456 },
+                  height: { xs: 376, sm: 456 },
                   bgcolor: bgColors[0],
                   borderRadius: { xs: 2, md: 4 },
                   border: 'solid #f0f0f0',
@@ -114,16 +114,15 @@ const Charts = (initState: State) => {
               >
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart
-                    width={500}
                     height={300}
                     data={charts.dailyData}
                     margin={
                       isMobile
-                        ? { top: 32, right: 12, left: 8, bottom: 20 }
-                        : { top: 48, right: 108, left: 100, bottom: 48 }
+                        ? { top: 32, right: 24, left: 8, bottom: 30 }
+                        : { top: 48, right: 108, left: 100, bottom: 64 }
                     }
                   >
-                    <CartesianGrid strokeDasharray="4" />
+                    <CartesianGrid strokeDasharray={isMobile ? '2' : '4'} />
                     <XAxis
                       dataKey="date"
                       tick={{ fontSize: isMobile ? 11 : 12, color: theme.palette.secondary.main }}
@@ -142,33 +141,40 @@ const Charts = (initState: State) => {
                               <YLabel theme={theme} isMobile={isMobile} value={t(key)} align="right" />
                             ),
                         }}
-                        unit={unit}
+                        hide={idx === 1 && isMobile}
+                        unit={unit === GAS_UNIT && isMobile ? '' : unit}
                         key={key + '-yaxis'}
                         yAxisId={idx}
                         orientation={idx ? 'right' : 'left'}
                         tick={{ fontSize: isMobile ? 11 : 12, color: theme.palette.secondary.main }}
                         tickLine={false}
+                        minTickGap={15}
                         axisLine={false}
                         interval="preserveStartEnd"
                       />
                     ))}
-                    {keys.map(({ key }) => (
+                    {keys.map(({ key }, idx) => (
                       <Tooltip
                         key={key}
                         wrapperStyle={{ fontSize: isMobile ? 13 : 14 }}
                         content={<CustomTooltip theme={theme} isMobile={isMobile} />}
-                        offset={12}
+                        offset={18}
                       />
                     ))}
-                    <Brush height={20} tickFormatter={() => ''} stroke={theme.palette.primary.light}>
-                      <AreaChart height={30} data={charts.dailyData}>
+                    <Brush
+                      height={isMobile ? 36 : 48}
+                      tickFormatter={() => ''}
+                      stroke={theme.palette.primary.light}
+                      y={isMobile ? 318 : 358}
+                    >
+                      <AreaChart height={isMobile ? 36 : 48} data={charts.dailyData}>
                         {keys.map(({ key }, idx) => (
                           <Area
                             key={key}
                             type="monotone"
                             dataKey={key}
                             stroke={accentColors[idx]}
-                            fill="#ccc"
+                            fill="#cccccc"
                             fillOpacity={0.2}
                           />
                         ))}
