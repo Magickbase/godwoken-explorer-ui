@@ -51,6 +51,18 @@ const Charts = (initState: State) => {
   }, [setCharts, initState])
 
   const title = `${t('charts')}`
+
+  const renderTraveller = props => {
+    const { x, y, width, height } = props
+    return (
+      <svg x={x - 7} y={isMobile ? y + 6 : y + 12} fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0.5" y="0.5" width="14" height="23" rx="1.5" fill="#F0F0F0" stroke="#999999" />
+        <line x1="5.5" y1="6.5" x2="5.5" y2="17.5" stroke="#999999" strokeLinecap="round" />
+        <line x1="9.5" y1="6.5" x2="9.5" y2="17.5" stroke="#999999" strokeLinecap="round" />
+      </svg>
+    )
+  }
+
   return (
     <>
       <SubpageHead subtitle={title} />
@@ -164,8 +176,10 @@ const Charts = (initState: State) => {
                     <Brush
                       height={isMobile ? 36 : 48}
                       tickFormatter={() => ''}
-                      stroke={theme.palette.primary.light}
+                      stroke="#ccc"
                       y={isMobile ? 318 : 358}
+                      traveller={renderTraveller}
+                      travellerWidth={1}
                     >
                       <AreaChart height={isMobile ? 36 : 48} data={charts.dailyData}>
                         {keys.map(({ key }, idx) => (
