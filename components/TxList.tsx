@@ -336,10 +336,10 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number; vie
                       )}
                     </TableCell>
                     <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                      <Address address={from} type={item.from_account.type} size="normal" />
+                      <Address address={from} type={item.from_account.type} />
                     </TableCell>
                     <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                      <Address address={to} type={item.to_account.type} size="normal" />
+                      <Address address={to} type={item.to_account.type} />
                     </TableCell>
                     <TableCell sx={{ display: { xs: 'table-cell', md: 'none' } }}>
                       <Stack>
