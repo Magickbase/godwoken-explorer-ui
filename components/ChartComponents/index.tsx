@@ -1,24 +1,15 @@
 import styles from './styles.module.scss'
 
 export const CustomTooltip: React.FC<any> = props => {
-  const { active, payload, label, isMobile, theme } = props
+  const { active, payload, label, theme } = props
   if (active && payload && payload.length) {
     return (
-      <div
-        className={styles.content}
-        style={{
-          border: 'none',
-          borderRadius: isMobile ? 4 : 8,
-          boxShadow: isMobile ? '0px 3px 10px rgba(0, 0, 0, 0.1)' : '0px 6px 20px rgba(0, 0, 0, 0.1)',
-          padding: isMobile ? '12px 8px 10px' : '16px 16px 14px',
-          backgroundColor: '#fff',
-        }}
-      >
-        <div style={{ color: '#666' }}>{`${label}`}</div>
+      <div className={styles.tooltipContent}>
+        <div>{`${label}`}</div>
         <ul>
           {payload.map(({ name, value }, idx) => (
             <li key={name} style={{ color: idx === 0 ? theme.palette.primary.main : '#28b959' }}>
-              <span style={{ fontSize: isMobile ? 13 : 14 }}>{`${name}: ${value}`}</span>
+              <span>{`${name}: ${value}`}</span>
             </li>
           ))}
         </ul>
