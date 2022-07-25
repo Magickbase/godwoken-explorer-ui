@@ -110,12 +110,21 @@ const TokenList = () => {
                         <Stack direction="row" alignItems="center">
                           <Avatar
                             src={token.icon ?? null}
-                            sx={{ bgcolor: token.icon ? '#f0f0f0' : nameToColor(token.name) }}
+                            sx={{
+                              bgcolor: token.icon ? '#f0f0f0' : nameToColor(token.name),
+                              img: { objectFit: 'fill' },
+                            }}
                           >
                             {token.name?.[0] ?? '?'}
                           </Avatar>
                           <NextLink href={`/token/${token.id}`}>
-                            <Link href={`/token/${token.id}`} underline="none" color="secondary" ml={2}>
+                            <Link
+                              href={`/token/${token.id}`}
+                              underline="none"
+                              color="secondary"
+                              ml={2}
+                              whiteSpace="nowrap"
+                            >
                               {token.name || '-'}
                             </Link>
                           </NextLink>

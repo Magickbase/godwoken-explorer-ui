@@ -19,6 +19,9 @@ const StyledInputBase = styled((props: InputBaseProps) => <OutlinedInput {...pro
     borderRadius: '8px',
     padding: theme.spacing(1),
   },
+  [theme.breakpoints.up('sm')]: {
+    marginTop: theme.spacing(3),
+  },
   '& .MuiInputBase-input': {
     height: '100%',
     paddingLeft: theme.spacing(2),
