@@ -168,7 +168,10 @@ const TokenList = () => {
                         </NextLink>
                       </TableCell>
                       <TableCell style={{ whiteSpace: 'nowrap' }}>
-                        {formatAmount(token.supply || '0', { symbol: token.symbol, decimal: token.decimal })}
+                        {formatAmount(token.supply || '0', {
+                          symbol: token.symbol?.split('.')[0] ?? '',
+                          decimal: token.decimal,
+                        })}
                       </TableCell>
                       <TableCell>{token.holderCount || '0'}</TableCell>
                     </TableRow>
