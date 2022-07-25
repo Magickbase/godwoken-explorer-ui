@@ -59,8 +59,8 @@ import {
   CHANNEL,
   CKB_DECIMAL,
   GCKB_DECIMAL,
+  PCKB_SYMBOL,
   NotFoundException,
-  PCKB_UAN,
 } from 'utils'
 
 type RawTx = Parameters<typeof getTxRes>[0]
@@ -217,7 +217,7 @@ const Tx = (initState: State) => {
         <Typography variant="body2" sx={{ textTransform: 'none' }}>{`${new BigNumber(tx.value || '0')
           .multipliedBy(CKB_DECIMAL)
           .dividedBy(GCKB_DECIMAL)
-          .toFormat()} ${PCKB_UAN}`}</Typography>
+          .toFormat()} ${PCKB_SYMBOL}`}</Typography>
       ),
     },
   ]
@@ -283,7 +283,7 @@ const Tx = (initState: State) => {
           label: 'gasPrice',
           value: (
             <Typography variant="body2" sx={{ textTransform: 'none' }}>
-              {new BigNumber(tx.gasPrice).toFormat() + ` ${PCKB_UAN}`}
+              {new BigNumber(tx.gasPrice).toFormat() + ` ${PCKB_SYMBOL}`}
             </Typography>
           ),
         }
@@ -305,7 +305,7 @@ const Tx = (initState: State) => {
           label: 'fee',
           value: (
             <Typography variant="body2" sx={{ textTransform: 'none' }}>
-              {new BigNumber(tx.gasUsed).times(new BigNumber(tx.gasPrice)).toFormat() + ` ${PCKB_UAN}`}
+              {new BigNumber(tx.gasUsed).times(new BigNumber(tx.gasPrice)).toFormat() + ` ${PCKB_SYMBOL}`}
             </Typography>
           ),
         }
