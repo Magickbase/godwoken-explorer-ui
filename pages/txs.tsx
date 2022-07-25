@@ -22,7 +22,7 @@ import TxListComp, { fetchTxList } from 'components/TxList'
 import SubpageHead from 'components/SubpageHead'
 import Pagination from 'components/SimplePagination'
 import { SIZES } from 'components/PageSize'
-import { PCKB_UAN } from 'utils'
+import { PCKB_SYMBOL } from 'utils'
 
 const TxList = () => {
   const [t] = useTranslation('list')
@@ -79,7 +79,7 @@ const TxList = () => {
                       </TableCell>
                       <TableCell component="th" sx={{ whiteSpace: 'nowrap', textTransform: 'none' }}>{`${t(
                         'value',
-                      )} (${PCKB_UAN})`}</TableCell>
+                      )} (${PCKB_SYMBOL})`}</TableCell>
                       <TableCell component="th">{t('type')}</TableCell>
                     </TableRow>
                   </TableHead>
