@@ -25,7 +25,7 @@ import BigNumber from 'bignumber.js'
 import SubpageHead from 'components/SubpageHead'
 import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined'
 import Pagination from 'components/Pagination'
-import { fetchTokenList, nameToColor, PAGE_SIZE } from 'utils'
+import { fetchTokenList, formatAmount, nameToColor, PAGE_SIZE } from 'utils'
 
 const BRIDGED_TOKEN_TEMPLATE_URL =
   'https://github.com/nervina-labs/godwoken_explorer/issues/new?assignees=Keith-CY&labels=Token+Registration&template=register-a-new-bridged-token.yml&title=%5BBridged+Token%5D+%2A%2AToken+Name%2A%2A'
@@ -167,7 +167,9 @@ const TokenList = () => {
                           </Link>
                         </NextLink>
                       </TableCell>
-                      <TableCell>{new BigNumber(token.supply || '0').toFormat() || '-'}</TableCell>
+                      <TableCell style={{ whiteSpace: 'nowrap' }}>
+                        {formatAmount(token.supply || '0', { symbol: token.symbol, decimal: token.decimal })}
+                      </TableCell>
                       <TableCell>{token.holderCount || '0'}</TableCell>
                     </TableRow>
                   ))

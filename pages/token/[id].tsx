@@ -30,7 +30,14 @@ import BridgedRecordList from 'components/BridgedRecordList'
 import TokenHolderList from 'components/TokenHolderList'
 import Address from 'components/AddressInHalfPanel'
 import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
-import { fetchToken, fetchERC20TransferList, nameToColor, fetchBridgedRecordList, fetchTokenHolderList } from 'utils'
+import {
+  fetchToken,
+  fetchERC20TransferList,
+  nameToColor,
+  fetchBridgedRecordList,
+  fetchTokenHolderList,
+  formatAmount,
+} from 'utils'
 
 import type { API } from 'utils/api/utils'
 
@@ -153,7 +160,9 @@ const Token: React.FC<Props> = () => {
       value: !token ? (
         <Skeleton animation="wave" />
       ) : (
-        <Typography variant="body2">{token.supply ? new BigNumber(token.supply).toFormat() : '-'}</Typography>
+        <Typography variant="body2">
+          {token.supply ? formatAmount(token.supply, { symbol: token.symbol, decimal: token.decimal }) : '-'}
+        </Typography>
       ),
     },
     {
