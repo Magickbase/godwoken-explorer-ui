@@ -41,4 +41,20 @@
       padding-right: 1.5rem;
     }
   }
+
+  @media screen and (max-width: 1024px) {
+    thead {
+      tr {
+        height: 2rem;
+        font-size: 0.75rem;
+        font-weight: 400;
+      }
+    }
+    tbody {
+      td {
+        padding-top: 0.875rem;
+        padding-bottom: 0.875rem;
+      }
+    }
+  }
 }

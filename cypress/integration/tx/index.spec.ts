@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-context.skip('Transaction Page', () => {
+context('Transaction Page', () => {
   let hash: string
   before(() => {
     cy.fixture('tx').then(tx => {
@@ -9,124 +9,141 @@ context.skip('Transaction Page', () => {
     })
   })
 
-  describe('general sets', () => {
-    it('cy.title() - get the title', () => {
-      cy.title().should('include', 'Godwoken Explorer')
-    })
-  })
-
   describe('transaction info', () => {
-    it('should have title with tx hash', () => {
-      cy.get('.card-header').should('have.text', `tx hash#${hash}`)
-    })
-    it('should have from account which is a link', () => {
-      cy.get(`a[aria-label='from']`).should(link => {
-        const id = link.text()
-        expect(link).to.have.attr('href').to.eq(`/account/${id}`)
+    describe('overview', () => {
+      it('should have txn hash', () => {
+        cy.get('dl[title="txn hash"]')
+          .find('dt')
+          .should('have.text', 'txn hash')
+          .next()
+          .should('have.text', '0x1c63fd6014c9c57ea68e283edfc1159b642e94c6bac7fe699b59bf7c299d1ee1')
       })
-    })
-    it('should have to account which is a link', () => {
-      cy.get(`a[aria-label='to']`).should(link => {
-        const id = link.text()
-        expect(link).to.have.attr('href').to.eq(`/account/${id}`)
+
+      it('should have from', () => {
+        cy.get('dl[title="from"]')
+          .find('dt')
+          .should('have.text', 'from')
+          .next()
+          .should('have.text', '0x40dfb7df991c9aa6138a60f0cac6ed1d02b834b8')
+      })
+
+      it('should have contract address', () => {
+        cy.get('dl[title="Interact with Contract"]')
+          .find('dt')
+          .should('have.text', 'Interact with Contract')
+          .next()
+          .should('have.text', 'ERC20')
+      })
+
+      it('should have value', () => {
+        cy.get('dl[title="value"]')
+          .find('dt')
+          .should('have.text', 'value')
+          .next()
+          .should('have.text', '0 pCKB.gw|gb.ckb')
+      })
+
+      it('should have input', () => {
+        cy.get('dl[title="input"]')
+          .find('dt')
+          .first()
+          .should('have.text', 'input')
+          .next()
+          .find('pre')
+          .should(
+            'have.text',
+            'raw0xa9059cbb00000000000000000000000040dfb7df991c9aa6138a60f0cac6ed1d02b834b80000000000000000000000000000000000000000000000013f306a2409fc0000decodedFunction: transfer(address,uint256)\n\nMethodID: 0xa9059cbb\n[0]: 0x40DfB7Df991c9Aa6138A60F0Cac6ed1d02b834B8\n[1]: 23000000000000000000',
+          )
       })
     })
 
-    describe('group 1', () => {
-      it('should have timestamp', () => {
-        cy.get('.card-fieldset:first')
-          .find('.card-field')
-          .should(fields => {
-            const timestamp = fields[0]
-            expect(timestamp.querySelector('.card-label')).to.have.text('timestamp')
-            expect(timestamp.querySelector('time')).to.exist
-          })
-      })
-      it('should have l2 block which is a link', () => {
-        cy.get('.card-fieldset:first')
-          .find('.card-field')
-          .should(fields => {
-            const l2block = fields[1]
-            expect(l2block.querySelector('.card-label')).to.have.text('l2 block')
-            const link = l2block.querySelector(`a[title='l2 block']`)
-            const number = link.textContent.replace(/,/g, '')
-            expect(link).to.have.attr('href').to.eq(`/block/${number}`)
-          })
-      })
-      it('should have l1 block which is a link', () => {
-        cy.get('.card-fieldset:first')
-          .find('.card-field')
-          .should(fields => {
-            const l1block = fields[2]
-            expect(l1block.querySelector('.card-label')).to.have.text('l1 block')
-            const link = l1block.querySelector(`a[title='l1 block']`)
-            const number = link.textContent.replace(/,/g, '')
-            expect(link)
-              .to.have.attr('href')
-              .to.match(new RegExp(`/block/${number}$`))
-          })
-      })
-      it('should have type', () => {
-        cy.get('.card-fieldset:first')
-          .find('.card-field')
-          .should(fields => {
-            const type = fields[3]
-            expect(type.querySelector('.card-label')).to.have.text('type')
-            expect(type.querySelector('.card-label+span')).to.have.class('tx-type-badge')
-          })
-      })
+    describe('basic info', () => {
       it('should have finalize state', () => {
-        cy.get('.card-fieldset:first')
-          .find('.card-field')
-          .should(fields => {
-            const state = fields[4]
-            expect(state.querySelector('.card-label')).to.have.text('finalize state')
-            // TODO: test content
-          })
+        cy.get('dl[title="finalize state"]')
+          .find('dt')
+          .should('have.text', 'finalize state')
+          .next()
+          .should('have.text', 'finalized')
       })
-    })
 
-    describe('group 2', () => {
+      it('should have type', () => {
+        cy.get('dl[title="type"').find('dt').should('have.text', 'type').next().should('have.text', 'polyjuice')
+      })
+
+      it('should have l1 block', () => {
+        cy.get('dl[title="l1 block"').find('dt').should('have.text', 'l1 block').next().should('have.text', '6,050,986')
+      })
+
+      it('should have l2 block', () => {
+        cy.get('dl[title="l2 block"').find('dt').should('have.text', 'l2 block').next().should('have.text', '198,240')
+      })
+
+      it('should have index', () => {
+        cy.get('dl[title="index"').find('dt').should('have.text', 'index').next().should('have.text', '0')
+      })
+
       it('should have nonce', () => {
-        cy.get('.card-fieldset:last')
-          .find('.card-field')
-          .should(fields => {
-            const nonce = fields[0]
-            expect(nonce.querySelector('.card-label')).to.have.text('nonce')
-            expect(isNaN(+nonce.querySelector(`span[title='nonce']`).textContent.replace(/,/g, ''))).to.be.false
-          })
+        cy.get('dl[title="nonce"').find('dt').should('have.text', 'nonce').next().should('have.text', '43')
       })
-      it('should have args', () => {
-        cy.get('.card-fieldset:last')
-          .find('.card-field')
-          .should(fields => {
-            const state = fields[1]
-            expect(state.querySelector('.card-label')).to.have.text('args')
-            expect(state.querySelector(`span[title='args']`).textContent).to.match(/^0x/)
-          })
+
+      it('should have status', () => {
+        cy.get('dl[title="status"').find('dt').should('have.text', 'status').next().should('have.text', 'success')
       })
+
       it('should have gas price', () => {
-        cy.get('.card-fieldset:last')
-          .find('.card-field')
-          .should(fields => {
-            if (fields.length === 4) {
-              const state = fields[2]
-              expect(state.querySelector('.card-label')).to.have.text('gas price')
-              // TODO: test content
-            } else {
-              // ignore
-            }
-          })
+        cy.get('dl[title="gas price"')
+          .find('dt')
+          .should('have.text', 'gas price')
+          .next()
+          .should('have.text', '0.00009 pCKB.gw|gb.ckb')
       })
+
+      it('should have gas used', () => {
+        cy.get('dl[title="gas used"').find('dt').should('have.text', 'gas used').next().should('have.text', '27,049')
+      })
+
+      it('should have gas limit', () => {
+        cy.get('dl[title="gas limit"').find('dt').should('have.text', 'gas limit').next().should('have.text', '82,573')
+      })
+
       it('should have fee', () => {
-        cy.get('.card-fieldset:last')
-          .find('.card-field')
-          .should(fields => {
-            const state = fields[fields.length - 1]
-            expect(state.querySelector('.card-label')).to.have.text('fee')
-            // TODO: test content
-          })
+        cy.get('dl[title="fee"')
+          .find('dt')
+          .should('have.text', 'fee')
+          .next()
+          .should('have.text', '2.43441 pCKB.gw|gb.ckb')
+      })
+
+      it('should have timestamp', () => {
+        cy.get('dl[title="fee"')
+          .find('dt')
+          .should('have.text', 'fee')
+          .next()
+          .should('have.text', '2.43441 pCKB.gw|gb.ckb')
       })
     })
   })
+
+  describe.only('should have erc20 transfer, logs, raw data tabs', () => {
+    it('should have 3 tabs', () => {
+      cy.get('div[data-role="tabs"]')
+        .find('a')
+        .first()
+        .should('have.text', 'ERC20 Transfers')
+        .should('have.attr', 'href', '/tx/0x1c63fd6014c9c57ea68e283edfc1159b642e94c6bac7fe699b59bf7c299d1ee1?tab=erc20')
+        .next()
+        .should('have.text', 'Logs')
+        .should('have.attr', 'href', '/tx/0x1c63fd6014c9c57ea68e283edfc1159b642e94c6bac7fe699b59bf7c299d1ee1?tab=logs')
+        .next()
+        .should('have.text', 'Raw Data')
+        .should(
+          'have.attr',
+          'href',
+          '/tx/0x1c63fd6014c9c57ea68e283edfc1159b642e94c6bac7fe699b59bf7c299d1ee1?tab=raw-data',
+        )
+    })
+  })
+  // TODO: test transfer list
+  // TODO: test logs
+  // TODO: test raw data
 })

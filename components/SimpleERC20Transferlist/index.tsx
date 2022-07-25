@@ -1,27 +1,13 @@
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
-import {
-  Stack,
-  Box,
-  Link,
-  Table,
-  TableContainer,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  Typography,
-  IconButton,
-  Menu,
-  TextField,
-  Button,
-} from '@mui/material'
+import { Stack, Box, Typography, IconButton, Menu, TextField, Button } from '@mui/material'
 import { FilterAlt as FilterIcon, Clear as ClearIcon } from '@mui/icons-material'
+import Table from 'components/Table'
 import { gql } from 'graphql-request'
-import Address from 'components/TruncatedAddress'
 import Pagination from 'components/SimplePagination'
 import { GraphQLSchema, client, formatAmount, useFilterMenu } from 'utils'
+import styles from './styles.module.scss'
 
 export type TransferListProps = {
   token_transfers: {
@@ -144,106 +130,69 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
   })
 
   return (
-    <Box sx={{ px: 1, py: 2 }}>
-      <TableContainer>
-        <Table size="small">
-          <TableHead sx={{ textTransform: 'capitalize' }}>
-            <TableRow>
-              <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }} component="th">
-                <Stack direction="row" alignItems="center" whiteSpace="nowrap">
-                  {t('from')}
-                  <IconButton size="small" data-fields="address_from" onClick={handleBlockFilterOpen}>
-                    <FilterIcon fontSize="inherit" />
-                  </IconButton>
-                </Stack>
-              </TableCell>
-              <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }} component="th">
-                <Stack direction="row" alignItems="center" whiteSpace="nowrap">
-                  {t('to')}
-                  <IconButton size="small" data-fields="address_to" onClick={handleBlockFilterOpen}>
-                    <FilterIcon fontSize="inherit" />
-                  </IconButton>
-                </Stack>
-              </TableCell>
-              <TableCell sx={{ display: { xs: 'table-cell', md: 'none' } }} component="th">
-                {t('transfer')}
-                <IconButton size="small" data-fields="address_from,address_to" onClick={handleBlockFilterOpen}>
+    <div>
+      <Table>
+        <thead>
+          <tr>
+            <th>
+              <Stack direction="row" alignItems="center" whiteSpace="nowrap">
+                {t('from')}
+                <IconButton size="small" data-fields="address_from" onClick={handleBlockFilterOpen}>
                   <FilterIcon fontSize="inherit" />
                 </IconButton>
-              </TableCell>
-              <TableCell component="th">{`${t('value')}`}</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {metadata.total_count ? (
-              entries.map(item => (
-                <TableRow key={`${item.transaction_hash}-{item.log_index}`}>
-                  <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                    <NextLink href={`/account/${item.from_address}`}>
-                      <Link
-                        href={`/account/${item.from_address}`}
-                        underline="none"
-                        color="secondary"
-                        className="mono-font"
-                      >
-                        {item.from_address}
-                      </Link>
+              </Stack>
+            </th>
+            <th>
+              <Stack direction="row" alignItems="center" whiteSpace="nowrap">
+                {t('to')}
+                <IconButton size="small" data-fields="address_to" onClick={handleBlockFilterOpen}>
+                  <FilterIcon fontSize="inherit" />
+                </IconButton>
+              </Stack>
+            </th>
+            <th>{`${t('value')}`}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {metadata.total_count ? (
+            entries.map(item => (
+              <tr key={`${item.transaction_hash}-{item.log_index}`}>
+                <td className={styles.address}>
+                  <NextLink href={`/account/${item.from_address}`}>
+                    <a className="mono-font">
+                      <span>{item.from_address}</span>
+                      <span>{`${item.from_address.slice(0, 8)}...${item.from_address.slice(-8)}`}</span>
+                    </a>
+                  </NextLink>
+                </td>
+                <td className={styles.address}>
+                  <NextLink href={`/account/${item.to_address}`}>
+                    <a className="mono-font">
+                      <span> {item.to_address} </span>
+                      <span> {`${item.to_address.slice(0, 8)}...${item.to_address.slice(-8)}`} </span>
+                    </a>
+                  </NextLink>
+                </td>
+                <td title={item.udt.name}>
+                  {item.udt?.id ? (
+                    <NextLink href={`/token/${item.udt.id}`}>
+                      <a>{formatAmount(item.amount, item.udt)}</a>
                     </NextLink>
-                  </TableCell>
-                  <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                    <NextLink href={`/account/${item.to_address}`}>
-                      <Link
-                        href={`/account/${item.to_address}`}
-                        underline="none"
-                        color="secondary"
-                        className="mono-font"
-                      >
-                        {item.to_address}
-                      </Link>
-                    </NextLink>
-                  </TableCell>
-                  <TableCell sx={{ display: { xs: 'table-cell', md: 'none' } }}>
-                    <Stack>
-                      <Stack direction="row">
-                        <Typography
-                          fontSize={12}
-                          sx={{ minWidth: '35px', textTransform: 'capitalize', mr: 1, whiteSpace: 'nowrap' }}
-                        >{`${t('from')}:`}</Typography>
-                        <Address leading={8} address={item.from_address} />
-                      </Stack>
-
-                      <Stack direction="row">
-                        <Typography
-                          fontSize={12}
-                          sx={{ minWidth: '35px', textTransform: 'capitalize', mr: 1, whiteSpace: 'nowrap' }}
-                        >{`${t('to')}:`}</Typography>
-                        <Address address={item.to_address} leading={8} />
-                      </Stack>
-                    </Stack>
-                  </TableCell>
-                  <TableCell sx={{ whiteSpace: 'nowrap' }} title={item.udt.name}>
-                    {item.udt?.id ? (
-                      <NextLink href={`/token/${item.udt.id}`}>
-                        <Link href={`/token/${item.udt.id}`} underline="none" color="secondary">
-                          {formatAmount(item.amount, item.udt)}
-                        </Link>
-                      </NextLink>
-                    ) : (
-                      formatAmount(item.amount, item.udt)
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={7} align="center">
-                  {t(`no_records`)}
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                  ) : (
+                    formatAmount(item.amount, item.udt)
+                  )}
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan={3} style={{ textAlign: 'center' }}>
+                {t(`no_records`)}
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </Table>
       <Menu
         anchorEl={filterAnchorEl}
         open={!!filterAnchorEl}
@@ -287,7 +236,7 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
           {t(`last-n-records`, { n: `100k` })}
         </Typography>
       </Stack>
-    </Box>
+    </div>
   )
 }
 export default TransferList

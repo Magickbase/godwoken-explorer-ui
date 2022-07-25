@@ -29,18 +29,6 @@ main,
   min-height: calc(100vh - var(--footer-height) - var(--header-height));
 }
 
-.main-center {
-  width: 100%;
-  max-width: var(--main-center-width);
-  margin: 1rem auto;
-  @media screen and (max-width: 1232px) {
-    box-sizing: border-box;
-    margin: 1rem 0;
-    padding: 0 1rem;
-    max-width: unset;
-  }
-}
-
 a {
   text-decoration: none;
   cursor: pointer;
