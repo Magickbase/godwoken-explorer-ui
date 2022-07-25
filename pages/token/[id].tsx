@@ -161,7 +161,9 @@ const Token: React.FC<Props> = () => {
         <Skeleton animation="wave" />
       ) : (
         <Typography variant="body2">
-          {token.supply ? formatAmount(token.supply, { symbol: token.symbol, decimal: token.decimal }) : '-'}
+          {token.supply
+            ? formatAmount(token.supply, { symbol: token.symbol?.split('.')[0] ?? '', decimal: token.decimal })
+            : '-'}
         </Typography>
       ),
     },
