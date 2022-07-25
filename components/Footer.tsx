@@ -2,14 +2,18 @@ import NextLink from 'next/link'
 import Box from '@mui/material/Box'
 import Link from '@mui/material/Link'
 import Typography from '@mui/material/Typography'
-import { CKB_EXPLORER_URL, NERVINA_GITHUB_URL, NERVOS_URL } from 'utils'
+import { CKB_EXPLORER_URL, NERVINA_GITHUB_URL, NERVOS_URL, IS_MAINNET } from 'utils'
 import Button from '@mui/material/Button'
+
+const BRIDGE_URL = IS_MAINNET ? 'https://bridge.godwoken.io/#/v1' : 'https://testnet.bridge.godwoken.io/#/v1'
 
 const links = [
   { label: 'Nervos', url: NERVOS_URL },
   { label: 'GitHub', url: NERVINA_GITHUB_URL },
   { label: 'CKB Explorer', url: CKB_EXPLORER_URL },
+  { label: 'Bridge', url: BRIDGE_URL },
 ]
+
 const Footer = () => (
   <Box
     component="footer"

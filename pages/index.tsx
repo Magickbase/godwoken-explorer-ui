@@ -298,12 +298,13 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
             </Box>
           ))
         : list.map((tx, idx) => {
+            const hash = tx.eth_hash ?? tx.hash
             const from = tx.from_account.eth_address || tx.from_account.script_hash
             const to = tx.to_account.eth_address || tx.to_account.script_hash
             const isSpecialFrom = SPECIAL_ADDR_TYPES.includes(tx.from_account.type)
             const isSpecialTo = SPECIAL_ADDR_TYPES.includes(tx.to_account.type)
             return (
-              <Box key={tx.eth_hash}>
+              <Box key={hash}>
                 <Divider variant={idx ? 'middle' : 'fullWidth'} />
                 <ListItem>
                   <ListItemIcon>
@@ -313,19 +314,21 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
                     primary={
                       <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" minHeight={73}>
                         <Stack>
-                          <Tooltip placement="top" title={tx.eth_hash}>
+                          <Tooltip placement="top" title={hash}>
                             <Box>
-                              <NextLink href={`/tx/${tx.eth_hash}`}>
+                              <NextLink href={`/tx/${hash}`}>
                                 <Button
                                   color="secondary"
-                                  href={`/tx/${tx.eth_hash}`}
+                                  href={`/tx/${hash}`}
                                   component={Link}
                                   className="mono-font"
                                   sx={{
                                     textTransform: 'lowercase',
                                     whiteSpace: 'nowrap',
                                   }}
-                                >{`${tx.eth_hash.slice(0, 8)}...${tx.eth_hash.slice(-8)}`}</Button>
+                                >
+                                  {`${hash.slice(0, 8)}...${hash.slice(-8)}`}
+                                </Button>
                               </NextLink>
                             </Box>
                           </Tooltip>
