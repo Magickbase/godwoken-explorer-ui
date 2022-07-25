@@ -1,7 +1,6 @@
 import styles from './styles.module.scss'
 
-export const CustomTooltip: React.FC<any> = props => {
-  const { active, payload, label, theme } = props
+export const CustomTooltip: React.FC<any> = ({ active, payload, label, theme }) => {
   if (active && payload && payload.length) {
     return (
       <div className={styles.tooltipContent}>

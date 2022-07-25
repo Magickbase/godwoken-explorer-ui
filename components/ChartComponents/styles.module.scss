@@ -1,6 +1,6 @@
 .tooltipContent {
   border: none;
-  border-radius: 8;
+  border-radius: 8px;
   box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.1);
   padding: 16px 16px 14px;
   background-color: #fff;
@@ -37,7 +37,7 @@
 
   @media screen and (max-width: 600px) {
     border: none;
-    border-radius: 4;
+    border-radius: 4px;
     box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.1);
     padding: 12px 8px 10px;
 
