@@ -54,6 +54,24 @@ const Charts = (initState: State) => {
 
   const renderTraveller = props => {
     const { x, y, width, height } = props
+    if (isMobile) {
+      return (
+        <svg x={x - 5.5} y={y + 10} fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect
+            x="0.25"
+            y="0.25"
+            width="11.5"
+            height="15.5"
+            rx="1.75"
+            fill="#F0F0F0"
+            stroke="#999999"
+            strokeWidth="0.5"
+          />
+          <line x1="3.5" y1="4.5" x2="3.5" y2="11.5" stroke="#999999" strokeLinecap="round" />
+          <line x1="8.5" y1="4.5" x2="8.5" y2="11.5" stroke="#999999" strokeLinecap="round" />
+        </svg>
+      )
+    }
     return (
       <svg x={x - 7} y={isMobile ? y + 6 : y + 12} fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect x="0.5" y="0.5" width="14" height="23" rx="1.5" fill="#F0F0F0" stroke="#999999" />
@@ -130,14 +148,18 @@ const Charts = (initState: State) => {
                     data={charts.dailyData}
                     margin={
                       isMobile
-                        ? { top: 32, right: 24, left: 8, bottom: 30 }
-                        : { top: 48, right: 108, left: 100, bottom: 64 }
+                        ? { top: 32, right: 24, left: 8, bottom: 48 }
+                        : { top: 48, right: 108, left: 100, bottom: 76 }
                     }
                   >
                     <CartesianGrid strokeDasharray={isMobile ? '2' : '4'} />
                     <XAxis
                       dataKey="date"
-                      tick={{ fontSize: isMobile ? 11 : 12, color: theme.palette.secondary.main }}
+                      tick={{
+                        fontSize: isMobile ? 11 : 12,
+                        color: theme.palette.secondary.main,
+                      }}
+                      dy={isMobile ? 20 : 16}
                       tickLine={false}
                       minTickGap={30}
                       axisLine={false}
