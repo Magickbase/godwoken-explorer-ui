@@ -13,50 +13,19 @@ import {
   TableHead,
   TableBody,
   TableRow,
-  TableCell,
   Link,
   Stack,
-  tableCellClasses,
   Skeleton,
 } from '@mui/material'
-import { styled, useTheme } from '@mui/material/styles'
+import { useTheme } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import PageTitle from 'components/PageTitle'
 import SubpageHead from 'components/SubpageHead'
 import Pagination from 'components/Pagination'
 import PageSize, { SIZES } from 'components/PageSize'
 import BlockStateIcon from 'components/BlockStateIcon'
+import TableCell from 'components/TableCell'
 import { fetchBlockList, timeDistance } from 'utils'
-
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.root}`]: {
-    color: theme.palette.secondary.main,
-    fontWeight: 400,
-    width: '20%',
-    padding: 8,
-    borderColor: '#f0f0f0',
-    [theme.breakpoints.down('sm')]: {
-      minWidth: 120,
-    },
-  },
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: '#fafafa',
-    color: theme.palette.secondary.light,
-    whiteSpace: 'nowrap',
-    height: 48,
-    fontSize: 14,
-    [theme.breakpoints.down('sm')]: {
-      fontSize: 12,
-      height: 32,
-    },
-  },
-  [`&.${tableCellClasses.body}`]: {
-    height: 64,
-    [theme.breakpoints.down('sm')]: {
-      height: 52.5,
-    },
-  },
-}))
 
 const BlockList = () => {
   const [t, { language }] = useTranslation(['list', 'common'])
@@ -112,23 +81,23 @@ const BlockList = () => {
               <Table size="small" sx={{ fontSize: { xs: 12, md: 14 } }}>
                 <TableHead sx={{ textTransform: 'capitalize' }}>
                   <TableRow>
-                    <StyledTableCell component="th">{t(`block_number`)}</StyledTableCell>
-                    <StyledTableCell component="th">{t(`age`)}</StyledTableCell>
-                    <StyledTableCell component="th">{t(`tx_count`)}</StyledTableCell>
-                    <StyledTableCell component="th" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
+                    <TableCell component="th">{t(`block_number`)}</TableCell>
+                    <TableCell component="th">{t(`age`)}</TableCell>
+                    <TableCell component="th">{t(`tx_count`)}</TableCell>
+                    <TableCell component="th" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
                       {t(`gas_used`)}
-                    </StyledTableCell>
-                    <StyledTableCell component="th" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
+                    </TableCell>
+                    <TableCell component="th" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
                       {t(`gas_limit`)}
-                    </StyledTableCell>
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {Array.from({ length: +page_size }).map((_, idx) => (
                     <TableRow key={idx}>
-                      <StyledTableCell colSpan={5}>
+                      <TableCell colSpan={5}>
                         <Skeleton animation="wave" height={20} />
-                      </StyledTableCell>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -205,27 +174,27 @@ const BlockList = () => {
             <Table>
               <TableHead sx={{ textTransform: 'capitalize' }}>
                 <TableRow sx={{ borderTop: '1px solid #f0f0f0' }}>
-                  <StyledTableCell component="th" sx={{ pl: { xs: '12px !important', md: '24px !important' } }}>
+                  <TableCell component="th" sx={{ pl: { xs: '12px !important', md: '24px !important' } }}>
                     {t(`block_number`)}
-                  </StyledTableCell>
-                  <StyledTableCell component="th">{t(`age`)}</StyledTableCell>
-                  <StyledTableCell component="th" sx={{ minWidth: { md: 260 } }}>
+                  </TableCell>
+                  <TableCell component="th">{t(`age`)}</TableCell>
+                  <TableCell component="th" sx={{ minWidth: { md: 260 } }}>
                     {t(`tx_count`)}
-                  </StyledTableCell>
-                  <StyledTableCell component="th">{t(`gas_used`)}</StyledTableCell>
-                  <StyledTableCell
+                  </TableCell>
+                  <TableCell component="th">{t(`gas_used`)}</TableCell>
+                  <TableCell
                     component="th"
                     sx={{ textAlign: 'end', pr: { xs: '12px !important', md: '24px !important' } }}
                   >
                     {t(`gas_limit`)}
-                  </StyledTableCell>
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {blockList.totalPage ? (
                   blockList.blocks.map(b => (
                     <TableRow key={b.hash}>
-                      <StyledTableCell sx={{ pl: { xs: '12px !important', md: '24px !important' } }}>
+                      <TableCell sx={{ pl: { xs: '12px !important', md: '24px !important' } }}>
                         <Stack direction="row" alignItems="center">
                           <NextLink href={`block/${b.hash}`} passHref>
                             <Link href={`block/${b.hash}`} underline="none" color="primary">
@@ -234,8 +203,8 @@ const BlockList = () => {
                           </NextLink>
                           <BlockStateIcon state={b.finalizeState} />
                         </Stack>
-                      </StyledTableCell>
-                      <StyledTableCell sx={{ whiteSpace: 'nowrap' }}>
+                      </TableCell>
+                      <TableCell sx={{ whiteSpace: 'nowrap' }}>
                         {b.timestamp > 0 ? (
                           <time dateTime={new Date(b.timestamp).toISOString()}>
                             {timeDistance(b.timestamp, language)}
@@ -243,19 +212,19 @@ const BlockList = () => {
                         ) : (
                           t('pending')
                         )}
-                      </StyledTableCell>
-                      <StyledTableCell>{b.txCount.toLocaleString('en')}</StyledTableCell>
-                      <StyledTableCell>{(+b.gas.used).toLocaleString('en')}</StyledTableCell>
-                      <StyledTableCell sx={{ textAlign: 'end', pr: { xs: '12px !important', md: '24px !important' } }}>
+                      </TableCell>
+                      <TableCell>{b.txCount.toLocaleString('en')}</TableCell>
+                      <TableCell>{(+b.gas.used).toLocaleString('en')}</TableCell>
+                      <TableCell sx={{ textAlign: 'end', pr: { xs: '12px !important', md: '24px !important' } }}>
                         {(+b.gas.limit).toLocaleString('en')}
-                      </StyledTableCell>
+                      </TableCell>
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <StyledTableCell colSpan={5} align="center">
+                    <TableCell colSpan={5} align="center">
                       {t(`no_records`)}
-                    </StyledTableCell>
+                    </TableCell>
                   </TableRow>
                 )}
               </TableBody>
