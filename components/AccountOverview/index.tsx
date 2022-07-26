@@ -10,11 +10,11 @@ import Polyjuice from 'components/Polyjuice'
 import SUDT from 'components/SUDT'
 import UnknownAccount from 'components/UnknownAccount'
 import InfoList from 'components/InfoList'
-import { GCKB_DECIMAL, GraphQLSchema, client, PCKB_UAN, provider } from 'utils'
 import styles from './styles.module.scss'
+import { GCKB_DECIMAL, GraphQLSchema, client, provider, PCKB_SYMBOL } from 'utils'
 
 export type BasicScript = Record<'args' | 'code_hash' | 'hash_type', string>
-interface AccountBase {
+export interface AccountBase {
   eth_address: string | null
   script_hash: string
   transaction_count: number
@@ -194,7 +194,7 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({
               <Skeleton animation="wave" />
             ) : (
               <span className={styles.balance}>
-                {new BigNumber(balance || '0').dividedBy(GCKB_DECIMAL).toFormat() + ` ${PCKB_UAN}`}
+                {new BigNumber(balance || '0').dividedBy(GCKB_DECIMAL).toFormat() + ` ${PCKB_SYMBOL}`}
               </span>
             ),
           },

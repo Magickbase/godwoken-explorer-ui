@@ -1,4 +1,4 @@
-import type { PolyjuiceContract as PolyjuiceContractProps } from '../AccountOverview'
+import type { PolyjuiceContract as PolyjuiceContractProps } from 'components/AccountOverview'
 import { useState, useMemo, useEffect } from 'react'
 import { styled } from '@mui/system'
 import { useTranslation } from 'next-i18next'

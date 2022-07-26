@@ -35,7 +35,7 @@ import {
   CHANNEL,
   CKB_DECIMAL,
   GCKB_DECIMAL,
-  PCKB_UAN,
+  PCKB_SYMBOL,
   NotFoundException,
 } from 'utils'
 import styles from './styles.module.scss'
@@ -174,7 +174,7 @@ const Tx = (initState: State) => {
         <div className={styles.value}>{`${new BigNumber(tx.value || '0')
           .multipliedBy(CKB_DECIMAL)
           .dividedBy(GCKB_DECIMAL)
-          .toFormat()} ${PCKB_UAN}`}</div>
+          .toFormat()} ${PCKB_SYMBOL}`}</div>
       ),
     },
     tx.input
@@ -243,7 +243,7 @@ const Tx = (initState: State) => {
       label: 'gasPrice',
       value:
         tx.gasPrice !== null ? (
-          <span className={styles.gasPirce}>{`${new BigNumber(tx.gasPrice).toFormat()} ${PCKB_UAN}`}</span>
+          <span className={styles.gasPirce}>{`${new BigNumber(tx.gasPrice).toFormat()} ${PCKB_SYMBOL}`}</span>
         ) : (
           '-'
         ),
@@ -262,7 +262,7 @@ const Tx = (initState: State) => {
         tx.gasPrice !== null && typeof tx.gasUsed !== null ? (
           <span className={styles.gasFee}>{`${new BigNumber(tx.gasUsed)
             .times(new BigNumber(tx.gasPrice))
-            .toFormat()} ${PCKB_UAN}`}</span>
+            .toFormat()} ${PCKB_SYMBOL}`}</span>
         ) : (
           '-'
         ),
