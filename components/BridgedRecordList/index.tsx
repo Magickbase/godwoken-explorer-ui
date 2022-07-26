@@ -1,7 +1,7 @@
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
-import { Tooltip } from '@mui/material'
 import BigNumber from 'bignumber.js'
+import Tooltip from 'components/Tooltip'
 import Table from 'components/Table'
 import HashLink from 'components/HashLink'
 import Address from 'components/TruncatedAddress'

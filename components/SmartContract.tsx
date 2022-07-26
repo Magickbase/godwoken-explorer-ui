@@ -1,6 +1,7 @@
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
-import { Tooltip, List, ListItem, ListItemText, ListSubheader, Divider, Typography, Link, Button } from '@mui/material'
+import { Tooltip, Typography, Link } from '@mui/material'
+import InfoList from './InfoList'
 import { AddModeratorOutlined as RegisterIcon } from '@mui/icons-material'
 import { GraphQLSchema } from 'utils'
 
@@ -13,15 +14,15 @@ const SmartContract: React.FC<{
   isVerified: boolean
 }> = ({ deployer, deployTxHash, udt, isVerified }) => {
   const [t] = useTranslation('account')
-  const fields = [
+  const list = [
     {
-      label: t('type'),
-      value: <Typography variant="body2">{'Smart Contract'}</Typography>,
+      field: t('type'),
+      content: <Typography variant="body2">{'Smart Contract'}</Typography>,
     },
     deployer
       ? {
-          label: t('deployer'),
-          value: (
+          field: t('deployer'),
+          content: (
             <Tooltip title={deployer} placement="top">
               <Typography variant="body2" sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 <NextLink href={`/account/${deployer}`}>
@@ -36,8 +37,8 @@ const SmartContract: React.FC<{
       : null,
     deployTxHash
       ? {
-          label: t('deployTx'),
-          value: (
+          field: t('deployTx'),
+          content: (
             <Tooltip title={deployTxHash} placement="top">
               <Typography variant="body2" sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 <NextLink href={`/tx/${deployTxHash}`}>
@@ -52,8 +53,8 @@ const SmartContract: React.FC<{
       : null,
     udt?.id
       ? {
-          label: t('token'),
-          value: (
+          field: t('token'),
+          content: (
             <Typography variant="body2">
               <Typography variant="body2" sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 <NextLink href={`/token/${udt.id}`}>
@@ -67,8 +68,8 @@ const SmartContract: React.FC<{
         }
       : null,
     {
-      label: t('verify_status'),
-      value: isVerified ? (
+      field: t('verify_status'),
+      content: isVerified ? (
         <Typography variant="body2">{t(`verified`)}</Typography>
       ) : (
         <Typography variant="body2">
@@ -88,29 +89,7 @@ const SmartContract: React.FC<{
     },
   ]
 
-  return (
-    <List
-      subheader={
-        <ListSubheader component="div" sx={{ textTransform: 'capitalize', bgcolor: 'transparent' }}>
-          {t(`basicInfo`)}
-        </ListSubheader>
-      }
-      sx={{ textTransform: 'capitalize' }}
-    >
-      <Divider variant="middle" />
-      {fields.map(field =>
-        field ? (
-          <ListItem key={field.label}>
-            <ListItemText
-              primary={field.label}
-              secondary={field.value}
-              secondaryTypographyProps={{ component: 'div' }}
-            />
-          </ListItem>
-        ) : null,
-      )}
-    </List>
-  )
+  return <InfoList title={t(`basicInfo`)} list={list} />
 }
 
 export default SmartContract

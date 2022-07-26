@@ -1,0 +1,36 @@
+@import '../../styles/mixin.scss';
+
+.container {
+  @include main-center;
+  margin-top: 0;
+
+  .title {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    h5 {
+      margin: 0;
+    }
+  }
+
+  .hash {
+    @include mono-font;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #333;
+    word-break: break-all;
+    user-select: none;
+
+    svg {
+      margin-left: 8px;
+    }
+  }
+}
+
+.list {
+  background-color: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
+  overflow-y: hidden;
+}

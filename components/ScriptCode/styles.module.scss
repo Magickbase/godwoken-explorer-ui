@@ -1,0 +1,54 @@
+.container {
+  summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    list-style: none;
+    cursor: pointer;
+    user-select: none;
+
+    svg {
+      margin-left: 4px;
+      transition: transform 0.2s linear;
+      transform: rotateX(0.5turn);
+    }
+
+    &:hover {
+      svg path {
+        color: var(--primary-color);
+      }
+    }
+  }
+
+  pre {
+    border: 1px solid #f0f0f0;
+    background: #fafafa;
+    padding: 0.875rem 1rem;
+    border-radius: 4px;
+    margin: 15px 0 0;
+    word-break: break-all;
+    white-space: break-spaces;
+    text-transform: none;
+    /* @media screen and (max-width: 1024px) { */
+    /*   margin-left: -7.25rem; */
+    /* } */
+  }
+
+  .name {
+    color: #666;
+    font-weight: 400;
+    font-size: 0.875rem;
+    height: 1.5rem;
+    padding: 0 8px;
+    background: #f0f0f0;
+    border-radius: 0.75rem;
+  }
+
+  &[open] {
+    summary {
+      svg {
+        transform: rotateX(0);
+      }
+    }
+  }
+}

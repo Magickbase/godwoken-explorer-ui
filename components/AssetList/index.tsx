@@ -4,6 +4,7 @@ import { gql } from 'graphql-request'
 import { Avatar } from '@mui/material'
 import Table from 'components/Table'
 import { client, formatAmount, nameToColor, GraphQLSchema } from 'utils'
+import styles from './styles.module.scss'
 
 export type UdtList = Array<{
   value: string
@@ -95,7 +96,7 @@ const AssetList = ({ list = [] }: { list: UdtList }) => {
           list.map(item => (
             <tr key={item.udt.id}>
               <td>
-                <div>
+                <div className={styles.name}>
                   <Avatar
                     src={item.udt.icon}
                     sx={{
@@ -113,13 +114,15 @@ const AssetList = ({ list = [] }: { list: UdtList }) => {
                   </NextLink>
                 </div>
               </td>
-              <td>{t(item.udt.type === GraphQLSchema.UdtType.Native ? 'native' : 'bridged')}</td>
+              <td className={styles.type}>
+                {t(item.udt.type === GraphQLSchema.UdtType.Native ? 'native' : 'bridged')}
+              </td>
               <td>{formatAmount(item.value, item.udt)}</td>
             </tr>
           ))
         ) : (
           <tr>
-            <td colSpan={3} align="center">
+            <td colSpan={3} align="center" className={styles.noRecords}>
               {t(`emptyAssetList`)}
             </td>
           </tr>

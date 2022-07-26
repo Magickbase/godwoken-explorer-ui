@@ -1,0 +1,15 @@
+.name {
+  display: flex;
+  align-items: center;
+  a {
+    margin-left: 8px;
+  }
+}
+
+.type {
+  text-transform: capitalize;
+}
+
+.noRecords {
+  text-align: center;
+}

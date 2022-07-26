@@ -9,3 +9,8 @@
     max-width: unset;
   }
 }
+
+@mixin mono-font {
+  font-family: 'JetBrains Mono', monospace, 'Courier New' !important;
+  user-select: all;
+}

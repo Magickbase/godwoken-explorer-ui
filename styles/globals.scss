@@ -1,3 +1,5 @@
+@import './mixin.scss';
+
 :root {
   --header-height: 64px;
   --footer-height: 200px;
@@ -36,8 +38,7 @@ a {
 }
 
 .mono-font {
-  font-family: 'JetBrains Mono', monospace, 'Courier New' !important;
-  user-select: all;
+  @include mono-font;
 }
 
 input[type='number']::-webkit-inner-spin-button,

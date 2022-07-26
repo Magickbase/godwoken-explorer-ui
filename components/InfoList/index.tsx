@@ -16,20 +16,22 @@ const InfoList: React.FC<{
             <dt>{title}</dt>
           </dl>
         ) : null}
-        {list.map(({ field, content }, idx) => {
-          return (
-            <dl
-              key={field}
-              role="listitem"
-              title={field}
-              className={styles.item}
-              style={{ order: type === 'one-column' ? 1 : idx >= midIndex ? (idx - midIndex) * 2 + 1 : idx * 2 }}
-            >
-              <dt className={styles.term}>{field}</dt>
-              <dd className={styles.desc}>{content}</dd>
-            </dl>
-          )
-        })}
+        {list
+          .filter(v => v)
+          .map(({ field, content }, idx) => {
+            return (
+              <dl
+                key={field}
+                role="listitem"
+                title={field}
+                className={styles.item}
+                style={{ order: type === 'one-column' ? 1 : idx >= midIndex ? (idx - midIndex) * 2 + 1 : idx * 2 }}
+              >
+                <dt className={styles.term}>{field}</dt>
+                <dd className={styles.desc}>{content}</dd>
+              </dl>
+            )
+          })}
       </div>
     </div>
   )
