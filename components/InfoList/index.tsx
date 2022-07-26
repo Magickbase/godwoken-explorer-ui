@@ -2,7 +2,7 @@ import styles from './styles.module.scss'
 
 const InfoList: React.FC<{
   title?: string
-  list: Array<{ field: string; content: React.ReactNode }>
+  list: Array<{ field: string; content: React.ReactNode; expandable?: boolean }>
   style?: React.CSSProperties
   type?: 'one-column' | 'two-columns'
 }> = ({ title, list, style, type = 'one-column' }) => {
@@ -18,7 +18,7 @@ const InfoList: React.FC<{
         ) : null}
         {list
           .filter(v => v)
-          .map(({ field, content }, idx) => {
+          .map(({ field, content, expandable }, idx) => {
             return (
               <dl
                 key={field}
@@ -28,7 +28,9 @@ const InfoList: React.FC<{
                 style={{ order: type === 'one-column' ? 1 : idx >= midIndex ? (idx - midIndex) * 2 + 1 : idx * 2 }}
               >
                 <dt className={styles.term}>{field}</dt>
-                <dd className={styles.desc}>{content}</dd>
+                <dd className={styles.desc} data-expandable={expandable}>
+                  {content}
+                </dd>
               </dl>
             )
           })}

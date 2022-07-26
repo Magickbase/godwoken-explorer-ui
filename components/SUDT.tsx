@@ -38,6 +38,7 @@ const SUDT = ({ udt, script, script_hash }: SudtProps) => {
       ? {
           field: t(`l2Script`),
           content: <ScriptCode script={script} name={t(`l2Script`)} />,
+          expandable: true,
         }
       : null,
   ]

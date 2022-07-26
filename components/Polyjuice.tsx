@@ -6,7 +6,7 @@ import InfoList from './InfoList'
 
 const Polyjuice = ({ script, scriptHash }: { script: PolyjuiceCreatorProps['script']; scriptHash: string }) => {
   const [t] = useTranslation('account')
-  const list: Array<{ field: string; content: React.ReactNode }> = [
+  const list: Array<{ field: string; content: React.ReactNode; expandable?: boolean }> = [
     {
       field: t('type'),
       content: `Polyjuice`,
@@ -24,6 +24,7 @@ const Polyjuice = ({ script, scriptHash }: { script: PolyjuiceCreatorProps['scri
     {
       field: t(`l2Script`),
       content: <ScriptCode name={t(`l2Script`)} script={script} />,
+      expandable: true,
     },
   ]
   return <InfoList title={t('basicInfo')} list={list} />

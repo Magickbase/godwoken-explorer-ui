@@ -70,6 +70,10 @@
       text-overflow: ellipsis;
     }
 
+    dd.desc[data-expandable='true'] {
+      overflow: visible;
+    }
+
     &:last-of-type {
       border-bottom-color: transparent;
     }

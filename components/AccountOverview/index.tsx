@@ -147,7 +147,7 @@ export const fetchDeployAddress = (variables: { eth_hash: string }) =>
 const OverviewPlaceHolderCount = {
   [GraphQLSchema.AccountType.EthUser]: 0,
   [GraphQLSchema.AccountType.PolyjuiceCreator]: 1,
-  [GraphQLSchema.AccountType.PolyjuiceContract]: 2,
+  [GraphQLSchema.AccountType.PolyjuiceContract]: 3,
   [GraphQLSchema.AccountType.MetaContract]: 6,
   [GraphQLSchema.AccountType.EthAddrReg]: 0,
   [GraphQLSchema.AccountType.Udt]: 4,

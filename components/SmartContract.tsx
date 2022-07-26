@@ -1,6 +1,6 @@
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
-import { Tooltip, Typography, Link } from '@mui/material'
+import Tooltip from 'components/Tooltip'
 import InfoList from './InfoList'
 import { AddModeratorOutlined as RegisterIcon } from '@mui/icons-material'
 import { GraphQLSchema } from 'utils'
@@ -17,20 +17,16 @@ const SmartContract: React.FC<{
   const list = [
     {
       field: t('type'),
-      content: <Typography variant="body2">{'Smart Contract'}</Typography>,
+      content: 'Smart Contract',
     },
     deployer
       ? {
           field: t('deployer'),
           content: (
             <Tooltip title={deployer} placement="top">
-              <Typography variant="body2" sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                <NextLink href={`/account/${deployer}`}>
-                  <Link href={`/account/${deployer}`} underline="none" className="mono-font" color="secondary">
-                    {deployer}
-                  </Link>
-                </NextLink>
-              </Typography>
+              <NextLink href={`/account/${deployer}`}>
+                <a className="mono-font">{deployer}</a>
+              </NextLink>
             </Tooltip>
           ),
         }
@@ -40,13 +36,9 @@ const SmartContract: React.FC<{
           field: t('deployTx'),
           content: (
             <Tooltip title={deployTxHash} placement="top">
-              <Typography variant="body2" sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                <NextLink href={`/tx/${deployTxHash}`}>
-                  <Link href={`/tx/${deployTxHash}`} underline="none" className="mono-font" color="secondary">
-                    {deployTxHash}
-                  </Link>
-                </NextLink>
-              </Typography>
+              <NextLink href={`/tx/${deployTxHash}`}>
+                <a className="mono-font">{deployTxHash}</a>
+              </NextLink>
             </Tooltip>
           ),
         }
@@ -55,36 +47,25 @@ const SmartContract: React.FC<{
       ? {
           field: t('token'),
           content: (
-            <Typography variant="body2">
-              <Typography variant="body2" sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                <NextLink href={`/token/${udt.id}`}>
-                  <Link href={`/token/${udt.id}`} underline="none" className="mono-font" color="secondary">
-                    {udt.name ?? '-'}
-                  </Link>
-                </NextLink>
-              </Typography>
-            </Typography>
+            <NextLink href={`/token/${udt.id}`}>
+              <a className="mono-font">{udt.name ?? '-'}</a>
+            </NextLink>
           ),
         }
       : null,
     {
       field: t('verify_status'),
       content: isVerified ? (
-        <Typography variant="body2">{t(`verified`)}</Typography>
+        t(`verified`)
       ) : (
-        <Typography variant="body2">
-          <Link
-            href={CONTRACT_FORM_URL}
-            target="_blank"
-            rel="noreferrer noopener"
-            display="flex"
-            alignItems="center"
-            underline="none"
-            color="secondary"
-          >
-            {t(`unverified`)} <RegisterIcon fontSize="small" />
-          </Link>
-        </Typography>
+        <a
+          href={CONTRACT_FORM_URL}
+          target="_blank"
+          rel="noreferrer noopener"
+          style={{ display: 'flex', alignItems: 'center' }}
+        >
+          {t(`unverified`)} <RegisterIcon fontSize="small" />
+        </a>
       ),
     },
   ]
