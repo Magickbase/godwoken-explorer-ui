@@ -14,6 +14,7 @@ import {
   Brush,
   LineChart,
   Line,
+  Legend,
 } from 'recharts'
 import { Container, Stack, Paper, Box, Typography, Alert } from '@mui/material'
 import SubpageHead from 'components/SubpageHead'
@@ -148,7 +149,9 @@ const Charts = (initState: State) => {
                     data={charts.dailyData}
                     margin={
                       isMobile
-                        ? { top: 32, right: 24, left: 8, bottom: 48 }
+                        ? keys.length >= 2
+                          ? { top: 32, right: -14, left: -14, bottom: 48 }
+                          : { top: 32, right: 24, left: 8, bottom: 48 }
                         : { top: 48, right: 108, left: 100, bottom: 76 }
                     }
                   >
@@ -161,21 +164,22 @@ const Charts = (initState: State) => {
                       }}
                       dy={isMobile ? 20 : 16}
                       tickLine={false}
-                      minTickGap={30}
+                      minTickGap={20}
                       axisLine={false}
                       interval="preserveStartEnd"
                     />
                     {keys.map(({ key, unit }, idx) => (
                       <YAxis
                         label={{
-                          content:
-                            idx === 0 ? (
-                              <YLabel theme={theme} isMobile={isMobile} value={t(key)} />
-                            ) : (
-                              <YLabel theme={theme} isMobile={isMobile} value={t(key)} align="right" />
-                            ),
+                          content: ((keys.length < 2 && isMobile) || !isMobile) && (
+                            <YLabel
+                              theme={theme}
+                              isMobile={isMobile}
+                              value={t(key)}
+                              align={idx === 0 ? 'left' : 'right'}
+                            />
+                          ),
                         }}
-                        hide={idx === 1 && isMobile}
                         unit={unit === GAS_UNIT && isMobile ? '' : unit}
                         key={key + '-yaxis'}
                         yAxisId={idx}
@@ -195,6 +199,17 @@ const Charts = (initState: State) => {
                         offset={18}
                       />
                     ))}
+                    {isMobile && keys.length > 1 && (
+                      <Legend
+                        verticalAlign="bottom"
+                        height={40}
+                        iconSize={6}
+                        wrapperStyle={{ fontSize: 12 }}
+                        formatter={(value, entry, index) => (
+                          <span style={{ color: theme.palette.secondary.light }}>{value}</span>
+                        )}
+                      />
+                    )}
                     <Brush
                       height={isMobile ? 36 : 48}
                       tickFormatter={() => ''}

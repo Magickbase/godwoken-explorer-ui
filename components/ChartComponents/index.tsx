@@ -22,7 +22,7 @@ export const CustomYLabel: React.FC<any> = ({ value, theme, isMobile, align = 'l
   const y = align === 'left' ? (isMobile ? '6%' : '10%') : isMobile ? '90%' : '254%'
   return (
     <text
-      x={isMobile ? '-158' : '-185'}
+      x={isMobile ? '-150' : '-180'}
       y={y}
       fill={theme.palette.secondary.light}
       color={theme.palette.secondary.light}
