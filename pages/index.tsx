@@ -541,6 +541,8 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
                                 className={isSpecialTo ? 'Roboto' : 'mono-font'}
                                 disableRipple
                                 fontSize={{ xs: 13, md: 14 }}
+                                minWidth={{ xs: 98, sm: 'auto' }}
+                                justifyContent={{ xs: 'flex-end', sm: 'center' }}
                                 sx={{
                                   'p': 0,
                                   'pl': 1,
