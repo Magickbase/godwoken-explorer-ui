@@ -36,8 +36,10 @@ type State = API.Home.Parsed
 
 const formatAddress = (addr: string, bigScreen: boolean = true, isSpecial: boolean = false) => {
   if (isSpecial) {
-    if (addr.length > 15) {
+    if (!bigScreen && addr.length > 15) {
       return addr.split(' ')[0] + '...'
+    } else {
+      return addr
     }
   }
   if (bigScreen && addr.length > 16) {
