@@ -21,16 +21,15 @@ import {
   Typography,
   Skeleton,
 } from '@mui/material'
-import BigNumber from 'bignumber.js'
 import SubpageHead from 'components/SubpageHead'
 import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined'
 import Pagination from 'components/Pagination'
 import { fetchTokenList, formatAmount, nameToColor, PAGE_SIZE } from 'utils'
 
 const BRIDGED_TOKEN_TEMPLATE_URL =
-  'https://github.com/nervina-labs/godwoken_explorer/issues/new?assignees=Keith-CY&labels=Token+Registration&template=register-a-new-bridged-token.yml&title=%5BBridged+Token%5D+%2A%2AToken+Name%2A%2A'
+  'https://github.com/magickbase/godwoken_explorer/issues/new?assignees=Keith-CY&labels=Token+Registration&template=register-a-new-bridged-token.yml&title=%5BBridged+Token%5D+%2A%2AToken+Name%2A%2A'
 const NATIVE_TOKEN_TEMPLATE_URL =
-  'https://github.com/nervina-labs/godwoken_explorer/issues/new?assignees=Keith-CY&labels=Token+Registration&template=register-a-new-native-erc20-token.yml&title=%5BNative+ERC20+Token%5D+%2A%2AToken+Name%2A%2A'
+  'https://github.com/magickbase/godwoken_explorer/issues/new?assignees=Keith-CY&labels=Token+Registration&template=register-a-new-native-erc20-token.yml&title=%5BNative+ERC20+Token%5D+%2A%2AToken+Name%2A%2A'
 
 const TokenList = () => {
   const [t] = useTranslation(['tokens', 'common'])
