@@ -1,12 +1,15 @@
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
-import { Stack, Box, Typography, IconButton, Menu, TextField, Button } from '@mui/material'
+import { Stack, Box, IconButton, Menu, TextField, Button } from '@mui/material'
 import { FilterAlt as FilterIcon, Clear as ClearIcon } from '@mui/icons-material'
+import BigNumber from 'bignumber.js'
+import { SIZES } from 'components/PageSize'
 import Table from 'components/Table'
 import { gql } from 'graphql-request'
 import Pagination from 'components/SimplePagination'
-import { GraphQLSchema, client, formatAmount, useFilterMenu } from 'utils'
+import TokenLogo from 'components/TokenLogo'
+import { GraphQLSchema, client, useFilterMenu } from 'utils'
 import styles from './styles.module.scss'
 
 export type TransferListProps = {
@@ -32,6 +35,7 @@ const transferListQuery = gql`
     $from_address: String
     $to_address: String
     $combine_from_to: Boolean
+    $limit: Int
   ) {
     token_transfers(
       input: {
@@ -41,6 +45,7 @@ const transferListQuery = gql`
         from_address: $from_address
         to_address: $to_address
         combine_from_to: $combine_from_to
+        limit: $limit
       }
     ) {
       entries {
@@ -85,6 +90,7 @@ export const fetchTransferList = (variables: {
   from_address?: string | null
   to_address?: string | null
   combine_from_to?: boolean | null
+  limit: number
 }) =>
   client
     .request<TransferListProps>(transferListQuery, variables)
@@ -95,7 +101,7 @@ const FILTER_KEYS = ['address_from', 'address_to'] as const
 const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries, metadata } }) => {
   const [t] = useTranslation('list')
   const {
-    query: { id: _, ...query },
+    query: { id: _, page_size = SIZES[1], ...query },
     push,
     asPath,
   } = useRouter()
@@ -130,7 +136,7 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
   })
 
   return (
-    <div>
+    <div className={styles.container}>
       <Table>
         <thead>
           <tr>
@@ -150,6 +156,7 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
                 </IconButton>
               </Stack>
             </th>
+            <th className={styles.tokenLogo}>{t('token')}</th>
             <th>{`${t('value')}`}</th>
           </tr>
         </thead>
@@ -173,15 +180,12 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
                     </a>
                   </NextLink>
                 </td>
-                <td title={item.udt.name}>
-                  {item.udt?.id ? (
-                    <NextLink href={`/token/${item.udt.id}`}>
-                      <a>{formatAmount(item.amount, item.udt)}</a>
-                    </NextLink>
-                  ) : (
-                    formatAmount(item.amount, item.udt)
-                  )}
+                <td className={styles.tokenLogo}>
+                  <NextLink href={`/token/${item.udt.id}`}>
+                    <TokenLogo name={item.udt.name} logo={item.udt.icon} />
+                  </NextLink>
                 </td>
+                <td title={item.udt.name}>{new BigNumber(item.amount).toFormat()}</td>
               </tr>
             ))
           ) : (
@@ -230,12 +234,8 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
           </Stack>
         </form>
       </Menu>
-      <Pagination {...metadata} />
-      <Stack direction="row-reverse">
-        <Typography color="primary.light" variant="caption">
-          {t(`last-n-records`, { n: `100k` })}
-        </Typography>
-      </Stack>
+
+      <Pagination {...metadata} pageSize={page_size as string} note={t(`last-n-records`, { n: `100k` })} />
     </div>
   )
 }

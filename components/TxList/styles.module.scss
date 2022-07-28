@@ -1,0 +1,11 @@
+.container {
+  th,
+  td {
+    &:last-child {
+      text-align: right;
+    }
+  }
+  td:last-child > div {
+    margin-left: auto;
+  }
+}
