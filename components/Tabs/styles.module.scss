@@ -11,11 +11,12 @@
     font-size: 1rem;
     font-weight: 500;
     text-transform: capitalize;
-    overflow-y: scroll;
+    overflow-y: auto;
     border-bottom: 1px solid var(--border-color);
   }
 
-  a {
+  a,
+  span {
     position: relative;
     display: flex;
     align-items: center;

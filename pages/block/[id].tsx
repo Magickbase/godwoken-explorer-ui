@@ -17,8 +17,8 @@ import HashLink from 'components/HashLink'
 import CopyBtn from 'components/CopyBtn'
 import OpenInNewIcon from 'assets/icons/open-in-new.svg'
 import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
-import styles from './styles.module.scss'
 import { fetchBlock, formatDatetime, CKB_EXPLORER_URL, formatInt, fetchBridgedRecordList } from 'utils'
+import styles from './styles.module.scss'
 
 const tabs = ['transactions', 'bridged', 'raw-data']
 
