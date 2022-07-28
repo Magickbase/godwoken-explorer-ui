@@ -9,7 +9,6 @@ import {
   Typography,
   Box,
   TableContainer,
-  Table,
   TableHead,
   TableBody,
   TableRow,
@@ -23,7 +22,7 @@ import SubpageHead from 'components/SubpageHead'
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/Pagination'
 import PageSize, { SIZES } from 'components/PageSize'
-import TableCell from 'components/TableCell'
+import Table from 'components/Table'
 import { fetchContractList, PCKB_SYMBOL } from 'utils'
 
 const ContractList = () => {
@@ -92,80 +91,63 @@ const ContractList = () => {
           </Stack>
 
           <TableContainer>
-            <Table size="small" sx={{ fontSize: { xs: 12, md: 14 } }}>
-              <TableHead sx={{ textTransform: 'capitalize' }}>
-                <TableRow sx={{ borderTop: '1px solid #f0f0f0' }}>
-                  <TableCell component="th" sx={{ pl: { xs: '12px !important', md: '24px !important' } }}>
-                    {t(`address`)}
-                  </TableCell>
-                  <TableCell component="th" sx={{ whiteSpace: 'nowrap' }}>
-                    {t(`contract_name`)}
-                  </TableCell>
-                  <TableCell component="th">{t(`compiler`)}</TableCell>
-                  <TableCell component="th">{t(`compiler_version`)}</TableCell>
-                  <TableCell component="th">
+            <Table>
+              <thead style={{ textTransform: 'capitalize', fontSize: isMobile ? 12 : 14 }}>
+                <tr>
+                  <th>{t(`address`)}</th>
+                  <th>{t(`contract_name`)}</th>
+                  <th>{t(`compiler`)}</th>
+                  <th>{t(`compiler_version`)}</th>
+                  <th>
                     {t(`balance`)}
                     <span style={{ textTransform: 'none' }}>{`(${PCKB_SYMBOL})`}</span>
-                  </TableCell>
-                  <TableCell
-                    component="th"
-                    sx={{ textAlign: 'end', pr: { xs: '12px !important', md: '24px !important' } }}
-                  >
-                    {t(`tx_count`)}
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
+                  </th>
+                  <th style={{ textAlign: 'end' }}>{t(`tx_count`)}</th>
+                </tr>
+              </thead>
+              <tbody>
                 {isLoading ? (
                   Array.from({ length: +page_size }).map((_, idx) => (
-                    <TableRow key={idx}>
-                      <TableCell colSpan={6}>
+                    <tr key={idx}>
+                      <td colSpan={6}>
                         <Skeleton animation="wave" />
-                      </TableCell>
-                    </TableRow>
+                      </td>
+                    </tr>
                   ))
                 ) : data.meta.totalPage ? (
                   data.contracts.map(c => (
-                    <TableRow key={c.id} title={c.address}>
-                      <TableCell sx={{ pl: { xs: '12px !important', md: '24px !important' } }}>
-                        <Address address={c.address} />
-                      </TableCell>
-                      <TableCell sx={{ fontSize: 'inherit' }} title={c.name}>
-                        {c.name}
-                      </TableCell>
-                      <TableCell
-                        sx={{ fontSize: 'inherit', textTransform: 'capitalize' }}
-                        title={c.compiler.fileFormat}
-                      >
+                    <tr key={c.id} title={c.address}>
+                      <td style={{ width: '25%' }}>
+                        <Address address={c.address} leading={isMobile ? 8 : 30} sx={{ width: 'min-content' }} />
+                      </td>
+                      <td title={c.name}>{c.name}</td>
+                      <td style={{ textTransform: 'capitalize' }} title={c.compiler.fileFormat}>
                         {c.compiler.fileFormat.split(' ')[0]}
-                      </TableCell>
-                      <TableCell sx={{ fontSize: 'inherit' }} title={c.compiler.version}>
-                        {c.compiler.version.split('+')[0]}
-                      </TableCell>
-                      <TableCell sx={{ fontSize: 'inherit' }} title={c.balance}>
-                        {new BigNumber(c.balance ?? '0').toFormat()}
-                      </TableCell>
-                      <TableCell sx={{ fontSize: 'inherit' }} title={`${c.txCount}`}>
+                      </td>
+                      <td title={c.compiler.version}>{c.compiler.version.split('+')[0]}</td>
+                      <td title={c.balance}>{new BigNumber(c.balance ?? '0').toFormat()}</td>
+                      <td style={{ textAlign: 'end' }} title={`${c.txCount}`}>
                         {c.txCount.toLocaleString('en')}
-                      </TableCell>
-                    </TableRow>
+                      </td>
+                    </tr>
                   ))
                 ) : (
-                  <TableRow>
-                    <TableCell colSpan={6} align="center">
+                  <tr>
+                    <td colSpan={6} align="center">
                       {t(`no_records`)}
-                    </TableCell>
-                  </TableRow>
+                    </td>
+                  </tr>
                 )}
-              </TableBody>
+              </tbody>
             </Table>
           </TableContainer>
+
           <Stack
             direction="row"
             flexWrap="wrap"
             justifyContent={isMobile ? 'center' : 'end'}
             alignItems="center"
-            mt={{ xs: 2, md: 2 }}
+            mt={{ xs: 0, md: 2 }}
             px={{ xs: 1.5, md: 3 }}
           >
             {/* <PageSize pageSize={+page_size} /> */}

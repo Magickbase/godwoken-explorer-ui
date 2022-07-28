@@ -40,5 +40,14 @@
     &:last-child {
       padding-right: 1.5rem;
     }
+
+    @media screen and (max-width: 768px) {
+      &:first-child {
+        padding-left: 0.875rem;
+      }
+      &:last-child {
+        padding-right: 0.875rem;
+      }
+    }
   }
 }
