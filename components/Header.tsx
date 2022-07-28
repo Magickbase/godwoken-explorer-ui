@@ -1,6 +1,5 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState } from 'react'
 import NextLink from 'next/link'
-import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import {
@@ -14,66 +13,22 @@ import {
   MenuList,
   MenuItem,
   Typography,
-  InputBase,
   IconButton,
-  Divider,
-  styled,
-  alpha,
+  MenuProps,
+  Backdrop,
+  SvgIcon,
 } from '@mui/material'
-import { Search as SearchIcon, Translate as TranslateIcon, MoreVert as MoreIcon } from '@mui/icons-material'
-import { EXPLORER_TITLE, IMG_URL, SEARCH_FIELDS, handleSearchKeyPress, fetchVersion } from 'utils'
-
-const Search = styled('div')(({ theme }) => ({
-  'position': 'relative',
-  'borderRadius': theme.shape.borderRadius,
-  'backgroundColor': alpha(theme.palette.common.white, 0.15),
-  '&:hover': {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
-  },
-  'width': '100%',
-  [theme.breakpoints.up('sm')]: {
-    marginLeft: theme.spacing(1),
-    width: 'auto',
-  },
-}))
-
-const SearchIconWrapper = styled('div')(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: '100%',
-  position: 'absolute',
-  pointerEvents: 'none',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-}))
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  'color': 'inherit',
-  '& .MuiInputBase-input': {
-    padding: theme.spacing(1, 1, 1, 0),
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create('width'),
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-      'width': '25ch',
-      '&:focus': {
-        width: '30ch',
-      },
-    },
-    [theme.breakpoints.up('md')]: {
-      'width': '30ch',
-      '&:focus': {
-        width: '40ch',
-      },
-    },
-    [theme.breakpoints.up('lg')]: {
-      'width': '40ch',
-      '&:focus': {
-        width: '66ch',
-      },
-    },
-  },
-}))
+import MuiAccordion, { AccordionProps } from '@mui/material/Accordion'
+import MuiAccordionSummary, { AccordionSummaryProps } from '@mui/material/AccordionSummary'
+import MuiAccordionDetails from '@mui/material/AccordionDetails'
+import { styled } from '@mui/material/styles'
+import { Language as LanguageIcon, KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material'
+import { EXPLORER_TITLE } from 'utils'
+import Logo from './Logo'
+import CloseIcon from '../assets/icons/close.svg'
+import MobileMenuIcon from '../assets/icons/mobile-menu.svg'
+import { usePopupState, bindHover, bindMenu } from 'material-ui-popup-state/hooks'
+import HoverMenu from 'material-ui-popup-state/HoverMenu'
 
 const CHAIN_LINKS = [
   { label: 'mainnet_v1', href: 'https://v1.gwscan.com' },
@@ -84,22 +39,115 @@ const CHAIN_LINKS = [
 const TOKEN_TYPE_LIST = ['bridge', 'native']
 const LOCALE_LIST = ['zh-CN', 'en-US']
 
+const Accordion = styled((props: AccordionProps) => <MuiAccordion disableGutters elevation={0} square {...props} />)(
+  () => ({
+    '&:not(:last-child)': {
+      borderBottom: 0,
+    },
+    '&:before': {
+      display: 'none',
+    },
+  }),
+)
+
+const AccordionSummary = styled((props: AccordionSummaryProps) => (
+  <MuiAccordionSummary
+    expandIcon={<KeyboardArrowDown color="secondary" sx={{ ml: '2px', fontSize: 32 }} />}
+    {...props}
+  />
+))(({ theme }) => ({
+  '& .MuiAccordionSummary-content.Mui-expanded': {
+    color: theme.palette.primary.main,
+  },
+  '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
+    'transform': 'rotate(180deg)',
+    '& svg': {
+      color: theme.palette.primary.main,
+    },
+  },
+}))
+
+const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
+  'padding': `0 ${theme.spacing(1)}`,
+  '& .MuiList-root': {
+    'padding': 0,
+    '& a': {
+      fontSize: '0.9rem',
+    },
+  },
+}))
+
+const StyledMenu = styled((props: MenuProps) => <HoverMenu {...props} />)(({ theme }) => ({
+  '& .MuiPaper-root': {
+    borderRadius: theme.spacing(1),
+    boxShadow: `0px 4px 9px ${theme.palette.primary.light}`,
+  },
+  '& .MuiMenuItem-root': {
+    '& :hover': {
+      color: theme.palette.primary.main,
+    },
+    '& a': {
+      color: theme.palette.secondary.main,
+    },
+  },
+}))
+
+const MobileMenu = styled((props: MenuProps) => (
+  <Menu
+    elevation={0}
+    anchorReference="anchorPosition"
+    anchorPosition={{ top: 54, left: 0 }}
+    anchorOrigin={{
+      vertical: 'top',
+      horizontal: 'center',
+    }}
+    transformOrigin={{
+      vertical: 'top',
+      horizontal: 'center',
+    }}
+    {...props}
+  />
+))(({ theme }) => ({
+  '& .MuiPaper-root': {
+    'width': '100%',
+    'maxWidth': '100%',
+    'maxHeight': 750,
+    'left': '0 !important',
+    'borderRadius': 0,
+    'border': 'none',
+    'backgroundColor': theme.palette.primary.light,
+    '& .MuiMenu-list': {
+      padding: '4px 0',
+      width: '100%',
+    },
+  },
+}))
+
 const Header = () => {
   const [t, { language }] = useTranslation('common')
-  const [version, setVersion] = useState<string | null>(null)
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
-  const anchorElLabel = anchorEl?.getAttribute('aria-label')
-  const {
-    push,
-    query: { search: searchInQuery },
-    asPath,
-  } = useRouter()
-  const searchRef = useRef<HTMLInputElement | null>(null)
+  const [expanded, setExpanded] = useState<string | false>('')
 
+  const anchorElLabel = anchorEl?.getAttribute('aria-label')
+  const { asPath } = useRouter()
+  const isHome = asPath === '/' || asPath === '/zh-CN'
   const CHAIN_TYPE_LIST = ['mainnet', 'testnet']
 
-  const handleSearch = async (e: React.KeyboardEvent<HTMLInputElement>) => {
-    handleSearchKeyPress(e, push)
+  const tokenPopover = usePopupState({
+    variant: 'popover',
+    popupId: 'tokenPopover',
+  })
+  const chainPopover = usePopupState({
+    variant: 'popover',
+    popupId: 'chainPopover',
+  })
+  const languagePopover = usePopupState({
+    variant: 'popover',
+    popupId: 'languagePopover',
+  })
+
+  const handleMobileMenuChange = (panel: string) => (_: React.SyntheticEvent, newExpanded: boolean) => {
+    setExpanded(newExpanded ? panel : false)
   }
 
   const handleMenuListOpen = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -107,87 +155,17 @@ const Header = () => {
   }
   const handleMenuListClose = () => setAnchorEl(null)
 
-  useEffect(() => {
-    if (searchRef.current && typeof searchInQuery === 'string' && searchInQuery) {
-      searchRef.current.value = searchInQuery
-    }
-    return () => {
-      if (searchRef.current) {
-        searchRef.current.value = ''
-      }
-    }
-  }, [searchInQuery, searchRef])
-
-  useEffect(() => {
-    fetchVersion()
-      .then(versions => {
-        setVersion(versions.godwokenVersion?.split(' ')[0])
-      })
-      .catch(() => {
-        /* ignore */
-      })
-  }, [setVersion])
-
-  const contractMenuItems = (
-    <MenuList dense>
-      <Typography
-        variant="subtitle2"
-        textAlign="center"
-        sx={{ display: { xs: 'block', md: 'none', pointerEvents: 'none' } }}
-      >
-        {t(`contracts`)}
-      </Typography>
-      <MenuItem onClick={handleMenuListClose} sx={{ p: 0 }}>
-        <NextLink href={`/contracts`}>
-          <Link
-            href={`/contracts`}
-            title={t(`registered_contracts`)}
-            underline="none"
-            sx={{ width: '100%', padding: '6px 16px' }}
-          >
-            {t(`registered_contracts`)}
-          </Link>
-        </NextLink>
-      </MenuItem>
-    </MenuList>
-  )
-
-  const moreMenuItems = (
-    <MenuList dense>
-      <Typography
-        variant="subtitle2"
-        textAlign="center"
-        sx={{ display: { xs: 'block', md: 'none', pointerEvents: 'none' } }}
-      >
-        {t(`more`)}
-      </Typography>
-      <MenuItem onClick={handleMenuListClose} sx={{ p: 0 }}>
-        <NextLink href={`/charts`}>
-          <Link href={`/charts`} title={t(`charts`)} underline="none" sx={{ width: '100%', padding: '6px 16px' }}>
-            {t(`charts`)}
-          </Link>
-        </NextLink>
-      </MenuItem>
-    </MenuList>
-  )
-
-  const tokenMenuItems = (
-    <MenuList dense>
-      <Typography
-        variant="subtitle2"
-        textAlign="center"
-        sx={{ display: { xs: 'block', md: 'none', pointerEvents: 'none' } }}
-      >
-        {t(`token`)}
-      </Typography>
+  const TokenMenuItems = ({ dense }) => (
+    <MenuList dense={dense} onClick={tokenPopover.close}>
       {TOKEN_TYPE_LIST.map(type => (
         <MenuItem key={type} onClick={handleMenuListClose} sx={{ p: 0 }}>
-          <NextLink href={`/tokens/${type}`}>
+          <NextLink href={`/tokens/${type}`} passHref>
             <Link
               href={`/tokens/${type}`}
               title={t(`${type}-udt`)}
               underline="none"
               sx={{ width: '100%', padding: '6px 16px' }}
+              color="secondary"
             >
               {t(`${type}-udt`)}
             </Link>
@@ -197,29 +175,21 @@ const Header = () => {
     </MenuList>
   )
 
-  const chainMenuItems = (
-    <MenuList dense>
-      <Typography
-        variant="subtitle2"
-        textAlign="center"
-        sx={{ display: { xs: 'block', md: 'none', pointerEvents: 'none' } }}
-      >
-        {t(`chainType`)}
-      </Typography>
+  const ChainMenuItems = ({ dense }) => (
+    <MenuList dense={dense} onClick={chainPopover.close}>
       {CHAIN_LINKS.map(chain => {
         const url = `${chain.href}/${language}`
         const [label, version] = chain.label.split('_')
         return (
           <MenuItem key={chain.label} onClick={handleMenuListClose} sx={{ p: 0 }}>
-            <NextLink href={url}>
+            <NextLink href={url} passHref>
               <Link
                 href={url}
                 title={`${t(label)} ${version}`}
                 underline="none"
-                display="flex"
                 justifyContent="space-between"
-                minWidth="105px"
                 sx={{ width: '100%', padding: '6px 16px' }}
+                color="secondary"
               >
                 <span>{t(label)}</span>
                 <span>{version}</span>
@@ -231,19 +201,12 @@ const Header = () => {
     </MenuList>
   )
 
-  const localeMenuItems = (
-    <MenuList dense>
-      <Typography
-        variant="subtitle2"
-        textAlign="center"
-        sx={{ display: { xs: 'block', md: 'none' }, pointerEvents: 'none' }}
-      >
-        {t(`language`)}
-      </Typography>
+  const LocaleMenuItems = ({ dense }) => (
+    <MenuList dense={dense} onClick={languagePopover.close}>
       {LOCALE_LIST.map(locale => (
         <MenuItem key={locale} onClick={handleMenuListClose} sx={{ p: 0 }}>
           <NextLink href={asPath} locale={locale} passHref>
-            <Link title={t(locale)} underline="none" sx={{ width: '100%', padding: '6px 16px' }}>
+            <Link title={t(locale)} underline="none" sx={{ width: '100%', padding: '6px 16px' }} color="secondary">
               {t(locale)}
             </Link>
           </NextLink>
@@ -253,14 +216,26 @@ const Header = () => {
   )
 
   return (
-    <AppBar position="sticky" sx={{ bgcolor: 'primary.dark' }}>
-      <Container>
+    <AppBar
+      position="sticky"
+      sx={{
+        bgcolor: isHome || anchorElLabel === 'mobile-menu' ? 'primary.light' : '#F8F8FB',
+        boxShadow: {
+          sm: isHome
+            ? 'none'
+            : process.env.NEXT_PUBLIC_CHAIN_TYPE !== 'mainnet'
+            ? 'none'
+            : '0px 1px 2px rgba(0, 0, 0, 0.05)',
+          xs: 'none',
+        },
+      }}
+    >
+      <Container sx={{ px: { md: 3, lg: 1 } }}>
         <Toolbar sx={{ flexGrow: 1 }} disableGutters>
-          <NextLink href="/">
+          <NextLink href="/" passHref>
             <Link
               href="/"
               title={EXPLORER_TITLE}
-              color="#fff"
               underline="none"
               mr="auto"
               display="flex"
@@ -271,185 +246,221 @@ const Header = () => {
                 },
               }}
             >
-              <Image
-                src={`${IMG_URL}nervina-logo.svg`}
-                loading="lazy"
-                width="31"
-                height="20"
-                layout="fixed"
-                alt="logo"
-              />
-              <Typography sx={{ ml: 2, display: { xs: 'none', sm: 'flex' } }} variant="h5" noWrap>
-                {EXPLORER_TITLE}
-              </Typography>
-              {version ? (
-                <Typography
-                  variant="subtitle2"
-                  letterSpacing={0}
-                  sx={{
-                    lineHeight: '1em',
-                    alignSelf: 'flex-end',
-                    ml: 0.5,
-                    mb: { xs: 0, sm: '6px' },
-                    fontVariant: 'unicase',
-                    fontStyle: 'italic',
-                  }}
-                >
-                  {`V${version}`}
-                </Typography>
-              ) : null}
+              <Logo id="logo" color="primary" />
             </Link>
           </NextLink>
 
-          <Search sx={{ ml: 2 }}>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder={SEARCH_FIELDS}
-              autoFocus
-              title={SEARCH_FIELDS}
-              inputProps={{ 'aria-label': 'search' }}
-              onKeyPress={handleSearch}
-              inputRef={searchRef}
-            />
-          </Search>
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
             <Button
-              aria-label="token-list"
-              aria-haspopup="true"
-              aria-expanded={anchorElLabel === 'token-list' ? 'true' : undefined}
-              aria-controls={anchorElLabel === 'token-list' ? 'token-list' : undefined}
-              onClick={handleMenuListOpen}
-              color="inherit"
+              aria-label="home"
               disableRipple
+              sx={{
+                'textTransform': 'none',
+                'mx': 2,
+                '&.MuiButtonBase-root:hover': {
+                  bgcolor: 'transparent',
+                },
+              }}
+            >
+              <NextLink href={`/`} passHref>
+                <Link href={`/`} title={t(`home`)} underline="none" color="secondary">
+                  {t(`home`)}
+                </Link>
+              </NextLink>
+            </Button>
+            <Button
+              color="secondary"
+              disableRipple
+              sx={{
+                'textTransform': 'none',
+                'mx': 2,
+                '& .MuiButton-endIcon': { m: 0 },
+                '&.MuiButtonBase-root:hover': {
+                  bgcolor: 'transparent',
+                },
+              }}
+              endIcon={tokenPopover.isOpen ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+              {...bindHover(tokenPopover)}
             >
               {t(`token`)}
             </Button>
-            <Menu
-              id="token-list"
-              anchorEl={anchorEl}
-              open={anchorElLabel === 'token-list'}
-              onClose={handleMenuListClose}
-              MenuListProps={{ 'aria-labelledby': 'token-item' }}
-              sx={{ display: { xs: 'none', md: 'block' } }}
-            >
-              {tokenMenuItems}
-            </Menu>
+            <StyledMenu id="token-list" sx={{ display: { xs: 'none', md: 'block' } }} {...bindMenu(tokenPopover)}>
+              <TokenMenuItems dense />
+            </StyledMenu>
             <Button
-              aria-label="contract-list"
-              aria-haspopup="true"
-              aria-expanded={anchorElLabel === 'contract-list' ? 'true' : undefined}
-              aria-controls={anchorElLabel === 'contract-list' ? 'contract-list' : undefined}
-              onClick={handleMenuListOpen}
-              color="inherit"
+              color="secondary"
               disableRipple
+              sx={{
+                'textTransform': 'none',
+                'mx': 2,
+                '&.MuiButtonBase-root:hover': {
+                  bgcolor: 'transparent',
+                },
+              }}
             >
-              {t(`contracts`)}
+              <NextLink href={`/contracts`} passHref>
+                <Link href={`/contracts`} title={t(`contracts`)} underline="none" color="secondary">
+                  {t(`contracts`)}
+                </Link>
+              </NextLink>
             </Button>
-            <Menu
-              id="contract-list"
-              anchorEl={anchorEl}
-              open={anchorElLabel === 'contract-list'}
-              onClose={handleMenuListClose}
-              MenuListProps={{ 'aria-labelledby': 'contract-item' }}
-              sx={{ display: { xs: 'none', md: 'block' } }}
-            >
-              {contractMenuItems}
-            </Menu>
             <Button
-              aria-label="more-list"
-              aria-haspopup="true"
-              aria-expanded={anchorElLabel === 'more-list' ? 'true' : undefined}
-              aria-controls={anchorElLabel === 'more-list' ? 'more-list' : undefined}
-              onClick={handleMenuListOpen}
-              color="inherit"
+              color="secondary"
               disableRipple
+              sx={{
+                'textTransform': 'none',
+                'mx': 2,
+                '&.MuiButtonBase-root:hover': {
+                  bgcolor: 'transparent',
+                },
+              }}
             >
-              {t(`more`)}
+              <NextLink href={`/charts`} passHref>
+                <Link href={`/charts`} title={t(`charts`)} underline="none" color="secondary">
+                  {t(`charts`)}
+                </Link>
+              </NextLink>
             </Button>
-            <Menu
-              id="more-list"
-              anchorEl={anchorEl}
-              open={anchorElLabel === 'more-list'}
-              onClose={handleMenuListClose}
-              MenuListProps={{ 'aria-labelledby': 'more-item' }}
-              sx={{ display: { xs: 'none', md: 'block' } }}
-            >
-              {moreMenuItems}
-            </Menu>
             <Button
-              aria-label="chain-type"
-              aria-haspopup="true"
-              aria-expanded={anchorElLabel === 'chain-type' ? 'true' : undefined}
-              aria-controls={anchorElLabel === 'chain-type' ? 'chain-type' : undefined}
-              onClick={handleMenuListOpen}
-              color="inherit"
+              color="secondary"
               disableRipple
+              sx={{
+                'textTransform': 'none',
+                'mx': 2,
+                '& .MuiButton-endIcon': { m: 0 },
+                '&.MuiButtonBase-root:hover': {
+                  bgcolor: 'transparent',
+                },
+              }}
+              endIcon={chainPopover.isOpen ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+              {...bindHover(chainPopover)}
             >
               {t(process.env.NEXT_PUBLIC_CHAIN_TYPE || CHAIN_TYPE_LIST[1])}
             </Button>
-            <Menu
-              id="chain-type"
-              anchorEl={anchorEl}
-              open={anchorElLabel === 'chain-type'}
-              onClose={handleMenuListClose}
-              MenuListProps={{ 'aria-labelledby': 'chain-type' }}
-              sx={{ display: { xs: 'none', md: 'block' } }}
-            >
-              {chainMenuItems}
-            </Menu>
-            <IconButton
-              aria-label="i18n"
-              aria-haspopup="true"
-              aria-expanded={anchorElLabel === 'i18n' ? 'true' : undefined}
-              aria-controls={anchorElLabel === 'i18n' ? 'i18n' : undefined}
-              onClick={handleMenuListOpen}
-              color="inherit"
+            <StyledMenu id="chain-type" sx={{ display: { xs: 'none', md: 'block' } }} {...bindMenu(chainPopover)}>
+              <ChainMenuItems dense />
+            </StyledMenu>
+            <Button
+              color="secondary"
               disableRipple
+              sx={{
+                'textTransform': 'none',
+                'ml': 2,
+                '& [class^=MuiButton-]': { ml: 0, mr: 0.5 },
+                'pr': 0,
+                '&.MuiButtonBase-root:hover': {
+                  bgcolor: 'transparent',
+                },
+              }}
+              startIcon={<LanguageIcon fontSize="small" />}
+              endIcon={languagePopover.isOpen ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+              {...bindHover(languagePopover)}
             >
-              <TranslateIcon fontSize="small" />
-            </IconButton>
-            <Menu
-              id="i18n"
-              anchorEl={anchorEl}
-              open={anchorElLabel === 'i18n'}
-              onClose={handleMenuListClose}
-              MenuListProps={{ 'aria-labelledby': 'locale' }}
-              sx={{ display: { xs: 'none', md: 'block' } }}
-            >
-              {localeMenuItems}
-            </Menu>
+              {language === 'zh-CN' ? '中文' : 'Eng'}
+            </Button>
+            <StyledMenu id="i18n" sx={{ display: { xs: 'none', md: 'block' } }} {...bindMenu(languagePopover)}>
+              <LocaleMenuItems dense />
+            </StyledMenu>
           </Box>
           <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
             <IconButton
               aria-label="mobile-menu"
-              size="large"
+              size="small"
               aria-haspopup="true"
               onClick={handleMenuListOpen}
-              color="inherit"
+              color="primary"
+              disableRipple
+              sx={{ p: 0 }}
             >
-              <MoreIcon />
+              {anchorElLabel === 'mobile-menu' ? (
+                <SvgIcon component={CloseIcon} />
+              ) : (
+                <SvgIcon component={MobileMenuIcon} />
+              )}
             </IconButton>
-            <Menu
+            <Backdrop
+              sx={{ zIndex: theme => theme.zIndex.drawer + 1, top: 56 }}
+              open={anchorElLabel === 'mobile-menu'}
+            />
+            <MobileMenu
               id="mobile-menu"
               anchorEl={anchorEl}
               open={anchorElLabel === 'mobile-menu'}
               onClose={handleMenuListClose}
               MenuListProps={{ 'aria-labelledby': 'mobile-menu' }}
-              sx={{ textTransform: 'capitalize', display: { xs: 'block', md: 'none' } }}
+              sx={{
+                textTransform: 'capitalize',
+                display: { xs: 'block', md: 'none' },
+              }}
               autoFocus={false}
             >
-              {tokenMenuItems}
-              <Divider />
-              {contractMenuItems}
-              <Divider />
-              {moreMenuItems}
-              <Divider />
-              {chainMenuItems}
-              <Divider />
-              {localeMenuItems}
-            </Menu>
+              <MenuItem>
+                <NextLink href={`/`} passHref>
+                  <Link href={`/`} title={t(`home`)} underline="none">
+                    <Typography
+                      variant="body1"
+                      textAlign="left"
+                      color={isHome ? 'primary' : 'secondary'}
+                      sx={{ display: { xs: 'block', md: 'none', pointerEvents: 'none' }, py: '6px' }}
+                    >
+                      {t(`home`)}
+                    </Typography>
+                  </Link>
+                </NextLink>
+              </MenuItem>
+              <Accordion expanded={expanded === 'token'} onChange={handleMobileMenuChange('token')}>
+                <AccordionSummary aria-controls="token-content" id="token-header">
+                  <Typography>{t(`token`)}</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <TokenMenuItems dense={false} />
+                </AccordionDetails>
+              </Accordion>
+              <MenuItem>
+                <NextLink href={`/contracts`} passHref>
+                  <Link href={`/contracts`} title={t(`contracts`)} underline="none">
+                    <Typography
+                      variant="body1"
+                      textAlign="left"
+                      color={asPath.startsWith('/contracts') ? 'primary' : 'secondary'}
+                      sx={{ display: { xs: 'block', md: 'none', pointerEvents: 'none' }, py: '6px' }}
+                    >
+                      {t(`contracts`)}
+                    </Typography>
+                  </Link>
+                </NextLink>
+              </MenuItem>
+              <MenuItem>
+                <NextLink href={`/charts`} passHref>
+                  <Link href={`/charts`} title={t(`charts`)} underline="none">
+                    <Typography
+                      variant="body1"
+                      textAlign="left"
+                      color={asPath.startsWith('/charts') ? 'primary' : 'secondary'}
+                      sx={{ display: { xs: 'block', md: 'none', pointerEvents: 'none' }, py: '6px' }}
+                    >
+                      {t(`charts`)}
+                    </Typography>
+                  </Link>
+                </NextLink>
+              </MenuItem>
+              <Accordion expanded={expanded === 'chainType'} onChange={handleMobileMenuChange('chainType')}>
+                <AccordionSummary aria-controls="chainType-content" id="chainType-header">
+                  <Typography>{t(`chainType`)}</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <ChainMenuItems dense={false} />
+                </AccordionDetails>
+              </Accordion>
+              <Accordion expanded={expanded === 'language'} onChange={handleMobileMenuChange('language')}>
+                <AccordionSummary aria-controls="language-content" id="language-header">
+                  <Typography>{t(`language`)}</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <LocaleMenuItems dense={false} />
+                </AccordionDetails>
+              </Accordion>
+            </MobileMenu>
           </Box>
         </Toolbar>
       </Container>

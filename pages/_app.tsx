@@ -7,12 +7,13 @@ import { appWithTranslation } from 'next-i18next'
 import { AppProps } from 'next/app'
 import ErrorBoundary from 'components/ErrorBoundary'
 import { theme } from '../utils'
-import '../styles/globals.css'
+import '../styles/globals.scss'
 import '@fontsource/roboto/300.css'
 import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
 import '@fontsource/material-icons'
+import '@fontsource/jetbrains-mono'
 
 const queryClient = new QueryClient()
 
@@ -80,7 +81,7 @@ const Agera = ({ Component, pageProps }: AppProps) => {
         <ErrorBoundary>
           {loading ? (
             <LinearProgress
-              color="secondary"
+              color="primary"
               variant="determinate"
               value={loading}
               sx={{

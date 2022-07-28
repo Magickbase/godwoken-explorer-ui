@@ -1,0 +1,16 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 1.5rem;
+  padding: 0 8px;
+  font-size: 0.875rem;
+  line-height: 1;
+  color: #666;
+  text-transform: capitalize;
+  background-color: #f0f0f0;
+  text-align: center;
+  border-radius: 0.75rem;
+  font-family: 'Roboto';
+  user-select: none;
+}

@@ -1,0 +1,44 @@
+.container {
+  overflow-y: auto;
+  font-weight: 400;
+  font-size: 0.875rem;
+  font-family: 'Roboto';
+
+  table {
+    min-width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead {
+    tr {
+      height: 3rem;
+      color: var(--secondary-text-color);
+      background-color: #fafafa;
+    }
+  }
+  tbody {
+    tr {
+      border-bottom: 1px solid var(--border-color);
+    }
+    td {
+      vertical-align: middle;
+      padding-top: 1.25rem;
+      padding-bottom: 1.25rem;
+      color: var(--primary-text-color);
+    }
+  }
+  th,
+  td {
+    vertical-align: middle;
+    text-align: left;
+    padding: 0 1.25rem;
+    white-space: nowrap;
+    box-sizing: border-box;
+    &:first-child {
+      padding-left: 1.5rem;
+    }
+    &:last-child {
+      padding-right: 1.5rem;
+    }
+  }
+}

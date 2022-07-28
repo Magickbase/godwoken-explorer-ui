@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-context('Transaction Page', () => {
+context.skip('Transaction Page', () => {
   let hash: string
   before(() => {
     cy.fixture('tx').then(tx => {

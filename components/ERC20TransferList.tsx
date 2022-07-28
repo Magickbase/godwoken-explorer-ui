@@ -95,10 +95,10 @@ const TransferList: React.FC<{
                     </time>
                   </TableCell>
                   <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                    <Address address={item.from} size="normal" />
+                    <Address address={item.from} />
                   </TableCell>
                   <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                    {item.to ? <Address address={item.to} size="normal" /> : null}
+                    {item.to ? <Address address={item.to} /> : null}
                   </TableCell>
                   <TableCell sx={{ display: { xs: 'table-cell', md: 'none' } }}>
                     <Stack>

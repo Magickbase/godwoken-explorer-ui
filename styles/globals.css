@@ -39,6 +39,11 @@ input[type='number']::-webkit-outer-spin-button {
     --footer-height: 127px;
   }
 }
+
 table thead th {
   white-space: nowrap;
+}
+
+video {
+  user-select: none;
 }

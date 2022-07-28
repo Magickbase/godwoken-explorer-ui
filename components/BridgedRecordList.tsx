@@ -66,7 +66,7 @@ const BridgedRecordList: React.FC<{
                   </TableCell>
                   {showUser ? (
                     <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                      <Address address={r.to} size="normal" />
+                      <Address address={r.to} />
                     </TableCell>
                   ) : null}
                   <TableCell>
