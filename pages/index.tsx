@@ -34,7 +34,14 @@ type State = API.Home.Parsed
 // TODO: add polyjuice status
 // TODO: how to display special address
 
-const formatAddress = (addr: string, bigScreen: boolean = true) => {
+const formatAddress = (addr: string, bigScreen: boolean = true, isSpecial: boolean = false) => {
+  if (isSpecial) {
+    if (!bigScreen && addr.length > 15) {
+      return addr.split(' ')[0] + '...'
+    } else {
+      return addr
+    }
+  }
   if (bigScreen && addr.length > 16) {
     return `${addr.slice(0, 8)}...${addr.slice(-7)}`
   }
@@ -385,7 +392,7 @@ const SPECIAL_ADDR_TYPES = [
 const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: boolean }> = ({ list, isLoading }) => {
   const [t, { language }] = useTranslation('tx')
   const theme = useTheme()
-  const matches = useMediaQuery(theme.breakpoints.up('sm'))
+  const isBigScreen = useMediaQuery(theme.breakpoints.up('sm'))
   if (isLoading) {
     return (
       <ListContainer title={t(`latestTxs`)} link="/txs" tooltip={t(`view_all_transactions`, { ns: 'common' })}>
@@ -453,7 +460,7 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
                                 '&:hover': { backgroundColor: 'unset' },
                               }}
                             >
-                              {formatAddress(hash, matches)}
+                              {formatAddress(hash, isBigScreen)}
                             </Button>
                           </NextLink>
                         </Box>
@@ -482,7 +489,7 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
                           color="secondary"
                           noWrap
                         >
-                          {`${t('from')}:`}
+                          {`${t('from')}`}
                         </Typography>
                         <Tooltip title={from} className="mono-font">
                           <Box>
@@ -492,18 +499,23 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
                                 color="primary"
                                 href={`/account/${from}`}
                                 component={Link}
-                                className="mono-font"
+                                className={isSpecialFrom ? 'Roboto' : 'mono-font'}
                                 disableRipple
                                 fontSize={{ xs: 13, md: 14 }}
                                 sx={{
                                   'p': 0,
                                   'pl': 1,
-                                  'textTransform': isSpecialFrom ? 'uppercase' : 'lowercase',
+                                  'textTransform': 'lowercase',
                                   '&:hover': { backgroundColor: 'unset' },
                                   'whiteSpace': 'nowrap',
+                                  'fontWeight': 400,
                                 }}
                               >
-                                {isSpecialFrom ? tx.from_account.type.replace(/_/g, ' ') : formatAddress(from, matches)}
+                                {formatAddress(
+                                  isSpecialFrom ? tx.from_account.type.replace(/_/g, ' ') : from,
+                                  isBigScreen,
+                                  isSpecialFrom,
+                                )}
                               </Button>
                             </NextLink>
                           </Box>
@@ -515,8 +527,10 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
                           sx={{ textTransform: 'capitalize' }}
                           color="secondary"
                           noWrap
+                          width={{ xs: '100%', sm: 'auto' }}
+                          textAlign={{ xs: 'right', sm: 'left' }}
                         >
-                          {`${t('to')}:`}
+                          {`${t('to')}`}
                         </Typography>
                         <Tooltip title={to} className="mono-font">
                           <Box>
@@ -526,18 +540,25 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
                                 color="primary"
                                 href={`/account/${to}`}
                                 component={Link}
-                                className="mono-font"
+                                className={isSpecialTo ? 'Roboto' : 'mono-font'}
                                 disableRipple
                                 fontSize={{ xs: 13, md: 14 }}
+                                minWidth={{ xs: 98, sm: 'auto' }}
+                                justifyContent={{ xs: 'flex-end', sm: 'center' }}
                                 sx={{
                                   'p': 0,
                                   'pl': 1,
-                                  'textTransform': isSpecialFrom ? 'uppercase' : 'lowercase',
+                                  'textTransform': 'lowercase',
                                   '&:hover': { backgroundColor: 'unset' },
                                   'whiteSpace': 'nowrap',
+                                  'fontWeight': 400,
                                 }}
                               >
-                                {isSpecialTo ? tx.to_account.type.replace(/_/g, ' ') : formatAddress(to, matches)}
+                                {formatAddress(
+                                  isSpecialTo ? tx.to_account.type.replace(/_/g, ' ') : to,
+                                  isBigScreen,
+                                  isSpecialTo,
+                                )}
                               </Button>
                             </NextLink>
                           </Box>
@@ -573,7 +594,12 @@ const Home = () => {
           <Search />
         </Container>
         <Container sx={{ px: { md: 3, lg: 1 }, pr: { xs: 0 } }}>
-          <Stack direction="row" sx={{ pt: 2.5, pb: 1 }} justifyContent="space-between" alignItems="center">
+          <Stack
+            direction="row"
+            sx={{ pt: 2.5, pb: 1, overflow: 'hidden' }}
+            justifyContent="space-between"
+            alignItems="center"
+          >
             <Statistic {...staticsData?.statistic} isLoading={isStaticsLoading} />
             <video
               autoPlay

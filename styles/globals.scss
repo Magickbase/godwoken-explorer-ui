@@ -52,8 +52,16 @@ input[type='number']::-webkit-outer-spin-button {
   appearance: none;
 }
 
+table thead th {
+  white-space: nowrap;
+}
+
 video::-webkit-media-controls {
   display: none !important;
+}
+
+video {
+  user-select: none;
 }
 
 @media screen and (max-width: 600px) {
