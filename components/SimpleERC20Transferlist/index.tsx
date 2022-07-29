@@ -156,7 +156,7 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
                 </IconButton>
               </Stack>
             </th>
-            <th className={styles.tokenLogo}>{t('token')}</th>
+            <th className={styles.tokenLogo}>{t('token', { ns: 'common' })}</th>
             <th>{`${t('value')}`}</th>
           </tr>
         </thead>
@@ -190,7 +190,7 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
             ))
           ) : (
             <tr>
-              <td colSpan={3} style={{ textAlign: 'center' }}>
+              <td colSpan={4} style={{ textAlign: 'center' }}>
                 {t(`no_records`)}
               </td>
             </tr>
