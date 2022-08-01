@@ -56,7 +56,7 @@ const StyledFooter = styled(Box)`
 
   @media (max-width: 900px) {
     #footer-container {
-      padding-top: 10px;
+      padding-top: 14px;
       grid-template-rows: 40px 85px 1px 66px;
       grid-template-columns: 1fr;
       grid-template-areas:
@@ -73,9 +73,11 @@ const StyledFooter = styled(Box)`
     #footer-links {
       grid-area: links;
       margin-top: 0;
-      padding-left: 24px;
       justify-self: center;
       align-self: center;
+      a {
+        font-size: 12px;
+      }
     }
     #footer-divider {
       display: block;
@@ -129,7 +131,7 @@ const Footer = () => {
             height: '55px',
             justifyContent: { xs: 'center', md: 'left' },
             alignItems: 'center',
-            pl: { xs: 1, md: 2, lg: 0 },
+            pl: { xs: 0, md: 2, lg: 0 },
           }}
         >
           {links.map((link, i) => (
@@ -140,7 +142,7 @@ const Footer = () => {
                   title={link.label}
                   color="inherit"
                   component={Link}
-                  sx={{ textTransform: 'none', fontWeight: 400, mr: 1.4 }}
+                  sx={{ textTransform: 'none', fontWeight: 400 }}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -151,8 +153,7 @@ const Footer = () => {
                 <Divider
                   sx={{
                     display: { xs: 'block', md: 'none' },
-                    ml: 1.4,
-                    mr: i === links.length - 2 ? 1.5 : 2.8,
+                    mx: 1.4,
                     height: '12px',
                     alignSelf: 'center',
                     opacity: 0.5,

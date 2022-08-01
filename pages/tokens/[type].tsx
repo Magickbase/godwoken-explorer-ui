@@ -21,6 +21,15 @@ const BRIDGED_TOKEN_TEMPLATE_URL =
 const NATIVE_TOKEN_TEMPLATE_URL =
   'https://github.com/magickbase/godwoken_explorer/issues/new?assignees=Keith-CY&labels=Token+Registration&template=register-a-new-native-erc20-token.yml&title=%5BNative+ERC20+Token%5D+%2A%2AToken+Name%2A%2A'
 
+const parseTokenName = (name: string) => {
+  const parsed = name?.split(/\(via|from/) ?? []
+  return {
+    name: parsed[0]?.trim() ?? '',
+    bridge: parsed[1]?.trim() ?? '',
+    origin: parsed[2]?.trim().slice(0, -1) ?? '',
+  }
+}
+
 const TokenList = () => {
   const [t] = useTranslation(['tokens', 'common', 'list'])
   const {
@@ -172,12 +181,37 @@ const TokenList = () => {
                           <NextLink href={`/token/${token.id}`} passHref>
                             <Link
                               href={`/token/${token.id}`}
+                              display="flex"
+                              alignItems="center"
                               underline="none"
                               color="primary"
                               ml={1}
                               whiteSpace="nowrap"
                             >
-                              {token.name || '-'}
+                              <Typography
+                                fontSize="inherit"
+                                fontFamily="inherit"
+                                sx={{
+                                  display: {
+                                    xs: 'none',
+                                    md: 'flex',
+                                  },
+                                }}
+                              >
+                                {token.address}
+                              </Typography>
+                              <Typography
+                                fontSize="inherit"
+                                fontFamily="inherit"
+                                sx={{
+                                  display: {
+                                    xs: 'flex',
+                                    md: 'none',
+                                  },
+                                }}
+                              >
+                                {`${token.address.slice(0, 8)}...${token.address.slice(-8)}`}
+                              </Typography>
                             </Link>
                           </NextLink>
                         </Stack>
