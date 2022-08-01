@@ -2,20 +2,19 @@ import Tooltip from 'components/Tooltip'
 import { TokenOrigins } from 'utils'
 import styles from './styles.module.scss'
 
+const DEFAULT_LOGO_URL = '/icons/token-placeholder.svg'
 const TokenLogo: React.FC<{ logo: string; name: string }> = ({ name, logo }) => {
   const origin = TokenOrigins.find(o => name?.endsWith(` from ${o.name})`))
 
-  const Token = logo ? (
+  const Token = (
     <img
       className={styles.token}
-      src={logo}
+      src={logo || DEFAULT_LOGO_URL}
       title={name}
       loading="lazy"
       crossOrigin="anonymous"
       referrerPolicy="no-referrer"
     />
-  ) : (
-    <div className={styles.token}>{name?.[0] ?? '?'}</div>
   )
 
   if (!origin) {
@@ -28,7 +27,7 @@ const TokenLogo: React.FC<{ logo: string; name: string }> = ({ name, logo }) => 
         <div className={styles.overlap}>
           <img
             className={styles.origin}
-            src={origin.logo}
+            src={origin.logo || DEFAULT_LOGO_URL}
             loading="lazy"
             crossOrigin="anonymous"
             referrerPolicy="no-referrer"
