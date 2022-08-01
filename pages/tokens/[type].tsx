@@ -52,7 +52,7 @@ const TokenList = () => {
     { key: type === 'bridge' ? 'circulatingSupply' : 'totalSupply' },
     { key: 'holderCount' },
     { key: 'origin' },
-    { key: 'bridge' },
+    { key: 'bridgeName' },
   ]
 
   const { isLoading, data } = useQuery(
