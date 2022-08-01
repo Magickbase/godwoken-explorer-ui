@@ -1,0 +1,43 @@
+.container {
+  position: relative;
+  display: inline-flex;
+  label {
+    display: flex;
+    cursor: pointer;
+    input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+  }
+  .menu {
+    position: absolute;
+    top: calc(100% + 1rem);
+    right: 0;
+    transform: translateX(50%);
+    pointer-events: none;
+    background: #fff;
+    box-shadow: 0 0 2px #000;
+    opacity: 0;
+    padding: 0.5rem;
+
+    input {
+      padding: 4px 8px;
+      border: 1px solid #f0f0f0;
+    }
+  }
+
+  .btns {
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &:focus-within {
+    .menu {
+      pointer-events: unset;
+      opacity: 1;
+    }
+  }
+}
