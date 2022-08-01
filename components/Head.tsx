@@ -31,6 +31,7 @@ const Head = () => (
     <link rel="apple-touch-icon" sizes="180x180" href="/icon-192x192.png" />
     <link rel="shortcut icon" href="/favicon.ico" />
     <link rel="manifest" href="/manifest.json" />
+    <script src="/scripts/crisp.js" defer />
   </NextHead>
 )
 
