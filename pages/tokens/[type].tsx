@@ -31,6 +31,15 @@ const BRIDGED_TOKEN_TEMPLATE_URL =
 const NATIVE_TOKEN_TEMPLATE_URL =
   'https://github.com/magickbase/godwoken_explorer/issues/new?assignees=Keith-CY&labels=Token+Registration&template=register-a-new-native-erc20-token.yml&title=%5BNative+ERC20+Token%5D+%2A%2AToken+Name%2A%2A'
 
+const parseTokenName = (name: string) => {
+  const parsed = name?.split(/\(via|from/) ?? []
+  return {
+    name: parsed[0]?.trim() ?? '',
+    bridge: parsed[1]?.trim() ?? '',
+    origin: parsed[2]?.trim().slice(0, -1) ?? '',
+  }
+}
+
 const TokenList = () => {
   const [t] = useTranslation(['tokens', 'common'])
   const {
@@ -42,6 +51,8 @@ const TokenList = () => {
     { key: 'address', label: 'address' },
     { key: type === 'bridge' ? 'circulatingSupply' : 'totalSupply' },
     { key: 'holderCount' },
+    { key: 'origin' },
+    { key: 'bridge' },
   ]
 
   const { isLoading, data } = useQuery(
@@ -85,7 +96,7 @@ const TokenList = () => {
                       title={t(h.label ?? h.key)}
                       sx={{
                         whiteSpace: 'nowrap',
-                        display: idx === 1 ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
+                        display: [1, 4, 5].includes(idx) ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
                       }}
                     >
                       {t(h.label ?? h.key)}
@@ -103,78 +114,102 @@ const TokenList = () => {
                     </TableRow>
                   ))
                 ) : data.tokens.length ? (
-                  data.tokens.map(token => (
-                    <TableRow key={token.id.toString()}>
-                      <TableCell>
-                        <Stack direction="row" alignItems="center">
-                          <Avatar
-                            src={token.icon ?? null}
-                            sx={{
-                              bgcolor: token.icon ? '#f0f0f0' : nameToColor(token.name),
-                              img: { objectFit: 'fill' },
-                            }}
-                          >
-                            {token.name?.[0] ?? '?'}
-                          </Avatar>
+                  data.tokens.map(token => {
+                    const { name, bridge, origin } = parseTokenName(token.name)
+                    return (
+                      <TableRow key={token.id.toString()}>
+                        <TableCell title={token.name}>
+                          <Stack direction="row" alignItems="center">
+                            <Avatar
+                              src={token.icon ?? null}
+                              sx={{
+                                bgcolor: token.icon ? '#f0f0f0' : nameToColor(name),
+                                img: { objectFit: 'fill' },
+                              }}
+                            >
+                              {name[0] ?? '?'}
+                            </Avatar>
+                            <NextLink href={`/token/${token.id}`}>
+                              <Link
+                                href={`/token/${token.id}`}
+                                underline="none"
+                                color="secondary"
+                                ml={2}
+                                whiteSpace="nowrap"
+                              >
+                                {name || '-'}
+                              </Link>
+                            </NextLink>
+                          </Stack>
+                        </TableCell>
+                        <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
                           <NextLink href={`/token/${token.id}`}>
                             <Link
                               href={`/token/${token.id}`}
+                              display="flex"
+                              alignItems="center"
                               underline="none"
                               color="secondary"
-                              ml={2}
-                              whiteSpace="nowrap"
+                              className="mono-font"
                             >
-                              {token.name || '-'}
+                              <Typography
+                                fontSize="inherit"
+                                fontFamily="inherit"
+                                sx={{
+                                  display: {
+                                    xs: 'none',
+                                    md: 'flex',
+                                  },
+                                }}
+                              >
+                                {token.address}
+                              </Typography>
+                              <Typography
+                                fontSize="inherit"
+                                fontFamily="inherit"
+                                sx={{
+                                  display: {
+                                    xs: 'flex',
+                                    md: 'none',
+                                  },
+                                }}
+                              >
+                                {`${token.address.slice(0, 8)}...${token.address.slice(-8)}`}
+                              </Typography>
                             </Link>
                           </NextLink>
-                        </Stack>
-                      </TableCell>
-                      <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
-                        <NextLink href={`/token/${token.id}`}>
-                          <Link
-                            href={`/token/${token.id}`}
-                            display="flex"
-                            alignItems="center"
-                            underline="none"
-                            color="secondary"
-                            className="mono-font"
-                          >
-                            <Typography
-                              fontSize="inherit"
-                              fontFamily="inherit"
-                              sx={{
-                                display: {
-                                  xs: 'none',
-                                  md: 'flex',
-                                },
-                              }}
-                            >
-                              {token.address}
-                            </Typography>
-                            <Typography
-                              fontSize="inherit"
-                              fontFamily="inherit"
-                              sx={{
-                                display: {
-                                  xs: 'flex',
-                                  md: 'none',
-                                },
-                              }}
-                            >
-                              {`${token.address.slice(0, 8)}...${token.address.slice(-8)}`}
-                            </Typography>
-                          </Link>
-                        </NextLink>
-                      </TableCell>
-                      <TableCell style={{ whiteSpace: 'nowrap' }}>
-                        {formatAmount(token.supply || '0', {
-                          symbol: token.symbol?.split('.')[0] ?? '',
-                          decimal: token.decimal,
-                        })}
-                      </TableCell>
-                      <TableCell>{token.holderCount || '0'}</TableCell>
-                    </TableRow>
-                  ))
+                        </TableCell>
+                        <TableCell style={{ whiteSpace: 'nowrap' }}>
+                          {formatAmount(token.supply || '0', {
+                            symbol: token.symbol?.split('.')[0] ?? '',
+                            decimal: token.decimal,
+                          })}
+                        </TableCell>
+                        <TableCell>{token.holderCount || '0'}</TableCell>
+                        <TableCell
+                          sx={{
+                            display: {
+                              xs: 'none',
+                              sm: 'table-cell',
+                            },
+                          }}
+                        >
+                          {origin || '-'}
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            display: {
+                              xs: 'none',
+                              sm: 'table-cell',
+                            },
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {bridge || '-'}
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })
                 ) : (
                   <TableRow>
                     <TableCell colSpan={headers.length}>{t(`no_records`)}</TableCell>
