@@ -9,7 +9,7 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 import Table from 'components/Table'
 import PageTitle from 'components/PageTitle'
 import SubpageHead from 'components/SubpageHead'
-import Pagination from 'components/Pagination'
+// import Pagination from 'components/SimplePagination'
 import { SIZES } from 'components/PageSize'
 import TxListComp, { fetchTxList } from 'components/TxList'
 import { PCKB_SYMBOL } from 'utils'
@@ -138,7 +138,7 @@ const TxList = () => {
               md: '1px solid #F0F0F0',
             },
             pt: { xs: 1.5, md: 2 },
-            pb: 2,
+            // pb: 2,
             mt: { xs: 2, md: 3 },
             bgcolor: '#fff',
           }}
@@ -158,8 +158,7 @@ const TxList = () => {
                   from: txList.entries[txList.entries.length - 1].block.number,
                 })}
               </Typography>
-              {/* TODO: need update from TxListComp first  */}
-              <Pagination page={1} total={txList.metadata.total_count * +page_size} />
+              {/* <Pagination {...txList.metadata} pageSize={page_size as string} /> */}
             </Stack>
           ) : null}
 
