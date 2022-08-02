@@ -156,7 +156,7 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
                 </IconButton>
               </Stack>
             </th>
-            <th className={styles.tokenLogo}>{t('token', { ns: 'common' })}</th>
+            {/* <th className={styles.tokenLogo}>{t('token', { ns: 'common' })}</th> */}
             <th>{`${t('value')}`}</th>
           </tr>
         </thead>
@@ -180,17 +180,17 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
                     </a>
                   </NextLink>
                 </td>
-                <td className={styles.tokenLogo}>
-                  <NextLink href={`/token/${item.udt.id}`}>
-                    <TokenLogo name={item.udt.name} logo={item.udt.icon} />
-                  </NextLink>
-                </td>
+                {/* <td className={styles.tokenLogo}> */}
+                {/*   <NextLink href={`/token/${item.udt.id}`}> */}
+                {/*     <TokenLogo name={item.udt.name} logo={item.udt.icon} /> */}
+                {/*   </NextLink> */}
+                {/* </td> */}
                 <td title={item.udt.name}>{new BigNumber(item.amount).toFormat()}</td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan={4} style={{ textAlign: 'center' }}>
+              <td colSpan={3} style={{ textAlign: 'center' }}>
                 {t(`no_records`)}
               </td>
             </tr>
