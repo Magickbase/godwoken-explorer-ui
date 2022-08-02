@@ -22,11 +22,11 @@ const NATIVE_TOKEN_TEMPLATE_URL =
   'https://github.com/magickbase/godwoken_explorer/issues/new?assignees=Keith-CY&labels=Token+Registration&template=register-a-new-native-erc20-token.yml&title=%5BNative+ERC20+Token%5D+%2A%2AToken+Name%2A%2A'
 
 const parseTokenName = (name: string) => {
-  const parsed = name?.split(/\(via|from/) ?? []
+  const parsed = name?.match(/Wrapped (\w+) \((\w+) from (\w+)\)/) ?? []
   return {
-    name: parsed[0]?.trim() ?? '',
-    bridge: parsed[1]?.trim() ?? '',
-    origin: parsed[2]?.trim().slice(0, -1) ?? '',
+    name: parsed[1]?.trim() ?? '',
+    bridge: parsed[2]?.trim() ?? '',
+    origin: parsed[3]?.trim() ?? '',
   }
 }
 
@@ -43,9 +43,7 @@ const TokenList = () => {
     { key: 'address', label: 'address' },
     { key: type === 'bridge' ? 'circulatingSupply' : 'totalSupply' },
     { key: 'holderCount' },
-    // TODO: in split UAN feature, add origin and bridge for bridge token
-    // { key: 'origin' },
-    // { key: 'bridge' },
+    ...(type === 'bridge' ? [{ key: 'origin' }, { key: 'bridge' }] : []),
   ]
 
   const { isLoading, data } = useQuery(
@@ -136,7 +134,7 @@ const TokenList = () => {
           <TableContainer sx={{ width: '100%' }}>
             <Table>
               <thead style={{ textTransform: 'capitalize', fontSize: isMobile ? 12 : 14 }}>
-                <tr>
+                <tr style={{ borderTop: '1px solid #f0f0f0', borderBottom: '1px solid #f0f0f0' }}>
                   {headers.map((h, idx) => (
                     <th
                       key={h.key}
@@ -161,77 +159,80 @@ const TokenList = () => {
                     </tr>
                   ))
                 ) : data.tokens.length ? (
-                  data.tokens.map(token => (
-                    <tr key={token.id.toString()}>
-                      <td>
-                        <Stack direction="row" alignItems="center">
-                          <Avatar
-                            src={token.icon ?? null}
-                            sx={{
-                              bgcolor: token.icon ? '#f0f0f0' : nameToColor(token.name),
-                              img: { objectFit: 'fill' },
-                              width: isMobile ? 24 : 32,
-                              height: isMobile ? 24 : 32,
+                  data.tokens.map(token => {
+                    let { name, bridge, origin } = parseTokenName(token.name)
+                    if (!name) {
+                      name = token.name
+                    }
+                    const supply = formatAmount(token.supply || '0', {
+                      symbol: token.symbol?.split('.')[0] ?? '',
+                      decimal: token.decimal,
+                    })
+                    return (
+                      <tr key={token.id.toString()}>
+                        <td title={name}>
+                          <Stack direction="row" alignItems="center">
+                            <Avatar
+                              src={token.icon ?? null}
+                              sx={{
+                                bgcolor: token.icon ? '#f0f0f0' : nameToColor(name),
+                                img: { objectFit: 'fill' },
+                                width: isMobile ? 24 : 32,
+                                height: isMobile ? 24 : 32,
+                              }}
+                            >
+                              {name?.[0] ?? '?'}
+                            </Avatar>
+                            {/* TODO: Change Avatar to this */}
+                            {/* <TokenLogo name={token.udt.name} logo={token.udt.icon} /> */}
+                            <NextLink href={`/token/${token.id}`} passHref>
+                              <Link
+                                href={`/token/${token.id}`}
+                                display="flex"
+                                alignItems="center"
+                                underline="none"
+                                color="primary"
+                                ml={1}
+                              >
+                                <Typography
+                                  fontSize="inherit"
+                                  fontFamily="inherit"
+                                  sx={{
+                                    whiteSpace: 'nowrap',
+                                    textOverflow: 'ellipsis',
+                                    overflow: 'hidden',
+                                    width: isMobile ? 90 : 130,
+                                  }}
+                                >
+                                  {name}
+                                </Typography>
+                              </Link>
+                            </NextLink>
+                          </Stack>
+                        </td>
+                        <td>
+                          <Address address={token.address} leading={isMobile ? 8 : 30} sx={{ width: 'min-content' }} />
+                        </td>
+                        <td>
+                          <div
+                            style={{
+                              whiteSpace: 'nowrap',
+                              textOverflow: 'ellipsis',
+                              overflow: 'hidden',
+                              width: type === 'bridge' ? 180 : 250,
                             }}
                           >
-                            {token.name?.[0] ?? '?'}
-                          </Avatar>
-                          {/* TODO: Change Avatar to this */}
-                          {/* <TokenLogo name={token.udt.name} logo={token.udt.icon} /> */}
-                          <NextLink href={`/token/${token.id}`} passHref>
-                            <Link
-                              href={`/token/${token.id}`}
-                              display="flex"
-                              alignItems="center"
-                              underline="none"
-                              color="primary"
-                              ml={1}
-                              whiteSpace="nowrap"
-                            >
-                              <Typography
-                                fontSize="inherit"
-                                fontFamily="inherit"
-                                sx={{
-                                  display: {
-                                    xs: 'none',
-                                    md: 'flex',
-                                  },
-                                }}
-                              >
-                                {token.address}
-                              </Typography>
-                              <Typography
-                                fontSize="inherit"
-                                fontFamily="inherit"
-                                sx={{
-                                  display: {
-                                    xs: 'flex',
-                                    md: 'none',
-                                  },
-                                }}
-                              >
-                                {`${token.address.slice(0, 8)}...${token.address.slice(-8)}`}
-                              </Typography>
-                            </Link>
-                          </NextLink>
-                        </Stack>
-                      </td>
-                      <td>
-                        <Address address={token.address} leading={isMobile ? 8 : 30} sx={{ width: 'min-content' }} />
-                      </td>
-                      <td style={{ whiteSpace: 'nowrap', width: type === 'bridge' ? '15%' : '25%' }}>
-                        {formatAmount(token.supply || '0', {
-                          symbol: token.symbol?.split('.')[0] ?? '',
-                          decimal: token.decimal,
-                        })}
-                      </td>
-                      {/* TODO: in split UAN feature, fix this textAlign */}
-                      <td style={{ textAlign: type === 'bridge' ? 'end' : 'end' }}>{token.holderCount || '0'}</td>
-                      {/* TODO: in split UAN feature, add origin and bridge for bridge token */}
-                      {/* {type === 'bridge' && <td>{token.origin || '0'}</td>}
-                      {type === 'bridge' && <td style={{ textAlign: 'end' }}>{token.bridge || '0'}</td>} */}
-                    </tr>
-                  ))
+                            {supply}
+                          </div>
+                        </td>
+                        <td style={{ textAlign: type === 'bridge' ? 'left' : 'end', minWidth: isMobile ? 100 : 130 }}>
+                          {token.holderCount || '0'}
+                        </td>
+                        {type === 'bridge' && <td>{origin}</td>}
+                        {type === 'bridge' && <td style={{ textAlign: 'end' }}>{bridge}</td>}
+                      </tr>
+                    )
+                  })
                 ) : (
                   <tr>
                     <td colSpan={headers.length}>{t(`no_records`)}</td>
