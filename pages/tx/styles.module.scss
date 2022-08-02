@@ -39,6 +39,12 @@
         flex-basis: 168px !important;
       }
     }
+    dd {
+      a {
+        white-space: break-spaces;
+        word-break: break-all;
+      }
+    }
   }
 }
 
