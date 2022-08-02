@@ -13,8 +13,9 @@ import PageSize from 'components/PageSize'
 import Pagination from 'components/SimplePagination'
 import TransferDirection from 'components/TransferDirection'
 import Tooltip from 'components/Tooltip'
-import { timeDistance, GraphQLSchema, TxStatus, client, GCKB_DECIMAL, useFilterMenu, PCKB_UAN } from 'utils'
 import TxType from 'components/TxType'
+import { timeDistance, GraphQLSchema, TxStatus, client, GCKB_DECIMAL, useFilterMenu, PCKB_SYMBOL } from 'utils'
+import styles from './styles.module.scss'
 
 export type TxListProps = {
   transactions: {
@@ -161,7 +162,7 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
   })
 
   return (
-    <>
+    <div className={styles.container}>
       <Table>
         <thead>
           <tr>
@@ -175,8 +176,8 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
             <th>{t('age')}</th>
             <th>{t('from')}</th>
             <th>{t('to')}</th>
-            <th>{`${t('value')} (${PCKB_UAN})`}</th>
-            <th style={{ textAlign: 'right' }}>{t('type')}</th>
+            <th>{`${t('value')} (${PCKB_SYMBOL})`}</th>
+            <th>{t('type')}</th>
           </tr>
         </thead>
         <tbody>
@@ -195,12 +196,12 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
                           <HashLink label={`${hash.slice(0, 8)}...${hash.slice(-8)}`} href={`/tx/${hash}`} />
                         </div>
                       </Tooltip>
-                      {item.polyjuice ? (
-                        <TxStatusIcon
-                          status={getBlockStatus(item.block)}
-                          isSuccess={item.polyjuice.status === GraphQLSchema.PolyjuiceStatus.Succeed}
-                        />
-                      ) : null}
+                      <TxStatusIcon
+                        status={getBlockStatus(item.block)}
+                        isSuccess={
+                          item.polyjuice ? item.polyjuice.status === GraphQLSchema.PolyjuiceStatus.Succeed : true
+                        }
+                      />
                     </div>
                   </td>
                   <td>
@@ -300,7 +301,7 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
           </Typography>
         </div>
       ) : null}
-    </>
+    </div>
   )
 }
 export default TxList

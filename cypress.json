@@ -6,5 +6,7 @@
       "url": "/api/__coverage__"
     }
   },
+  "pluginsFile": "node_modules/@cypress/code-coverage/plugins",
+  "supportFile": "node_modules/@cypress/code-coverage/support",
   "projectId": "2sb35d"
 }

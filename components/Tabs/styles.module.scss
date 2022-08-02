@@ -13,6 +13,10 @@
     text-transform: capitalize;
     overflow-y: auto;
     border-bottom: 1px solid var(--border-color);
+    @media screen and (max-width: 1024px) {
+      height: 3.5rem;
+      font-size: 0.875rem;
+    }
   }
 
   a,
@@ -23,6 +27,9 @@
     padding: 0 2rem;
     color: var(--secondary-text-color);
     white-space: nowrap;
+    @media screen and (max-width: 1024px) {
+      padding: 0 1.25rem;
+    }
 
     &[data-active='true'] {
       color: var(--primary-color);
@@ -36,6 +43,9 @@
         width: 2.5rem;
         height: 2px;
         background-color: var(--primary-color);
+        @media screen and (max-width: 1024px) {
+          width: 2.75rem;
+        }
       }
     }
   }

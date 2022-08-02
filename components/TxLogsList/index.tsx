@@ -39,15 +39,9 @@ const TxLogsList = ({ list }: { list: ParsedEventLog[] }) => {
               <div className={styles.contractAddr}>
                 <div className={styles.field}>{t(`address`)}</div>
                 <NextLink href={`/account/${log.addressHash}`}>
-                  <Link
-                    href={`/account/${log.addressHash}`}
-                    underline="none"
-                    color="secondary"
-                    className="mono-font"
-                    whiteSpace="nowrap"
-                  >
+                  <a href={`/account/${log.addressHash}`} className="mono-font">
                     {log.addressHash}
-                  </Link>
+                  </a>
                 </NextLink>
               </div>
               {log.parsedLog ? (
@@ -71,7 +65,7 @@ const TxLogsList = ({ list }: { list: ParsedEventLog[] }) => {
                     <Link
                       href={`/account/${log.addressHash}?tab=contract`}
                       underline="none"
-                      color="secondary"
+                      color="primary.main"
                       whiteSpace="nowrap"
                       ml={2}
                     >
