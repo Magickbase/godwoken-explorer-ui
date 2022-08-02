@@ -44,7 +44,7 @@ const CKB_UDT_ID = '1'
 export const fetchUdtList = (variables: Variables) =>
   client
     .request<{ account_udts: UdtList }>(udtListQuery, variables)
-    .then(data => data.account_udts.filter(u => u.udt.id !== CKB_UDT_ID))
+    .then(data => data.account_udts.filter(u => u.udt.id !== CKB_UDT_ID && u.udt.type === GraphQLSchema.UdtType.Native))
     .catch(err => {
       console.error(err)
       return []

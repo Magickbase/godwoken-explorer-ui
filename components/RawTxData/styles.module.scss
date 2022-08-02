@@ -1,0 +1,25 @@
+.container {
+  padding: 1.5rem;
+  h6 {
+    font-size: 1rem;
+    font-weight: 900;
+    font-family: Roboto;
+    margin: 0 0 1rem;
+  }
+  textarea {
+    width: 100%;
+    margin: 0;
+    padding: 1rem;
+    resize: vertical;
+    height: 80ch;
+    overflow: auto;
+    background: #fafafa;
+    border-radius: 4px;
+    border-color: #f0f0f0;
+    font-size: 0.875rem;
+    color: #333;
+    &:first-of-type {
+      margin-bottom: 2rem;
+    }
+  }
+}
