@@ -14,7 +14,6 @@ import { fetchTokenList, formatAmount, nameToColor, PAGE_SIZE } from 'utils'
 import { useTheme } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import Address from 'components/TruncatedAddress'
-// import TokenLogo from 'components/TokenLogo'
 
 const BRIDGED_TOKEN_TEMPLATE_URL =
   'https://github.com/magickbase/godwoken_explorer/issues/new?assignees=Keith-CY&labels=Token+Registration&template=register-a-new-bridged-token.yml&title=%5BBridged+Token%5D+%2A%2AToken+Name%2A%2A'
@@ -22,11 +21,11 @@ const NATIVE_TOKEN_TEMPLATE_URL =
   'https://github.com/magickbase/godwoken_explorer/issues/new?assignees=Keith-CY&labels=Token+Registration&template=register-a-new-native-erc20-token.yml&title=%5BNative+ERC20+Token%5D+%2A%2AToken+Name%2A%2A'
 
 const parseTokenName = (name: string) => {
-  const parsed = name?.match(/Wrapped (\w+) \((\w+) from (\w+)\)/) ?? []
+  const parsed = name?.split(/\(via|from/) ?? []
   return {
-    name: parsed[1]?.trim() ?? '',
-    bridge: parsed[2]?.trim() ?? '',
-    origin: parsed[3]?.trim() ?? '',
+    name: parsed[0]?.trim() ?? '',
+    bridge: parsed[1]?.trim() ?? '',
+    origin: parsed[2]?.trim().slice(0, -1) ?? '',
   }
 }
 
@@ -43,7 +42,8 @@ const TokenList = () => {
     { key: 'address', label: 'address' },
     { key: type === 'bridge' ? 'circulatingSupply' : 'totalSupply' },
     { key: 'holderCount' },
-    ...(type === 'bridge' ? [{ key: 'origin' }, { key: 'bridge' }] : []),
+    { key: 'origin' },
+    { key: 'bridge' },
   ]
 
   const { isLoading, data } = useQuery(
@@ -183,8 +183,6 @@ const TokenList = () => {
                             >
                               {name?.[0] ?? '?'}
                             </Avatar>
-                            {/* TODO: Change Avatar to this */}
-                            {/* <TokenLogo name={token.udt.name} logo={token.udt.icon} /> */}
                             <NextLink href={`/token/${token.id}`} passHref>
                               <Link
                                 href={`/token/${token.id}`}
@@ -201,7 +199,7 @@ const TokenList = () => {
                                     whiteSpace: 'nowrap',
                                     textOverflow: 'ellipsis',
                                     overflow: 'hidden',
-                                    width: isMobile ? 90 : 130,
+                                    width: isMobile ? 90 : 120,
                                   }}
                                 >
                                   {name}
@@ -219,17 +217,15 @@ const TokenList = () => {
                               whiteSpace: 'nowrap',
                               textOverflow: 'ellipsis',
                               overflow: 'hidden',
-                              width: type === 'bridge' ? 180 : 250,
+                              width: type === 'bridge' ? 180 : 220,
                             }}
                           >
                             {supply}
                           </div>
                         </td>
-                        <td style={{ textAlign: type === 'bridge' ? 'left' : 'end', minWidth: isMobile ? 100 : 130 }}>
-                          {token.holderCount || '0'}
-                        </td>
-                        {type === 'bridge' && <td>{origin}</td>}
-                        {type === 'bridge' && <td style={{ textAlign: 'end' }}>{bridge}</td>}
+                        <td style={{ minWidth: isMobile ? 100 : 125 }}>{token.holderCount || '0'}</td>
+                        <td>{origin}</td>
+                        <td style={{ textAlign: 'end' }}>{bridge}</td>
                       </tr>
                     )
                   })
