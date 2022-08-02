@@ -106,6 +106,7 @@ const TokenList = () => {
                   'borderRadius': 2,
                   'textTransform': 'none',
                   'height': 40,
+                  'lineHeight': 40,
                   'px': { xs: 1, md: 2 },
                   'fontWeight': 500,
                   'fontSize': { xs: 13, md: 14 },
