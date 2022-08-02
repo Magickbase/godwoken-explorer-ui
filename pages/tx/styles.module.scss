@@ -79,6 +79,9 @@
       justify-content: space-between;
     }
   }
+  summary::-webkit-details-marker {
+    display: none;
+  }
 
   pre {
     border: 1px solid #f0f0f0;
