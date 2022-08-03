@@ -19,6 +19,18 @@
       }
     }
   }
+  .clearIcon {
+    display: none;
+    position: absolute;
+    top: -70%;
+    right: -70%;
+    width: 12px;
+    height: 12px;
+    cursor: pointer;
+    path {
+      fill: #333;
+    }
+  }
   .menu {
     position: absolute;
     top: calc(100% + 1rem);
@@ -90,6 +102,16 @@
       top: calc(100% + 1.5rem);
       pointer-events: unset;
       opacity: 1;
+    }
+  }
+  &[data-active='true'] {
+    label.filterBtn {
+      svg {
+        color: var(--primary-color);
+      }
+    }
+    .clearIcon {
+      display: block;
     }
   }
 }

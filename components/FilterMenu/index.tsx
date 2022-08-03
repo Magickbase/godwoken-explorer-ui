@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import FilterIcon from 'assets/icons/filter.svg'
+import ClearIcon from 'assets/icons/clear.svg'
 
 import styles from './styles.module.scss'
 
@@ -36,7 +37,7 @@ const FilterMenu: React.FC<{ filterKeys: Array<string> }> = ({ filterKeys }) => 
     document.body.focus()
   }
 
-  const handleFilterClear = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleFilterContentClear = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation()
     e.preventDefault()
     e.currentTarget
@@ -45,10 +46,22 @@ const FilterMenu: React.FC<{ filterKeys: Array<string> }> = ({ filterKeys }) => 
       .forEach(i => (i.value = ''))
   }
 
+  const handleFilterClear = (e: React.MouseEvent<HTMLOrSVGElement>) => {
+    e.stopPropagation()
+    e.preventDefault()
+    const q = { ...query } as Record<string, string>
+    filterKeys.forEach(field => {
+      delete q[field]
+    })
+
+    push(`${asPath.split('?')[0] ?? ''}?${new URLSearchParams(q)}`)
+  }
+
   return (
-    <div className={styles.container}>
+    <div className={styles.container} data-active={filterKeys.some(field => query[field])}>
       <label htmlFor={menuId} className={styles.filterBtn}>
         <FilterIcon fontSize="inherit" />
+        <ClearIcon className={styles.clearIcon} onClick={handleFilterClear} />
         <input id={menuId} />
       </label>
       <form onSubmit={handleFilterSubmit} className={styles.menu}>
@@ -66,7 +79,7 @@ const FilterMenu: React.FC<{ filterKeys: Array<string> }> = ({ filterKeys }) => 
           )
         })}
         <div className={styles.btns}>
-          <button type="button" onClick={handleFilterClear}>
+          <button type="button" onClick={handleFilterContentClear}>
             {t(`clear`)}
           </button>
           <button type="submit">{t(`filter`)}</button>
