@@ -1,18 +1,18 @@
 import { HelpOutlineOutlined as HelpIcon } from '@mui/icons-material'
 import { Box, SxProps, Tooltip } from '@mui/material'
 import { useTranslation } from 'next-i18next'
-import type { BlockState } from 'utils'
+import type { BlockState, GraphQLSchema } from 'utils'
 import CommittedIcon from 'assets/icons/committed.svg'
 import FinalizedIcon from 'assets/icons/finalized.svg'
 import PendingIcon from 'assets/icons/pending.svg'
 
-const BlockStateIcon: React.FC<{ state: BlockState }> = ({ state }) => {
+const BlockStateIcon: React.FC<{ state: BlockState | GraphQLSchema.BlockStatus }> = ({ state }) => {
   const [t] = useTranslation('common')
   const properties: { sx: SxProps } = {
-    sx: { fontSize: 16, ml: { xs: 0.4, md: 1 }, display: 'flex' },
+    sx: { fontSize: 16, display: 'flex' },
   }
 
-  if (state === 'committed') {
+  if (state.toLowerCase() === 'committed') {
     return (
       <Tooltip title={t(state)} placement="top">
         <Box {...properties}>
@@ -21,7 +21,7 @@ const BlockStateIcon: React.FC<{ state: BlockState }> = ({ state }) => {
       </Tooltip>
     )
   }
-  if (state === 'finalized') {
+  if (state.toLowerCase() === 'finalized') {
     return (
       <Tooltip title={t(state)} placement="top">
         <Box {...properties}>
@@ -30,7 +30,7 @@ const BlockStateIcon: React.FC<{ state: BlockState }> = ({ state }) => {
       </Tooltip>
     )
   }
-  if (state === 'pending') {
+  if (state.toLowerCase() === 'pending') {
     return (
       <Tooltip title={t(state)} placement="top">
         <Box {...properties}>

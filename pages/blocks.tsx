@@ -195,7 +195,7 @@ const BlockList = () => {
                   blockList.blocks.map(b => (
                     <TableRow key={b.hash}>
                       <TableCell sx={{ pl: { xs: '12px !important', md: '24px !important' } }}>
-                        <Stack direction="row" alignItems="center">
+                        <Stack direction="row" alignItems="center" columnGap={{ xs: 0.4, md: 1 }}>
                           <NextLink href={`block/${b.hash}`} passHref>
                             <Link href={`block/${b.hash}`} underline="none" color="primary">
                               {b.number.toLocaleString('en')}
