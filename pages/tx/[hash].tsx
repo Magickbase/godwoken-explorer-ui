@@ -4,12 +4,7 @@ import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useQuery } from 'react-query'
-import { Chip, Skeleton } from '@mui/material'
-import {
-  ErrorOutlineOutlined as ErrorIcon,
-  AccessTimeOutlined as PendingIcon,
-  Check as SuccessIcon,
-} from '@mui/icons-material'
+import { Skeleton } from '@mui/material'
 import { ethers } from 'ethers'
 import BigNumber from 'bignumber.js'
 import Tabs from 'components/Tabs'
@@ -23,6 +18,8 @@ import CopyBtn from 'components/CopyBtn'
 import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
 import TxType from 'components/TxType'
 import HashLink from 'components/HashLink'
+import { SIZES } from 'components/PageSize'
+import PolyjuiceStatus from 'components/PolyjuiceStatus'
 import ExpandIcon from 'assets/icons/expand.svg'
 import {
   formatDatetime,
@@ -50,7 +47,15 @@ const ADDR_LENGTH = 42
 const Tx = (initState: State) => {
   const [tx, setTx] = useState(initState)
   const {
-    query: { hash, tab = 'erc20', before = null, after = null, address_from = null, address_to = null },
+    query: {
+      hash,
+      tab = 'erc20',
+      before = null,
+      after = null,
+      address_from = null,
+      address_to = null,
+      page_size = SIZES[1],
+    },
   } = useRouter()
   const [t] = useTranslation('tx')
 
@@ -66,6 +71,7 @@ const Tx = (initState: State) => {
         from_address: address_from as string | null,
         to_address: address_to as string | null,
         combine_from_to: false,
+        limit: Number.isNaN(+page_size) ? +SIZES[1] : +page_size,
       }),
     {
       enabled: tab === 'erc20',
@@ -230,14 +236,7 @@ const Tx = (initState: State) => {
     { label: 'nonce', value: (tx.nonce || 0).toLocaleString('en') },
     {
       label: 'status',
-      value:
-        tx.polyjuiceStatus === 'failed' ? (
-          <Chip icon={<ErrorIcon />} label={t(`failed`)} color="warning" size="small" />
-        ) : tx.polyjuiceStatus === 'pending' ? (
-          <Chip icon={<PendingIcon />} label={t(`pending`)} size="small" />
-        ) : (
-          <Chip icon={<SuccessIcon />} label={t(`success`)} color="success" sx={{ color: '#fff' }} size="small" />
-        ),
+      value: <PolyjuiceStatus status={tx.polyjuiceStatus ?? null} />,
     },
     {
       label: 'gasPrice',

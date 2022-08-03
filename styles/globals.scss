@@ -41,6 +41,11 @@ a {
   @include mono-font;
 }
 
+*::selection {
+  color: #fff;
+  background-color: #000;
+}
+
 input[type='number']::-webkit-inner-spin-button,
 input[type='number']::-webkit-outer-spin-button {
   -webkit-appearance: none;
@@ -48,8 +53,16 @@ input[type='number']::-webkit-outer-spin-button {
   appearance: none;
 }
 
+table thead th {
+  white-space: nowrap;
+}
+
 video::-webkit-media-controls {
   display: none !important;
+}
+
+video {
+  user-select: none;
 }
 
 @media screen and (max-width: 600px) {
