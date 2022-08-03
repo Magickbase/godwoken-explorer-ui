@@ -1,20 +1,9 @@
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
-import {
-  Stack,
-  Box,
-  Table,
-  TableContainer,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  Typography,
-  Link,
-  Tooltip,
-} from '@mui/material'
+import { Stack, Box, TableContainer, Typography, Link, Tooltip } from '@mui/material'
 import BigNumber from 'bignumber.js'
 import TxStatusIcon from './TxStatusIcon'
+import Table from 'components/Table'
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/Pagination'
 import { timeDistance, getERC20TransferListRes } from 'utils'
@@ -30,29 +19,22 @@ const TransferList: React.FC<{
   return (
     <Box sx={{ px: 1, py: 2 }}>
       <TableContainer>
-        <Table size="small">
-          <TableHead sx={{ textTransform: 'capitalize' }}>
-            <TableRow>
-              <TableCell component="th">{t('txHash')}</TableCell>
-              <TableCell component="th">{t('block')} </TableCell>
-              <TableCell component="th">{t('age')} </TableCell>
-              <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }} component="th">
-                {t('from')}
-              </TableCell>
-              <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }} component="th">
-                {t('to')}
-              </TableCell>
-              <TableCell sx={{ display: { xs: 'table-cell', md: 'none' } }} component="th">
-                {t('transfer')}
-              </TableCell>
-              <TableCell component="th">{`${t('value')}`}</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
+        <Table>
+          <thead>
+            <tr>
+              <th>{t('txHash')}</th>
+              <th>{t('block')} </th>
+              <th>{t('age')} </th>
+              <th>{t('from')}</th>
+              <th>{t('to')}</th>
+              <th>{`${t('value')}`}</th>
+            </tr>
+          </thead>
+          <tbody>
             {+list.totalCount ? (
               list.txs.map(item => (
-                <TableRow key={item.hash + item.logIndex}>
-                  <TableCell>
+                <tr key={item.hash + item.logIndex}>
+                  <td>
                     <Stack direction="row" alignItems="center">
                       <TxStatusIcon status={item.status} isSuccess={item.isSuccess} />
                       <Tooltip title={item.hash} placement="top">
@@ -71,8 +53,8 @@ const TransferList: React.FC<{
                         </Box>
                       </Tooltip>
                     </Stack>
-                  </TableCell>
-                  <TableCell>
+                  </td>
+                  <td>
                     <NextLink href={`/block/${item.blockNumber}`}>
                       <Link
                         href={`/block/${item.blockNumber}`}
@@ -88,55 +70,34 @@ const TransferList: React.FC<{
                         {(+item.blockNumber).toLocaleString('en')}
                       </Link>
                     </NextLink>
-                  </TableCell>
-                  <TableCell sx={{ whiteSpace: 'nowrap', fontSize: { xs: 12, md: 14 } }}>
+                  </td>
+                  <td>
                     <time dateTime={new Date(+item.timestamp).toISOString()}>
                       {timeDistance(item.timestamp, language)}
                     </time>
-                  </TableCell>
-                  <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
+                  </td>
+                  <td>
                     <Address address={item.from} />
-                  </TableCell>
-                  <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                    {item.to ? <Address address={item.to} /> : null}
-                  </TableCell>
-                  <TableCell sx={{ display: { xs: 'table-cell', md: 'none' } }}>
-                    <Stack>
-                      <Stack direction="row" justifyContent="space-between">
-                        <Typography
-                          fontSize={12}
-                          sx={{ textTransform: 'capitalize', mr: 1, whiteSpace: 'nowrap' }}
-                        >{`${t('from')}:`}</Typography>
-                        <Address leading={5} address={item.from} />
-                      </Stack>
-
-                      <Stack direction="row" justifyContent="space-between">
-                        <Typography
-                          fontSize={12}
-                          sx={{ textTransform: 'capitalize', mr: 1, whiteSpace: 'nowrap' }}
-                        >{`${t('to')}:`}</Typography>
-                        {item.to ? <Address address={item.to} leading={5} /> : null}
-                      </Stack>
-                    </Stack>
-                  </TableCell>
-                  <TableCell sx={{ fontSize: { xs: 12, md: 14 } }}>
+                  </td>
+                  <td>{item.to ? <Address address={item.to} /> : null}</td>
+                  <td>
                     <div style={{ display: 'flex', whiteSpace: 'nowrap' }}>
                       <TransferDirection from={item.from} to={item.to} viewer={viewer ?? ''} />
                       {item.transferValue
                         ? `${new BigNumber(item.transferValue).toFormat()} ${item.udtSymbol ?? ''}`
                         : null}
                     </div>
-                  </TableCell>
-                </TableRow>
+                  </td>
+                </tr>
               ))
             ) : (
-              <TableRow>
-                <TableCell colSpan={7} align="center">
+              <tr>
+                <td colSpan={7} align="center">
                   {t(`no_records`)}
-                </TableCell>
-              </TableRow>
+                </td>
+              </tr>
             )}
-          </TableBody>
+          </tbody>
         </Table>
       </TableContainer>
       <Pagination total={+list.totalCount} page={+list.page} />

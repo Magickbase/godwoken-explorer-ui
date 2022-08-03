@@ -1,4 +1,8 @@
+@import '../../styles/mixin.scss';
+
 .container {
+  @include main-center;
+
   .title {
     width: 100%;
     display: flex;

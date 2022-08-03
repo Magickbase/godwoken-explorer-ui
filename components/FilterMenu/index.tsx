@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
-import { FilterAlt as FilterIcon } from '@mui/icons-material'
+import FilterIcon from 'assets/icons/filter.svg'
 
 import styles from './styles.module.scss'
 
@@ -34,7 +34,6 @@ const FilterMenu: React.FC<{ filterKeys: Array<string> }> = ({ filterKeys }) => 
 
     push(`${asPath.split('?')[0] ?? ''}?${new URLSearchParams(q)}`)
     document.body.focus()
-    // blur
   }
 
   const handleFilterClear = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -48,28 +47,29 @@ const FilterMenu: React.FC<{ filterKeys: Array<string> }> = ({ filterKeys }) => 
 
   return (
     <div className={styles.container}>
-      <label htmlFor={menuId}>
+      <label htmlFor={menuId} className={styles.filterBtn}>
         <FilterIcon fontSize="inherit" />
         <input id={menuId} />
       </label>
       <form onSubmit={handleFilterSubmit} className={styles.menu}>
-        {filterKeys.map((field, idx) => {
+        {filterKeys.map(field => {
           return (
-            <div key={field} style={{ padding: '4px 16px' }}>
+            <div key={field} className={styles.field}>
+              <label>{t(field)}</label>
               <input
                 type={NUM_KEYS.includes(field) ? 'number' : 'text'}
                 name={field}
+                placeholder={t(`filter_menu.${field}`)}
                 defaultValue={query[field] ?? ''}
-                autoFocus={!idx}
               />
             </div>
           )
         })}
         <div className={styles.btns}>
-          <button type="submit">{t(`filter`)}</button>
           <button type="button" onClick={handleFilterClear}>
             {t(`clear`)}
           </button>
+          <button type="submit">{t(`filter`)}</button>
         </div>
       </form>
     </div>

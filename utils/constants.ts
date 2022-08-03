@@ -32,3 +32,9 @@ export enum CHANNEL {
   ACCOUNT_INFO = 'accounts:',
   ACCOUNT_TX_LIST = 'account_transactions:',
 }
+
+export const TokenOrigins: Array<Record<'name' | 'logo', string>> = [
+  { name: 'ETH', logo: 'https://cryptologos.cc/logos/ethereum-eth-logo.svg' },
+  { name: 'BSC', logo: 'https://cryptologos.cc/logos/bnb-bnb-logo.svg' },
+  { name: 'CKB', logo: '/logos/nervos.svg' },
+]

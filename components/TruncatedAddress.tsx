@@ -22,7 +22,7 @@ const TruncatedAddress = ({
             GraphQLSchema.AccountType.MetaContract,
             GraphQLSchema.AccountType.PolyjuiceCreator,
           ].includes(type)
-            ? type.replace(/_/g, ' ')
+            ? type.replace(/_/g, ' ').toLowerCase()
             : address.length > leading * 2
             ? `${address.slice(0, leading)}...${address.slice(-leading)}`
             : address

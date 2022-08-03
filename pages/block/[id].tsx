@@ -191,7 +191,7 @@ const Block = () => {
   return (
     <>
       <SubpageHead subtitle={title} />
-      <div className={`main-center ${styles.container}`}>
+      <div className={styles.container}>
         <PageTitle>
           <div className={styles.title}>
             {title}

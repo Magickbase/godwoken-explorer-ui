@@ -1,8 +1,8 @@
 .container {
-  overflow-y: auto;
   font-weight: 400;
   font-size: 0.875rem;
   font-family: 'Roboto';
+  z-index: 1;
 
   table {
     min-width: 100%;
@@ -14,6 +14,7 @@
       height: 3rem;
       color: var(--secondary-text-color);
       background-color: #fafafa;
+      cursor: default;
     }
   }
   tbody {
@@ -48,6 +49,32 @@
       }
       &:last-child {
         padding-right: 0.875rem;
+      }
+    }
+  }
+
+  @media screen and (max-width: 1024px) {
+    thead {
+      tr {
+        height: 2rem;
+        font-size: 0.75rem;
+        font-weight: 400;
+      }
+    }
+    th,
+    td {
+      padding: 0 0.75rem;
+      &:first-child {
+        padding-left: 0.75rem;
+      }
+      &:last-child {
+        padding-right: 0.75rem;
+      }
+    }
+    tbody {
+      td {
+        padding-top: 0.875rem;
+        padding-bottom: 0.875rem;
       }
     }
   }
