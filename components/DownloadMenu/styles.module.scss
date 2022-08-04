@@ -77,4 +77,12 @@
       color: var(--primary-color);
     }
   }
+
+  @media screen and (max-width: 1024px) {
+    label {
+      width: 6rem;
+      height: 2rem;
+      font-size: 0.75rem;
+    }
+  }
 }

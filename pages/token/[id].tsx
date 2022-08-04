@@ -4,32 +4,16 @@ import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useRouter } from 'next/router'
 import { useQuery } from 'react-query'
-import {
-  Container,
-  Stack,
-  Grid,
-  Paper,
-  Tabs,
-  Tab,
-  Divider,
-  List,
-  ListSubheader,
-  ListItem,
-  ListItemText,
-  Avatar,
-  Typography,
-  Link,
-  Skeleton,
-} from '@mui/material'
-import OpenInNewIcon from '@mui/icons-material/OpenInNew'
-import BigNumber from 'bignumber.js'
+import { Container, Stack, Avatar, Typography, Link, Skeleton, Box } from '@mui/material'
+import Tabs from 'components/Tabs'
 import SubpageHead from 'components/SubpageHead'
 import PageTitle from 'components/PageTitle'
 import ERC20TransferList from 'components/ERC20TransferList'
-import BridgedRecordList from 'components/BridgedRecordList'
-import TokenHolderList from 'components/TokenHolderList'
-import Address from 'components/AddressInHalfPanel'
+import BridgedRecordList from 'components/BridgedRecordList/index'
+import TokenHolderList from 'components/TokenHolderList/index'
+import Address from 'components/TruncatedAddress'
 import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
+import OpenInNewIcon from 'assets/icons/open-in-new.svg'
 import {
   fetchToken,
   fetchERC20TransferList,
@@ -40,6 +24,7 @@ import {
 } from 'utils'
 
 import type { API } from 'utils/api/utils'
+import InfoList from 'components/InfoList'
 
 const tabs = ['transfers', 'bridged', 'holders']
 
@@ -71,6 +56,7 @@ const Token: React.FC<Props> = () => {
     if (!isTokenLoading && !token) {
       replace(`/${language}/404?query=${id}`)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isTokenLoading, token, replace])
 
   const { isLoading: isTransferListLoading, data: transferList } = useQuery(
@@ -94,18 +80,30 @@ const Token: React.FC<Props> = () => {
   const tokenInfo = [
     {
       label: 'decimal',
-      value: token ? <Typography variant="body2">{token.decimal || '-'}</Typography> : <Skeleton animation="wave" />,
+      value: token ? (
+        <Typography variant="body2" color="secondary">
+          {token.decimal || '-'}
+        </Typography>
+      ) : (
+        <Skeleton animation="wave" />
+      ),
     },
     {
       label: 'type',
-      value: token ? <Typography variant="body2">{t(token.type)}</Typography> : <Skeleton animation="wave" />,
+      value: token ? (
+        <Typography variant="body2" color="secondary">
+          {t(token.type)}
+        </Typography>
+      ) : (
+        <Skeleton animation="wave" />
+      ),
     },
     {
       label: 'contract',
       value: !token ? (
         <Skeleton animation="wave" />
       ) : token.address ? (
-        <Address address={token.address} />
+        <Address address={token.address} leading={35} sx={{ overflowWrap: 'anywhere' }} />
       ) : (
         <Typography variant="body2">-</Typography>
       ),
@@ -132,10 +130,10 @@ const Token: React.FC<Props> = () => {
               alignItems="center"
               color="secondary"
             >
-              <Typography variant="body2" overflow="hidden" textOverflow="ellipsis" className="mono-font">
+              <Typography variant="body2" overflow="hidden" textOverflow="ellipsis">
                 {token.officialSite}
               </Typography>
-              <OpenInNewIcon sx={{ fontSize: 16, ml: 0.5 }} />
+              <OpenInNewIcon style={{ marginLeft: 8 }} />
             </Link>
           ) : (
             '-'
@@ -154,13 +152,14 @@ const Token: React.FC<Props> = () => {
       ),
     },
   ]
+
   const tokenData = [
     {
       label: token?.type === 'bridge' ? 'circulatingSupply' : 'totalSupply',
       value: !token ? (
         <Skeleton animation="wave" />
       ) : (
-        <Typography variant="body2">
+        <Typography variant="body2" sx={{ overflowWrap: 'anywhere' }}>
           {token.supply
             ? formatAmount(token.supply, { symbol: token.symbol?.split('.')[0] ?? '', decimal: token.decimal })
             : '-'}
@@ -188,111 +187,87 @@ const Token: React.FC<Props> = () => {
   return (
     <>
       <SubpageHead subtitle={`${t('token')} ${token?.name || token?.symbol || '-'}`} />
-      <Container sx={{ py: { xs: 2, md: 6 } }}>
-        <Stack
-          direction={{ xs: 'column', md: 'row' }}
-          justifyContent="space-between"
-          alignItems={{ xs: 'flex-start', md: 'center' }}
-        >
+      <Container sx={{ px: { xs: 2, sm: 3, md: 2, lg: 0 }, pb: { xs: 5.5, md: 11 } }}>
+        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: { xs: 1.75, md: 0.5 } }}>
           <PageTitle>
-            <Stack direction={{ xs: 'column', sm: 'row' }} alignItems={{ xs: 'flex-start', sm: 'center' }}>
+            <Stack direction="row" alignItems="center">
               <Avatar
                 src={token?.icon ?? null}
                 sx={{
                   bgcolor: token?.icon ? '#f0f0f0' : nameToColor(token?.name ?? ''),
-                  mr: 2,
+                  mr: 1,
                   img: { objectFit: 'fill' },
+                  width: { xs: 24, md: 32 },
+                  height: '100%',
                 }}
               >
                 {token?.name?.[0] ?? '?'}
               </Avatar>
-              <Typography
-                variant="h5"
-                fontWeight="inherit"
-                sx={{ textTransform: 'none', fontSize: { xs: '0.875rem', md: '1.5rem' } }}
-              >
+              <Typography fontSize="inherit" fontWeight={500} sx={{ textTransform: 'none' }}>
                 {!token ? <Skeleton animation="wave" width="30px" /> : token.name || '-'}
               </Typography>
-              {token?.symbol ? (
-                <Typography
-                  fontWeight="inherit"
-                  color="primary.light"
-                  whiteSpace="pre"
-                  sx={{ textTransform: 'none', fontSize: { xs: '0.875rem', md: '1rem' } }}
-                >{` (${token.symbol})`}</Typography>
-              ) : null}
             </Stack>
           </PageTitle>
 
-          <DownloadMenu items={downloadItems} />
+          <Box sx={{ mt: { xs: 2.25, md: 0 } }}>
+            <DownloadMenu items={downloadItems} />
+          </Box>
         </Stack>
-        <Stack spacing={2}>
-          <Paper>
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={6}>
-                <List subheader={<ListSubheader sx={{ bgcolor: 'transparent' }}>{t('tokenInfo')}</ListSubheader>}>
-                  <Divider variant="middle" />
-                  {tokenInfo.map(field => (
-                    <ListItem key={field.label}>
-                      <ListItemText
-                        primary={t(field.label)}
-                        secondary={field.value}
-                        secondaryTypographyProps={{ component: 'div' }}
-                      />
-                    </ListItem>
-                  ))}
-                </List>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <List subheader={<ListSubheader sx={{ bgcolor: 'transparent' }}>{t('tokenData')}</ListSubheader>}>
-                  <Divider variant="middle" />
-                  {tokenData.map(field => (
-                    <ListItem key={field.label}>
-                      <ListItemText primary={t(field.label)} secondary={field.value} />
-                    </ListItem>
-                  ))}
-                </List>
-              </Grid>
-            </Grid>
-          </Paper>
-          <Paper>
-            <Tabs value={tabs.indexOf(tab as string)} variant="scrollable" scrollButtons="auto">
-              {[t('transferRecords'), t(`bridgedRecords`), t(`tokenHolders`)].map((label, idx) => (
-                <Tab
-                  key={label}
-                  label={label}
-                  onClick={e => {
-                    e.stopPropagation()
-                    e.preventDefault()
-                    push(`/token/${token.id}?tab=${tabs[idx]}`, undefined, { scroll: false })
-                  }}
-                />
-              ))}
-            </Tabs>
-            <Divider />
-            {tab === tabs[0] ? (
-              !isTransferListLoading && transferList ? (
-                <ERC20TransferList list={transferList} />
-              ) : (
-                <Skeleton animation="wave" />
-              )
-            ) : null}
-            {tab === tabs[1] ? (
-              !isBridgedListLoading && bridgedRecordList ? (
-                <BridgedRecordList list={bridgedRecordList} showUser />
-              ) : (
-                <Skeleton animation="wave" />
-              )
-            ) : null}
-            {tab === tabs[2] ? (
-              !isHolderListLoading && holderList ? (
-                <TokenHolderList list={holderList} />
-              ) : (
-                <Skeleton animation="wave" />
-              )
-            ) : null}
-          </Paper>
+
+        <Stack direction={{ xs: 'column', md: 'row' }} spacing={{ xs: 2, md: 4 }} mb={{ xs: 2, md: 3 }}>
+          <div style={{ flex: '1 1 50%' }}>
+            <InfoList
+              title={t(`info`)}
+              list={tokenInfo.filter(v => v).map(field => ({ field: t(field.label), content: field.value }))}
+              style={{ color: '#333' }}
+            />
+          </div>
+          <div style={{ flex: '1 1 50%' }}>
+            <InfoList
+              title={t(`stats`)}
+              list={tokenData.filter(v => v).map(field => ({ field: t(field.label), content: field.value }))}
+              style={{ color: '#333' }}
+            />
+          </div>
         </Stack>
+
+        <Box
+          sx={{
+            bgcolor: '#fff',
+            border: '1px solid var(--border-color)',
+            borderRadius: { xs: 2, md: 4 },
+            overflowY: 'hidden',
+          }}
+        >
+          <Tabs
+            value={tabs.indexOf(tab as string)}
+            tabs={['transferRecords', 'bridgedRecords', 'tokenHolders'].map((label, idx) => ({
+              label: t(label),
+              href: `/token/${id}?tab=${tabs[idx]}`,
+            }))}
+          />
+          {tab === tabs[0] ? (
+            !isTransferListLoading && transferList ? (
+              <ERC20TransferList list={transferList} />
+            ) : (
+              <Skeleton animation="wave" />
+            )
+          ) : null}
+          {tab === tabs[1] ? (
+            !isBridgedListLoading && bridgedRecordList ? (
+              <BridgedRecordList list={bridgedRecordList} showUser />
+            ) : (
+              <Skeleton animation="wave" />
+            )
+          ) : null}
+          {tab === tabs[2] ? (
+            !isHolderListLoading && holderList ? (
+              <TokenHolderList list={holderList} />
+            ) : (
+              <Skeleton animation="wave" />
+            )
+          ) : null}
+        </Box>
       </Container>
     </>
   )

@@ -2,7 +2,7 @@
   display: flex;
   background-color: #fff;
   border: 0.5px solid var(--border-color);
-  border-radius: 0.5rem;
+  border-radius: 1rem;
   overflow: hidden;
   font-family: Roboto;
   font-size: 0.875rem;
@@ -66,6 +66,7 @@
     dd.desc {
       margin: 0;
       flex: 1;
+      align-self: center;
     }
 
     &:last-of-type {
@@ -74,6 +75,7 @@
   }
 
   @media screen and (max-width: 1024px) {
+    border-radius: 0.5rem;
     dl.title,
     dl.item {
       padding: 0.75rem;
