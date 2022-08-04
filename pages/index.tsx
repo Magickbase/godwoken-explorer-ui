@@ -460,39 +460,41 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
                       justifyContent={{ xs: 'center', md: 'space-between' }}
                       height={{ xs: 36, md: 56 }}
                     >
-                      <Tooltip title={hash} className="mono-font">
-                        <Box sx={{ width: 'min-content', display: 'flex', alignItems: 'center' }}>
-                          <NextLink href={`/tx/${hash}`} passHref>
-                            <Button
-                              title="tx hash"
-                              color="primary"
-                              href={`/tx/${hash}`}
-                              component={Link}
-                              className="mono-font"
-                              disableRipple
-                              fontSize={{ xs: 13, md: 14 }}
-                              sx={{
-                                'textTransform': 'lowercase',
-                                'whiteSpace': 'nowrap',
-                                'fontSize': 14,
-                                'p': 0,
-                                'mr': { xs: 0.4, md: 1 },
-                                '&:hover': { backgroundColor: 'unset' },
-                                'lineHeight': { xs: '20px', md: '16px' },
-                                'height': { xs: '20px', md: '16px' },
-                              }}
-                            >
-                              {formatAddress(hash, isBigScreen)}
-                            </Button>
-                          </NextLink>
-                          <TxStatusIcon
-                            status={getBlockStatus(tx.block?.status)}
-                            isSuccess={
-                              tx.polyjuice ? tx.polyjuice.status === GraphQLSchema.PolyjuiceStatus.Succeed : true
-                            }
-                          />
-                        </Box>
-                      </Tooltip>
+                      <Box sx={{ width: 'min-content', display: 'flex', alignItems: 'center' }}>
+                        <Tooltip title={hash} className="mono-font">
+                          <Box>
+                            <NextLink href={`/tx/${hash}`} passHref>
+                              <Button
+                                title="tx hash"
+                                color="primary"
+                                href={`/tx/${hash}`}
+                                component={Link}
+                                className="mono-font"
+                                disableRipple
+                                fontSize={{ xs: 13, md: 14 }}
+                                sx={{
+                                  'textTransform': 'lowercase',
+                                  'whiteSpace': 'nowrap',
+                                  'fontSize': 14,
+                                  'p': 0,
+                                  'mr': { xs: 0.4, md: 1 },
+                                  '&:hover': { backgroundColor: 'unset' },
+                                  'lineHeight': { xs: '20px', md: '16px' },
+                                  'height': { xs: '20px', md: '16px' },
+                                }}
+                              >
+                                {formatAddress(hash, isBigScreen)}
+                              </Button>
+                            </NextLink>
+                          </Box>
+                        </Tooltip>
+                        <TxStatusIcon
+                          status={getBlockStatus(tx.block?.status)}
+                          isSuccess={
+                            tx.polyjuice ? tx.polyjuice.status === GraphQLSchema.PolyjuiceStatus.Succeed : true
+                          }
+                        />
+                      </Box>
                       <Box
                         alignItems="bottom"
                         fontWeight={400}

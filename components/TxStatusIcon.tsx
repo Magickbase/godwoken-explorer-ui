@@ -1,4 +1,4 @@
-import { SxProps, Tooltip } from '@mui/material'
+import Tooltip from 'components/Tooltip'
 import PendingIcon from 'assets/icons/pending.svg'
 import CommittedIcon from 'assets/icons/committed.svg'
 import FailedIcon from 'assets/icons/failed.svg'
