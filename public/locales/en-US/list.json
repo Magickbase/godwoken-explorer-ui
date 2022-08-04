@@ -49,5 +49,6 @@
     "block_to": "Block Number",
     "from": "Search by address",
     "to": "Search by address"
-  }
+  },
+  "n_kinds_in_total": "{{number}} Kinds in Total"
 }

@@ -4,17 +4,7 @@ import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import BigNumber from 'bignumber.js'
-import {
-  Container,
-  Typography,
-  Box,
-  TableContainer,
-  TableHead,
-  TableBody,
-  TableRow,
-  Stack,
-  Skeleton,
-} from '@mui/material'
+import { Container, Typography, Box, TableContainer, Stack, Skeleton } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import PageTitle from 'components/PageTitle'
@@ -74,14 +64,8 @@ const ContractList = () => {
             px={{ xs: 1.5, md: 3 }}
           >
             {!isLoading ? (
-              <Typography
-                variant="inherit"
-                color="secondary"
-                flex="1 0 300px"
-                fontWeight={500}
-                fontSize={{ xs: 14, md: 16 }}
-              >
-                {t(`n_contracts_in_total`, {
+              <Typography variant="inherit" color="secondary" fontWeight={500} fontSize={{ xs: 14, md: 16 }}>
+                {t(`n_kinds_in_total`, {
                   number: data.contracts.length,
                 })}
               </Typography>
