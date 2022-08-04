@@ -6,7 +6,8 @@ import Table from 'components/Table'
 import HashLink from 'components/HashLink'
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/Pagination'
-import { timeDistance, getBridgedRecordListRes, CKB_EXPLORER_URL, CKB_DECIMAL, PCKB_UAN } from 'utils'
+import { timeDistance, getBridgedRecordListRes, CKB_EXPLORER_URL, CKB_DECIMAL, PCKB_UAN, PCKB_SYMBOL } from 'utils'
+import styles from './styles.module.scss'
 
 type ParsedList = ReturnType<typeof getBridgedRecordListRes>
 
@@ -19,7 +20,7 @@ const BridgedRecordList: React.FC<{ list: ParsedList; showUser?: boolean }> = ({
           <tr>
             <th>{t('type')}</th>
             <th>{t('value')} </th>
-            <th>{PCKB_UAN}</th>
+            <th>{PCKB_SYMBOL}</th>
             <th>{t('age')} </th>
             {showUser ? <th>{t('account')} </th> : null}
             <th>{t('layer1Txn')} </th>
@@ -86,7 +87,9 @@ const BridgedRecordList: React.FC<{ list: ParsedList; showUser?: boolean }> = ({
           )}
         </tbody>
       </Table>
-      <Pagination total={+list.meta.total} page={+list.meta.page} />
+      <div className={styles.pagination}>
+        <Pagination total={+list.meta.total} page={+list.meta.page} />
+      </div>
     </>
   )
 }

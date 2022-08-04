@@ -210,8 +210,8 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
             </div>
           ) : null}
           {constructor_arguments ? (
-            <div>
-              <h6>{t(`constructor_arguments`)}</h6>
+            <div className={styles.constructorArgs}>
+              <h6 className={styles.title}>{t(`constructor_arguments`)}</h6>
               <textarea defaultValue={constructor_arguments} readOnly />
             </div>
           ) : null}

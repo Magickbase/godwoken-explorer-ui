@@ -105,6 +105,10 @@
       background: #fafafa;
       padding: 1rem;
 
+      &::-webkit-details-marker {
+        display: none;
+      }
+
       svg {
         margin-left: 4px;
         transition: transform 0.2s linear;
@@ -275,7 +279,8 @@
 }
 
 .sourceCode,
-.abi {
+.abi,
+.constructorArgs {
   h6 {
     font-size: 1rem;
     font-weight: 500;

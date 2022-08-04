@@ -1,23 +1,143 @@
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
-import { Stack, Typography } from '@mui/material'
+import { gql } from 'graphql-request'
 import BigNumber from 'bignumber.js'
 import Table from 'components/Table'
 import Tooltip from 'components/Tooltip'
 import Address from 'components/TruncatedAddress'
-import Pagination from 'components/Pagination'
+import Pagination from 'components/SimplePagination'
 import TxStatusIcon from 'components/TxStatusIcon'
 import TransferDirection from 'components/TransferDirection'
-import { timeDistance, getERC20TransferListRes } from 'utils'
+import { client, timeDistance, getBlockStatus, GraphQLSchema } from 'utils'
 import styles from './styles.module.scss'
 
-type ParsedTransferList = ReturnType<typeof getERC20TransferListRes>
+export type TransferListProps = {
+  token_transfers: {
+    entries: Array<{
+      amount: string
+      block: Pick<GraphQLSchema.Block, 'number' | 'status' | 'timestamp'>
+      from_address: string
+      to_address: string
+      from_account: Pick<GraphQLSchema.Account, 'type'>
+      to_account: Pick<GraphQLSchema.Account, 'type'>
+      log_index: number
+      polyjuice: Pick<GraphQLSchema.Polyjuice, 'status'>
+      transaction_hash: string
+      udt: Pick<GraphQLSchema.Udt, 'id' | 'decimal' | 'symbol'>
+    }>
+    metadata: GraphQLSchema.PageMetadata
+  }
+}
 
-const TransferList: React.FC<{
-  list: ParsedTransferList
-  viewer?: string
-}> = ({ list, viewer }) => {
+interface Cursor {
+  limit?: number
+  before: string
+  after: string
+}
+
+interface AccountTransferListVariables extends Nullable<Cursor> {
+  address: string
+}
+
+export interface TokenTransferListVariables extends Nullable<Cursor> {
+  contract_address: string
+}
+type Variables = AccountTransferListVariables | TokenTransferListVariables
+
+const transferListQuery = gql`
+  query ($address: HashAddress, $before: String, $after: String, $limit: Int) {
+    token_transfers(
+      input: { from_address: $address, to_address: $address, before: $before, after: $after, limit: $limit }
+    ) {
+      entries {
+        amount
+        transaction_hash
+        log_index
+        polyjuice {
+          status
+        }
+        from_address
+        to_address
+        from_account {
+          type
+        }
+        to_account {
+          type
+        }
+        block {
+          number
+          timestamp
+          status
+        }
+        udt {
+          id
+          decimal
+          symbol
+        }
+      }
+
+      metadata {
+        total_count
+        before
+        after
+      }
+    }
+  }
+`
+
+// FIXME: a patch because API returns 500 if from, to, contract_address are specified simultaneously
+const tokenTransferListQuery = gql`
+  query ($address: HashAddress, $before: String, $after: String, $limit: Int) {
+    token_transfers(input: { token_contract_address_hash: $address, before: $before, after: $after, limit: $limit }) {
+      entries {
+        amount
+        transaction_hash
+        log_index
+        polyjuice {
+          status
+        }
+        from_address
+        to_address
+        from_account {
+          type
+        }
+        to_account {
+          type
+        }
+        block {
+          number
+          timestamp
+          status
+        }
+        udt {
+          id
+          decimal
+          symbol
+        }
+      }
+
+      metadata {
+        total_count
+        before
+        after
+      }
+    }
+  }
+`
+
+export const fetchTransferList = (variables: Variables) =>
+  client.request<TransferListProps>(transferListQuery, variables).then(data => data.token_transfers)
+
+export const fetchTokenTransferList = (variables: Variables) =>
+  client.request<TransferListProps>(tokenTransferListQuery, variables).then(data => data.token_transfers)
+
+const TransferList: React.FC<
+  TransferListProps & {
+    viewer?: string
+  }
+> = ({ token_transfers, viewer }) => {
   const [t, { language }] = useTranslation('list')
+
   return (
     <div className={styles.container}>
       <Table>
@@ -32,41 +152,49 @@ const TransferList: React.FC<{
           </tr>
         </thead>
         <tbody>
-          {+list.totalCount ? (
-            list.txs.map(item => (
-              <tr key={item.hash + item.logIndex}>
+          {token_transfers.metadata.total_count ? (
+            token_transfers.entries.map(item => (
+              <tr key={item.transaction_hash + item.log_index}>
                 <td>
                   <div className={styles.hash}>
-                    <Tooltip title={item.hash} placement="top">
+                    <Tooltip title={item.transaction_hash} placement="top">
                       <span>
-                        <NextLink href={`/tx/${item.hash}`}>
-                          <a className="mono-font">{`${item.hash.slice(0, 8)}...${item.hash.slice(-8)}`}</a>
+                        <NextLink href={`/tx/${item.transaction_hash}`}>
+                          <a className="mono-font">{`${item.transaction_hash.slice(
+                            0,
+                            8,
+                          )}...${item.transaction_hash.slice(-8)}`}</a>
                         </NextLink>
                       </span>
                     </Tooltip>
-                    <TxStatusIcon status={item.status} isSuccess={item.isSuccess} />
+                    <TxStatusIcon
+                      status={getBlockStatus(item.block)}
+                      isSuccess={item.polyjuice.status === GraphQLSchema.PolyjuiceStatus.Succeed}
+                    />
                   </div>
                 </td>
                 <td>
-                  <NextLink href={`/block/${item.blockNumber}`}>
-                    <a>{(+item.blockNumber).toLocaleString('en')}</a>
+                  <NextLink href={`/block/${item.block.number}`}>
+                    <a>{(+item.block.number).toLocaleString('en')}</a>
                   </NextLink>
                 </td>
                 <td>
-                  <time dateTime={new Date(+item.timestamp).toISOString()}>
-                    {timeDistance(item.timestamp, language)}
+                  <time dateTime={item.block.timestamp}>
+                    {timeDistance(new Date(item.block.timestamp).getTime(), language)}
                   </time>
                 </td>
                 <td>
-                  <Address address={item.from} />
+                  <Address address={item.from_address} type={item.from_account?.type} />
                 </td>
-                <td>{item.to ? <Address address={item.to} /> : null}</td>
+                <td>
+                  <Address address={item.to_address} type={item.to_account?.type} />
+                </td>
                 <td>
                   <div style={{ display: 'flex', whiteSpace: 'nowrap' }}>
-                    <TransferDirection from={item.from} to={item.to} viewer={viewer ?? ''} />
-                    {item.transferValue
-                      ? `${new BigNumber(item.transferValue).toFormat()} ${item.udtSymbol ?? ''}`
-                      : null}
+                    <TransferDirection from={item.from_address} to={item.to_address} viewer={viewer ?? ''} />
+                    {`${new BigNumber(item.amount ?? 0).dividedBy(10 ** (item.udt?.decimal ?? 1)).toFormat()} ${
+                      item.udt?.symbol ?? ''
+                    }`}
                   </div>
                 </td>
               </tr>
@@ -80,12 +208,7 @@ const TransferList: React.FC<{
           )}
         </tbody>
       </Table>
-      <Pagination total={+list.totalCount} page={+list.page} />
-      <Stack direction="row-reverse">
-        <Typography color="primary.light" variant="caption">
-          {t(`last-n-records`, { n: `100k` })}
-        </Typography>
-      </Stack>
+      <Pagination {...token_transfers.metadata} />
     </div>
   )
 }

@@ -14,7 +14,7 @@ import Pagination from 'components/SimplePagination'
 import TransferDirection from 'components/TransferDirection'
 import Tooltip from 'components/Tooltip'
 import TxType from 'components/TxType'
-import { timeDistance, GraphQLSchema, TxStatus, client, GCKB_DECIMAL, useFilterMenu, PCKB_SYMBOL } from 'utils'
+import { getBlockStatus, timeDistance, GraphQLSchema, client, GCKB_DECIMAL, useFilterMenu, PCKB_SYMBOL } from 'utils'
 import styles from './styles.module.scss'
 
 export type TxListProps = {
@@ -111,20 +111,6 @@ export const fetchTxList = (variables: Variables) =>
     .request<TxListProps>(txListQuery, variables)
     .then(data => data.transactions)
     .catch(() => ({ entries: [], metadata: { before: null, after: null, total_count: 0 } }))
-
-const getBlockStatus = (block: Pick<GraphQLSchema.Block, 'status'> | null): TxStatus => {
-  switch (block?.status) {
-    case GraphQLSchema.BlockStatus.Committed: {
-      return 'committed'
-    }
-    case GraphQLSchema.BlockStatus.Finalized: {
-      return 'finalized'
-    }
-    default: {
-      return 'pending'
-    }
-  }
-}
 
 const FILTER_KEYS = ['block_from', 'block_to'] as const
 const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> = ({

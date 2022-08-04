@@ -41,6 +41,9 @@ a {
   @include mono-font;
 }
 
+* {
+  box-sizing: border-box;
+}
 *::selection {
   color: #fff;
   background-color: #000;

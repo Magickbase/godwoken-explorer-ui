@@ -7,6 +7,10 @@
     cursor: pointer;
     user-select: none;
 
+    &::-webkit-details-marker {
+      display: none;
+    }
+
     svg {
       margin-left: 4px;
       transition: transform 0.2s linear;

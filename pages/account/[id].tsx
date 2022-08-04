@@ -15,16 +15,18 @@ import AccountOverview, {
   PolyjuiceContract,
 } from 'components/AccountOverview'
 import Tabs from 'components/Tabs'
-import ERC20TransferList from 'components/ERC20TransferList'
+import ERC20TransferList, { fetchTransferList } from 'components/ERC20TransferList'
 import AssetList, { fetchUdtList } from 'components/AssetList'
 import TxList, { fetchTxList } from 'components/TxList'
 import BridgedRecordList from 'components/BridgedRecordList'
 import ContractInfo from 'components/ContractInfo'
 import ContractEventsList from 'components/ContractEventsList'
 import CopyBtn from 'components/CopyBtn'
+import PageTitle from 'components/PageTitle'
+import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
+import { SIZES } from 'components/PageSize'
 import {
   handleApiError,
-  fetchERC20TransferList,
   fetchBridgedRecordList,
   fetchEventLogsListByType,
   isEthAddress,
@@ -33,8 +35,6 @@ import {
   API_ENDPOINT,
   CKB_DECIMAL,
 } from 'utils'
-import PageTitle from 'components/PageTitle'
-import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
 import styles from './styles.module.scss'
 
 type State = AccountOverviewProps
@@ -46,7 +46,15 @@ const isSmartContractAccount = (account: AccountOverviewProps['account']): accou
 
 const Account = (initState: State) => {
   const {
-    query: { tab = 'transactions', before = null, after = null, block_from = null, block_to = null, page = '1' },
+    query: {
+      tab = 'transactions',
+      before = null,
+      after = null,
+      block_from = null,
+      block_to = null,
+      page = '1',
+      page_size = SIZES[1],
+    },
   } = useRouter()
   const [accountAndList, setAccountAndList] = useState(initState)
   const [t] = useTranslation(['account', 'common'])
@@ -95,9 +103,11 @@ const Account = (initState: State) => {
   const { isLoading: isTransferListLoading, data: transferList } = useQuery(
     ['account-transfer-list', q.address, page],
     () =>
-      fetchERC20TransferList({
-        eth_address: q.address,
-        page: page as string,
+      fetchTransferList({
+        address: q.address,
+        limit: +page_size,
+        before: before as string,
+        after: after as string,
       }),
     { enabled: tab === 'erc20' && !!q.address },
   )
@@ -196,7 +206,7 @@ const Account = (initState: State) => {
           ) : null}
           {tab === 'erc20' ? (
             !isTransferListLoading && transferList ? (
-              <ERC20TransferList list={transferList} viewer={id} />
+              <ERC20TransferList token_transfers={transferList} viewer={id} />
             ) : (
               <Skeleton animation="wave" />
             )
