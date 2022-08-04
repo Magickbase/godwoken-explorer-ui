@@ -287,20 +287,10 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
         </form>
       </Menu>
       {pageSize ? (
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <PageSize pageSize={pageSize} />
-          <Pagination {...metadata} />
-        </div>
+        <Pagination {...metadata} pageSize={`${pageSize}`} note={t(`last-n-records`, { n: maxCount })} />
       ) : (
-        <Pagination {...metadata} />
+        <Pagination {...metadata} note={t(`last-n-records`, { n: maxCount })} />
       )}
-      {maxCount ? (
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Typography color="primary.light" variant="caption">
-            {t(`last-n-records`, { n: maxCount })}
-          </Typography>
-        </div>
-      ) : null}
     </div>
   )
 }

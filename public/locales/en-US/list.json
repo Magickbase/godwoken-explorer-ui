@@ -43,5 +43,5 @@
   "address_to": "to",
   "filter": "filter",
   "clear": "clear",
-  "n_contracts_in_total": "{{number}} Kinds in Total"
+  "n_kinds_in_total": "{{number}} Kinds in Total"
 }
