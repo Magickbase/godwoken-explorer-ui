@@ -35,10 +35,6 @@
     text-transform: none;
     tab-size: 2ch;
     font-size: 0.875rem;
-    @media screen and (max-width: 1024px) {
-      margin-left: -210px;
-      z-index: 9;
-    }
   }
 
   .name {

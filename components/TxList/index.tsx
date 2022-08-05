@@ -275,18 +275,11 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
       {pageSize ? (
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <PageSize pageSize={pageSize} />
-          <Pagination {...metadata} />
+          <Pagination {...metadata} note={maxCount ? t(`last-n-records`, { n: maxCount }) : ''} />
         </div>
       ) : (
-        <Pagination {...metadata} />
+        <Pagination {...metadata} note={maxCount ? t(`last-n-records`, { n: maxCount }) : ''} />
       )}
-      {maxCount ? (
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Typography color="primary.light" variant="caption">
-            {t(`last-n-records`, { n: maxCount })}
-          </Typography>
-        </div>
-      ) : null}
     </div>
   )
 }

@@ -161,7 +161,7 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({
 }) => {
   const [t] = useTranslation(['account', 'common'])
   return (
-    <div className={styles.container}>
+    <div className={styles.container} data-account-type={account.type}>
       {account.type === GraphQLSchema.AccountType.MetaContract ? (
         <MetaContract {...(account.script as MetaContract['script'])} />
       ) : null}

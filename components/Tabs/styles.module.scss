@@ -16,6 +16,10 @@
     @media screen and (max-width: 1024px) {
       height: 3.5rem;
       font-size: 0.875rem;
+      scrollbar-width: 0;
+      &::-webkit-scrollbar {
+        display: none;
+      }
     }
   }
 

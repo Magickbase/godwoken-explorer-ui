@@ -9,8 +9,12 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 8px;
     h5 {
       margin: 0;
+    }
+    @media screen and (max-width: 1024px) {
+      margin-bottom: 4px;
     }
   }
 

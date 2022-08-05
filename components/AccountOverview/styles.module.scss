@@ -15,13 +15,20 @@
   }
   dl[role='listitem'] {
     dt {
-      flex-basis: 210px !important;
+      flex-basis: 168px !important;
     }
     dd {
       white-space: nowrap;
     }
     dd[data-expandable='true'] {
       overflow: auto !important;
+    }
+  }
+  &[data-account-type='META_CONTRACT'] {
+    dl[role='listitem'] {
+      dt {
+        flex-basis: 210px !important;
+      }
     }
   }
 }
@@ -42,10 +49,23 @@
     dl[title=''] {
       display: none;
     }
+    dl[role='listitem'] {
+      dt {
+        flex-basis: 133px !important;
+      }
+    }
+    &[data-account-type='META_CONTRACT'] {
+      dl[role='listitem'] {
+        dt {
+          flex-basis: 133px !important;
+        }
+      }
+    }
     dl[role='listitem'] dd[data-expandable='true'] {
       overflow: visible !important;
       pre {
         max-width: calc(100vw - 56px);
+        margin-left: -133px;
       }
     }
   }
