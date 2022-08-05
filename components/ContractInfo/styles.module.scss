@@ -1,4 +1,22 @@
 .container {
+  padding: 1rem 1.5rem 1.5rem;
+  font-family: Roboto;
+
+  textarea {
+    width: 100%;
+    height: 50ch;
+    padding: 8px;
+    resize: vertical;
+    overflow: auto;
+    background: #f9f9f9;
+    font-family: Roboto;
+    font-weight: 400;
+    font-size: 0.875rem;
+    color: #333;
+    border-radius: 4px;
+    border-color: #ddd;
+  }
+
   fieldset {
     position: relative;
     -webkit-appearance: none;
@@ -11,23 +29,27 @@
     flex-direction: column;
 
     label {
-      font-size: 0.8rem;
-      margin: 4px 0px;
+      font-size: 0.875rem;
+      font-weight: 400;
+      color: #666;
+      margin: 8px 0px;
     }
     input {
       outline: none;
       flex: 1;
-      box-shadow: none;
-      border: 1px solid #0000001f;
-      padding: 12px 8px;
-      border-radius: 4px;
-      font-size: 0.8rem;
+      padding: 0.875rem 0.75rem;
+      border: 1px solid #f0f0f0;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 400;
+      color: #999;
       background-color: transparent;
-      align-self: stretch;
-      margin: 0;
+      margin: 0 0 1rem;
     }
+
     input[readOnly] {
       border: 1px solid #f0f0f0;
+      cursor: default;
     }
   }
   .writeRes {
@@ -40,6 +62,15 @@
       flex-basis: 100px;
     }
   }
+
+  .params,
+  .response {
+    color: #333;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-top: 0.5rem;
+  }
+
   .openInNew {
     margin-left: 8px;
     color: #ccc;
@@ -47,11 +78,235 @@
     height: 20px;
     cursor: pointer;
     transition: color 0.3s linear;
+    margin-bottom: 1rem;
     svg {
       pointer-events: none;
     }
     &:hover {
       color: #0c0c0c;
     }
+  }
+
+  details {
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid #f0f0f0;
+    margin: 1rem auto;
+    font-size: 0.875rem;
+    color: #333;
+
+    summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      list-style: none;
+      cursor: pointer;
+      user-select: none;
+      background: #fafafa;
+      padding: 1rem;
+
+      &::-webkit-details-marker {
+        display: none;
+      }
+
+      svg {
+        margin-left: 4px;
+        transition: transform 0.2s linear;
+        transform: rotateX(0.5turn);
+      }
+
+      &:hover {
+        svg path {
+          color: var(--primary-color);
+        }
+      }
+      & + div {
+        padding: 1rem;
+      }
+    }
+
+    form {
+      margin: 1rem;
+
+      button {
+        appearance: none;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 6rem;
+        height: 2.5rem;
+        font-size: 0.875rem;
+        font-weight: 400;
+        color: var(--primary-color);
+        background: transparent;
+        border: 1px solid var(--primary-color);
+        border-radius: 0.5rem;
+        cursor: pointer;
+        overflow: hidden;
+        box-sizing: border-box;
+        transition: all 0.1s;
+      }
+      &[data-is-loading='true'] {
+        button {
+          cursor: progress;
+          color: transparent;
+          width: 2.5rem;
+          border-radius: 100%;
+          border-width: 3px;
+          border-top-color: transparent;
+          border-bottom-color: transparent;
+          width: 2.5rem;
+          animation: spin 0.5s infinite;
+          margin-left: 1.75rem;
+        }
+        @keyframes spin {
+          to {
+            transform: rotate(1turn);
+          }
+        }
+      }
+
+      @media screen and (max-width: 1024px) {
+        button {
+          width: 100%;
+          border-radius: 4px;
+        }
+        &[data-is-loading='true'] {
+          button {
+            margin-left: calc(50% - 1.25rem) !important;
+          }
+        }
+      }
+    }
+
+    &[open] {
+      summary {
+        border-bottom: 1px solid #f0f0f0;
+        svg {
+          transform: rotateX(0);
+        }
+      }
+    }
+  }
+
+  pre {
+    border: 1px solid #f0f0f0;
+    background: #fafafa;
+    padding: 0.875rem 1rem;
+    border-radius: 4px;
+    margin: 15px 0 0;
+    word-break: break-all;
+    white-space: break-spaces;
+    text-transform: none;
+  }
+
+  .name {
+    color: #666;
+    font-weight: 400;
+    font-size: 0.875rem;
+    height: 1.5rem;
+    padding: 0 8px;
+    background: #f0f0f0;
+    border-radius: 0.75rem;
+  }
+}
+
+.tabs {
+  display: flex;
+  height: 2.5rem;
+  font-size: 0.875rem;
+  color: #666;
+  cursor: pointer;
+  & > div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 7.5rem;
+    border: 1px solid #f0f0f0;
+    white-space: nowrap;
+    &:first-child {
+      border-top-left-radius: 4px;
+      border-bottom-left-radius: 4px;
+    }
+    &:last-child {
+      border-top-right-radius: 4px;
+      border-bottom-right-radius: 4px;
+    }
+    &[data-active='true'] {
+      background: var(--primary-color);
+      border-color: var(--primary-color);
+      color: #fff;
+      cursor: default;
+    }
+  }
+  @media screen and (max-width: 600px) {
+    font-size: 0.75rem;
+  }
+}
+
+.info {
+  display: flex;
+  margin-top: 1rem;
+  background-color: #fafafa;
+  padding: 1rem 0;
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: #333;
+  & > div {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    &:not(:first-child) {
+      border-left: 1px solid #f0f0f0;
+    }
+  }
+  @media screen and (max-width: 1024px) {
+    flex-direction: column;
+    font-size: 0.75rem;
+    padding: 0;
+    color: #666;
+    & > div {
+      padding: 12px;
+      border-left: none !important;
+      justify-content: flex-start;
+      &:not(:first-child) {
+        border-top: 1px solid #f0f0f0;
+      }
+    }
+  }
+}
+
+.sourceCode,
+.abi,
+.constructorArgs {
+  h6 {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #333;
+    margin: 0;
+  }
+  .title {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    .vm {
+      color: #666;
+      padding-left: 4px;
+    }
+  }
+}
+.connectedAddr {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-right: 4px;
+  margin-top: 1rem;
+  white-space: nowrap;
+  a {
+    word-break: break-all;
+    white-space: break-spaces;
   }
 }

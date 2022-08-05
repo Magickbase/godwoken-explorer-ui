@@ -1,3 +1,5 @@
+@import './mixin.scss';
+
 :root {
   --header-height: 64px;
   --footer-height: 200px;
@@ -36,22 +38,22 @@ a {
 }
 
 .mono-font {
-  font-family: 'JetBrains Mono', monospace, 'Courier New' !important;
-  user-select: all;
+  @include mono-font;
 }
 
 * {
-  -webkit-tap-highlight-color: var(--primary-color);
+  box-sizing: border-box;
   outline-color: var(--primary-color);
-}
-
-input {
-  outline-style: none;
+  -webkit-tap-highlight-color: var(--primary-color);
 }
 
 *::selection {
   color: #fff;
   background-color: #000;
+}
+
+input {
+  outline-style: none;
 }
 
 input[type='number']::-webkit-inner-spin-button,

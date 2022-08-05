@@ -66,6 +66,12 @@
     dd.desc {
       margin: 0;
       flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    dd.desc[data-expandable='true'] {
+      overflow: visible;
     }
 
     &:last-of-type {

@@ -1,19 +1,17 @@
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
-import { Typography } from '@mui/material'
 import BigNumber from 'bignumber.js'
 import { gql } from 'graphql-request'
 import Table from 'components/Table'
 import TxStatusIcon from '../TxStatusIcon'
 import HashLink from 'components/HashLink'
 import Address from 'components/TruncatedAddress'
-import PageSize from 'components/PageSize'
 import Pagination from 'components/SimplePagination'
 import TransferDirection from 'components/TransferDirection'
 import Tooltip from 'components/Tooltip'
 import FilterMenu from 'components/FilterMenu'
-import { timeDistance, GraphQLSchema, getBlockStatus, client, GCKB_DECIMAL, PCKB_SYMBOL } from 'utils'
 import TxType from 'components/TxType'
+import { getBlockStatus, timeDistance, GraphQLSchema, client, GCKB_DECIMAL, PCKB_SYMBOL } from 'utils'
 import styles from './styles.module.scss'
 
 export type TxListProps = {
@@ -208,9 +206,13 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
         </tbody>
       </Table>
       {pageSize ? (
-        <Pagination {...metadata} pageSize={`${pageSize}`} note={t(`last-n-records`, { n: maxCount })} />
+        <Pagination
+          {...metadata}
+          pageSize={`${pageSize}`}
+          note={maxCount ? t(`last-n-records`, { n: maxCount }) : ''}
+        />
       ) : (
-        <Pagination {...metadata} note={t(`last-n-records`, { n: maxCount })} />
+        <Pagination {...metadata} note={maxCount ? t(`last-n-records`, { n: maxCount }) : ''} />
       )}
     </div>
   )

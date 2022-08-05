@@ -12,7 +12,7 @@ const Pagination: React.FC<{ total: number; page: number; pageSize?: number }> =
   pageSize = PAGE_SIZE,
 }) => {
   const [t] = useTranslation('common')
-  const { query, push, asPath } = useRouter()
+  const { query, asPath } = useRouter()
   const url = asPath.split('?')[0] ?? ''
   if (!total) {
     return null
@@ -20,6 +20,7 @@ const Pagination: React.FC<{ total: number; page: number; pageSize?: number }> =
   const prevPage = `${url}?${new URLSearchParams({ ...query, page: (page - 1).toString() })}`
   const nextPage = `${url}?${new URLSearchParams({ ...query, page: (page + 1).toString() })}`
   const totalPage = Math.ceil(total / pageSize)
+  console.log({ totalPage, page })
 
   return (
     <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'center' }} mt={{ xs: 2, sm: 0 }}>
@@ -29,7 +30,7 @@ const Pagination: React.FC<{ total: number; page: number; pageSize?: number }> =
           href={prevPage}
           underline="none"
           fontSize={14}
-          color={page === 1 ? '#ccc' : 'secondary'}
+          color={page <= 1 ? '#ccc' : 'secondary'}
           sx={{
             'transform': 'rotate(180deg)',
             'display': 'flex',
@@ -37,9 +38,10 @@ const Pagination: React.FC<{ total: number; page: number; pageSize?: number }> =
             'pl': 1.5,
             'py': 1,
             'pr': { xs: 1.5, md: '0' },
-            '&:hover': { color: page === 1 ? '#ccc' : 'primary.main' },
+            '&:hover': { color: page <= 1 ? '#ccc' : 'primary.main' },
             'borderRadius': '2px',
             'bgcolor': { xs: '#fafafa', sm: 'unset' },
+            'pointerEvents': page <= 1 ? 'none' : 'auto',
           }}
         >
           <NextPageIcon />
@@ -77,29 +79,28 @@ const Pagination: React.FC<{ total: number; page: number; pageSize?: number }> =
           )
         )
       })}
-      {totalPage > page ? (
-        <NextLink href={nextPage} passHref>
-          <Link
-            title={t(`next`)}
-            href={page === totalPage ? asPath : nextPage}
-            underline="none"
-            fontSize={14}
-            color={page === totalPage ? '#ccc' : 'secondary'}
-            sx={{
-              'display': 'flex',
-              'ml': { xs: '5.5px', md: '1px' },
-              'pl': 1.5,
-              'py': 1,
-              'pr': { xs: 1.5, md: '0' },
-              '&:hover': { color: 'primary.main' },
-              'borderRadius': '2px',
-              'bgcolor': { xs: '#fafafa', sm: 'unset' },
-            }}
-          >
-            <NextPageIcon />
-          </Link>
-        </NextLink>
-      ) : null}
+      <NextLink href={nextPage} passHref>
+        <Link
+          title={t(`next`)}
+          href={page >= totalPage ? asPath : nextPage}
+          underline="none"
+          fontSize={14}
+          color={page >= totalPage ? '#ccc' : 'secondary'}
+          sx={{
+            'display': 'flex',
+            'ml': { xs: '5.5px', md: '1px' },
+            'pl': 1.5,
+            'py': 1,
+            'pr': { xs: 1.5, md: '0' },
+            '&:hover': { color: 'primary.main' },
+            'borderRadius': '2px',
+            'bgcolor': { xs: '#fafafa', sm: 'unset' },
+            'pointerEvents': page >= totalPage ? 'none' : 'auto',
+          }}
+        >
+          <NextPageIcon />
+        </Link>
+      </NextLink>
     </Stack>
   )
 }

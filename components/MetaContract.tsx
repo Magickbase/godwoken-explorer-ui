@@ -1,7 +1,8 @@
-import { useTranslation } from 'next-i18next'
-import { List, ListItem, ListItemText, ListSubheader, Divider, Typography, Tooltip } from '@mui/material'
-import BigNumber from 'bignumber.js'
 import type { MetaContract as MetaContractProps } from './AccountOverview'
+import { useTranslation } from 'next-i18next'
+import Tooltip from 'components/Tooltip'
+import BigNumber from 'bignumber.js'
+import InfoList from './InfoList'
 
 const MetaContract = ({
   status,
@@ -11,82 +12,53 @@ const MetaContract = ({
   last_finalized_block_number,
 }: MetaContractProps['script']) => {
   const [t] = useTranslation('account')
-  const fields: Array<{ label: string; value: React.ReactNode }> = [
+  const list: Array<{ field: string; content: React.ReactNode }> = [
     {
-      label: t(`type`),
-      value: <Typography variant="body2">{`Meta Contract`}</Typography>,
+      field: t(`type`),
+      content: `Meta Contract`,
     },
     {
-      label: t('status'),
-      value: <Typography variant="body2">{t(status)}</Typography>,
+      field: t('status'),
+      content: t(status),
     },
     {
-      label: t('accountCount'),
-      value: <Typography variant="body2">{new BigNumber(account_merkle_state.account_count).toFormat()}</Typography>,
+      field: t('accountCount'),
+      content: new BigNumber(account_merkle_state.account_count).toFormat(),
     },
     {
-      label: t('blockCount'),
-      value: <Typography variant="body2">{new BigNumber(block_merkle_state.block_count).toFormat()}</Typography>,
+      field: t('blockCount'),
+      content: new BigNumber(block_merkle_state.block_count).toFormat(),
     },
     {
-      label: t('lastFinalizedBlockNumber'),
-      value: <Typography variant="body2">{new BigNumber(last_finalized_block_number).toFormat()}</Typography>,
+      field: t('lastFinalizedBlockNumber'),
+      content: new BigNumber(last_finalized_block_number).toFormat(),
     },
     {
-      label: t('accountMerkleRoot'),
-      value: (
+      field: t('accountMerkleRoot'),
+      content: (
         <Tooltip title={account_merkle_state.account_merkle_root} placement="top">
-          <Typography variant="body2" overflow="hidden" textOverflow="ellipsis" className="mono-font">
-            {t(account_merkle_state.account_merkle_root)}
-          </Typography>
+          <span className="mono-font">{t(account_merkle_state.account_merkle_root)}</span>
         </Tooltip>
       ),
     },
     {
-      label: t('blockMerkleRoot'),
-      value: (
+      field: t('blockMerkleRoot'),
+      content: (
         <Tooltip title={block_merkle_state.block_merkle_root} placement="top">
-          <Typography variant="body2" overflow="hidden" textOverflow="ellipsis" className="mono-font">
-            {t(block_merkle_state.block_merkle_root)}
-          </Typography>
+          <span className="mono-font">{t(block_merkle_state.block_merkle_root)}</span>
         </Tooltip>
       ),
     },
     {
-      label: t('revertedBlockRoot'),
-      value: (
+      field: t('revertedBlockRoot'),
+      content: (
         <Tooltip title={reverted_block_root} placement="top">
-          <Typography variant="body2" overflow="hidden" textOverflow="ellipsis" className="mono-font">
-            {reverted_block_root}
-          </Typography>
+          <span className="mono-font">{reverted_block_root}</span>
         </Tooltip>
       ),
     },
   ]
-  return (
-    <List
-      subheader={
-        <ListSubheader component="div" sx={{ textTransform: 'capitalize', bgcolor: 'transparent' }}>
-          {t('basicInfo')}
-        </ListSubheader>
-      }
-      sx={{ textTransform: 'capitalize' }}
-    >
-      <Divider variant="middle" />
-      {fields.map(field => (
-        <ListItem key={field.label}>
-          <ListItemText
-            primary={field.label}
-            secondary={
-              <Typography variant="body2" overflow="hidden" textOverflow="ellipsis">
-                {field.value}
-              </Typography>
-            }
-          />
-        </ListItem>
-      ))}
-    </List>
-  )
+  return <InfoList title={t('basicInfo')} list={list} />
 }
 
 export default MetaContract

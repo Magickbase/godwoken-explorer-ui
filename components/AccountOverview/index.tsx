@@ -1,18 +1,20 @@
 import { gql } from 'graphql-request'
 import { useTranslation } from 'next-i18next'
 import BigNumber from 'bignumber.js'
-import { Paper, List, ListItem, ListItemText, Divider, Grid, ListSubheader, Typography, Skeleton } from '@mui/material'
+import { Skeleton } from '@mui/material'
 import User from 'components/User'
-import EthAddrReg from './EthAddrReg'
+import EthAddrReg from 'components/EthAddrReg'
 import MetaContract from 'components/MetaContract'
 import SmartContract from 'components/SmartContract'
 import Polyjuice from 'components/Polyjuice'
 import SUDT from 'components/SUDT'
 import UnknownAccount from 'components/UnknownAccount'
+import InfoList from 'components/InfoList'
+import styles from './styles.module.scss'
 import { GCKB_DECIMAL, GraphQLSchema, client, provider, PCKB_SYMBOL } from 'utils'
 
 export type BasicScript = Record<'args' | 'code_hash' | 'hash_type', string>
-interface AccountBase {
+export interface AccountBase {
   eth_address: string | null
   script_hash: string
   transaction_count: number
@@ -109,21 +111,6 @@ const accountOverviewQuery = gql`
     }
   }
 `
-const accountBalanceQuery = gql`
-  query ($address_hashes: [String], $script_hashes: [String]) {
-    account_ckbs(input: { address_hashes: $address_hashes, script_hashes: $script_hashes }) {
-      balance
-    }
-  }
-`
-
-const newAccountBalanceQuery = gql`
-  query ($address_hashes: [String], $script_hashes: [String]) {
-    account_current_bridged_udts_of_ckb(input: { address_hashes: $address_hashes, script_hashes: $script_hashes }) {
-      value
-    }
-  }
-`
 
 const deployAddrQuery = gql`
   query ($eth_hash: String!) {
@@ -150,17 +137,6 @@ export const fetchAccountOverview = (variables: Variables) =>
       } as UnknownUser),
   )
 
-// export const fetchAccountBalance = (variables: { address_hashes: Array<string> } | { script_hashes: Array<string> }) =>
-//   Promise.all([
-//     client
-//       .request<{ account_ckbs: Array<{ balance: string }> }>(accountBalanceQuery, variables)
-//       .then(data => data.account_ckbs[0]?.balance)
-//       .catch(() => null),
-//     client
-//       .request<{ account_current_bridged_udts_of_ckb: Array<{ value: string }> }>(newAccountBalanceQuery, variables)
-//       .then(data => data.account_current_bridged_udts_of_ckb[0]?.value)
-//       .catch(() => null),
-//   ]).then(([b1, b2]) => b1 || b2 || '0')
 export const fetchAccountBalance = (address: string) => provider.getBalance(address).then(res => res.toString())
 
 export const fetchDeployAddress = (variables: { eth_hash: string }) =>
@@ -168,6 +144,14 @@ export const fetchDeployAddress = (variables: { eth_hash: string }) =>
     .request<{ transaction: { from_account: Pick<GraphQLSchema.Account, 'eth_address'> } }>(deployAddrQuery, variables)
     .then(data => data.transaction.from_account.eth_address)
 
+const OverviewPlaceHolderCount = {
+  [GraphQLSchema.AccountType.EthUser]: 0,
+  [GraphQLSchema.AccountType.PolyjuiceCreator]: 1,
+  [GraphQLSchema.AccountType.PolyjuiceContract]: 3,
+  [GraphQLSchema.AccountType.MetaContract]: 6,
+  [GraphQLSchema.AccountType.EthAddrReg]: 0,
+  [GraphQLSchema.AccountType.Udt]: 4,
+}
 const AccountOverview: React.FC<AccountOverviewProps> = ({
   account,
   balance,
@@ -177,74 +161,66 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({
 }) => {
   const [t] = useTranslation(['account', 'common'])
   return (
-    <Paper>
-      <Grid container spacing={2}>
-        <Grid item xs={12} md={6}>
-          <List
-            subheader={
-              <ListSubheader component="div" sx={{ textTransform: 'capitalize', bgcolor: 'transparent' }}>
-                {t(`overview`)}
-              </ListSubheader>
-            }
-            sx={{ textTransform: 'capitalize' }}
-          >
-            <Divider variant="middle" />
-            <ListItem>
-              <ListItemText
-                primary={t(`ckbBalance`)}
-                secondary={
-                  <Typography variant="body2" sx={{ textTransform: 'none' }}>
-                    {isBalanceLoading ? (
-                      <Skeleton animation="wave" />
-                    ) : (
-                      new BigNumber(balance || '0').dividedBy(GCKB_DECIMAL).toFormat() + ` ${PCKB_SYMBOL}`
-                    )}
-                  </Typography>
-                }
-              />
-            </ListItem>
-            <ListItem>
-              <ListItemText
-                primary={t(`txCount`)}
-                secondary={
-                  <Typography variant="body2">
-                    {isOverviewLoading ? (
-                      <Skeleton animation="wave" />
-                    ) : (
-                      new BigNumber(Math.max(account.nonce ?? 0, account.transaction_count ?? 0)).toFormat()
-                    )}
-                  </Typography>
-                }
-              />
-            </ListItem>
-          </List>
-        </Grid>
-        <Grid item xs={12} md={6}>
-          {account.type === GraphQLSchema.AccountType.MetaContract ? (
-            <MetaContract {...(account.script as MetaContract['script'])} />
-          ) : null}
-          {account.type === GraphQLSchema.AccountType.EthUser ? (
-            <User nonce={account.nonce} isLoading={isOverviewLoading} />
-          ) : null}
-          {account.type === GraphQLSchema.AccountType.EthAddrReg ? <EthAddrReg /> : null}
-          {account.type === GraphQLSchema.AccountType.PolyjuiceContract ? (
-            <SmartContract
-              deployer={deployerAddr}
-              deployTxHash={account.smart_contract?.deployment_tx_hash}
-              udt={account.udt}
-              isVerified={!!account.smart_contract?.abi}
-            />
-          ) : null}
-          {account.type === GraphQLSchema.AccountType.PolyjuiceCreator ? (
-            <Polyjuice script={account.script as PolyjuiceCreator['script']} scriptHash={account.script_hash} />
-          ) : null}
-          {account.type === GraphQLSchema.AccountType.Udt && account.udt ? (
-            <SUDT udt={account.udt} script={account.script} script_hash={account.script_hash} />
-          ) : null}
-          {account.type === GraphQLSchema.AccountType.Unknown ? <UnknownAccount nonce={account.nonce} /> : null}
-        </Grid>
-      </Grid>
-    </Paper>
+    <div className={styles.container} data-account-type={account.type}>
+      {account.type === GraphQLSchema.AccountType.MetaContract ? (
+        <MetaContract {...(account.script as MetaContract['script'])} />
+      ) : null}
+      {account.type === GraphQLSchema.AccountType.EthUser ? (
+        <User nonce={account.nonce} isLoading={isOverviewLoading} />
+      ) : null}
+      {account.type === GraphQLSchema.AccountType.EthAddrReg ? <EthAddrReg /> : null}
+      {account.type === GraphQLSchema.AccountType.PolyjuiceContract ? (
+        <SmartContract
+          deployer={deployerAddr}
+          deployTxHash={account.smart_contract?.deployment_tx_hash}
+          udt={account.udt}
+          isVerified={!!account.smart_contract?.abi}
+        />
+      ) : null}
+      {account.type === GraphQLSchema.AccountType.PolyjuiceCreator ? (
+        <Polyjuice script={account.script as PolyjuiceCreator['script']} scriptHash={account.script_hash} />
+      ) : null}
+      {account.type === GraphQLSchema.AccountType.Udt && account.udt ? (
+        <SUDT udt={account.udt} script={account.script} script_hash={account.script_hash} />
+      ) : null}
+      {account.type === GraphQLSchema.AccountType.Unknown ? <UnknownAccount nonce={account.nonce} /> : null}
+
+      <InfoList
+        title={t('overview')}
+        list={[
+          {
+            field: t(`ckbBalance`),
+            content: isBalanceLoading ? (
+              <Skeleton animation="wave" />
+            ) : (
+              <span className={styles.balance}>
+                {new BigNumber(balance || '0').dividedBy(GCKB_DECIMAL).toFormat() + ` ${PCKB_SYMBOL}`}
+              </span>
+            ),
+          },
+          {
+            field: t(`txCount`),
+            content: isOverviewLoading ? (
+              <Skeleton animation="wave" />
+            ) : (
+              new BigNumber(Math.max(account.nonce ?? 0, account.transaction_count ?? 0)).toFormat()
+            ),
+          },
+          OverviewPlaceHolderCount[account.type]
+            ? {
+                field: '',
+                content: (
+                  <div
+                    data-role="placeholder"
+                    style={{ height: `calc(${3.5 * OverviewPlaceHolderCount[account.type]}rem - 2rem)` }}
+                  ></div>
+                ),
+              }
+            : null,
+          // ...overviewPlaceHolderFields,
+        ]}
+      />
+    </div>
   )
 }
 

@@ -22,24 +22,17 @@ import {
   Skeleton,
 } from '@mui/material'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
-import BigNumber from 'bignumber.js'
 import SubpageHead from 'components/SubpageHead'
 import PageTitle from 'components/PageTitle'
-import ERC20TransferList from 'components/ERC20TransferList'
+import ERC20TransferList, { fetchTokenTransferList } from 'components/ERC20TransferList'
 import BridgedRecordList from 'components/BridgedRecordList'
 import TokenHolderList from 'components/TokenHolderList'
 import Address from 'components/AddressInHalfPanel'
 import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
-import {
-  fetchToken,
-  fetchERC20TransferList,
-  nameToColor,
-  fetchBridgedRecordList,
-  fetchTokenHolderList,
-  formatAmount,
-} from 'utils'
+import { fetchToken, nameToColor, fetchBridgedRecordList, fetchTokenHolderList, formatAmount } from 'utils'
 
 import type { API } from 'utils/api/utils'
+import { SIZES } from 'components/PageSize'
 
 const tabs = ['transfers', 'bridged', 'holders']
 
@@ -52,7 +45,7 @@ const Token: React.FC<Props> = () => {
   const {
     replace,
     push,
-    query: { id, tab = 'transfers', page = '1' },
+    query: { id, tab = 'transfers', page = '1', before = null, after = null, page_size = SIZES[1] },
   } = useRouter()
 
   const { isLoading: isTokenLoading, data: token } = useQuery(['token', id], () => fetchToken(id.toString()))
@@ -75,7 +68,13 @@ const Token: React.FC<Props> = () => {
 
   const { isLoading: isTransferListLoading, data: transferList } = useQuery(
     ['token-transfer-list', token?.address, page],
-    () => fetchERC20TransferList({ udt_address: token?.address, page: page as string }),
+    () =>
+      fetchTokenTransferList({
+        address: token?.address,
+        limit: +page_size,
+        before: before as string,
+        after: after as string,
+      }),
     { enabled: tab === tabs[0] && !!token?.address },
   )
 
@@ -272,7 +271,7 @@ const Token: React.FC<Props> = () => {
             <Divider />
             {tab === tabs[0] ? (
               !isTransferListLoading && transferList ? (
-                <ERC20TransferList list={transferList} />
+                <ERC20TransferList token_transfers={transferList} />
               ) : (
                 <Skeleton animation="wave" />
               )

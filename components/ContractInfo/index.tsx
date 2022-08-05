@@ -1,29 +1,10 @@
-import type { PolyjuiceContract as PolyjuiceContractProps } from '../AccountOverview'
+import type { PolyjuiceContract as PolyjuiceContractProps } from 'components/AccountOverview'
 import { useState, useMemo, useEffect } from 'react'
-import { styled } from '@mui/system'
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import { ethers } from 'ethers'
-import {
-  Box,
-  Stack,
-  Chip,
-  TabsUnstyled,
-  TabUnstyled,
-  TabsListUnstyled,
-  TextareaAutosize,
-  Typography,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Divider,
-  Button,
-  CircularProgress,
-  Link,
-  buttonUnstyledClasses,
-  tabUnstyledClasses,
-} from '@mui/material'
-import { ExpandMore as ExpandMoreIcon, OpenInNew as OpenInNewIcon } from '@mui/icons-material'
+import OpenInNewIcon from 'assets/icons/open-in-new.svg'
+import ExpandIcon from 'assets/icons/expand.svg'
 import { IS_MAINNET, provider } from 'utils'
 import styles from './styles.module.scss'
 
@@ -62,71 +43,6 @@ const NodeConfigs: Record<'mainnet' | 'testnet', ChainConfig> = {
     },
     blockExplorerUrls: ['https://v1.testnet.gwscan.com'],
   },
-}
-
-const grey = {
-  50: '#fafafa',
-  100: 'rgba(0,0,0,0.08)',
-  200: '#eee',
-  400: '#bdbdbd',
-  600: '#757575',
-}
-
-const Tab = styled(TabUnstyled)`
-  color: ${grey[600]};
-  cursor: pointer;
-  font-size: 0.875rem;
-  font-weight: bold;
-  background-color: transparent;
-  width: 100%;
-  padding: 8px 12px;
-  margin: 6px 6px;
-  border: none;
-  border-radius: 5px;
-  display: flex;
-  justify-content: center;
-
-  &:hover {
-    background-color: ${grey[50]};
-  }
-
-  &:focus {
-    border-radius: 3px;
-    outline: 2px solid ${grey[200]};
-    outline-offset: 2px;
-  }
-
-  &.${tabUnstyledClasses.selected} {
-    background-color: ${grey[100]};
-    color: ${grey[600]};
-  }
-
-  &.${buttonUnstyledClasses.disabled} {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`
-
-const TabsList = styled(TabsListUnstyled)`
-  min-width: 320px;
-  background-color: ${grey[500]};
-  border-radius: 8px;
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  align-content: space-between;
-`
-
-const textareaStyle: React.CSSProperties = {
-  padding: '8px',
-  resize: 'vertical',
-  height: '50ch',
-  overflow: 'auto',
-  background: '#F9F9F9',
-  color: '#080808',
-  borderRadius: '4px',
-  borderColor: '#ddd',
 }
 
 const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps['smart_contract'] }> = ({
@@ -203,7 +119,6 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
     }
   }, [abi, signer, tabIdx])
 
-  const handleTabChange = (_: React.SyntheticEvent, newIdx: number) => setTabIdx(newIdx)
   const vm = compiler_file_format?.split(' ')[0]
   const chips = [
     name ? `${t('contract_name')}: ${name}` : null,
@@ -219,7 +134,6 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
     e.preventDefault()
     const form = e.currentTarget
     const btn = form.querySelector<HTMLButtonElement>('button')
-    const loading = form.querySelector<HTMLDivElement>('.contract-loading')
     const paramInputList = form.querySelectorAll<HTMLInputElement>('input[name=parameter]')
     const resInputList = form.querySelectorAll<HTMLInputElement>('input[name=response]')
     const openInNew = form.querySelector<HTMLDivElement>(`.${styles.openInNew}`)
@@ -232,9 +146,13 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
 
     if (!method) return
     btn.disabled = true
-    if (loading) {
-      loading.style.display = 'block'
+    const LOADING_ATTRIBUTE = 'data-is-loading'
+
+    if (form.getAttribute(LOADING_ATTRIBUTE)) {
+      return
     }
+
+    form.setAttribute(LOADING_ATTRIBUTE, 'true')
     try {
       const result = await method(...params)
       if (tabIdx === 2) {
@@ -256,269 +174,198 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
       window.alert(message)
     } finally {
       btn.disabled = false
-      if (loading) {
-        loading.style.display = 'none'
-      }
+      form.removeAttribute(LOADING_ATTRIBUTE)
     }
   }
 
   return (
-    <Box sx={{ width: '100%' }} className={styles.container}>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <TabsUnstyled value={tabIdx} onChange={handleTabChange} style={{ width: 'min-content', marginTop: 8 }}>
-          <TabsList>
-            <Tab>{t('code')}</Tab>
-            {contract ? <Tab sx={{ whiteSpace: 'nowrap' }}>{t(`read_contract`)}</Tab> : null}
-            {contract ? <Tab sx={{ whiteSpace: 'nowrap' }}>{t(`write_contract`)}</Tab> : null}
-          </TabsList>
-        </TabsUnstyled>
-        {tabIdx === 0 ? (
-          <Stack direction="column" sx={{ p: '0px 16px 16px 16px' }} spacing={4}>
-            <Stack direction="row" flexWrap="wrap">
-              {chips.map(c => (
-                <Chip key={c} label={c} style={{ margin: '0 8px 8px 0' }} />
-              ))}
-            </Stack>
-            {contract_source_code ? (
-              <Stack>
-                <Stack direction="row" alignItems="center">
-                  <Typography variant="h6">{t(`contract_source_code`)}</Typography>
-                  {vm ? <Typography variant="body2" color="grey" ml={1}>{`(${vm})`}</Typography> : null}
-                </Stack>
-                <TextareaAutosize defaultValue={contract_source_code} readOnly style={textareaStyle} />
-              </Stack>
-            ) : null}
-            {contract ? (
-              <Stack>
-                <Typography variant="h6">{t(`abi`)}</Typography>
-                <TextareaAutosize defaultValue={JSON.stringify(abi, null, 2)} readOnly style={textareaStyle} />
-              </Stack>
-            ) : null}
-            {constructor_arguments ? (
-              <Stack>
-                <Typography variant="h6">{t(`constructor_arguments`)}</Typography>
-                <TextareaAutosize defaultValue={constructor_arguments} readOnly style={textareaStyle} />
-              </Stack>
-            ) : null}
-          </Stack>
-        ) : null}
-
-        {tabIdx === 1 && contract ? (
-          <Stack sx={{ p: '0px 16px 16px 16px' }} spacing={2}>
-            {viewMethodSignatures.map(signature => {
-              const { inputs = [], outputs = [] } = contract.interface.functions[signature] ?? {}
-              return (
-                <Accordion key={signature} sx={{ boxShadow: 'none', border: '1px solid #ddd' }}>
-                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography variant="body2">{`${signature}: ${outputs
-                      .map(output => output.type)
-                      .join(', ')}`}</Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <form onSubmit={handleMethodCall} data-signature={signature}>
-                      {inputs.length ? (
-                        <Divider>
-                          <Typography variant="body2">Parameters</Typography>
-                        </Divider>
-                      ) : null}
-
-                      <Stack spacing={2}>
-                        {inputs.map((input, i: number) => {
-                          return (
-                            <fieldset key={input.name + i}>
-                              <label>{`${input.name ?? t('anonymous_param')}: ${input.type}`}</label>
-                              <input name="parameter" />
-                            </fieldset>
-                          )
-                        })}
-                        <Divider>
-                          <Typography variant="body2">Response</Typography>
-                        </Divider>
-                        {outputs.map((output, i: number) => {
-                          return (
-                            <fieldset key={output.name + i}>
-                              <label>{`${output.name ?? t('anonymous_response')}: ${output.type}`}</label>
-                              <input name="response" readOnly />
-                            </fieldset>
-                          )
-                        })}
-                      </Stack>
-                      <Box sx={{ textAlign: 'right', marginTop: '16px' }}>
-                        <Button type="submit" variant="contained" size="small">
-                          Query
-                          <CircularProgress
-                            className="contract-loading"
-                            size={24}
-                            sx={{
-                              display: 'none',
-                              position: 'absolute',
-                              top: '50%',
-                              left: '50%',
-                              marginTop: '-12px',
-                              marginLeft: '-12px',
-                            }}
-                          />
-                        </Button>
-                      </Box>
-                    </form>
-                  </AccordionDetails>
-                </Accordion>
-              )
-            })}
-            {writeMethodSignatures.length ? (
-              <Divider>
-                <Typography variant="body2" my={4}>
-                  Call Static
-                </Typography>
-              </Divider>
-            ) : null}
-            {writeMethodSignatures.map(signature => {
-              const { inputs = [], outputs = [] } = contract.interface.functions[signature] ?? {}
-              return (
-                <Accordion key={signature} sx={{ boxShadow: 'none', border: '1px solid #ddd' }}>
-                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography variant="body2">{`${signature}: ${outputs
-                      .map(output => output.type)
-                      .join(', ')}`}</Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <form onSubmit={handleMethodCall} data-call-static="true" data-signature={signature}>
-                      {inputs.length ? (
-                        <Divider>
-                          <Typography variant="body2">Parameters</Typography>
-                        </Divider>
-                      ) : null}
-
-                      <Stack spacing={2}>
-                        {inputs.map((input, i: number) => {
-                          return (
-                            <fieldset key={input.name + i}>
-                              <label>{`${input.name ?? t('anonymous_param')}: ${input.type}`}</label>
-                              <input name="parameter" />
-                            </fieldset>
-                          )
-                        })}
-                        <Divider>
-                          <Typography variant="body2">Response</Typography>
-                        </Divider>
-                        {outputs.map((output, i: number) => {
-                          return (
-                            <fieldset key={output.name + i}>
-                              <label>{`${output.name ?? t('anonymous_response')}: ${output.type}`}</label>
-                              <input name="response" readOnly />
-                            </fieldset>
-                          )
-                        })}
-                      </Stack>
-                      <Box sx={{ textAlign: 'right', marginTop: '16px' }}>
-                        <Button type="submit" variant="contained" size="small">
-                          Query
-                          <CircularProgress
-                            className="contract-loading"
-                            size={24}
-                            sx={{
-                              display: 'none',
-                              position: 'absolute',
-                              top: '50%',
-                              left: '50%',
-                              marginTop: '-12px',
-                              marginLeft: '-12px',
-                            }}
-                          />
-                        </Button>
-                      </Box>
-                    </form>
-                  </AccordionDetails>
-                </Accordion>
-              )
-            })}
-          </Stack>
-        ) : null}
-
-        {tabIdx === 2 && contract ? (
-          <Stack sx={{ p: '0px 16px 16px 16px' }} spacing={2}>
-            {addr ? (
-              <div style={{ whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
-                <span style={{ marginRight: '4px' }}>{t(`connected_addr`)}</span>
-                <NextLink href={`/account/${addr}`}>
-                  <Link
-                    href={`/account/${addr}`}
-                    underline="none"
-                    color="secondary"
-                    className="mono-font"
-                    whiteSpace="nowrap"
-                    fontSize="14px"
-                  >
-                    {addr}
-                  </Link>
-                </NextLink>
+    <div className={styles.container}>
+      <div className={styles.tabs}>
+        {['code', 'read_contract', 'write_contract'].map((tab, idx) => (
+          <div key={tab} onClick={() => setTabIdx(idx)} data-active={idx === tabIdx}>
+            {t(tab)}
+          </div>
+        ))}
+      </div>
+      {tabIdx === 0 ? (
+        <div>
+          <div className={styles.info}>
+            {chips.map(c => (
+              <div key={c}>{c}</div>
+            ))}
+          </div>
+          {contract_source_code ? (
+            <div className={styles.sourceCode}>
+              <div className={styles.title}>
+                <h6>{t(`contract_source_code`)}</h6>
+                {vm ? <div className={styles.vm}>{`(${vm})`}</div> : null}
               </div>
-            ) : null}
-            {writeMethodSignatures.map(signature => {
-              const { inputs = [], outputs = [] } = contract.interface.functions[signature] ?? {}
-              return (
-                <Accordion key={signature} sx={{ boxShadow: 'none', border: '1px solid #ddd' }}>
-                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography variant="body2">{`${signature}: ${outputs
-                      .map(output => output.type)
-                      .join(', ')}`}</Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <form onSubmit={handleMethodCall} data-signature={signature}>
-                      {inputs.length ? (
-                        <Divider>
-                          <Typography variant="body2">Parameters</Typography>
-                        </Divider>
-                      ) : null}
+              <textarea defaultValue={contract_source_code} readOnly />
+            </div>
+          ) : null}
+          {contract ? (
+            <div className={styles.abi}>
+              <h6 className={styles.title}>{t(`abi`)}</h6>
+              <textarea defaultValue={JSON.stringify(abi, null, 2)} readOnly />
+            </div>
+          ) : null}
+          {constructor_arguments ? (
+            <div className={styles.constructorArgs}>
+              <h6 className={styles.title}>{t(`constructor_arguments`)}</h6>
+              <textarea defaultValue={constructor_arguments} readOnly />
+            </div>
+          ) : null}
+        </div>
+      ) : null}
 
-                      <Stack spacing={2}>
-                        {inputs.map((input, i: number) => {
-                          return (
-                            <fieldset key={input.name + i}>
-                              <label>{`${input.name ?? t('anonymous_param')}: ${input.type}`}</label>
-                              <input name="parameter" />
-                            </fieldset>
-                          )
-                        })}
-                        <Divider>
-                          <Typography variant="body2">Response</Typography>
-                        </Divider>
-                        <fieldset>
-                          <label>Txn Hash</label>
-                          <div className={styles.writeRes}>
-                            <input name="response" readOnly />
-                            <div className={styles.openInNew}>
-                              <OpenInNewIcon />
-                            </div>
-                          </div>
-                        </fieldset>
-                      </Stack>
-                      <Box sx={{ textAlign: 'right', marginTop: '16px' }}>
-                        <Button type="submit" variant="contained" size="small">
-                          Apply
-                          <CircularProgress
-                            className="contract-loading"
-                            size={24}
-                            sx={{
-                              display: 'none',
-                              position: 'absolute',
-                              top: '50%',
-                              left: '50%',
-                              marginTop: '-12px',
-                              marginLeft: '-12px',
-                            }}
+      {tabIdx === 1 && contract ? (
+        <div>
+          {viewMethodSignatures.map(signature => {
+            const { inputs = [], outputs = [] } = contract.interface.functions[signature] ?? {}
+            return (
+              <details key={signature}>
+                <summary>
+                  <div>{`${signature}: ${outputs.map(output => output.type).join(', ')}`}</div>
+                  <ExpandIcon />
+                </summary>
+                <form onSubmit={handleMethodCall} data-signature={signature}>
+                  {inputs.length ? <div className={styles.params}>Parameters</div> : null}
+
+                  <div>
+                    {inputs.map((input, i: number) => {
+                      return (
+                        <fieldset key={input.name + i}>
+                          <label>{`${input.name ?? t('anonymous_param')}: ${input.type}`}</label>
+                          <input
+                            name="parameter"
+                            placeholder={`${input.name ?? t('anonymous_param')}: ${input.type}`}
                           />
-                        </Button>
-                      </Box>
-                    </form>
-                  </AccordionDetails>
-                </Accordion>
-              )
-            })}
-          </Stack>
-        ) : null}
-      </Box>
-    </Box>
+                        </fieldset>
+                      )
+                    })}
+                    <div className={styles.response}>Response</div>
+                    {outputs.map((output, i: number) => {
+                      return (
+                        <fieldset key={output.name + i}>
+                          <label>{`${output.name ?? t('anonymous_response')}: ${output.type}`}</label>
+                          <input
+                            name="response"
+                            readOnly
+                            placeholder={`${output.name ?? t('anonymous_response')}: ${output.type}`}
+                          />
+                        </fieldset>
+                      )
+                    })}
+                  </div>
+                  <div>
+                    <button type="submit">Query</button>
+                  </div>
+                </form>
+              </details>
+            )
+          })}
+          {writeMethodSignatures.length ? <div className={styles.callStatic}>Call Static</div> : null}
+          {writeMethodSignatures.map(signature => {
+            const { inputs = [], outputs = [] } = contract.interface.functions[signature] ?? {}
+            return (
+              <details key={signature}>
+                <summary>
+                  <div>{`${signature}: ${outputs.map(output => output.type).join(', ')}`}</div>
+                </summary>
+                <form onSubmit={handleMethodCall} data-call-static="true" data-signature={signature}>
+                  {inputs.length ? <div className={styles.params}>Parameters</div> : null}
+
+                  <div>
+                    {inputs.map((input, i: number) => {
+                      return (
+                        <fieldset key={input.name + i}>
+                          <label>{`${input.name ?? t('anonymous_param')}: ${input.type}`}</label>
+                          <input
+                            name="parameter"
+                            placeholder={`${input.name ?? t('anonymous_param')}: ${input.type}`}
+                          />
+                        </fieldset>
+                      )
+                    })}
+                    <div className={styles.response}>Response</div>
+                    {outputs.map((output, i: number) => {
+                      return (
+                        <fieldset key={output.name + i}>
+                          <label>{`${output.name ?? t('anonymous_response')}: ${output.type}`}</label>
+                          <input
+                            name="response"
+                            readOnly
+                            placeholder={`${output.name ?? t('anonymous_response')}: ${output.type}`}
+                          />
+                        </fieldset>
+                      )
+                    })}
+                  </div>
+                  <div>
+                    <button type="submit">Query</button>
+                  </div>
+                </form>
+              </details>
+            )
+          })}
+        </div>
+      ) : null}
+
+      {tabIdx === 2 && contract ? (
+        <div>
+          {addr ? (
+            <div className={styles.connectedAddr}>
+              <span>{t(`connected_addr`)}</span>
+              <NextLink href={`/account/${addr}`}>
+                <a href={`/account/${addr}`} className="mono-font">
+                  {addr}
+                </a>
+              </NextLink>
+            </div>
+          ) : null}
+          {writeMethodSignatures.map(signature => {
+            const { inputs = [], outputs = [] } = contract.interface.functions[signature] ?? {}
+            return (
+              <details key={signature}>
+                <summary>
+                  <div>{`${signature}: ${outputs.map(output => output.type).join(', ')}`}</div>
+                </summary>
+                <form onSubmit={handleMethodCall} data-signature={signature}>
+                  {inputs.length ? <div className={styles.params}>Parameters</div> : null}
+
+                  <div>
+                    {inputs.map((input, i: number) => {
+                      return (
+                        <fieldset key={input.name + i}>
+                          <label>{`${input.name ?? t('anonymous_param')}: ${input.type}`}</label>
+                          <input
+                            name="parameter"
+                            placeholder={`${input.name ?? t('anonymous_param')}: ${input.type}`}
+                          />
+                        </fieldset>
+                      )
+                    })}
+                    <div className={styles.response}>Response</div>
+                    <fieldset>
+                      <label>Txn Hash</label>
+                      <div className={styles.writeRes}>
+                        <input name="response" readOnly />
+                        <div className={styles.openInNew}>
+                          <OpenInNewIcon />
+                        </div>
+                      </div>
+                    </fieldset>
+                  </div>
+                  <div>
+                    <button type="submit">Apply</button>
+                  </div>
+                </form>
+              </details>
+            )
+          })}
+        </div>
+      ) : null}
+    </div>
   )
 }
 
