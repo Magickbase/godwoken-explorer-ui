@@ -55,6 +55,7 @@ const Tx = (initState: State) => {
       address_from = null,
       address_to = null,
       page_size = SIZES[1],
+      log_index_sort = 'ASC',
     },
   } = useRouter()
   const [t] = useTranslation('tx')
@@ -62,7 +63,7 @@ const Tx = (initState: State) => {
   const downloadItems = [{ label: t('ERC20Records'), href: DOWNLOAD_HREF_LIST.txTransferList(tx.hash) }]
 
   const { isLoading: isTransferListLoading, data: transferList } = useQuery(
-    ['tx-transfer-list', hash, before, after, address_from, address_to],
+    ['tx-transfer-list', hash, before, after, address_from, address_to, log_index_sort, page_size],
     () =>
       fetchTransferList({
         transaction_hash: hash as string,
@@ -72,6 +73,7 @@ const Tx = (initState: State) => {
         to_address: address_to as string | null,
         combine_from_to: false,
         limit: Number.isNaN(+page_size) ? +SIZES[1] : +page_size,
+        log_index_sort: log_index_sort as 'ASC' | 'DESC',
       }),
     {
       enabled: tab === 'erc20',

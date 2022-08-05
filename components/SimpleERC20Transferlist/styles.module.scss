@@ -28,3 +28,21 @@
   padding-left: 0 !important;
   padding-right: 0 !important;
 }
+
+.index {
+  display: flex;
+  align-items: center;
+  svg {
+    cursor: pointer;
+    margin-left: 8px;
+    &[data-order='DESC'] {
+      transform: rotate(0.5turn);
+    }
+  }
+}
+
+.from,
+.to {
+  display: flex;
+  align-items: center;
+}

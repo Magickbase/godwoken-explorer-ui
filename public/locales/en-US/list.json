@@ -15,6 +15,7 @@
   "layer1Txn": "CKB Txn",
   "pending": "Pending",
   "account": "Account",
+  "log_index": "Log Index",
   "block_from_to": "Blocks From #{{from}} To #{{to}}",
   "tx_in_block_from_to": "Txns in blocks from #{{from}} to #{{to}}",
   "block_list_title": "Blocks",
@@ -43,5 +44,12 @@
   "address_to": "to",
   "filter": "filter",
   "clear": "clear",
+  "n_contracts_in_total": "{{number}} Kinds in Total",
+  "filter_menu": {
+    "block_from": "Block Number",
+    "block_to": "Block Number",
+    "from": "Search by address",
+    "to": "Search by address"
+  },
   "n_kinds_in_total": "{{number}} Kinds in Total"
 }

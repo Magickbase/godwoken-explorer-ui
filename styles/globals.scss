@@ -43,10 +43,17 @@ a {
 
 * {
   box-sizing: border-box;
+  outline-color: var(--primary-color);
+  -webkit-tap-highlight-color: var(--primary-color);
 }
+
 *::selection {
   color: #fff;
   background-color: #000;
+}
+
+input {
+  outline-style: none;
 }
 
 input[type='number']::-webkit-inner-spin-button,

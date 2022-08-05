@@ -15,6 +15,7 @@
   "layer1Txn": "CKB 交易",
   "pending": "待确认",
   "account": "账户",
+  "log_index": "日志序号",
   "block_from_to": "#{{from}} 到 #{{to}} 的区块",
   "tx_in_block_from_to": "#{{from}} 到 #{{to}} 的区块中的交易",
   "block_list_title": "区块",
@@ -43,5 +44,11 @@
   "address_to": "到",
   "filter": "筛选",
   "clear": "清除",
+  "filter_menu": {
+    "block_from": "区块高度",
+    "block_to": "区块高度",
+    "from": "通过地址搜索",
+    "to": "通过地址搜索"
+  },
   "n_kinds_in_total": "共计 {{number}} 种"
 }
