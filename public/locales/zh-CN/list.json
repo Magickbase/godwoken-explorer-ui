@@ -45,6 +45,7 @@
   "filter": "筛选",
   "clear": "清除",
   "filter_menu": {
+    "name": "名称",
     "block_from": "区块高度",
     "block_to": "区块高度",
     "from": "通过地址搜索",

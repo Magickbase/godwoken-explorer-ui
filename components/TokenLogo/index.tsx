@@ -12,7 +12,7 @@ const TokenLogo: React.FC<{ logo: string; name: string }> = ({ name, logo }) => 
       src={logo || DEFAULT_LOGO_URL}
       title={name}
       loading="lazy"
-      crossOrigin="anonymous"
+      // crossOrigin="anonymous" // FIXME: YOK logo is forbidden by this policy
       referrerPolicy="no-referrer"
     />
   )

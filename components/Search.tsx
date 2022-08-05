@@ -64,6 +64,7 @@ const Search = () => {
       onChange={handleChange}
       inputRef={searchRef}
       className="search-input"
+      id="search"
       sx={{
         'fontSize': { xs: 12, md: 14 },
         '& .MuiOutlinedInput-notchedOutline': {

@@ -34,7 +34,7 @@ const FilterMenu: React.FC<{ filterKeys: Array<string> }> = ({ filterKeys }) => 
     })
 
     push(`${asPath.split('?')[0] ?? ''}?${new URLSearchParams(q)}`)
-    document.body.focus()
+    document.querySelector<HTMLInputElement>('#search')?.focus()
   }
 
   const handleFilterContentClear = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -64,7 +64,7 @@ const FilterMenu: React.FC<{ filterKeys: Array<string> }> = ({ filterKeys }) => 
         <ClearIcon className={styles.clearIcon} onClick={handleFilterClear} />
         <input id={menuId} />
       </label>
-      <form onSubmit={handleFilterSubmit} className={styles.menu}>
+      <form onSubmit={handleFilterSubmit} className={styles.menu} data-role="filter-menu">
         {filterKeys.map(field => {
           return (
             <div key={field} className={styles.field}>
