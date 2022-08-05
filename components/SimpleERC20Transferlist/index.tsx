@@ -9,7 +9,8 @@ import Table from 'components/Table'
 import { gql } from 'graphql-request'
 import Pagination from 'components/SimplePagination'
 import TokenLogo from 'components/TokenLogo'
-import { GraphQLSchema, client, useFilterMenu } from 'utils'
+import { GraphQLSchema, client, useFilterMenu, formatAmount } from 'utils'
+import SortIcon from 'assets/icons/sort.svg'
 import styles from './styles.module.scss'
 
 export type TransferListProps = {
@@ -36,6 +37,7 @@ const transferListQuery = gql`
     $to_address: String
     $combine_from_to: Boolean
     $limit: Int
+    $log_index_sort: SortType
   ) {
     token_transfers(
       input: {
@@ -46,6 +48,7 @@ const transferListQuery = gql`
         to_address: $to_address
         combine_from_to: $combine_from_to
         limit: $limit
+        sorter: [{ sort_type: $log_index_sort, sort_value: LOG_INDEX }]
       }
     ) {
       entries {
@@ -91,6 +94,7 @@ export const fetchTransferList = (variables: {
   to_address?: string | null
   combine_from_to?: boolean | null
   limit: number
+  log_index_sort: 'ASC' | 'DESC'
 }) =>
   client
     .request<TransferListProps>(transferListQuery, variables)
@@ -101,7 +105,7 @@ const FILTER_KEYS = ['address_from', 'address_to'] as const
 const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries, metadata } }) => {
   const [t] = useTranslation('list')
   const {
-    query: { id: _, page_size = SIZES[1], ...query },
+    query: { id: _, page_size = SIZES[1], log_index_sort = 'ASC', ...query },
     push,
     asPath,
   } = useRouter()
@@ -135,11 +139,29 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
     query: query as Record<string, string>,
   })
 
+  const handleLogIndexSortClick = (e: React.MouseEvent<HTMLOrSVGImageElement>) => {
+    const {
+      dataset: { order },
+    } = e.currentTarget
+    push(
+      `${asPath.split('?')[0] ?? ''}?${new URLSearchParams({
+        ...query,
+        log_index_sort: order === 'ASC' ? 'DESC' : 'ASC',
+      })}`,
+    )
+  }
+
   return (
     <div className={styles.container}>
       <Table>
         <thead>
           <tr>
+            <th>
+              <div className={styles.index}>
+                {t(`log_index`)}
+                <SortIcon onClick={handleLogIndexSortClick} data-order={log_index_sort} />
+              </div>
+            </th>
             <th>
               <Stack direction="row" alignItems="center" whiteSpace="nowrap">
                 {t('from')}
@@ -163,7 +185,8 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
         <tbody>
           {metadata.total_count ? (
             entries.map(item => (
-              <tr key={`${item.transaction_hash}-{item.log_index}`}>
+              <tr key={`${item.transaction_hash}-${item.log_index}`}>
+                <td>{item.log_index}</td>
                 <td className={styles.address}>
                   <NextLink href={`/account/${item.from_address}`}>
                     <a className="mono-font">
@@ -185,7 +208,7 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
                 {/*     <TokenLogo name={item.udt.name} logo={item.udt.icon} /> */}
                 {/*   </NextLink> */}
                 {/* </td> */}
-                <td title={item.udt.name}>{new BigNumber(item.amount).toFormat()}</td>
+                <td title={item.udt.name}>{formatAmount(item.amount, item.udt)}</td>
               </tr>
             ))
           ) : (
