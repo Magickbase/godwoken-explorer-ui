@@ -35,6 +35,8 @@ type State = API.Home.Parsed
 
 // TODO: add polyjuice status
 // TODO: how to display special address
+// TODO: compress the poster
+// FIXME: video flashes on switching language, maybe loaded multiple times
 
 const formatAddress = (addr: string, bigScreen: boolean = true, isSpecial: boolean = false) => {
   if (isSpecial) {
@@ -60,6 +62,8 @@ const statisticGroups = [
   { key: 'tps', suffix: ' Txs/s' },
   { key: 'accountCount' },
 ]
+
+const VIDEO_NAME = IS_MAINNET ? 'home-video' : 'testnet-home-video'
 
 const queryHomeLists = gql`
   query {
@@ -164,7 +168,7 @@ const Statistic: React.FC<State['statistic'] & { isLoading: boolean }> = ({
       rowSpacing={{ xs: 3, md: 3 }}
       columnSpacing={{ xs: 1, md: 6 }}
       sx={{ maxWidth: { xs: '35%', md: '50%' }, pb: 2, pt: 1 }}
-      className="statistic-container"
+      id="statistic-container"
     >
       {statisticGroups.map((field, i) => (
         <Grid
@@ -619,6 +623,16 @@ const Home = () => {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
+  useEffect(() => {
+    const handler = () => {
+      document.querySelector<HTMLVideoElement>('video')?.play()
+    }
+    document.addEventListener('WeixinJSBridgeReady', handler)
+    return () => {
+      document.removeEventListener('WeixinJSBridgeReady', handler)
+    }
+  })
+
   return (
     <Box sx={{ pb: { xs: 5, md: 11 } }}>
       <Box sx={{ bgcolor: 'primary.light' }}>
@@ -636,16 +650,16 @@ const Home = () => {
             <video
               autoPlay
               playsInline
-              webkit-playsinline="true"
               loop
               muted
-              preload="auto"
+              preload="none"
+              webkit-playsinline="true"
               x5-video-player-type="h5"
               x5-video-player-fullscreen="true"
-              style={{ maxWidth: '78%', width: 'auto', height: 'auto', maxHeight: 444 }}
-            >
-              <source src={IS_MAINNET ? '/home-video.mp4' : '/testnet-home-video.mp4'} />
-            </video>
+              style={{ maxWidth: '78%', width: 'auto', height: 'auto', maxHeight: 444, objectFit: 'cover' }}
+              poster={`${VIDEO_NAME}.png`}
+              src={`${VIDEO_NAME}.mp4`}
+            />
           </Stack>
         </Container>
       </Box>
