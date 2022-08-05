@@ -1,0 +1,46 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px;
+  max-width: min-content;
+  white-space: nowrap;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 400;
+  font-family: Roboto;
+  svg {
+    width: 1rem;
+    height: 1rem;
+    margin-right: 4px;
+  }
+  &[data-status='succeed'] {
+    color: #2bd56f;
+    background-color: #f0fcf1;
+  }
+  &[data-status='pending'] {
+    color: #f3b515;
+    background-color: #faf0e1;
+    svg {
+      path {
+        fill: currentColor;
+        stroke: #faf0e1;
+      }
+      rect {
+        fill: currentColor;
+      }
+    }
+  }
+  &[data-status='failed'] {
+    color: #f83f3f;
+    background-color: #fcf0f0;
+    svg {
+      rect {
+        fill: currentColor;
+      }
+      path {
+        fill: #fcf0f0;
+      }
+    }
+  }
+}

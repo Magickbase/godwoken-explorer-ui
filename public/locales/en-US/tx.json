@@ -52,5 +52,6 @@
   "rawData": "Raw Data",
   "txRawData": "Transaction",
   "txReceiptRawData": "Transaction Receipt",
-  "noData": "No Data"
+  "noData": "No Data",
+  "check": "Check"
 }

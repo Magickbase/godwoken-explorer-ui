@@ -1,0 +1,140 @@
+@import '../../styles/mixin.scss';
+
+.container {
+  @include main-center;
+  margin-top: 0;
+
+  h5 {
+    margin: 0 !important;
+  }
+
+  .title {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    text-transform: capitalize;
+    @media screen and (max-width: 600px) {
+      margin: 0.5rem auto;
+    }
+  }
+
+  .hash {
+    word-break: break-all;
+    span {
+      padding-right: 6px;
+    }
+  }
+
+  .value,
+  .gasPrice,
+  .gasFee {
+    text-transform: none;
+  }
+
+  a {
+    word-break: break-all;
+  }
+
+  dl[role='listitem'] {
+    dt {
+      @media screen and (min-width: 1024px) {
+        flex-basis: 168px !important;
+      }
+    }
+    dd {
+      a {
+        white-space: break-spaces;
+        word-break: break-all;
+      }
+    }
+  }
+}
+
+.list {
+  background-color: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
+  @media screen and (max-width: 1024px) {
+    border-radius: 0.5rem;
+  }
+}
+
+.input {
+  summary {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    cursor: pointer;
+    user-select: none;
+
+    svg {
+      margin-left: 4px;
+      transition: transform 0.2s linear;
+      transform: rotateX(0.5turn);
+    }
+
+    &:hover {
+      svg path {
+        color: var(--primary-color);
+      }
+    }
+
+    @media screen and (max-width: 1024px) {
+      justify-content: space-between;
+    }
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  pre {
+    border: 1px solid #f0f0f0;
+    background: #fafafa;
+    padding: 0.875rem 1rem;
+    border-radius: 4px;
+    margin: 15px 0 0;
+    @media screen and (max-width: 1024px) {
+      margin-left: -7.25rem;
+    }
+  }
+
+  dl.decodedInput {
+    display: flex;
+    margin: 0 0 0.75rem;
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    dt {
+      text-transform: uppercase;
+      flex-basis: 80px !important;
+      color: #666;
+      flex-shrink: 0;
+    }
+
+    dd {
+      margin: 0;
+      word-break: break-all;
+      white-space: break-spaces;
+      user-select: all;
+    }
+
+    @media screen and (max-width: 1024px) {
+      flex-basis: unset;
+      flex-direction: column;
+      dt {
+        flex-basis: auto !important;
+      }
+    }
+  }
+
+  &[open] {
+    summary {
+      svg {
+        transform: rotateX(0);
+      }
+    }
+  }
+}

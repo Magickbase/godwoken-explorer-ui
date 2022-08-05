@@ -3,10 +3,12 @@ import { useTranslation } from 'next-i18next'
 import { useRef } from 'react'
 import { useRouter } from 'next/router'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { Container, TextField, Stack, Typography, Button } from '@mui/material'
-import BackIcon from '@mui/icons-material/ArrowBackIosNewOutlined'
+import { Container, Stack, Typography } from '@mui/material'
+import SvgIcon from '@mui/material/SvgIcon'
+import Link from '@mui/material/Link'
 import SubpageHead from 'components/SubpageHead'
-import { SEARCH_FIELDS, handleSearchKeyPress } from 'utils'
+import SearchEmptyIcon from '../assets/icons/search-result-empty.svg'
+import NotFoundIcon from '../assets/icons/404.svg'
 
 const Custom404 = () => {
   const [t] = useTranslation('common')
@@ -27,55 +29,61 @@ const Custom404 = () => {
       }
     }
   }, [setSearch, query])
+
   return (
     <>
-      <SubpageHead subtitle={'404'} />
+      <SubpageHead subtitle={''} />
       <Container
-        className="full-height"
-        sx={{ px: 1, py: 8, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
+        sx={{
+          px: 1,
+          py: 8,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          height: 'calc(100vh - var(--footer-height) - var(--header-height) - var(--search-height))',
+        }}
       >
-        {search ? (
-          <Stack sx={{ px: { xs: 2, md: 16 } }}>
-            <TextField
-              autoFocus
-              inputRef={searchRef}
-              defaultValue={search}
-              label={t('search')}
-              onKeyPress={(e: any) => handleSearchKeyPress(e, push)}
-              placeholder={SEARCH_FIELDS}
-              helperText={
-                <Stack>
-                  <Typography variant="body1">{t('notFoundMessage', { search })}</Typography>
-                  <Typography variant="body1" fontWeight={600} component="b">
-                    {SEARCH_FIELDS}
-                  </Typography>
-                </Stack>
-              }
-            />
-            <Button
-              onClick={back}
-              variant="text"
-              startIcon={<BackIcon />}
-              sx={{ alignSelf: 'start', mt: 2 }}
-              color="secondary"
-            >
-              {t('back')}
-            </Button>
-          </Stack>
-        ) : (
-          <Stack justifyContent="center" alignItems="center">
-            {t('pageNotFound')}
-            <Button
-              onClick={back}
-              variant="outlined"
-              startIcon={<BackIcon />}
-              color="secondary"
-              sx={{ display: 'flex', alignItems: 'center', mt: 4 }}
-            >
-              {t('back')}
-            </Button>
-          </Stack>
-        )}
+        <Stack sx={{ px: { xs: 2, md: 16 }, textAlign: 'center' }} alignItems="center">
+          <SvgIcon
+            sx={{
+              'width': { xs: 66, md: 96 },
+              'height': { xs: 66, md: 96 },
+              '& g path': {
+                fill: search && 'none',
+              },
+            }}
+            component={search ? SearchEmptyIcon : NotFoundIcon}
+            color="primary"
+            viewBox="0 0 96 96"
+          />
+          {search ? (
+            <Stack alignItems="center" sx={{ mt: { xs: 3, md: 9 } }}>
+              <Typography
+                variant="body2"
+                fontSize={{ xs: 13, md: 14 }}
+                sx={{ color: { xs: '#666', md: '#333' }, mb: 1 }}
+              >
+                {t('notFoundMessage', { search })}
+              </Typography>
+              <Typography variant="body2" fontSize={{ xs: 13, md: 14 }} color="secondary">
+                {'block hash/txn hash/lockhash/ETH address/token name/token symbol'}
+              </Typography>
+            </Stack>
+          ) : (
+            <Typography variant="body2" color="secondary" fontSize={{ xs: 13, md: 14 }} sx={{ mt: { xs: 3, md: 6 } }}>
+              {t('pageNotFound')}
+            </Typography>
+          )}
+          <Link
+            onClick={back}
+            color="primary"
+            fontSize={{ xs: 14, md: 16 }}
+            fontWeight={500}
+            sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none', mt: { xs: 5, md: 4 } }}
+          >
+            {t('back')}
+          </Link>
+        </Stack>
       </Container>
     </>
   )

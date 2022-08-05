@@ -11,7 +11,7 @@ const TxLogsList = ({ list }: { list: ParsedEventLog[] }) => {
   return list?.length ? (
     <div className={styles.container}>
       <div className={styles.title}>{t('txReceiptEventLogs')}</div>
-      {list.map((log, i) => {
+      {list.reverse().map((log, i) => {
         const topics = log.topics.map((value, i) => {
           const parsed =
             log.parsedLog?.eventFragment.inputs[i - 1]?.type === 'address'
@@ -34,20 +34,14 @@ const TxLogsList = ({ list }: { list: ParsedEventLog[] }) => {
 
         return (
           <div key={log.id} className={styles.logItem}>
-            <div className={styles.logIndex}>{list.length - 1 - i}</div>
+            <div className={styles.logIndex}>{i}</div>
             <div style={{ flex: 1 }}>
               <div className={styles.contractAddr}>
                 <div className={styles.field}>{t(`address`)}</div>
                 <NextLink href={`/account/${log.addressHash}`}>
-                  <Link
-                    href={`/account/${log.addressHash}`}
-                    underline="none"
-                    color="secondary"
-                    className="mono-font"
-                    whiteSpace="nowrap"
-                  >
+                  <a href={`/account/${log.addressHash}`} className="mono-font">
                     {log.addressHash}
-                  </Link>
+                  </a>
                 </NextLink>
               </div>
               {log.parsedLog ? (
@@ -71,7 +65,7 @@ const TxLogsList = ({ list }: { list: ParsedEventLog[] }) => {
                     <Link
                       href={`/account/${log.addressHash}?tab=contract`}
                       underline="none"
-                      color="secondary"
+                      color="primary.main"
                       whiteSpace="nowrap"
                       ml={2}
                     >

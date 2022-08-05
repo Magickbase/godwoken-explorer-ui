@@ -1,0 +1,12 @@
+.container {
+  th,
+  td {
+    &:last-child {
+      text-align: right;
+    }
+  }
+}
+.direction {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
