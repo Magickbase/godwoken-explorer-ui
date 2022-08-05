@@ -153,7 +153,7 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
                         </div>
                       </Tooltip>
                       <TxStatusIcon
-                        status={getBlockStatus(item.block)}
+                        status={getBlockStatus(item.block?.status)}
                         isSuccess={
                           item.polyjuice ? item.polyjuice.status === GraphQLSchema.PolyjuiceStatus.Succeed : true
                         }

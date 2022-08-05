@@ -14,8 +14,10 @@ export const isEthAddress = (hash: string) => {
   return false
 }
 
-export const getBlockStatus = (block: Pick<GraphQLSchema.Block, 'status'> | null): TxStatus => {
-  switch (block?.status) {
+export const provider = new providers.JsonRpcProvider(NODE_URL)
+
+export const getBlockStatus = (status: GraphQLSchema.BlockStatus | null): TxStatus => {
+  switch (status) {
     case GraphQLSchema.BlockStatus.Committed: {
       return 'committed'
     }
@@ -27,5 +29,3 @@ export const getBlockStatus = (block: Pick<GraphQLSchema.Block, 'status'> | null
     }
   }
 }
-
-export const provider = new providers.JsonRpcProvider(NODE_URL)

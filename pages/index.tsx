@@ -28,7 +28,9 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded'
 import Search from 'components/Search'
 import Tooltip from 'components/Tooltip'
-import { fetchHome, timeDistance, formatInt, client, GraphQLSchema, IS_MAINNET } from 'utils'
+import BlockStateIcon from 'components/BlockStateIcon'
+import TxStatusIcon from 'components/TxStatusIcon'
+import { fetchHome, timeDistance, formatInt, client, GraphQLSchema, IS_MAINNET, getBlockStatus } from 'utils'
 type State = API.Home.Parsed
 
 // TODO: add polyjuice status
@@ -66,6 +68,7 @@ const queryHomeLists = gql`
         eth_hash
         hash
         block {
+          status
           timestamp
         }
         from_account {
@@ -98,7 +101,7 @@ interface HomeLists {
   blocks: Array<Pick<GraphQLSchema.Block, 'hash' | 'number' | 'status' | 'transaction_count' | 'timestamp'>>
   transactions: {
     entries: Array<{
-      block: Pick<GraphQLSchema.Block, 'timestamp'>
+      block: Pick<GraphQLSchema.Block, 'timestamp' | 'status'>
       eth_hash: string
       hash: string
       type: GraphQLSchema.TransactionType
@@ -282,12 +285,16 @@ const TxAvatar = () => (
   </ListItemIcon>
 )
 
-const BlockList: React.FC<{ list: HomeLists['blocks']; isLoading: boolean }> = ({ list, isLoading }) => {
+const BlockList: React.FC<{ list: HomeLists['blocks']; isLoading: boolean; length: number }> = ({
+  list,
+  isLoading,
+  length,
+}) => {
   const [t, { language }] = useTranslation(['block', 'common'])
   if (isLoading) {
     return (
       <ListContainer title={t(`latestBlocks`)} link="/blocks" tooltip={t(`view_all_blocks`, { ns: 'common' })}>
-        {Array.from({ length: 10 }).map((_, idx) => {
+        {Array.from({ length: length }).map((_, idx) => {
           return (
             <Box key={idx}>
               {idx !== 0 && <Divider variant="middle" color="#f0f0f0" sx={{ borderColor: 'transparent' }} />}
@@ -312,7 +319,7 @@ const BlockList: React.FC<{ list: HomeLists['blocks']; isLoading: boolean }> = (
 
   return (
     <ListContainer title={t(`latestBlocks`)} link="/blocks" tooltip={t(`view_all_blocks`, { ns: 'common' })}>
-      {list?.map((block, idx) => (
+      {list?.slice(0, length).map((block, idx) => (
         <Stack key={block.hash} sx={{ '& :hover': { backgroundColor: 'primary.light' } }}>
           {idx !== 0 && <Divider variant="middle" color="#f0f0f0" sx={{ borderColor: 'transparent' }} />}
           <ListItem>
@@ -326,19 +333,28 @@ const BlockList: React.FC<{ list: HomeLists['blocks']; isLoading: boolean }> = (
                     justifyContent={{ xs: 'center', md: 'space-between' }}
                     height={{ xs: 36, md: 56 }}
                   >
-                    <Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
                       <NextLink href={`/block/${block.hash}`} passHref>
                         <Button
                           color="primary"
                           href={`/block/${block.hash}`}
                           component={Link}
-                          sx={{ 'fontSize': 14, 'p': 0, 'lineHeight': 1.5, '&:hover': { backgroundColor: 'unset' } }}
+                          sx={{
+                            'fontSize': 14,
+                            'p': 0,
+                            'mr': { xs: 0.4, md: 0.8 },
+                            '&:hover': { backgroundColor: 'unset' },
+                            'lineHeight': { xs: '20px', md: '16px' },
+                            'height': { xs: '20px', md: '16px' },
+                            'minWidth': 60,
+                          }}
                           disableRipple
                           title="block number"
                         >
                           {`# ${formatInt(block.number)}`}
                         </Button>
                       </NextLink>
+                      <BlockStateIcon state={block.status} />
                     </Box>
                     <Tooltip title={block.hash} className="mono-font" hidden>
                       <Box
@@ -389,14 +405,18 @@ const SPECIAL_ADDR_TYPES = [
   GraphQLSchema.AccountType.PolyjuiceCreator,
 ]
 
-const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: boolean }> = ({ list, isLoading }) => {
+const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: boolean; length: number }> = ({
+  list,
+  isLoading,
+  length,
+}) => {
   const [t, { language }] = useTranslation('tx')
   const theme = useTheme()
   const isBigScreen = useMediaQuery(theme.breakpoints.up('sm'))
   if (isLoading) {
     return (
       <ListContainer title={t(`latestTxs`)} link="/txs" tooltip={t(`view_all_transactions`, { ns: 'common' })}>
-        {Array.from({ length: 10 }).map((_, idx) => {
+        {Array.from({ length: length }).map((_, idx) => {
           return (
             <Box key={idx}>
               {idx !== 0 && <Divider variant="middle" color="#f0f0f0" sx={{ borderColor: 'transparent' }} />}
@@ -420,7 +440,7 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
   }
   return (
     <ListContainer title={t(`latestTxs`)} link="/txs" tooltip={t(`view_all_transactions`, { ns: 'common' })}>
-      {list?.map((tx, idx) => {
+      {list?.slice(0, length).map((tx, idx) => {
         const hash = tx.eth_hash ?? tx.hash
         const from = tx.from_account.eth_address || tx.from_account.script_hash
         const to = tx.to_account.eth_address || tx.to_account.script_hash
@@ -440,31 +460,41 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
                       justifyContent={{ xs: 'center', md: 'space-between' }}
                       height={{ xs: 36, md: 56 }}
                     >
-                      <Tooltip title={hash} className="mono-font">
-                        <Box sx={{ width: 'min-content' }}>
-                          <NextLink href={`/tx/${hash}`} passHref>
-                            <Button
-                              title="tx hash"
-                              color="primary"
-                              href={`/tx/${hash}`}
-                              component={Link}
-                              className="mono-font"
-                              disableRipple
-                              fontSize={{ xs: 13, md: 14 }}
-                              sx={{
-                                'textTransform': 'lowercase',
-                                'whiteSpace': 'nowrap',
-                                'fontSize': 14,
-                                'p': 0,
-                                'lineHeight': 1.5,
-                                '&:hover': { backgroundColor: 'unset' },
-                              }}
-                            >
-                              {formatAddress(hash, isBigScreen)}
-                            </Button>
-                          </NextLink>
-                        </Box>
-                      </Tooltip>
+                      <Box sx={{ width: 'min-content', display: 'flex', alignItems: 'center' }}>
+                        <Tooltip title={hash} className="mono-font">
+                          <Box>
+                            <NextLink href={`/tx/${hash}`} passHref>
+                              <Button
+                                title="tx hash"
+                                color="primary"
+                                href={`/tx/${hash}`}
+                                component={Link}
+                                className="mono-font"
+                                disableRipple
+                                fontSize={{ xs: 13, md: 14 }}
+                                sx={{
+                                  'textTransform': 'lowercase',
+                                  'whiteSpace': 'nowrap',
+                                  'fontSize': 14,
+                                  'p': 0,
+                                  'mr': { xs: 0.4, md: 1 },
+                                  '&:hover': { backgroundColor: 'unset' },
+                                  'lineHeight': { xs: '20px', md: '16px' },
+                                  'height': { xs: '20px', md: '16px' },
+                                }}
+                              >
+                                {formatAddress(hash, isBigScreen)}
+                              </Button>
+                            </NextLink>
+                          </Box>
+                        </Tooltip>
+                        <TxStatusIcon
+                          status={getBlockStatus(tx.block?.status)}
+                          isSuccess={
+                            tx.polyjuice ? tx.polyjuice.status === GraphQLSchema.PolyjuiceStatus.Succeed : true
+                          }
+                        />
+                      </Box>
                       <Box
                         alignItems="bottom"
                         fontWeight={400}
@@ -586,6 +616,8 @@ const Home = () => {
   const { isLoading: isListsLoading, data: lists } = useQuery('home-lists', () => fetchHomeLists(), {
     refetchInterval: INTERVAL,
   })
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
   return (
     <Box sx={{ pb: { xs: 5, md: 11 } }}>
@@ -624,10 +656,10 @@ const Home = () => {
           sx={{ pt: { xs: 3, md: 8, columnGap: 2 } }}
         >
           <Box sx={{ width: '100%', lg: { width: '50%' } }} className="latest-blocks">
-            <BlockList list={lists?.blocks ?? []} isLoading={isListsLoading} />
+            <BlockList list={lists?.blocks ?? []} isLoading={isListsLoading} length={isMobile ? 5 : 10} />
           </Box>
           <Box sx={{ width: '100%', lg: { width: '50%' } }} className="latest-txs">
-            <TxList list={lists?.transactions.entries ?? []} isLoading={isListsLoading} />
+            <TxList list={lists?.transactions.entries ?? []} isLoading={isListsLoading} length={isMobile ? 5 : 10} />
           </Box>
         </Stack>
       </Container>

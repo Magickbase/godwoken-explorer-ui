@@ -168,7 +168,7 @@ const TransferList: React.FC<
                       </span>
                     </Tooltip>
                     <TxStatusIcon
-                      status={getBlockStatus(item.block)}
+                      status={getBlockStatus(item.block.status)}
                       isSuccess={item.polyjuice.status === GraphQLSchema.PolyjuiceStatus.Succeed}
                     />
                   </div>
