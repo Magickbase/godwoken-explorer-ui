@@ -12,7 +12,7 @@ import Pagination from 'components/SimplePagination'
 import TransferDirection from 'components/TransferDirection'
 import Tooltip from 'components/Tooltip'
 import FilterMenu from 'components/FilterMenu'
-import { timeDistance, GraphQLSchema, TxStatus, client, GCKB_DECIMAL, PCKB_SYMBOL } from 'utils'
+import { timeDistance, GraphQLSchema, getBlockStatus, client, GCKB_DECIMAL, PCKB_SYMBOL } from 'utils'
 import TxType from 'components/TxType'
 import styles from './styles.module.scss'
 
@@ -111,20 +111,6 @@ export const fetchTxList = (variables: Variables) =>
     .then(data => data.transactions)
     .catch(() => ({ entries: [], metadata: { before: null, after: null, total_count: 0 } }))
 
-const getBlockStatus = (block: Pick<GraphQLSchema.Block, 'status'> | null): TxStatus => {
-  switch (block?.status) {
-    case GraphQLSchema.BlockStatus.Committed: {
-      return 'committed'
-    }
-    case GraphQLSchema.BlockStatus.Finalized: {
-      return 'finalized'
-    }
-    default: {
-      return 'pending'
-    }
-  }
-}
-
 const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> = ({
   transactions: { entries, metadata },
   maxCount,
@@ -169,7 +155,7 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
                         </div>
                       </Tooltip>
                       <TxStatusIcon
-                        status={getBlockStatus(item.block)}
+                        status={getBlockStatus(item.block?.status)}
                         isSuccess={
                           item.polyjuice ? item.polyjuice.status === GraphQLSchema.PolyjuiceStatus.Succeed : true
                         }
