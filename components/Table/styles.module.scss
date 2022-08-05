@@ -54,6 +54,8 @@
   }
 
   @media screen and (max-width: 1024px) {
+    overflow-x: auto;
+
     thead {
       tr {
         height: 2rem;
