@@ -1,8 +1,9 @@
-import { useState } from 'react'
 import { useTranslation } from 'next-i18next'
-import { Button, Menu, MenuList, MenuItem, Link, Tooltip } from '@mui/material'
-import { Download as DownloadIcon } from '@mui/icons-material'
+import NextLink from 'next/link'
+import Tooltip from 'components/Tooltip'
 import { API_ENDPOINT } from 'utils'
+import DownloadIcon from 'assets/icons/download.svg'
+import styles from './styles.module.scss'
 
 interface DownloadMenuProps {
   items: Array<Record<'label' | 'href', string>>
@@ -26,37 +27,27 @@ export const DOWNLOAD_HREF_LIST = {
 
 const DownloadMenu: React.FC<DownloadMenuProps> = ({ items }) => {
   const [t] = useTranslation('common')
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
-
-  const handleOpen = (e: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(e.currentTarget)
-  }
-  const handleDismiss = () => setAnchorEl(null)
 
   return (
-    <div style={{ marginLeft: 'auto' }}>
-      <Tooltip title={t(`up_to_5k_records_will_be_exported`)} placement="bottom">
-        <Button variant="text" onClick={handleOpen} endIcon={<DownloadIcon />} sx={{ whiteSpace: 'nowrap' }}>
-          {t('download')}
-        </Button>
+    <div className={styles.container}>
+      <Tooltip title={t(`up_to_5k_records_will_be_exported`)} placement="top">
+        <>
+          <label htmlFor="download-button">
+            {t(`download`)}
+            <DownloadIcon />
+          </label>
+          <input id="download-button" readOnly inputMode="none" />
+        </>
       </Tooltip>
-      <Menu
-        anchorEl={anchorEl}
-        open={!!anchorEl}
-        onClose={handleDismiss}
-        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-      >
-        <MenuList>
-          {items.map(item => (
-            <Link key={item.label} href={item.href} underline="none">
-              <MenuItem sx={{ minWidth: 100 }} onClick={handleDismiss}>
-                {item.label}
-              </MenuItem>
-            </Link>
-          ))}
-        </MenuList>
-      </Menu>
+      <ul className={styles.list}>
+        {items.map(item => (
+          <li key={item.label}>
+            <NextLink href={item.href}>
+              <a>{item.label}</a>
+            </NextLink>
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }

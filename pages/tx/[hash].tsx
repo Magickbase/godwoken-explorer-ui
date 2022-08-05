@@ -1,58 +1,31 @@
 import { useEffect, useState, useMemo } from 'react'
 import { GetStaticPaths, GetStaticProps } from 'next'
 import { useRouter } from 'next/router'
-import NextLink from 'next/link'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useQuery } from 'react-query'
-import {
-  Alert,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Chip,
-  colors,
-  Paper,
-  Container,
-  List,
-  ListItem,
-  ListItemText,
-  Typography,
-  Divider,
-  Link,
-  Grid,
-  ListSubheader,
-  Stack,
-  Tooltip,
-  IconButton,
-  Snackbar,
-  Tabs,
-  Tab,
-  Skeleton,
-} from '@mui/material'
-import {
-  OpenInNew as OpenInNewIcon,
-  ContentCopyOutlined as CopyIcon,
-  ErrorOutlineOutlined as ErrorIcon,
-  AccessTimeOutlined as PendingIcon,
-} from '@mui/icons-material'
-import { ExpandMore } from '@mui/icons-material'
+import { Skeleton } from '@mui/material'
 import { ethers } from 'ethers'
 import BigNumber from 'bignumber.js'
+import Tabs from 'components/Tabs'
 import SubpageHead from 'components/SubpageHead'
 import PageTitle from 'components/PageTitle'
-import Address from 'components/AddressInHalfPanel'
-import TransferList, { fetchTransferList } from 'components/SimpleERC20TransferList'
+import InfoList from 'components/InfoList'
+import TransferList, { fetchTransferList } from 'components/SimpleERC20Transferlist'
 import TxLogsList from 'components/TxLogsList'
 import RawTxData from 'components/RawTxData'
+import CopyBtn from 'components/CopyBtn'
 import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
+import TxType from 'components/TxType'
+import HashLink from 'components/HashLink'
+import { SIZES } from 'components/PageSize'
+import PolyjuiceStatus from 'components/PolyjuiceStatus'
+import ExpandIcon from 'assets/icons/expand.svg'
 import {
   formatDatetime,
   fetchTx,
   useWS,
   getTxRes,
-  formatInt,
-  handleCopy,
   fetchEventLogsListByType,
   handleApiError,
   CKB_EXPLORER_URL,
@@ -62,6 +35,7 @@ import {
   PCKB_SYMBOL,
   NotFoundException,
 } from 'utils'
+import styles from './styles.module.scss'
 
 type RawTx = Parameters<typeof getTxRes>[0]
 type ParsedTx = ReturnType<typeof getTxRes>
@@ -72,18 +46,24 @@ const ADDR_LENGTH = 42
 
 const Tx = (initState: State) => {
   const [tx, setTx] = useState(initState)
-  const [inputMode, setInputMode] = useState<'raw' | 'decoded' | 'utf8'>('raw')
-  const [isCopied, setIsCopied] = useState(false)
   const {
-    push,
-    query: { hash, tab = 'erc20', before = null, after = null, address_from = null, address_to = null },
+    query: {
+      hash,
+      tab = 'erc20',
+      before = null,
+      after = null,
+      address_from = null,
+      address_to = null,
+      page_size = SIZES[1],
+      log_index_sort = 'ASC',
+    },
   } = useRouter()
   const [t] = useTranslation('tx')
 
   const downloadItems = [{ label: t('ERC20Records'), href: DOWNLOAD_HREF_LIST.txTransferList(tx.hash) }]
 
   const { isLoading: isTransferListLoading, data: transferList } = useQuery(
-    ['tx-transfer-list', hash, before, after, address_from, address_to],
+    ['tx-transfer-list', hash, before, after, address_from, address_to, log_index_sort, page_size],
     () =>
       fetchTransferList({
         transaction_hash: hash as string,
@@ -92,6 +72,8 @@ const Tx = (initState: State) => {
         from_address: address_from as string | null,
         to_address: address_to as string | null,
         combine_from_to: false,
+        limit: Number.isNaN(+page_size) ? +SIZES[1] : +page_size,
+        log_index_sort: log_index_sort as 'ASC' | 'DESC',
       }),
     {
       enabled: tab === 'erc20',
@@ -104,6 +86,32 @@ const Tx = (initState: State) => {
     {
       enabled: tab === 'logs',
     },
+  )
+
+  useEffect(() => {
+    setTx(initState)
+  }, [setTx, initState])
+
+  useWS(
+    `${CHANNEL.TX_INFO}${tx.hash}`,
+    (init: RawTx) => {
+      if (init) {
+        setTx(prev => ({ ...getTxRes(init), gasUsed: prev.gasUsed, gasLimit: prev.gasLimit }))
+      }
+    },
+    ({
+      status = 'pending',
+      l1_block_number,
+      polyjuice_status,
+    }: Partial<Pick<RawTx, 'status' | 'l1_block_number' | 'polyjuice_status'>>) => {
+      setTx(prev => ({
+        ...prev,
+        status,
+        l1BlockNumber: l1_block_number,
+        polyjuiceStatus: polyjuice_status ?? prev.polyjuiceStatus,
+      }))
+    },
+    [setTx, tx.hash],
   )
 
   const decodedInput = useMemo(() => {
@@ -130,43 +138,6 @@ const Tx = (initState: State) => {
     return null
   }, [initState.input])
 
-  useEffect(() => {
-    setTx(initState)
-  }, [setTx, initState])
-
-  useEffect(() => {
-    if (decodedInput) {
-      setInputMode('decoded')
-    }
-  }, [decodedInput, setInputMode])
-
-  useWS(
-    `${CHANNEL.TX_INFO}${tx.hash}`,
-    (init: RawTx) => {
-      if (init) {
-        setTx(prev => ({ ...getTxRes(init), gasUsed: prev.gasUsed, gasLimit: prev.gasLimit }))
-      }
-    },
-    ({
-      status = 'pending',
-      l1_block_number,
-      polyjuice_status,
-    }: Partial<Pick<RawTx, 'status' | 'l1_block_number' | 'polyjuice_status'>>) => {
-      setTx(prev => ({
-        ...prev,
-        status,
-        l1BlockNumber: l1_block_number,
-        polyjuiceStatus: polyjuice_status ?? prev.polyjuiceStatus,
-      }))
-    },
-    [setTx, tx.hash],
-  )
-
-  const handleTxHashCopy = async () => {
-    await handleCopy(tx.hash)
-    setIsCopied(true)
-  }
-
   const inputContents = [
     { type: 'raw', text: tx.input },
     decodedInput
@@ -184,143 +155,127 @@ const Tx = (initState: State) => {
     {
       label: 'hash',
       value: (
-        <Tooltip title={tx.hash} placement="top">
-          <Stack direction="row" alignItems="center">
-            <Typography variant="body2" className="mono-font" overflow="hidden" textOverflow="ellipsis" color="primary">
-              {tx.hash}
-            </Typography>
-            <IconButton aria-label="copy" size="small" onClick={handleTxHashCopy}>
-              <CopyIcon fontSize="inherit" />
-            </IconButton>
-          </Stack>
-        </Tooltip>
+        <div className={styles.hash}>
+          <span className="mono-font">{tx.hash}</span>
+          <CopyBtn content={tx.hash} />
+        </div>
       ),
     },
     {
       label: 'from',
-      value: <Address address={tx.from} />,
+      value: <HashLink label={tx.from} href={`/address/${tx.from}`} style={{ wordBreak: 'break-all' }} />,
     },
     {
       label: tx.toAlias ? 'interactedContract' : 'to',
-      value: <Address address={tx.to} alias={tx.toAlias} />,
+      value: <HashLink label={tx.toAlias || tx.to} href={`/address/${tx.to}`} />,
     },
     tx.contractAddress?.length === ADDR_LENGTH
       ? {
           label: 'deployed_contract',
-          value: <Address address={tx.contractAddress} alias={tx.contractAddress} />,
+          value: <HashLink label={tx.contractAddress} href={`/address/${tx.contractAddress}`} />,
         }
       : null,
     {
       label: 'value',
       // FIXME: tx.value is formatted incorrectly
       value: (
-        <Typography variant="body2" sx={{ textTransform: 'none' }}>{`${new BigNumber(tx.value || '0')
+        <div className={styles.value}>{`${new BigNumber(tx.value || '0')
           .multipliedBy(CKB_DECIMAL)
           .dividedBy(GCKB_DECIMAL)
-          .toFormat()} ${PCKB_SYMBOL}`}</Typography>
+          .toFormat()} ${PCKB_SYMBOL}`}</div>
       ),
     },
+    tx.input
+      ? {
+          label: 'input',
+          value: (
+            <details className={styles.input}>
+              <summary>
+                {t('check')}
+                <ExpandIcon />
+              </summary>
+              <pre>
+                {inputContents.map(content => (
+                  <dl key={content.type} className={styles.decodedInput}>
+                    <dt>{content.type}</dt>
+                    <dd>{content.text}</dd>
+                  </dl>
+                ))}
+              </pre>
+            </details>
+          ),
+        }
+      : null,
   ]
+
   const basicInfo = [
-    tx.polyjuiceStatus === 'succeed'
-      ? null
-      : {
-          label: 'status',
-          value:
-            tx.polyjuiceStatus === 'failed' ? (
-              <Chip icon={<ErrorIcon />} label={t(`failed`)} color="warning" size="small" />
-            ) : (
-              <Chip icon={<PendingIcon />} label={t(`pending`)} size="small" />
-            ),
-        },
-    { label: 'finalizeState', value: <Typography variant="body2">{t(tx.status)}</Typography> },
+    { label: 'finalizeState', value: t(tx.status) },
     {
       label: 'type',
-      value: (
-        <Typography variant="body2" sx={{ textTransform: 'capitalize' }}>
-          {tx.type.replace(/_/g, ' ')}
-        </Typography>
-      ),
+      value: <TxType type={tx.type} />,
     },
     {
       label: 'l1Block',
       value: tx.l1BlockNumber ? (
-        <Link
+        <HashLink
+          label={tx.l1BlockNumber.toLocaleString('en')}
           href={`${CKB_EXPLORER_URL}/block/${tx.l1BlockNumber}`}
-          underline="none"
-          target="_blank"
-          rel="noopener noreferrer"
-          display="flex"
-          alignItems="center"
-          color="secondary"
-        >
-          {formatInt(tx.l1BlockNumber)}
-          <OpenInNewIcon sx={{ fontSize: 16, ml: 0.5 }} />
-        </Link>
+          external
+        />
       ) : (
-        <Typography variant="body2">{t('pending')}</Typography>
+        t('pending')
       ),
     },
     {
       label: 'l2Block',
       value: tx.blockNumber ? (
-        <Typography variant="body2">
-          <NextLink href={`/block/${tx.blockNumber}`}>
-            <Link href={`/block/${tx.blockNumber}`} underline="none" color="secondary">
-              {formatInt(tx.blockNumber)}
-            </Link>
-          </NextLink>
-        </Typography>
+        <HashLink label={tx.blockNumber.toLocaleString('en')} href={`/block/${tx.blockNumber}`} />
       ) : (
-        <Typography variant="body2">{t('pending')}</Typography>
+        t('pending')
       ),
     },
-    tx.index !== null ? { label: 'index', value: <Typography variant="body2">{tx.index}</Typography> } : null,
-    { label: 'nonce', value: <Typography variant="body2">{Number(tx.nonce).toLocaleString('en')}</Typography> },
-
-    tx.gasPrice
-      ? {
-          label: 'gasPrice',
-          value: (
-            <Typography variant="body2" sx={{ textTransform: 'none' }}>
-              {new BigNumber(tx.gasPrice).toFormat() + ` ${PCKB_SYMBOL}`}
-            </Typography>
-          ),
-        }
-      : null,
-    tx.gasUsed
-      ? {
-          label: 'gasUsed',
-          value: <Typography variant="body2">{new BigNumber(tx.gasUsed).toFormat()}</Typography>,
-        }
-      : null,
-    tx.gasLimit
-      ? {
-          label: 'gasLimit',
-          value: <Typography variant="body2">{new BigNumber(tx.gasLimit).toFormat()}</Typography>,
-        }
-      : null,
-    tx.gasUsed && tx.gasPrice
-      ? {
-          label: 'fee',
-          value: (
-            <Typography variant="body2" sx={{ textTransform: 'none' }}>
-              {new BigNumber(tx.gasUsed).times(new BigNumber(tx.gasPrice)).toFormat() + ` ${PCKB_SYMBOL}`}
-            </Typography>
-          ),
-        }
-      : null,
+    { label: 'index', value: tx.index ?? '-' },
+    { label: 'nonce', value: (tx.nonce || 0).toLocaleString('en') },
+    {
+      label: 'status',
+      value: <PolyjuiceStatus status={tx.polyjuiceStatus ?? null} />,
+    },
+    {
+      label: 'gasPrice',
+      value:
+        tx.gasPrice !== null ? (
+          <span className={styles.gasPirce}>{`${new BigNumber(tx.gasPrice).toFormat()} ${PCKB_SYMBOL}`}</span>
+        ) : (
+          '-'
+        ),
+    },
+    {
+      label: 'gasUsed',
+      value: tx.gasUsed !== null ? new BigNumber(tx.gasUsed).toFormat() : '-',
+    },
+    {
+      label: 'gasLimit',
+      value: tx.gasLimit !== null ? new BigNumber(tx.gasLimit).toFormat() : '-',
+    },
+    {
+      label: 'fee',
+      value:
+        tx.gasPrice !== null && typeof tx.gasUsed !== null ? (
+          <span className={styles.gasFee}>{`${new BigNumber(tx.gasUsed)
+            .times(new BigNumber(tx.gasPrice))
+            .toFormat()} ${PCKB_SYMBOL}`}</span>
+        ) : (
+          '-'
+        ),
+    },
     {
       label: 'timestamp',
-      value: (
-        <Typography variant="body2">
-          {tx.timestamp >= 0 ? (
-            <time dateTime={new Date(tx.timestamp).toISOString()}>{formatDatetime(tx.timestamp)}</time>
-          ) : (
-            t('pending')
-          )}
-        </Typography>
-      ),
+      value:
+        tx.timestamp >= 0 ? (
+          <time dateTime={new Date(tx.timestamp).toISOString()}>{formatDatetime(tx.timestamp)}</time>
+        ) : (
+          t('pending')
+        ),
     },
   ]
 
@@ -329,162 +284,52 @@ const Tx = (initState: State) => {
   return (
     <>
       <SubpageHead subtitle={`${title} ${tx.hash}`} />
-      <Container sx={{ pb: 6 }}>
-        <Stack direction="row" justifyContent="space-between" alignItems="center">
-          <PageTitle>{title}</PageTitle>
-          <DownloadMenu items={downloadItems} />
-        </Stack>
-        <Stack spacing={2}>
-          <Paper>
-            <Grid container>
-              <Grid item xs={12} md={6}>
-                <List
-                  subheader={<ListSubheader sx={{ bgcolor: 'transparent' }}>{t('overview')}</ListSubheader>}
-                  sx={{ textTransform: 'capitalize' }}
-                >
-                  <Divider variant="middle" />
-                  {overview.map(field =>
-                    field ? (
-                      <ListItem key={field.label}>
-                        <ListItemText
-                          primary={t(field.label)}
-                          secondary={field.value}
-                          secondaryTypographyProps={{ component: 'div' }}
-                        />
-                      </ListItem>
-                    ) : null,
-                  )}
-                  {tx.input ? (
-                    <Accordion sx={{ boxShadow: 'none', width: '100%' }}>
-                      <AccordionSummary sx={{ textTransform: 'capitalize' }} expandIcon={<ExpandMore />}>
-                        {t(`input`)}
-                      </AccordionSummary>
-                      <AccordionDetails>
-                        <Stack>
-                          <Tabs value={inputMode} onChange={(_, v) => setInputMode(v)}>
-                            {inputContents.map(({ type }) => (
-                              <Tab
-                                key={type}
-                                value={type}
-                                label={t(`${type}Input`)}
-                                disableRipple
-                                sx={{ fontSize: 12 }}
-                              />
-                            ))}
-                          </Tabs>
-                          <Divider />
-                          <Typography
-                            variant="body2"
-                            component="pre"
-                            sx={{ wordBreak: 'break-all', whiteSpace: 'pre-wrap', maxHeight: '51ch', overflow: 'auto' }}
-                            p={2}
-                            mt={1}
-                            border="1px solid"
-                            borderColor="primary.light"
-                            borderRadius={1}
-                            bgcolor={colors.grey[50]}
-                            className="mono-font"
-                          >
-                            {inputContents.find(c => c.type === inputMode)?.text}
-                          </Typography>
-                        </Stack>
-                      </AccordionDetails>
-                    </Accordion>
-                  ) : null}
-                  {tx.scriptArgs ? (
-                    <Accordion sx={{ boxShadow: 'none', width: '100%' }}>
-                      <AccordionSummary sx={{ textTransform: 'capitalize' }} expandIcon={<ExpandMore />}>
-                        {t(`args`)}
-                      </AccordionSummary>
-                      <AccordionDetails>
-                        <Typography
-                          variant="body2"
-                          component="pre"
-                          sx={{ wordBreak: 'break-all', whiteSpace: 'pre-wrap', maxHeight: '51ch', overflow: 'auto' }}
-                          p={2}
-                          border="1px solid"
-                          borderColor="primary.light"
-                          borderRadius={1}
-                          bgcolor={colors.grey[50]}
-                          className="mono-font"
-                        >
-                          {tx.scriptArgs}
-                        </Typography>
-                      </AccordionDetails>
-                    </Accordion>
-                  ) : null}
-                </List>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <List
-                  subheader={<ListSubheader sx={{ bgcolor: 'transparent' }}>{t('basicInfo')}</ListSubheader>}
-                  sx={{ textTransform: 'capitalize' }}
-                >
-                  <Divider variant="middle" />
-                  {basicInfo
-                    .filter(v => v)
-                    .map(field =>
-                      field ? (
-                        <ListItem key={field.label}>
-                          <ListItemText
-                            primary={t(field.label)}
-                            secondary={field.value}
-                            secondaryTypographyProps={{ component: 'div' }}
-                          />
-                        </ListItem>
-                      ) : null,
-                    )}
-                </List>
-              </Grid>
-            </Grid>
-          </Paper>
-          <Paper>
-            <Tabs value={tabs.indexOf(tab as string)} variant="scrollable" scrollButtons="auto">
-              {['erc20_records', 'logs', 'rawData'].map((label, idx) => (
-                <Tab
-                  key={label}
-                  label={t(label)}
-                  onClick={e => {
-                    e.stopPropagation()
-                    e.preventDefault()
-                    push(`/tx/${tx.hash}?tab=${tabs[idx]}`, undefined, { scroll: false })
-                  }}
-                />
-              ))}
-            </Tabs>
-            <Divider />
-            {tab === 'erc20' ? (
-              transferList || !isTransferListLoading ? (
-                <TransferList token_transfers={transferList} />
-              ) : (
-                <Skeleton animation="wave" />
-              )
-            ) : null}
-            {tab === 'logs' ? (
-              logsList || !isLogListLoading ? (
-                <TxLogsList list={logsList} />
-              ) : (
-                <Skeleton animation="wave" />
-              )
-            ) : null}
-            {tab === 'raw-data' && tx ? <RawTxData hash={tx.hash} /> : null}
-          </Paper>
-        </Stack>
-        <Snackbar
-          open={isCopied}
-          onClose={() => setIsCopied(false)}
-          anchorOrigin={{
-            horizontal: 'center',
-            vertical: 'top',
-          }}
-          autoHideDuration={3000}
-          color="secondary"
-        >
-          <Alert severity="success" variant="filled">
-            {t(`txHashCopied`)}
-          </Alert>
-        </Snackbar>
-      </Container>
+      <div className={styles.container}>
+        <PageTitle>
+          <div className={styles.title}>
+            {title}
+            <DownloadMenu items={downloadItems} />
+          </div>
+        </PageTitle>
+
+        <InfoList
+          title={t(`overview`)}
+          list={overview.filter(v => v).map(field => ({ field: t(field.label), content: field.value }))}
+          style={{ marginBottom: '2rem' }}
+        />
+
+        <InfoList
+          title={t(`basicInfo`)}
+          list={basicInfo.filter(v => v).map(field => ({ field: t(field.label), content: field.value }))}
+          style={{ marginBottom: '2rem' }}
+          type="two-columns"
+        />
+
+        <div className={styles.list}>
+          <Tabs
+            value={tabs.indexOf(tab as string)}
+            tabs={['erc20_records', 'logs', 'rawData'].map((label, idx) => ({
+              label: t(label),
+              href: `/tx/${tx.hash}?tab=${tabs[idx]}`,
+            }))}
+          />
+          {tab === 'erc20' ? (
+            transferList || !isTransferListLoading ? (
+              <TransferList token_transfers={transferList} />
+            ) : (
+              <Skeleton animation="wave" />
+            )
+          ) : null}
+          {tab === 'logs' ? (
+            logsList || !isLogListLoading ? (
+              <TxLogsList list={logsList} />
+            ) : (
+              <Skeleton animation="wave" />
+            )
+          ) : null}
+          {tab === 'raw-data' && tx ? <RawTxData hash={tx.hash} /> : null}
+        </div>
+      </div>
     </>
   )
 }

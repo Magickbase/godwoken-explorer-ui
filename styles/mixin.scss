@@ -1,0 +1,16 @@
+@mixin main-center {
+  width: 100%;
+  max-width: var(--main-center-width);
+  margin: 1rem auto;
+  @media screen and (max-width: 1232px) {
+    box-sizing: border-box;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    max-width: unset;
+  }
+}
+
+@mixin mono-font {
+  font-family: 'JetBrains Mono', monospace, 'Courier New' !important;
+  user-select: all;
+}

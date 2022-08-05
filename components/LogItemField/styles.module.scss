@@ -2,26 +2,63 @@
   flex: 1;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  line-height: 1.5rem;
   cursor: default;
   & > div {
     user-select: all;
   }
+  a {
+    white-space: break-spaces;
+  }
+  .content {
+    word-break: break-all;
+    padding-right: 20px;
+    padding-top: 6px;
+  }
   .toggle {
     user-select: none;
     flex-shrink: 0;
-    border: 1px solid #f0f0f0;
-    border-radius: 2px;
     overflow: hidden;
+    cursor: pointer;
     span {
-      padding: 4px 8px;
-      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 3.5rem;
+      height: 2rem;
+      text-transform: capitalize;
+      background-color: #fff;
+      border: 1px solid #f0f0f0;
+    }
+    span:first-child {
+      border-top-left-radius: 6px;
+      border-bottom-left-radius: 6px;
+    }
+    span:last-child {
+      border-top-right-radius: 6px;
+      border-bottom-right-radius: 6px;
     }
     span:hover {
-      background: #eee;
+      font-weight: 500;
     }
     span[data-active='true'] {
-      background: white;
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+      cursor: default;
+    }
+  }
+
+  @media screen and (max-width: 1024px) {
+    flex-direction: column;
+    align-items: flex-start;
+    .content {
+      padding-right: 0;
+    }
+    .toggle {
+      margin-top: 0.75rem;
+      span {
+        width: 5.5rem;
+      }
     }
   }
 }
