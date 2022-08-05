@@ -56,6 +56,9 @@
   background-color: #fff;
   border: 1px solid var(--border-color);
   border-radius: 1rem;
+  @media screen and (max-width: 1024px) {
+    border-radius: 0.5rem;
+  }
 }
 
 .input {

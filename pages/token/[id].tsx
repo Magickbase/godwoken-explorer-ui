@@ -11,10 +11,11 @@ import Tabs from 'components/Tabs'
 import InfoList from 'components/InfoList'
 import ERC20TransferList, { fetchTokenTransferList } from 'components/ERC20TransferList'
 import BridgedRecordList from 'components/BridgedRecordList'
-import TokenHolderList from 'components/TokenHolderList'
+import TokenHolderList from 'components/TokenHolderList/index'
 import HashLink from 'components/HashLink'
 import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
 import { fetchToken, fetchBridgedRecordList, fetchTokenHolderList, formatAmount } from 'utils'
+import styles from './styles.module.scss'
 
 import type { API } from 'utils/api/utils'
 import { SIZES } from 'components/PageSize'
@@ -78,15 +79,15 @@ const Token: React.FC<Props> = () => {
 
   const tokenInfo = [
     {
-      field: 'decimal',
+      field: t('decimal'),
       content: token ? token.decimal || '-' : <Skeleton animation="wave" />,
     },
     {
-      field: 'type',
+      field: t('type'),
       content: token ? t(token.type) : <Skeleton animation="wave" />,
     },
     {
-      field: 'contract',
+      field: t('contract'),
       content: !token ? (
         <Skeleton animation="wave" />
       ) : token.address ? (
@@ -96,7 +97,7 @@ const Token: React.FC<Props> = () => {
       ),
     },
     {
-      field: 'officialSite',
+      field: t('officialSite'),
       content: token ? (
         token.officialSite ? (
           <HashLink label={token.officialSite} href={token.officialSite} external />
@@ -115,7 +116,7 @@ const Token: React.FC<Props> = () => {
 
   const tokenData = [
     {
-      field: token?.type === 'bridge' ? 'circulatingSupply' : 'totalSupply',
+      field: t(token?.type === 'bridge' ? 'circulatingSupply' : 'totalSupply'),
       content: !token ? (
         <Skeleton animation="wave" />
       ) : token.supply ? (
@@ -125,30 +126,40 @@ const Token: React.FC<Props> = () => {
       ),
     },
     {
-      field: 'holderCount',
+      field: t('holderCount'),
       content: token ? token.holderCount || '-' : <Skeleton animation="wave" />,
     },
     {
-      field: 'transferCount',
+      field: t('transferCount'),
       content: token ? token.transferCount || '-' : <Skeleton animation="wave" />,
+    },
+    {
+      field: '',
+      content: <div data-role="placeholder" style={{ height: `5rem` }}></div>,
     },
   ]
 
   return (
     <>
       <SubpageHead subtitle={`${t('token')} ${token?.name || token?.symbol || '-'}`} />
-      <div className={''}>
+      <div className={styles.container}>
         <PageTitle>
-          <div>
+          <div className={styles.title}>
             <TokenLogo name={token?.name ?? ''} logo={token?.icon ?? ''} />
-            {!token ? <Skeleton animation="wave" width="30px" /> : token.name || '-'}
+            {!token ? (
+              <Skeleton animation="wave" width="30px" />
+            ) : (
+              <span className={styles.name}>{token.name || '-'}</span>
+            )}
           </div>
           <DownloadMenu items={downloadItems} />
         </PageTitle>
-        <InfoList title={t(`token_info`)} list={tokenInfo} style={{ marginBottom: '2rem' }} />
-        <InfoList title={t(`token_data`)} list={tokenData} style={{ marginBottom: '2rem' }} />
+        <div className={styles.overview}>
+          <InfoList title={t(`tokenInfo`)} list={tokenInfo} />
+          <InfoList title={t(`tokenData`)} list={tokenData} />
+        </div>
 
-        <div className="list">
+        <div className={styles.list}>
           <Tabs
             value={tabs.indexOf(tab as string)}
             tabs={[t('transferRecords'), t(`bridgedRecords`), t(`tokenHolders`)].map((label, idx) => ({
