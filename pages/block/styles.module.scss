@@ -76,4 +76,7 @@
   border: 1px solid var(--border-color);
   border-radius: 1rem;
   overflow-y: hidden;
+  @media screen and (max-width: 1024px) {
+    border-radius: 0.5rem;
+  }
 }

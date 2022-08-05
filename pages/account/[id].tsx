@@ -189,7 +189,7 @@ const Account = (initState: State) => {
             ]
               .filter(v => v)
               .map((label, idx) => ({
-                label: t(label),
+                label,
                 href: `/account/${id}?tab=${tabs[idx]}`,
               }))}
           />

@@ -1,4 +1,4 @@
-import { SxProps } from '@mui/material'
+import { Box, SxProps } from '@mui/material'
 import Tooltip from 'components/Tooltip'
 import HashLink from './HashLink'
 import { GraphQLSchema } from 'utils'
@@ -14,7 +14,7 @@ const TruncatedAddress = ({
   type?: GraphQLSchema.AccountType
 }) => (
   <Tooltip title={address} placement="top" sx={sx}>
-    <div>
+    <Box sx={sx}>
       <HashLink
         label={
           [
@@ -29,7 +29,7 @@ const TruncatedAddress = ({
         }
         href={`/account/${address}`}
       />
-    </div>
+    </Box>
   </Tooltip>
 )
 

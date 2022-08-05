@@ -304,7 +304,7 @@ const TokenList = () => {
                                   width: isMobile ? 90 : 120,
                                 }}
                               >
-                                {name}
+                                {name || '-'}
                               </Typography>
                             </Link>
                           </NextLink>
