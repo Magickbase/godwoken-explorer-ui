@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-context('MetaContract Account Page', () => {
+context.skip('MetaContract Account Page', () => {
   before(() => {
     cy.fixture('accountIds').then(ids => cy.visit(`/en-US/account/${ids.metaContract}`))
   })

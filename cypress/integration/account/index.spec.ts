@@ -1,25 +1,25 @@
 /// <reference types="cypress" />
 
-context('Account Page', () => {
+context.skip('Account Page', () => {
   let id: number
 
-  before(() => {
-    cy.fixture('accountIds')
-      .then(ids => {
-        id = ids.user
-      })
-      .then(() => {
-        cy.visit(`/en-US/account/${id}`)
-      })
-  })
+  // before(() => {
+  // cy.fixture('accountIds')
+  //   .then(ids => {
+  //     id = ids.user
+  //   })
+  //   .then(() => {
+  //     cy.visit(`/en-US/account/${id}`)
+  //   })
+  // })
 
-  describe('general sets', () => {
+  describe.skip('general sets', () => {
     it.skip('cy.title() - get the title', () => {
       cy.title().should('include', 'Godwoken Explorer')
     })
   })
 
-  describe('basic info', () => {
+  describe.skip('basic info', () => {
     it('should have id', () => {
       cy.get(`h2[aria-label='account']`).should('have.text', `account${id}`)
     })

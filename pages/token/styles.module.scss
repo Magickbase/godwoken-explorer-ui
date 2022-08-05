@@ -1,0 +1,92 @@
+@import '../../styles/mixin.scss';
+
+.container {
+  @include main-center;
+  margin-top: 0;
+
+  .title {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    h5 {
+      margin: 0 !important;
+    }
+    /* & > div { */
+    /*   margin-right: 0.5rem; */
+    /* } */
+    .name {
+      display: block;
+      margin-left: 0.5rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    h5 {
+      margin: 0;
+    }
+    @media screen and (max-width: 1024px) {
+      margin-bottom: 4px;
+      .name {
+        max-width: calc(100vw - 178px);
+      }
+    }
+  }
+
+  .hash {
+    @include mono-font;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #333;
+    word-break: break-all;
+    user-select: none;
+
+    svg {
+      margin-left: 8px;
+    }
+  }
+}
+
+.overview {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+  width: 100%;
+  & > div {
+    flex: 1;
+    &:first-child {
+      margin-right: 1rem;
+    }
+    &:last-child {
+      margin-left: 1rem;
+    }
+  }
+  dl[role='listitem'] {
+    dd {
+      white-space: nowrap !important;
+    }
+  }
+
+  @media screen and (max-width: 1024px) {
+    flex-direction: column;
+    align-items: stretch;
+    margin-bottom: 0;
+    margin-top: 0.5rem;
+    & > div {
+      margin: 0 0 1rem 0 !important;
+    }
+    dl[title=''] {
+      display: none;
+    }
+  }
+}
+
+.list {
+  background-color: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
+  @media screen and (max-width: 1024px) {
+    border-radius: 0.5rem;
+  }
+}

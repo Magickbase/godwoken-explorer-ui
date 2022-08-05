@@ -1,0 +1,120 @@
+.container {
+  position: relative;
+  display: inline-flex;
+  label.filterBtn {
+    display: flex;
+    cursor: pointer;
+    input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+      pointer-events: none;
+    }
+    &:hover {
+      color: var(--primary-color);
+    }
+    svg {
+      @media screen and (max-width: 1024px) {
+        transform: scale(0.9);
+      }
+    }
+  }
+  .clearIcon {
+    display: none;
+    position: absolute;
+    top: -70%;
+    right: -70%;
+    width: 12px;
+    height: 12px;
+    cursor: pointer;
+    path {
+      fill: #333;
+    }
+  }
+  .menu {
+    position: absolute;
+    top: calc(100% + 1rem);
+    right: 0;
+    padding: 0.75rem;
+    width: 256px;
+    pointer-events: none;
+    background: #fff;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    transform: translateX(50%);
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 9;
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      label {
+        line-height: 1em;
+        text-transform: capitalize;
+      }
+    }
+
+    input {
+      width: 100%;
+      color: #333;
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 0.75rem 0.5rem;
+      margin: 0.25rem 0 0.75rem 0;
+      border: 1px solid #f0f0f0;
+      border-radius: 4px;
+      box-sizing: border-box;
+      &:focus {
+        border-color: var(--primary-color);
+      }
+      &::placeholder {
+        color: #999;
+      }
+    }
+  }
+
+  .btns {
+    display: flex;
+    justify-content: flex-end;
+    button {
+      appearance: none;
+      border: none;
+      margin-left: 0.5rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 5.5rem;
+      height: 2rem;
+      border-radius: 1rem;
+      border: 1px solid #e5e5e5;
+      background-color: transparent;
+      text-transform: capitalize;
+      cursor: pointer;
+      &[type='submit'] {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        color: #fff;
+      }
+    }
+  }
+
+  &:focus-within {
+    .menu {
+      top: calc(100% + 1.5rem);
+      pointer-events: unset;
+      opacity: 1;
+    }
+  }
+  &[data-active='true'] {
+    label.filterBtn {
+      svg {
+        color: var(--primary-color);
+      }
+    }
+    .clearIcon {
+      display: block;
+    }
+  }
+}

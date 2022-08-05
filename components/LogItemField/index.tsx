@@ -16,7 +16,7 @@ const LogFieldItem: React.FC<{ value: string; parsed?: Record<'type' | 'hex', st
           <Link
             href={`/account/${parsed.hex.toLowerCase()}`}
             underline="none"
-            color="secondary"
+            color="primary.main"
             className="mono-font"
             whiteSpace="nowrap"
           >
@@ -37,9 +37,7 @@ const LogFieldItem: React.FC<{ value: string; parsed?: Record<'type' | 'hex', st
   }
   return (
     <div className={styles.logItemWithToggle}>
-      <div className="mono-font" style={{ wordBreak: 'break-all', paddingRight: 20 }}>
-        {fmt === 'hex' ? value : comp}
-      </div>
+      <div className={`mono-font ${styles.content}`}>{fmt === 'hex' ? value : comp}</div>
       {parsed ? (
         <div className={styles.toggle}>
           {['dec', 'hex'].map(label => (

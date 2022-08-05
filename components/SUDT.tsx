@@ -1,8 +1,8 @@
 import type { Udt as UdtProps } from './AccountOverview'
-import NextLink from 'next/link'
+// import NextLink from 'next/link'
 import { useTranslation } from 'next-i18next'
-import { Link, List, ListItem, ListItemText, ListSubheader, Divider, Typography } from '@mui/material'
-import CollapsableScript from './CollapsableScript'
+import ScriptCode from 'components/ScriptCode'
+import InfoList from 'components/InfoList'
 
 interface SudtProps extends Pick<UdtProps, 'udt' | 'script'> {
   script_hash: string
@@ -11,63 +11,39 @@ interface SudtProps extends Pick<UdtProps, 'udt' | 'script'> {
 const SUDT = ({ udt, script, script_hash }: SudtProps) => {
   const [t] = useTranslation('account')
 
-  const fields = [
-    { label: t(`type`), value: <Typography variant="body2">{`sUDT`}</Typography> },
+  const list = [
+    { field: t(`type`), content: `sUDT` },
     {
-      label: t('name'),
-      value: (
-        <Typography variant="body2">
-          <Typography variant="body2" sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            <NextLink href={`/token/${udt.id}`}>
-              <Link href={`/token/${udt.id}`} underline="none" className="mono-font" color="secondary">
-                {udt.name ?? '-'}
-              </Link>
-            </NextLink>
-          </Typography>
-        </Typography>
-      ),
+      field: t('name'),
+      content: udt.name ?? '-',
+      // TODO: token id of a bridge one leads to 404, wait for an update
+      // content: (
+      //   <NextLink href={`/token/${udt.id}`}>
+      //     <a>{udt.name ?? '-'}</a>
+      //   </NextLink>
+      // ),
     },
     {
-      label: t('symbol'),
-      value: <Typography variant="body2">{udt.symbol}</Typography>,
+      field: t('symbol'),
+      content: udt.symbol,
     },
-    { label: t('decimal'), value: <Typography variant="body2">{udt.decimal}</Typography> },
+    { field: t('decimal'), content: udt.decimal },
+    script_hash
+      ? {
+          field: t(`l2Script`),
+          content: <span className="mono-font">{script_hash}</span>,
+        }
+      : null,
+    script
+      ? {
+          field: t(`l2Script`),
+          content: <ScriptCode script={script} name={t(`l2Script`)} />,
+          expandable: true,
+        }
+      : null,
   ]
 
-  return (
-    <List
-      subheader={
-        <ListSubheader component="div" sx={{ textTransform: 'capitalize', bgcolor: 'transparent' }}>
-          {t('basicInfo')}
-        </ListSubheader>
-      }
-      sx={{ textTransform: 'capitalize' }}
-    >
-      <Divider variant="middle" />
-      {fields.map(field => (
-        <ListItem key={field.label}>
-          <ListItemText primary={field.label} secondary={field.value} />
-        </ListItem>
-      ))}
-      {script ? (
-        <>
-          <ListItem>
-            <ListItemText
-              primary={t(`l2ScriptHash`)}
-              secondary={
-                <Typography variant="body2" overflow="hidden" textOverflow="ellipsis" className="mono-font">
-                  {script_hash}
-                </Typography>
-              }
-            />
-          </ListItem>
-          <ListItem>
-            <CollapsableScript script={script} name={t(`l2Script`)} />
-          </ListItem>
-        </>
-      ) : null}
-    </List>
-  )
+  return <InfoList title={t(`basicInfo`)} list={list} />
 }
 
 export default SUDT

@@ -83,12 +83,12 @@ const ContractEventsList = ({ list }: { list: ParsedEventLog[] }) => {
             startAdornment: (
               <InputAdornment position="start">
                 <Image
-                  src={`${IMG_URL}search-event.svg`}
+                  src={`${IMG_URL}search-icon.svg`}
                   loading="lazy"
                   width="17"
                   height="17"
                   layout="fixed"
-                  alt="search-event"
+                  alt="search-icon"
                 />
               </InputAdornment>
             ),
