@@ -24,9 +24,11 @@ const SmartContract: React.FC<{
           field: t('deployer'),
           content: (
             <Tooltip title={deployer} placement="top">
-              <NextLink href={`/account/${deployer}`}>
-                <a className="mono-font">{deployer}</a>
-              </NextLink>
+              <span>
+                <NextLink href={`/account/${deployer}`}>
+                  <a className="mono-font">{deployer}</a>
+                </NextLink>
+              </span>
             </Tooltip>
           ),
         }
@@ -36,9 +38,11 @@ const SmartContract: React.FC<{
           field: t('deployTx'),
           content: (
             <Tooltip title={deployTxHash} placement="top">
-              <NextLink href={`/tx/${deployTxHash}`}>
-                <a className="mono-font">{deployTxHash}</a>
-              </NextLink>
+              <span>
+                <NextLink href={`/tx/${deployTxHash}`}>
+                  <a className="mono-font">{deployTxHash}</a>
+                </NextLink>
+              </span>
             </Tooltip>
           ),
         }
