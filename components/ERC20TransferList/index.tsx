@@ -1,15 +1,16 @@
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import { gql } from 'graphql-request'
-import BigNumber from 'bignumber.js'
 import Table from 'components/Table'
 import Tooltip from 'components/Tooltip'
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/SimplePagination'
 import TxStatusIcon from 'components/TxStatusIcon'
 import TransferDirection from 'components/TransferDirection'
+import RoundedAmount from 'components/RoundedAmount'
 import { client, timeDistance, getBlockStatus, GraphQLSchema } from 'utils'
 import styles from './styles.module.scss'
+import TokenLogo from 'components/TokenLogo'
 
 export type TransferListProps = {
   token_transfers: {
@@ -23,7 +24,7 @@ export type TransferListProps = {
       log_index: number
       polyjuice: Pick<GraphQLSchema.Polyjuice, 'status'>
       transaction_hash: string
-      udt: Pick<GraphQLSchema.Udt, 'id' | 'decimal' | 'symbol'>
+      udt: Pick<GraphQLSchema.Udt, 'id' | 'decimal' | 'symbol' | 'icon' | 'name'>
     }>
     metadata: GraphQLSchema.PageMetadata
   }
@@ -73,6 +74,8 @@ const transferListQuery = gql`
           id
           decimal
           symbol
+          icon
+          name
         }
       }
 
@@ -148,57 +151,66 @@ const TransferList: React.FC<
             <th>{t('age')} </th>
             <th>{t('from')}</th>
             <th>{t('to')}</th>
+            <th className={styles.direction}></th>
+            <th>{t('token')}</th>
             <th>{`${t('value')}`}</th>
           </tr>
         </thead>
         <tbody>
           {token_transfers.metadata.total_count ? (
-            token_transfers.entries.map(item => (
-              <tr key={item.transaction_hash + item.log_index}>
-                <td>
-                  <div className={styles.hash}>
-                    <Tooltip title={item.transaction_hash} placement="top">
-                      <span>
-                        <NextLink href={`/tx/${item.transaction_hash}`}>
-                          <a className="mono-font">{`${item.transaction_hash.slice(
-                            0,
-                            8,
-                          )}...${item.transaction_hash.slice(-8)}`}</a>
-                        </NextLink>
-                      </span>
-                    </Tooltip>
-                    <TxStatusIcon
-                      status={getBlockStatus(item.block.status)}
-                      isSuccess={item.polyjuice.status === GraphQLSchema.PolyjuiceStatus.Succeed}
-                    />
-                  </div>
-                </td>
-                <td>
-                  <NextLink href={`/block/${item.block.number}`}>
-                    <a>{(+item.block.number).toLocaleString('en')}</a>
-                  </NextLink>
-                </td>
-                <td>
-                  <time dateTime={item.block.timestamp}>
-                    {timeDistance(new Date(item.block.timestamp).getTime(), language)}
-                  </time>
-                </td>
-                <td>
-                  <Address address={item.from_address} type={item.from_account?.type} />
-                </td>
-                <td>
-                  <Address address={item.to_address} type={item.to_account?.type} />
-                </td>
-                <td>
-                  <div style={{ display: 'flex', whiteSpace: 'nowrap' }}>
+            token_transfers.entries.map(item => {
+              return (
+                <tr key={item.transaction_hash + item.log_index}>
+                  <td>
+                    <div className={styles.hash}>
+                      <Tooltip title={item.transaction_hash} placement="top">
+                        <span>
+                          <NextLink href={`/tx/${item.transaction_hash}`}>
+                            <a className="mono-font">{`${item.transaction_hash.slice(
+                              0,
+                              8,
+                            )}...${item.transaction_hash.slice(-8)}`}</a>
+                          </NextLink>
+                        </span>
+                      </Tooltip>
+                      <TxStatusIcon
+                        status={getBlockStatus(item.block.status)}
+                        isSuccess={item.polyjuice.status === GraphQLSchema.PolyjuiceStatus.Succeed}
+                      />
+                    </div>
+                  </td>
+                  <td>
+                    <NextLink href={`/block/${item.block.number}`}>
+                      <a>{(+item.block.number).toLocaleString('en')}</a>
+                    </NextLink>
+                  </td>
+                  <td>
+                    <time dateTime={item.block.timestamp}>
+                      {timeDistance(new Date(item.block.timestamp).getTime(), language)}
+                    </time>
+                  </td>
+                  <td>
+                    <Address address={item.from_address} type={item.from_account?.type} />
+                  </td>
+                  <td>
+                    <Address address={item.to_address} type={item.to_account?.type} />
+                  </td>
+                  <td className={styles.direction}>
                     <TransferDirection from={item.from_address} to={item.to_address} viewer={viewer ?? ''} />
-                    {`${new BigNumber(item.amount ?? 0).dividedBy(10 ** (item.udt?.decimal ?? 1)).toFormat()} ${
-                      item.udt?.symbol ?? ''
-                    }`}
-                  </div>
-                </td>
-              </tr>
-            ))
+                  </td>
+                  <td>
+                    <NextLink href={`/token/${item.udt.id}`}>
+                      <a>
+                        <TokenLogo name={item.udt?.name} logo={item.udt?.icon} />
+                      </a>
+                    </NextLink>
+                  </td>
+                  <td>
+                    <RoundedAmount amount={item.amount} udt={item.udt} />
+                  </td>
+                </tr>
+              )
+            })
           ) : (
             <tr>
               <td colSpan={7} align="center" className={styles.noRecords}>

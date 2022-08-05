@@ -271,6 +271,7 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
               <details key={signature}>
                 <summary>
                   <div>{`${signature}: ${outputs.map(output => output.type).join(', ')}`}</div>
+                  <ExpandIcon />
                 </summary>
                 <form onSubmit={handleMethodCall} data-call-static="true" data-signature={signature}>
                   {inputs.length ? <div className={styles.params}>Parameters</div> : null}
@@ -329,6 +330,7 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
               <details key={signature}>
                 <summary>
                   <div>{`${signature}: ${outputs.map(output => output.type).join(', ')}`}</div>
+                  <ExpandIcon />
                 </summary>
                 <form onSubmit={handleMethodCall} data-signature={signature}>
                   {inputs.length ? <div className={styles.params}>Parameters</div> : null}

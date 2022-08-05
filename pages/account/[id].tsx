@@ -38,7 +38,6 @@ import {
 import styles from './styles.module.scss'
 
 type State = AccountOverviewProps
-const tabs = ['transactions', 'erc20', 'bridged', 'assets', 'contract', 'events']
 
 const isSmartContractAccount = (account: AccountOverviewProps['account']): account is PolyjuiceContract => {
   return !!(account as PolyjuiceContract)?.smart_contract
@@ -147,13 +146,32 @@ const Account = (initState: State) => {
   const title = t(`accountType.${account.type}`)
   const accountType = account.type
 
+  // const tabs = ['transactions', 'erc20', 'bridged', 'assets', 'contract', 'events']
+  const tabs = [
+    { label: t('transactionRecords'), key: 'transactions' },
+    [GraphQLSchema.AccountType.EthUser, GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType)
+      ? { label: t(`ERC20Records`), key: 'erc20' }
+      : null,
+    [GraphQLSchema.AccountType.EthUser, GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType)
+      ? { label: t(`bridgedRecords`), key: 'bridged' }
+      : null,
+    [GraphQLSchema.AccountType.EthUser, GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType)
+      ? { label: t('userDefinedAssets'), key: 'assets' }
+      : null,
+    [GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType) &&
+    isSmartContractAccount(account) &&
+    account.smart_contract?.abi
+      ? { label: t('contract'), key: 'contract' }
+      : null,
+    [GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType) ? { label: t('events'), key: 'events' } : null,
+  ].filter(v => v)
   return (
     <>
       <SubpageHead subtitle={`${title} ${id}`} />
       <div className={styles.container}>
         <div className={styles.title}>
           <PageTitle>{title}</PageTitle>
-          <DownloadMenu items={downloadItems} />
+          {downloadItems.length ? <DownloadMenu items={downloadItems} /> : null}
         </div>
         <div className={styles.hash}>
           {id}
@@ -168,30 +186,11 @@ const Account = (initState: State) => {
         />
         <div className={styles.list}>
           <Tabs
-            value={tabs.indexOf(tab as string)}
-            tabs={[
-              t('transactionRecords'),
-              [GraphQLSchema.AccountType.EthUser, GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType)
-                ? t(`ERC20Records`)
-                : null,
-              [GraphQLSchema.AccountType.EthUser, GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType)
-                ? t(`bridgedRecords`)
-                : null,
-              [GraphQLSchema.AccountType.EthUser, GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType)
-                ? t('userDefinedAssets')
-                : null,
-              [GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType) &&
-              isSmartContractAccount(account) &&
-              account.smart_contract?.abi
-                ? t('contract')
-                : null,
-              [GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType) ? t('events') : null,
-            ]
-              .filter(v => v)
-              .map((label, idx) => ({
-                label,
-                href: `/account/${id}?tab=${tabs[idx]}`,
-              }))}
+            value={tabs.findIndex(tabItem => tabItem.key === tab)}
+            tabs={tabs.map((tabItem, idx) => ({
+              label: tabItem.label,
+              href: `/account/${id}?tab=${tabs[idx].key}`,
+            }))}
           />
           {tab === 'transactions' ? (
             !isTxListLoading ? (

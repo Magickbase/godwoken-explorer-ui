@@ -1,4 +1,11 @@
 .container {
+  th,
+  td {
+    &:last-child {
+      text-align: right;
+      padding-left: 0 !important;
+    }
+  }
   .hash {
     display: flex;
     align-items: center;
@@ -10,4 +17,12 @@
   .noRecords {
     text-align: center;
   }
+}
+
+.direction {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+.amount {
+  margin-right: 0.25rem;
 }

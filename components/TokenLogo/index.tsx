@@ -18,7 +18,11 @@ const TokenLogo: React.FC<{ logo: string; name: string }> = ({ name, logo }) => 
   )
 
   if (!origin) {
-    return Token
+    return (
+      <Tooltip title={name} placement="top">
+        {Token}
+      </Tooltip>
+    )
   }
 
   if (origin) {

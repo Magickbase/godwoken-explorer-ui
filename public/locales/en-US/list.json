@@ -5,6 +5,7 @@
   "value": "Value",
   "age": "Age",
   "transfer": "Transfer",
+  "token": "Token",
   "no_records": "No Records",
   "txHash": "Txn Hash",
   "block": "Block",

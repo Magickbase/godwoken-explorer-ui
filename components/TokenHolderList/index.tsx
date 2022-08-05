@@ -5,8 +5,8 @@ import Address from 'components/TruncatedAddress'
 import Pagination from 'components/Pagination'
 import { useTheme } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
+import { Stack } from '@mui/material'
 import { getTokenHolderListRes } from 'utils'
-import { Stack, Typography } from '@mui/material'
 
 type ParsedTokenHolderList = ReturnType<typeof getTokenHolderListRes>
 

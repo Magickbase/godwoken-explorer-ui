@@ -8,7 +8,8 @@ import Pagination from 'components/SimplePagination'
 import TokenLogo from 'components/TokenLogo'
 import FilterMenu from 'components/FilterMenu'
 import SortIcon from 'assets/icons/sort.svg'
-import { GraphQLSchema, client, formatAmount } from 'utils'
+import RoundedAmount from 'components/RoundedAmount'
+import { GraphQLSchema, client, formatAmount, parseTokenName } from 'utils'
 import styles from './styles.module.scss'
 
 export type TransferListProps = {
@@ -142,7 +143,7 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
                 <FilterMenu filterKeys={['address_to']} />
               </div>
             </th>
-            {/* <th className={styles.tokenLogo}>{t('token', { ns: 'common' })}</th> */}
+            <th className={styles.tokenLogo}>{t('token', { ns: 'common' })}</th>
             <th>{`${t('value')}`}</th>
           </tr>
         </thead>
@@ -167,12 +168,16 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
                     </a>
                   </NextLink>
                 </td>
-                {/* <td className={styles.tokenLogo}> */}
-                {/*   <NextLink href={`/token/${item.udt.id}`}> */}
-                {/*     <TokenLogo name={item.udt.name} logo={item.udt.icon} /> */}
-                {/*   </NextLink> */}
-                {/* </td> */}
-                <td title={item.udt.name}>{formatAmount(item.amount, item.udt)}</td>
+                <td className={styles.tokenLogo}>
+                  <NextLink href={`/token/${item.udt.id}`}>
+                    <a>
+                      <TokenLogo name={item.udt.name} logo={item.udt.icon} />
+                    </a>
+                  </NextLink>
+                </td>
+                <td title={item.udt.name}>
+                  <RoundedAmount amount={item.amount} udt={item.udt} />
+                </td>
               </tr>
             ))
           ) : (

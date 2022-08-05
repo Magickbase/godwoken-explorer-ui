@@ -20,7 +20,6 @@ const Pagination: React.FC<{ total: number; page: number; pageSize?: number }> =
   const prevPage = `${url}?${new URLSearchParams({ ...query, page: (page - 1).toString() })}`
   const nextPage = `${url}?${new URLSearchParams({ ...query, page: (page + 1).toString() })}`
   const totalPage = Math.ceil(total / pageSize)
-  console.log({ totalPage, page })
 
   return (
     <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'center' }} mt={{ xs: 2, sm: 0 }}>

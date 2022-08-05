@@ -5,6 +5,7 @@
   "value": "价值",
   "age": "时间",
   "transfer": "转移",
+  "token": "代币",
   "no_records": "暂无记录",
   "txHash": "交易哈希",
   "block": "区块",

@@ -1,6 +1,5 @@
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
-import BigNumber from 'bignumber.js'
 import { gql } from 'graphql-request'
 import Table from 'components/Table'
 import TxStatusIcon from '../TxStatusIcon'
@@ -10,9 +9,11 @@ import Pagination from 'components/SimplePagination'
 import TransferDirection from 'components/TransferDirection'
 import Tooltip from 'components/Tooltip'
 import FilterMenu from 'components/FilterMenu'
-import TxType from 'components/TxType'
-import { getBlockStatus, timeDistance, GraphQLSchema, client, GCKB_DECIMAL, PCKB_SYMBOL } from 'utils'
+import { getBlockStatus, timeDistance, GraphQLSchema, client, PCKB_SYMBOL } from 'utils'
 import styles from './styles.module.scss'
+import RoundedAmount from 'components/RoundedAmount'
+
+const GCKB_DECIMAL = 18 // FIXME: canonical in constant
 
 export type TxListProps = {
   transactions: {
@@ -132,8 +133,8 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
             <th>{t('age')}</th>
             <th>{t('from')}</th>
             <th>{t('to')}</th>
+            <th className={styles.direction}></th>
             <th>{`${t('value')} (${PCKB_SYMBOL})`}</th>
-            <th>{t('type')}</th>
           </tr>
         </thead>
         <tbody>
@@ -184,14 +185,17 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
                   <td>
                     <Address address={to} type={item.to_account.type} />
                   </td>
-                  <td>
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <TransferDirection from={from} to={to} viewer={viewer ?? ''} />
-                      {`${new BigNumber(item.polyjuice?.value ?? 0).dividedBy(GCKB_DECIMAL).toFormat()}`}
-                    </div>
+                  <td className={styles.direction}>
+                    <TransferDirection from={from} to={to} viewer={viewer ?? ''} />
                   </td>
                   <td>
-                    <TxType type={item.type} />
+                    <RoundedAmount
+                      amount={item.polyjuice?.value ?? '0'}
+                      udt={{
+                        decimal: GCKB_DECIMAL,
+                        symbol: PCKB_SYMBOL,
+                      }}
+                    />
                   </td>
                 </tr>
               )

@@ -5,7 +5,8 @@
       text-align: right;
     }
   }
-  td:last-child > div {
-    margin-left: auto;
-  }
+}
+.direction {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
