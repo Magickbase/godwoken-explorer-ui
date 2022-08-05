@@ -4,27 +4,16 @@ import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useQuery } from 'react-query'
-import {
-  Avatar,
-  Container,
-  Paper,
-  IconButton,
-  Stack,
-  Link,
-  Tooltip,
-  TableContainer,
-  Table,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableCell,
-  Typography,
-  Skeleton,
-} from '@mui/material'
+import { Avatar, Container, Stack, Link, TableContainer, Typography, Skeleton, Box, Button } from '@mui/material'
+import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded'
 import SubpageHead from 'components/SubpageHead'
-import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined'
 import Pagination from 'components/Pagination'
+import Table from 'components/Table'
+import PageTitle from 'components/PageTitle'
 import { fetchTokenList, formatAmount, nameToColor, PAGE_SIZE } from 'utils'
+import { useTheme } from '@mui/material/styles'
+import useMediaQuery from '@mui/material/useMediaQuery'
+import Address from 'components/TruncatedAddress'
 
 const BRIDGED_TOKEN_TEMPLATE_URL =
   'https://github.com/magickbase/godwoken_explorer/issues/new?assignees=Keith-CY&labels=Token+Registration&template=register-a-new-bridged-token.yml&title=%5BBridged+Token%5D+%2A%2AToken+Name%2A%2A'
@@ -41,10 +30,12 @@ const parseTokenName = (name: string) => {
 }
 
 const TokenList = () => {
-  const [t] = useTranslation(['tokens', 'common'])
+  const [t] = useTranslation(['tokens', 'common', 'list'])
   const {
     query: { page = '1', type },
   } = useRouter()
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
   const headers = [
     { key: 'token' },
@@ -52,7 +43,7 @@ const TokenList = () => {
     { key: type === 'bridge' ? 'circulatingSupply' : 'totalSupply' },
     { key: 'holderCount' },
     { key: 'origin' },
-    { key: 'bridgeName' },
+    { key: 'bridge' },
   ]
 
   const { isLoading, data } = useQuery(
@@ -67,159 +58,202 @@ const TokenList = () => {
   return (
     <>
       <SubpageHead subtitle={title} />
-      <Container sx={{ py: 6 }}>
-        <Paper sx={{ p: 2 }}>
-          <Stack direction="row" justifyContent="space-between" alignItems="center">
-            <Typography fontWeight={600}>{title}</Typography>
-            <Stack direction="row" alignItems="center">
-              <Tooltip title={t(type === 'bridge' ? 'add-bridged-token' : 'add-native-erc20-token')} placement="top">
-                <Link
-                  href={type === 'bridge' ? BRIDGED_TOKEN_TEMPLATE_URL : NATIVE_TOKEN_TEMPLATE_URL}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                >
-                  <IconButton>
-                    <AddBoxOutlinedIcon className="pointer-events-none" />
-                  </IconButton>
-                </Link>
-              </Tooltip>
+      <Container sx={{ px: { xs: 2, sm: 3, md: 2, lg: 0 }, pb: { xs: 5.5, md: 11 } }}>
+        <PageTitle>
+          <Typography variant="inherit" display="inline" pr={1}>
+            {title}
+          </Typography>
+        </PageTitle>
+        <Box
+          sx={{
+            borderRadius: {
+              xs: 2,
+              sm: 4,
+            },
+            border: {
+              xs: '0.5px solid #F0F0F0',
+              md: '1px solid #F0F0F0',
+            },
+            pt: { xs: 1.5, md: 2 },
+            pb: 2,
+            mt: { xs: 2, md: 3 },
+            bgcolor: '#fff',
+          }}
+        >
+          {!isLoading ? (
+            <Stack
+              direction="row"
+              flexWrap="wrap"
+              justifyContent="space-between"
+              alignItems="center"
+              mb={{ xs: 1.5, md: 2 }}
+              px={{ xs: 1.5, md: 3 }}
+            >
+              <Typography variant="inherit" color="secondary" fontWeight={500} fontSize={{ xs: 14, md: 16 }}>
+                {t('n_kinds_in_total', {
+                  ns: 'list',
+                  number: data.tokens.length,
+                })}
+              </Typography>
+              <Button
+                endIcon={<AddCircleOutlineRoundedIcon sx={{ fontSize: 13 }} />}
+                component={Link}
+                href={type === 'bridge' ? BRIDGED_TOKEN_TEMPLATE_URL : NATIVE_TOKEN_TEMPLATE_URL}
+                target="_blank"
+                rel="noreferrer noopener"
+                sx={{
+                  'bgcolor': theme.palette.primary.light,
+                  'borderRadius': 2,
+                  'textTransform': 'none',
+                  'height': 40,
+                  'lineHeight': 40,
+                  'px': { xs: 1, md: 2 },
+                  'fontWeight': 500,
+                  'fontSize': { xs: 13, md: 14 },
+                  '& .MuiButton-endIcon': {
+                    marginLeft: 0.5,
+                  },
+                }}
+              >
+                {t(type === 'bridge' ? 'add-bridged-token' : 'add-native-erc20-token')}
+              </Button>
             </Stack>
-          </Stack>
+          ) : (
+            <Stack
+              direction="row"
+              flexWrap="wrap"
+              justifyContent="space-between"
+              alignItems="center"
+              mb={{ xs: 1.5, md: 2 }}
+              px={{ xs: 1.5, md: 3 }}
+            >
+              <Skeleton animation="wave" width={50} />
+              <Skeleton animation="wave" width={50} />
+            </Stack>
+          )}
+
           <TableContainer sx={{ width: '100%' }}>
-            <Table size="small">
-              <TableHead sx={{ textTransform: 'capitalize' }}>
-                <TableRow>
+            <Table>
+              <thead style={{ textTransform: 'capitalize', fontSize: isMobile ? 12 : 14 }}>
+                <tr style={{ borderTop: '1px solid #f0f0f0', borderBottom: '1px solid #f0f0f0' }}>
                   {headers.map((h, idx) => (
-                    <TableCell
-                      component="th"
+                    <th
                       key={h.key}
                       title={t(h.label ?? h.key)}
-                      sx={{
+                      style={{
                         whiteSpace: 'nowrap',
-                        display: [1, 4, 5].includes(idx) ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
+                        textAlign: idx === headers.length - 1 ? 'end' : 'left',
                       }}
                     >
                       {t(h.label ?? h.key)}
-                    </TableCell>
+                    </th>
                   ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
+                </tr>
+              </thead>
+              <tbody>
                 {isLoading ? (
                   Array.from({ length: 20 }).map((_, idx) => (
-                    <TableRow key={idx}>
-                      <TableCell colSpan={headers.length}>
-                        <Skeleton animation="wave" height={40} />
-                      </TableCell>
-                    </TableRow>
+                    <tr key={idx}>
+                      <td colSpan={headers.length}>
+                        <Skeleton animation="wave" />
+                      </td>
+                    </tr>
                   ))
                 ) : data.tokens.length ? (
                   data.tokens.map(token => {
-                    const { name, bridge, origin } = parseTokenName(token.name)
+                    let { name, bridge, origin } = parseTokenName(token.name)
+                    if (!name) {
+                      name = token.name
+                    }
+                    const supply = formatAmount(token.supply || '0', {
+                      symbol: token.symbol?.split('.')[0] ?? '',
+                      decimal: token.decimal,
+                    })
                     return (
-                      <TableRow key={token.id.toString()}>
-                        <TableCell title={token.name}>
+                      <tr key={token.id.toString()}>
+                        <td title={name}>
                           <Stack direction="row" alignItems="center">
                             <Avatar
                               src={token.icon ?? null}
                               sx={{
                                 bgcolor: token.icon ? '#f0f0f0' : nameToColor(name),
                                 img: { objectFit: 'fill' },
+                                width: isMobile ? 24 : 32,
+                                height: isMobile ? 24 : 32,
                               }}
                             >
-                              {name[0] ?? '?'}
+                              {name?.[0] ?? '?'}
                             </Avatar>
-                            <NextLink href={`/token/${token.id}`}>
+                            <NextLink href={`/token/${token.id}`} passHref>
                               <Link
                                 href={`/token/${token.id}`}
+                                display="flex"
+                                alignItems="center"
                                 underline="none"
-                                color="secondary"
-                                ml={2}
-                                whiteSpace="nowrap"
+                                color="primary"
+                                ml={1}
                               >
-                                {name || '-'}
+                                <Typography
+                                  fontSize="inherit"
+                                  fontFamily="inherit"
+                                  sx={{
+                                    whiteSpace: 'nowrap',
+                                    textOverflow: 'ellipsis',
+                                    overflow: 'hidden',
+                                    width: isMobile ? 90 : 120,
+                                  }}
+                                >
+                                  {name}
+                                </Typography>
                               </Link>
                             </NextLink>
                           </Stack>
-                        </TableCell>
-                        <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
-                          <NextLink href={`/token/${token.id}`}>
-                            <Link
-                              href={`/token/${token.id}`}
-                              display="flex"
-                              alignItems="center"
-                              underline="none"
-                              color="secondary"
-                              className="mono-font"
-                            >
-                              <Typography
-                                fontSize="inherit"
-                                fontFamily="inherit"
-                                sx={{
-                                  display: {
-                                    xs: 'none',
-                                    md: 'flex',
-                                  },
-                                }}
-                              >
-                                {token.address}
-                              </Typography>
-                              <Typography
-                                fontSize="inherit"
-                                fontFamily="inherit"
-                                sx={{
-                                  display: {
-                                    xs: 'flex',
-                                    md: 'none',
-                                  },
-                                }}
-                              >
-                                {`${token.address.slice(0, 8)}...${token.address.slice(-8)}`}
-                              </Typography>
-                            </Link>
-                          </NextLink>
-                        </TableCell>
-                        <TableCell style={{ whiteSpace: 'nowrap' }}>
-                          {formatAmount(token.supply || '0', {
-                            symbol: token.symbol?.split('.')[0] ?? '',
-                            decimal: token.decimal,
-                          })}
-                        </TableCell>
-                        <TableCell>{token.holderCount || '0'}</TableCell>
-                        <TableCell
-                          sx={{
-                            display: {
-                              xs: 'none',
-                              sm: 'table-cell',
-                            },
-                          }}
-                        >
-                          {origin || '-'}
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            display: {
-                              xs: 'none',
-                              sm: 'table-cell',
-                            },
-                            whiteSpace: 'nowrap',
-                          }}
-                        >
-                          {bridge || '-'}
-                        </TableCell>
-                      </TableRow>
+                        </td>
+                        <td>
+                          <Address address={token.address} leading={isMobile ? 8 : 30} sx={{ width: 'min-content' }} />
+                        </td>
+                        <td>
+                          <div
+                            style={{
+                              whiteSpace: 'nowrap',
+                              textOverflow: 'ellipsis',
+                              overflow: 'hidden',
+                              width: type === 'bridge' ? 180 : 220,
+                            }}
+                          >
+                            {supply}
+                          </div>
+                        </td>
+                        <td style={{ minWidth: isMobile ? 100 : 125 }}>{token.holderCount || '0'}</td>
+                        <td>{origin}</td>
+                        <td style={{ textAlign: 'end' }}>{bridge}</td>
+                      </tr>
                     )
                   })
                 ) : (
-                  <TableRow>
-                    <TableCell colSpan={headers.length}>{t(`no_records`)}</TableCell>
-                  </TableRow>
+                  <tr>
+                    <td colSpan={headers.length}>{t(`no_records`)}</td>
+                  </tr>
                 )}
-              </TableBody>
+              </tbody>
             </Table>
           </TableContainer>
-          {data ? <Pagination page={data.meta.current} total={data.meta.total * PAGE_SIZE} /> : null}
-        </Paper>
+
+          <Stack
+            direction="row"
+            flexWrap="wrap"
+            justifyContent={isMobile ? 'center' : 'end'}
+            alignItems="center"
+            mt={{ xs: 0, md: 2 }}
+            px={{ xs: 1.5, md: 3 }}
+          >
+            {isLoading ? (
+              <Skeleton animation="wave" width="20px" />
+            ) : (
+              <Pagination page={data.meta.current} total={data.meta.total * PAGE_SIZE} />
+            )}
+          </Stack>
+        </Box>
       </Container>
     </>
   )
@@ -231,7 +265,7 @@ export const getStaticPaths: GetStaticPaths = () => ({
 })
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
-  const lng = await serverSideTranslations(locale, ['common', 'tokens'])
+  const lng = await serverSideTranslations(locale, ['common', 'tokens', 'list'])
   return { props: lng }
 }
 

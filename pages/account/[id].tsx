@@ -5,20 +5,7 @@ import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useQuery } from 'react-query'
 import BigNumber from 'bignumber.js'
-import {
-  Alert,
-  Stack,
-  Container,
-  Paper,
-  IconButton,
-  Divider,
-  Tabs,
-  Tab,
-  Typography,
-  Snackbar,
-  Skeleton,
-} from '@mui/material'
-import { ContentCopyOutlined as CopyIcon } from '@mui/icons-material'
+import { Skeleton } from '@mui/material'
 import SubpageHead from 'components/SubpageHead'
 import AccountOverview, {
   fetchAccountOverview,
@@ -27,16 +14,19 @@ import AccountOverview, {
   AccountOverviewProps,
   PolyjuiceContract,
 } from 'components/AccountOverview'
-import ERC20TransferList from 'components/ERC20TransferList'
-import AssetList, { fetchUdtList } from 'components/UdtList'
+import Tabs from 'components/Tabs'
+import ERC20TransferList, { fetchTransferList } from 'components/ERC20TransferList'
+import AssetList, { fetchUdtList } from 'components/AssetList'
 import TxList, { fetchTxList } from 'components/TxList'
 import BridgedRecordList from 'components/BridgedRecordList'
 import ContractInfo from 'components/ContractInfo'
 import ContractEventsList from 'components/ContractEventsList'
+import CopyBtn from 'components/CopyBtn'
+import PageTitle from 'components/PageTitle'
+import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
+import { SIZES } from 'components/PageSize'
 import {
-  handleCopy,
   handleApiError,
-  fetchERC20TransferList,
   fetchBridgedRecordList,
   fetchEventLogsListByType,
   isEthAddress,
@@ -45,8 +35,7 @@ import {
   API_ENDPOINT,
   CKB_DECIMAL,
 } from 'utils'
-import PageTitle from 'components/PageTitle'
-import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
+import styles from './styles.module.scss'
 
 type State = AccountOverviewProps
 const tabs = ['transactions', 'erc20', 'bridged', 'assets', 'contract', 'events']
@@ -57,11 +46,17 @@ const isSmartContractAccount = (account: AccountOverviewProps['account']): accou
 
 const Account = (initState: State) => {
   const {
-    push,
-    query: { tab = 'transactions', before = null, after = null, block_from = null, block_to = null, page = '1' },
+    query: {
+      tab = 'transactions',
+      before = null,
+      after = null,
+      block_from = null,
+      block_to = null,
+      page = '1',
+      page_size = SIZES[1],
+    },
   } = useRouter()
   const [accountAndList, setAccountAndList] = useState(initState)
-  const [isCopied, setIsCopied] = useState(false)
   const [t] = useTranslation(['account', 'common'])
 
   const id = accountAndList.account.eth_address || accountAndList.account.script_hash
@@ -86,7 +81,7 @@ const Account = (initState: State) => {
     () => fetchAccountBalance(id),
     {
       refetchInterval: 10000,
-      enabled: !!id,
+      enabled: !!id && isEthAddress(id),
     },
   )
 
@@ -108,9 +103,11 @@ const Account = (initState: State) => {
   const { isLoading: isTransferListLoading, data: transferList } = useQuery(
     ['account-transfer-list', q.address, page],
     () =>
-      fetchERC20TransferList({
-        eth_address: q.address,
-        page: page as string,
+      fetchTransferList({
+        address: q.address,
+        limit: +page_size,
+        before: before as string,
+        after: after as string,
       }),
     { enabled: tab === 'erc20' && !!q.address },
   )
@@ -147,135 +144,99 @@ const Account = (initState: State) => {
       ]
     : []
 
-  const handleAddressCopy = async () => {
-    await handleCopy(id)
-    setIsCopied(true)
-  }
-
-  const title = `${t('accountType.' + account.type)} ${id}`
+  const title = t(`accountType.${account.type}`)
   const accountType = account.type
 
   return (
     <>
-      <SubpageHead subtitle={title} />
-      <Container sx={{ py: 6 }}>
-        <Stack direction="row" justifyContent="space-between" alignItems="center">
-          <PageTitle>
-            <Stack direction="row" alignItems="center">
-              <Typography variant="inherit" overflow="hidden" textOverflow="ellipsis" noWrap>
-                {title}
-              </Typography>
-
-              <IconButton aria-label="copy" onClick={handleAddressCopy}>
-                <CopyIcon fontSize="inherit" />
-              </IconButton>
-            </Stack>
-          </PageTitle>
+      <SubpageHead subtitle={`${title} ${id}`} />
+      <div className={styles.container}>
+        <div className={styles.title}>
+          <PageTitle>{title}</PageTitle>
           <DownloadMenu items={downloadItems} />
-        </Stack>
-        <Stack spacing={2}>
-          <AccountOverview
-            isOverviewLoading={isOverviewLoading}
-            isBalanceLoading={isBalanceLoading}
-            account={account}
-            balance={balance}
-            deployerAddr={accountAndList.deployerAddr}
+        </div>
+        <div className={styles.hash}>
+          {id}
+          <CopyBtn content={id} />
+        </div>
+        <AccountOverview
+          isOverviewLoading={isOverviewLoading}
+          isBalanceLoading={isBalanceLoading}
+          account={account}
+          balance={balance}
+          deployerAddr={accountAndList.deployerAddr}
+        />
+        <div className={styles.list}>
+          <Tabs
+            value={tabs.indexOf(tab as string)}
+            tabs={[
+              t('transactionRecords'),
+              [GraphQLSchema.AccountType.EthUser, GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType)
+                ? t(`ERC20Records`)
+                : null,
+              [GraphQLSchema.AccountType.EthUser, GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType)
+                ? t(`bridgedRecords`)
+                : null,
+              [GraphQLSchema.AccountType.EthUser, GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType)
+                ? t('userDefinedAssets')
+                : null,
+              [GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType) &&
+              isSmartContractAccount(account) &&
+              account.smart_contract?.abi
+                ? t('contract')
+                : null,
+              [GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType) ? t('events') : null,
+            ]
+              .filter(v => v)
+              .map((label, idx) => ({
+                label,
+                href: `/account/${id}?tab=${tabs[idx]}`,
+              }))}
           />
-          <Paper>
-            <Tabs value={tabs.indexOf(tab as string)} variant="scrollable" scrollButtons="auto">
-              {[
-                t('transactionRecords'),
-                [GraphQLSchema.AccountType.EthUser, GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType)
-                  ? t(`ERC20Records`)
-                  : null,
-                [GraphQLSchema.AccountType.EthUser, GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType)
-                  ? t(`bridgedRecords`)
-                  : null,
-                [GraphQLSchema.AccountType.EthUser, GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType)
-                  ? t('userDefinedAssets')
-                  : null,
-                [GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType) &&
-                isSmartContractAccount(account) &&
-                account.smart_contract?.abi
-                  ? t('contract')
-                  : null,
-                [GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType) ? t('events') : null,
-              ].map((label, idx) =>
-                label ? (
-                  <Tab
-                    key={label}
-                    label={label}
-                    onClick={e => {
-                      e.stopPropagation()
-                      e.preventDefault()
-                      push(`/account/${id}?tab=${tabs[idx]}`, undefined, { scroll: false })
-                    }}
-                  />
-                ) : (
-                  <Tab key="none" sx={{ display: 'none' }} />
-                ),
-              )}
-            </Tabs>
-            <Divider />
-            {tab === 'transactions' ? (
-              !isTxListLoading ? (
-                <TxList
-                  transactions={txList ?? { entries: [], metadata: { total_count: 0, before: null, after: null } }}
-                  maxCount="100k"
-                  viewer={id}
-                />
-              ) : (
-                <Skeleton animation="wave" />
-              )
-            ) : null}
-            {tab === 'erc20' ? (
-              !isTransferListLoading && transferList ? (
-                <ERC20TransferList list={transferList} viewer={id} />
-              ) : (
-                <Skeleton animation="wave" />
-              )
-            ) : null}
-            {tab === 'bridged' ? (
-              !isBridgedListLoading && bridgedRecordList ? (
-                <BridgedRecordList list={bridgedRecordList} />
-              ) : (
-                <Skeleton animation="wave" />
-              )
-            ) : null}
-            {tab === 'assets' ? (
-              !isUdtListLoading && udtList ? (
-                <AssetList list={udtList} />
-              ) : (
-                <Skeleton animation="wave" />
-              )
-            ) : null}
-            {tab === 'contract' && isSmartContractAccount(account) && account.smart_contract?.abi ? (
-              <ContractInfo address={account.eth_address} contract={account.smart_contract} />
-            ) : null}
-            {tab === 'events' ? (
-              !isEventListLoading && eventsList ? (
-                <ContractEventsList list={eventsList} />
-              ) : (
-                <Skeleton animation="wave" />
-              )
-            ) : null}
-          </Paper>
-        </Stack>
-        <Snackbar
-          open={isCopied}
-          onClose={() => setIsCopied(false)}
-          anchorOrigin={{
-            horizontal: 'center',
-            vertical: 'top',
-          }}
-          autoHideDuration={3000}
-          color="secondary"
-        >
-          <Alert severity="success" variant="filled">
-            {t(`addressCopied`, { ns: 'common' })}
-          </Alert>
-        </Snackbar>
-      </Container>
+          {tab === 'transactions' ? (
+            !isTxListLoading ? (
+              <TxList
+                transactions={txList ?? { entries: [], metadata: { total_count: 0, before: null, after: null } }}
+                maxCount="100k"
+                viewer={id}
+              />
+            ) : (
+              <Skeleton animation="wave" />
+            )
+          ) : null}
+          {tab === 'erc20' ? (
+            !isTransferListLoading && transferList ? (
+              <ERC20TransferList token_transfers={transferList} viewer={id} />
+            ) : (
+              <Skeleton animation="wave" />
+            )
+          ) : null}
+          {tab === 'bridged' ? (
+            !isBridgedListLoading && bridgedRecordList ? (
+              <BridgedRecordList list={bridgedRecordList} />
+            ) : (
+              <Skeleton animation="wave" />
+            )
+          ) : null}
+          {tab === 'assets' ? (
+            !isUdtListLoading && udtList ? (
+              <AssetList list={udtList} />
+            ) : (
+              <Skeleton animation="wave" />
+            )
+          ) : null}
+          {tab === 'contract' && isSmartContractAccount(account) && account.smart_contract?.abi ? (
+            <ContractInfo address={account.eth_address} contract={account.smart_contract} />
+          ) : null}
+          {tab === 'events' ? (
+            !isEventListLoading && eventsList ? (
+              <ContractEventsList list={eventsList} />
+            ) : (
+              <Skeleton animation="wave" />
+            )
+          ) : null}
+        </div>
+      </div>
     </>
   )
 }

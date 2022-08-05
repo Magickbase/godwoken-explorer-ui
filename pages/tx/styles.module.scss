@@ -33,6 +33,10 @@
     text-transform: none;
   }
 
+  a {
+    word-break: break-all;
+  }
+
   dl[role='listitem'] {
     dt {
       @media screen and (min-width: 1024px) {
@@ -52,7 +56,6 @@
   background-color: #fff;
   border: 1px solid var(--border-color);
   border-radius: 1rem;
-  overflow-y: hidden;
 }
 
 .input {

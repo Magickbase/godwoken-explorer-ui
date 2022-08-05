@@ -95,15 +95,14 @@ const StyledMenu = styled((props: MenuProps) => <HoverMenu {...props} />)(({ the
 const MobileMenu = styled((props: MenuProps) => (
   <Menu
     elevation={0}
-    anchorReference="anchorPosition"
-    anchorPosition={{ top: 54, left: 0 }}
+    anchorReference="anchorEl"
     anchorOrigin={{
-      vertical: 'top',
-      horizontal: 'center',
+      vertical: 'bottom',
+      horizontal: 'right',
     }}
     transformOrigin={{
       vertical: 'top',
-      horizontal: 'center',
+      horizontal: 'right',
     }}
     {...props}
   />
@@ -117,7 +116,7 @@ const MobileMenu = styled((props: MenuProps) => (
     'border': 'none',
     'backgroundColor': theme.palette.primary.light,
     '& .MuiMenu-list': {
-      padding: '4px 0',
+      padding: '12px 0 4px 0',
       width: '100%',
     },
   },
@@ -153,7 +152,10 @@ const Header = () => {
   const handleMenuListOpen = (e: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(e.currentTarget)
   }
-  const handleMenuListClose = () => setAnchorEl(null)
+  const handleMenuListClose = () => {
+    setExpanded(false)
+    setAnchorEl(null)
+  }
 
   const TokenMenuItems = ({ dense }) => (
     <MenuList dense={dense} onClick={tokenPopover.close}>
@@ -392,6 +394,7 @@ const Header = () => {
                 textTransform: 'capitalize',
                 display: { xs: 'block', md: 'none' },
               }}
+              transitionDuration={400}
               autoFocus={false}
             >
               <MenuItem>

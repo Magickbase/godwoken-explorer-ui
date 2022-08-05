@@ -86,3 +86,14 @@
     }
   }
 }
+
+@media screen and (max-width: 1024px) {
+  .container {
+    label {
+      width: 6rem;
+      height: 2.25rem;
+      border-radius: 1.125rem;
+      font-size: 0.75rem;
+    }
+  }
+}

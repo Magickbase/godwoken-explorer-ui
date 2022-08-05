@@ -1,0 +1,13 @@
+.container {
+  .hash {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    a {
+      padding-right: 4px;
+    }
+  }
+  .noRecords {
+    text-align: center;
+  }
+}

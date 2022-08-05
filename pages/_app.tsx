@@ -90,6 +90,7 @@ const Agera = ({ Component, pageProps }: AppProps) => {
                 width: '100%',
                 opacity: 0.8,
                 top: { xs: '56px', sm: '64px' },
+                zIndex: 1,
               }}
             />
           ) : null}
