@@ -19,7 +19,6 @@ const AddressInHalfPanel = ({ address, alias }: { address: string; alias?: strin
       <Address
         address={text}
         sx={{ display: text.length >= 32 ? { xs: 'inline', sm: 'none' } : 'none' }}
-        size="normal"
         leading={15}
       />
     </Typography>

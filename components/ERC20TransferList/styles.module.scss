@@ -1,0 +1,28 @@
+.container {
+  th,
+  td {
+    &:last-child {
+      text-align: right;
+      padding-left: 0 !important;
+    }
+  }
+  .hash {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    a {
+      padding-right: 4px;
+    }
+  }
+  .noRecords {
+    text-align: center;
+  }
+}
+
+.direction {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+.amount {
+  margin-right: 0.25rem;
+}

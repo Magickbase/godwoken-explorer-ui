@@ -1,34 +1,34 @@
-import NextLink from 'next/link'
-import { Tooltip, Box, Link, SxProps } from '@mui/material'
+import { Box, SxProps } from '@mui/material'
+import Tooltip from 'components/Tooltip'
+import HashLink from './HashLink'
 import { GraphQLSchema } from 'utils'
 const TruncatedAddress = ({
   address,
   leading = 8,
-  size = 'small',
   sx = {},
   type,
 }: {
   address: string
   leading?: number
-  size?: 'normal' | 'small'
   sx?: SxProps
   type?: GraphQLSchema.AccountType
 }) => (
   <Tooltip title={address} placement="top" sx={sx}>
-    <Box fontSize={size === 'small' ? 12 : 14}>
-      <NextLink href={`/account/${address}`}>
-        <Link href={`/account/${address}`} underline="none" color="secondary" className="mono-font" whiteSpace="nowrap">
-          {[
+    <Box sx={sx}>
+      <HashLink
+        label={
+          [
             GraphQLSchema.AccountType.EthAddrReg,
             GraphQLSchema.AccountType.MetaContract,
             GraphQLSchema.AccountType.PolyjuiceCreator,
           ].includes(type)
-            ? type.replace(/_/g, ' ')
+            ? type.replace(/_/g, ' ').toLowerCase()
             : address.length > leading * 2
             ? `${address.slice(0, leading)}...${address.slice(-leading)}`
-            : address}
-        </Link>
-      </NextLink>
+            : address
+        }
+        href={`/account/${address}`}
+      />
     </Box>
   </Tooltip>
 )

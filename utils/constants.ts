@@ -21,7 +21,7 @@ export const CKB_DECIMAL = new BigNumber(10 ** 8)
 export const GCKB_DECIMAL = new BigNumber(10 ** 18)
 export const PCKB_UAN = 'pCKB.gw|gb.ckb'
 export const PCKB_SYMBOL = 'pCKB'
-export const SEARCH_FIELDS = 'block hash/txn hash/lockhash/ETH address/token name/token symbol'
+export const SEARCH_FIELDS = 'Block Hash/Txn Hash/Lockhash/ETH Address/Token Name/Token Symbol'
 export const MAINNET_HOSTNAME = process.env.NEXT_PUBLIC_MAINNET_EXPLORER_HOSTNAME
 export const TESTNET_HOSTNAME = process.env.NEXT_PUBLIC_TESTNET_EXPLORER_HOSTNAME
 
@@ -32,3 +32,9 @@ export enum CHANNEL {
   ACCOUNT_INFO = 'accounts:',
   ACCOUNT_TX_LIST = 'account_transactions:',
 }
+
+export const TokenOrigins: Array<Record<'name' | 'logo', string>> = [
+  { name: 'ETH', logo: 'https://cryptologos.cc/logos/ethereum-eth-logo.svg' },
+  { name: 'BSC', logo: 'https://cryptologos.cc/logos/bnb-bnb-logo.svg' },
+  { name: 'CKB', logo: '/logos/nervos.svg' },
+]
