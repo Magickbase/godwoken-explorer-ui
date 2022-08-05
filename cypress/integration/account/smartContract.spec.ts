@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-context('Smart Contract Account Page', () => {
+context.skip('Smart Contract Account Page', () => {
   before(() => {
     cy.fixture('accountIds').then(ids => cy.visit(`/en-US/account/${ids.smartContract}`))
   })

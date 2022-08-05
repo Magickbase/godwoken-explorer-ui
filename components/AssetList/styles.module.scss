@@ -1,0 +1,25 @@
+.name {
+  display: flex;
+  align-items: center;
+  a {
+    margin-right: 8px;
+  }
+}
+
+.type {
+  text-transform: capitalize;
+}
+
+.tableHeader,
+.tableBody {
+  th,
+  td {
+    &:last-child {
+      text-align: right;
+    }
+  }
+}
+
+.noRecords {
+  text-align: center;
+}

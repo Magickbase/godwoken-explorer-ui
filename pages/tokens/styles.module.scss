@@ -1,0 +1,33 @@
+.container {
+  table {
+    th {
+      white-space: nowrap;
+      & > div {
+        display: flex;
+        align-items: center;
+      }
+    }
+    th,
+    td {
+      &:last-child {
+        text-align: right;
+      }
+    }
+  }
+  form[data-role='filter-menu']:first-of-type {
+    left: 0;
+    transform: translateX(-20px);
+  }
+}
+
+.sorter {
+  cursor: pointer;
+
+  &[data-order='DESC'] {
+    transform: rotate(0.5turn);
+  }
+}
+
+.noRecords {
+  text-align: center !important;
+}

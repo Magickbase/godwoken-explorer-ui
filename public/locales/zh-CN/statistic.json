@@ -1,5 +1,5 @@
 {
-  "blockHeight": "区块高度\n",
+  "blockHeight": "区块高度 #\n",
   "txCount": "交易总数\n",
   "tps": "TPS",
   "accountCount": "账户总数",

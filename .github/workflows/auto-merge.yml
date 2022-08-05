@@ -49,18 +49,3 @@ jobs:
           pr_reviewer: 'keith-cy'
           pr_label: 'auto-pr'
           github_token: ${{ secrets.GITHUB_TOKEN }}
-
-  merge-to-update-ui:
-    name: Merge to update ui
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@master
-      - name: Request PR
-        uses: repo-sync/pull-request@v2
-        with:
-          source_branch: 'develop'
-          destination_branch: 'update-ui'
-          pr_title: 'Merge develop ${{ github.ref }} into update-ui'
-          pr_reviewer: 'keith-cy'
-          pr_label: 'auto-pr'
-          github_token: ${{ secrets.GITHUB_TOKEN }}

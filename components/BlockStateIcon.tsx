@@ -1,33 +1,46 @@
-import {
-  Done as CommittedIcon,
-  DoneAllOutlined as FinalizedIcon,
-  HelpOutlineOutlined as HelpIcon,
-} from '@mui/icons-material'
-import { SxProps, Tooltip } from '@mui/material'
+import { HelpOutlineOutlined as HelpIcon } from '@mui/icons-material'
 import { useTranslation } from 'next-i18next'
-import type { BlockState } from 'utils'
+import type { BlockState, GraphQLSchema } from 'utils'
+import Tooltip from 'components/Tooltip'
+import CommittedIcon from 'assets/icons/committed.svg'
+import FinalizedIcon from 'assets/icons/finalized.svg'
+import PendingIcon from 'assets/icons/pending.svg'
 
-const BlockStateIcon: React.FC<{ state: BlockState }> = ({ state }) => {
+const BlockStateIcon: React.FC<{ state: BlockState | GraphQLSchema.BlockStatus }> = ({ state }) => {
   const [t] = useTranslation('common')
-  const properties: { sx: SxProps } = {
-    sx: { fontSize: 16, mr: 1 },
+  // const properties = { fontSize: 16, display: 'flex' }
+  const properties = { display: 'flex', alignItems: 'center', flexShrink: 0 }
+  const stateLowercase = state.toLowerCase()
+
+  if (stateLowercase === 'committed') {
+    return (
+      <Tooltip title={t(stateLowercase)} placement="top">
+        <div style={{ ...properties }}>
+          <CommittedIcon />
+        </div>
+      </Tooltip>
+    )
+  }
+  if (stateLowercase === 'finalized') {
+    return (
+      <Tooltip title={t(stateLowercase)} placement="top">
+        <div style={{ ...properties }}>
+          <FinalizedIcon {...properties} />
+        </div>
+      </Tooltip>
+    )
+  }
+  if (stateLowercase === 'pending') {
+    return (
+      <Tooltip title={t(stateLowercase)} placement="top">
+        <div style={{ ...properties }}>
+          <PendingIcon {...properties} />
+        </div>
+      </Tooltip>
+    )
   }
 
-  if (state === 'committed') {
-    return (
-      <Tooltip title={t(state)} placement="top">
-        <CommittedIcon {...properties} />
-      </Tooltip>
-    )
-  }
-  if (state === 'finalized') {
-    return (
-      <Tooltip title={t(state)} placement="top">
-        <FinalizedIcon {...properties} />
-      </Tooltip>
-    )
-  }
-  return <HelpIcon {...properties} color="warning" />
+  return <HelpIcon sx={{ ...properties }} color="warning" />
 }
 
 export default BlockStateIcon
