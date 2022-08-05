@@ -43,5 +43,11 @@
   "address_to": "到",
   "filter": "筛选",
   "clear": "清除",
+  "filter_menu": {
+    "block_from": "区块高度",
+    "block_to": "区块高度",
+    "from": "通过地址搜索",
+    "to": "通过地址搜索"
+  },
   "n_kinds_in_total": "共计 {{number}} 种"
 }
