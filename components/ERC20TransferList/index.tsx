@@ -213,7 +213,7 @@ const TransferList: React.FC<
             })
           ) : (
             <tr>
-              <td colSpan={7} align="center" className={styles.noRecords}>
+              <td colSpan={8} align="center" className={styles.noRecords}>
                 {t(`no_records`)}
               </td>
             </tr>

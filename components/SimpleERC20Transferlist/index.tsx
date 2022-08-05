@@ -182,7 +182,7 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
             ))
           ) : (
             <tr>
-              <td colSpan={4} style={{ textAlign: 'center' }}>
+              <td colSpan={5} style={{ textAlign: 'center' }}>
                 {t(`no_records`)}
               </td>
             </tr>
