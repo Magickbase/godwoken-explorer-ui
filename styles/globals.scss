@@ -40,6 +40,15 @@ a {
   user-select: all;
 }
 
+* {
+  -webkit-tap-highlight-color: var(--primary-color);
+  outline-color: var(--primary-color);
+}
+
+input {
+  outline-style: none;
+}
+
 *::selection {
   color: #fff;
   background-color: #000;

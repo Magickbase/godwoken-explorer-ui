@@ -1,8 +1,6 @@
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
-import { useRouter } from 'next/router'
-import { Typography, IconButton, Menu, TextField, Button } from '@mui/material'
-import { FilterAlt as FilterIcon, Clear as ClearIcon } from '@mui/icons-material'
+import { Typography } from '@mui/material'
 import BigNumber from 'bignumber.js'
 import { gql } from 'graphql-request'
 import Table from 'components/Table'
@@ -13,8 +11,9 @@ import PageSize from 'components/PageSize'
 import Pagination from 'components/SimplePagination'
 import TransferDirection from 'components/TransferDirection'
 import Tooltip from 'components/Tooltip'
+import FilterMenu from 'components/FilterMenu'
+import { timeDistance, GraphQLSchema, getBlockStatus, client, GCKB_DECIMAL, PCKB_SYMBOL } from 'utils'
 import TxType from 'components/TxType'
-import { timeDistance, GraphQLSchema, getBlockStatus, client, GCKB_DECIMAL, useFilterMenu, PCKB_SYMBOL } from 'utils'
 import styles from './styles.module.scss'
 
 export type TxListProps = {
@@ -112,7 +111,6 @@ export const fetchTxList = (variables: Variables) =>
     .then(data => data.transactions)
     .catch(() => ({ entries: [], metadata: { before: null, after: null, total_count: 0 } }))
 
-const FILTER_KEYS = ['block_from', 'block_to'] as const
 const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> = ({
   transactions: { entries, metadata },
   maxCount,
@@ -120,32 +118,6 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
   viewer,
 }) => {
   const [t, { language }] = useTranslation('list')
-  const {
-    query: { id: _, ...query },
-    push,
-    asPath,
-  } = useRouter()
-  const {
-    filters,
-    setFilters,
-    handleFilterOpen,
-    handleFilterDismiss,
-    filterAnchorEl,
-    handleFilterSubmit: handleFilterSubmitFunc,
-    handleFilterClear,
-  } = useFilterMenu<typeof FILTER_KEYS[number]>()
-
-  const handleBlockFilterOpen = (e: React.MouseEvent<HTMLButtonElement>) => {
-    setFilters(['block_from', 'block_to'])
-    handleFilterOpen(e)
-  }
-
-  const handleFilterSubmit = handleFilterSubmitFunc({
-    filterKeys: FILTER_KEYS,
-    query: query as Record<string, string>,
-    url: asPath,
-    push,
-  })
 
   return (
     <div className={styles.container}>
@@ -154,10 +126,10 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
           <tr>
             <th>{t('txHash')}</th>
             <th>
-              {t('block')}
-              <IconButton size="small" onClick={handleBlockFilterOpen}>
-                <FilterIcon fontSize="inherit" />
-              </IconButton>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                {t('block')}
+                <FilterMenu filterKeys={['block_from', 'block_to']} />
+              </div>
             </th>
             <th>{t('age')}</th>
             <th>{t('from')}</th>
@@ -235,58 +207,11 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
           )}
         </tbody>
       </Table>
-      <Menu
-        anchorEl={filterAnchorEl}
-        open={!!filterAnchorEl}
-        onClose={handleFilterDismiss}
-        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-      >
-        <form onSubmit={handleFilterSubmit}>
-          {filters.map((field, idx) => {
-            return (
-              <div key={field} style={{ padding: '4px 16px' }}>
-                <TextField
-                  type={['block_from', 'block_to'].includes(field) ? 'number' : 'text'}
-                  name={field}
-                  label={t(field)}
-                  size="small"
-                  defaultValue={query[field] ?? ''}
-                  autoFocus={!idx}
-                  sx={{
-                    label: {
-                      textTransform: 'capitalize',
-                    },
-                  }}
-                />
-              </div>
-            )
-          })}
-          <div style={{ display: 'flex', justifyContent: 'space-around', padding: '16px' }}>
-            <Button type="submit" variant="contained" size="small" startIcon={<FilterIcon />}>
-              {t(`filter`)}
-            </Button>
-            <Button type="button" variant="text" onClick={handleFilterClear} size="small" startIcon={<ClearIcon />}>
-              {t(`clear`)}
-            </Button>
-          </div>
-        </form>
-      </Menu>
       {pageSize ? (
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <PageSize pageSize={pageSize} />
-          <Pagination {...metadata} />
-        </div>
+        <Pagination {...metadata} pageSize={`${pageSize}`} note={t(`last-n-records`, { n: maxCount })} />
       ) : (
-        <Pagination {...metadata} />
+        <Pagination {...metadata} note={t(`last-n-records`, { n: maxCount })} />
       )}
-      {maxCount ? (
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Typography color="primary.light" variant="caption">
-            {t(`last-n-records`, { n: maxCount })}
-          </Typography>
-        </div>
-      ) : null}
     </div>
   )
 }

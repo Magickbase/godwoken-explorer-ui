@@ -653,12 +653,12 @@ const Home = () => {
         <Stack
           direction={{ xs: 'column', sm: 'column', md: 'column', lg: 'row' }}
           spacing={4}
-          sx={{ pt: { xs: 3, md: 8 } }}
+          sx={{ pt: { xs: 3, md: 8, columnGap: 2 } }}
         >
-          <Box sx={{ width: '100%', lg: { width: '50%', mr: 2 } }} className="latest-blocks">
+          <Box sx={{ width: '100%', lg: { width: '50%' } }} className="latest-blocks">
             <BlockList list={lists?.blocks ?? []} isLoading={isListsLoading} length={isMobile ? 5 : 10} />
           </Box>
-          <Box sx={{ width: '100%', lg: { width: '50%', ml: 2 } }} className="latest-txs">
+          <Box sx={{ width: '100%', lg: { width: '50%' } }} className="latest-txs">
             <TxList list={lists?.transactions.entries ?? []} isLoading={isListsLoading} length={isMobile ? 5 : 10} />
           </Box>
         </Stack>

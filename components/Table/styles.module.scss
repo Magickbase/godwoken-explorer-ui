@@ -1,8 +1,8 @@
 .container {
-  overflow-y: auto;
   font-weight: 400;
   font-size: 0.875rem;
   font-family: 'Roboto';
+  z-index: 1;
 
   table {
     min-width: 100%;
@@ -14,6 +14,7 @@
       height: 3rem;
       color: var(--secondary-text-color);
       background-color: #fafafa;
+      cursor: default;
     }
   }
   tbody {
