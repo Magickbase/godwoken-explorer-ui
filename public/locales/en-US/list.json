@@ -15,6 +15,7 @@
   "layer1Txn": "CKB Txn",
   "pending": "Pending",
   "account": "Account",
+  "log_index": "Log Index",
   "block_from_to": "Blocks From #{{from}} To #{{to}}",
   "tx_in_block_from_to": "Txns in blocks from #{{from}} to #{{to}}",
   "block_list_title": "Blocks",
