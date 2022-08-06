@@ -20,6 +20,19 @@
   }
 }
 
+.amount {
+  display: inline-flex;
+  user-select: all;
+}
+
+.frac {
+  color: #aaa;
+}
+
+.symbol {
+  margin-left: 0.25rem;
+}
+
 .noRecords {
   text-align: center;
 }

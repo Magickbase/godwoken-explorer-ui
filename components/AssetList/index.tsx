@@ -5,6 +5,7 @@ import Table from 'components/Table'
 import TokenLogo from 'components/TokenLogo'
 import { parseTokenName, client, formatAmount, GraphQLSchema } from 'utils'
 import styles from './styles.module.scss'
+import BigNumber from 'bignumber.js'
 
 export type UdtList = Array<{
   value: string
@@ -54,26 +55,38 @@ const AssetList = ({ list = [] }: { list: UdtList }) => {
       </thead>
       <tbody className={styles.tableBody}>
         {list.length ? (
-          list.map(item => (
-            <tr key={item.udt.id}>
-              <td>
-                <div className={styles.name}>
-                  <NextLink href={`/token/${item.udt.id}`}>
-                    <a>
-                      <TokenLogo name={item.udt.name} logo={item.udt.icon} />
-                    </a>
-                  </NextLink>
-                  <NextLink href={`/token/${item.udt.id}`}>
-                    <a>{parseTokenName(item.udt.name).name}</a>
-                  </NextLink>
-                </div>
-              </td>
-              <td className={styles.type}>
-                {t(item.udt.type === GraphQLSchema.UdtType.Native ? 'native' : 'bridged')}
-              </td>
-              <td>{formatAmount(item.value, item.udt)}</td>
-            </tr>
-          ))
+          list.map(item => {
+            const [amountInt, amountFrac] = new BigNumber(item.value ?? '0')
+              .dividedBy(10 ** (item.udt.decimal ?? 0))
+              .toFormat()
+              .split('.')
+            return (
+              <tr key={item.udt.id}>
+                <td>
+                  <div className={styles.name}>
+                    <NextLink href={`/token/${item.udt.id}`}>
+                      <a>
+                        <TokenLogo name={item.udt.name} logo={item.udt.icon} />
+                      </a>
+                    </NextLink>
+                    <NextLink href={`/token/${item.udt.id}`}>
+                      <a>{parseTokenName(item.udt.name).name}</a>
+                    </NextLink>
+                  </div>
+                </td>
+                <td className={styles.type}>
+                  {t(item.udt.type === GraphQLSchema.UdtType.Native ? 'native' : 'bridged')}
+                </td>
+                <td>
+                  <div className={styles.amount}>
+                    <span>{amountInt}</span>
+                    {amountFrac ? <span className={styles.frac}>{`.${amountFrac}`}</span> : null}
+                  </div>
+                  <span className={styles.symbol}>{item.udt.symbol ?? ''}</span>
+                </td>
+              </tr>
+            )
+          })
         ) : (
           <tr>
             <td colSpan={3} align="center" className={styles.noRecords}>

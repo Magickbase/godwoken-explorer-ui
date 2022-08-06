@@ -45,6 +45,8 @@
     transform: translateX(50%);
     opacity: 0;
     transition: all 0.3s;
+    max-height: 0;
+    overflow: hidden;
     z-index: 9;
 
     .field {
@@ -105,6 +107,7 @@
       top: calc(100% + 1.5rem);
       pointer-events: unset;
       opacity: 1;
+      max-height: unset;
     }
   }
   &[data-active='true'] {

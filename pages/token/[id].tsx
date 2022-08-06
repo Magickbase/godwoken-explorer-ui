@@ -169,7 +169,7 @@ const Token: React.FC<Props> = () => {
           />
           {tab === tabs[0] ? (
             !isTransferListLoading && transferList ? (
-              <ERC20TransferList token_transfers={transferList} />
+              <ERC20TransferList token_transfers={transferList} showToken={false} />
             ) : (
               <Skeleton animation="wave" />
             )
