@@ -153,8 +153,8 @@ const Tx = (initState: State) => {
 
   const overview = [
     {
-      label: 'hash',
-      value: (
+      field: 'hash',
+      content: (
         <div className={styles.hash}>
           <span className="mono-font">{tx.hash}</span>
           <CopyBtn content={tx.hash} />
@@ -162,23 +162,23 @@ const Tx = (initState: State) => {
       ),
     },
     {
-      label: 'from',
-      value: <HashLink label={tx.from} href={`/address/${tx.from}`} style={{ wordBreak: 'break-all' }} />,
+      field: 'from',
+      content: <HashLink label={tx.from} href={`/address/${tx.from}`} style={{ wordBreak: 'break-all' }} />,
     },
     {
-      label: tx.toAlias ? 'interactedContract' : 'to',
-      value: <HashLink label={tx.toAlias || tx.to} href={`/address/${tx.to}`} />,
+      field: tx.toAlias ? 'interactedContract' : 'to',
+      content: <HashLink label={tx.toAlias || tx.to} href={`/address/${tx.to}`} />,
     },
     tx.contractAddress?.length === ADDR_LENGTH
       ? {
-          label: 'deployed_contract',
-          value: <HashLink label={tx.contractAddress} href={`/address/${tx.contractAddress}`} />,
+          field: 'deployed_contract',
+          content: <HashLink label={tx.contractAddress} href={`/address/${tx.contractAddress}`} />,
         }
       : null,
     {
-      label: 'value',
+      field: 'value',
       // FIXME: tx.value is formatted incorrectly
-      value: (
+      content: (
         <div className={styles.value}>{`${new BigNumber(tx.value || '0')
           .multipliedBy(CKB_DECIMAL)
           .dividedBy(GCKB_DECIMAL)
@@ -187,8 +187,8 @@ const Tx = (initState: State) => {
     },
     tx.input
       ? {
-          label: 'input',
-          value: (
+          field: 'input',
+          content: (
             <details className={styles.input}>
               <summary>
                 {t('check')}
@@ -204,19 +204,20 @@ const Tx = (initState: State) => {
               </pre>
             </details>
           ),
+          expandable: true,
         }
       : null,
   ]
 
   const basicInfo = [
-    { label: 'finalizeState', value: t(tx.status) },
+    { field: 'finalizeState', content: t(tx.status) },
     {
-      label: 'type',
-      value: <TxType type={tx.type} />,
+      field: 'type',
+      content: <TxType type={tx.type} />,
     },
     {
-      label: 'l1Block',
-      value: tx.l1BlockNumber ? (
+      field: 'l1Block',
+      content: tx.l1BlockNumber ? (
         <HashLink
           label={tx.l1BlockNumber.toLocaleString('en')}
           href={`${CKB_EXPLORER_URL}/block/${tx.l1BlockNumber}`}
@@ -227,22 +228,22 @@ const Tx = (initState: State) => {
       ),
     },
     {
-      label: 'l2Block',
-      value: tx.blockNumber ? (
+      field: 'l2Block',
+      content: tx.blockNumber ? (
         <HashLink label={tx.blockNumber.toLocaleString('en')} href={`/block/${tx.blockNumber}`} />
       ) : (
         t('pending')
       ),
     },
-    { label: 'index', value: tx.index ?? '-' },
-    { label: 'nonce', value: (tx.nonce || 0).toLocaleString('en') },
+    { field: 'index', content: tx.index ?? '-' },
+    { field: 'nonce', content: (tx.nonce || 0).toLocaleString('en') },
     {
-      label: 'status',
-      value: <PolyjuiceStatus status={tx.polyjuiceStatus ?? null} />,
+      field: 'status',
+      content: <PolyjuiceStatus status={tx.polyjuiceStatus ?? null} />,
     },
     {
-      label: 'gasPrice',
-      value:
+      field: 'gasPrice',
+      content:
         tx.gasPrice !== null ? (
           <span className={styles.gasPirce}>{`${new BigNumber(tx.gasPrice).toFormat()} ${PCKB_SYMBOL}`}</span>
         ) : (
@@ -250,16 +251,16 @@ const Tx = (initState: State) => {
         ),
     },
     {
-      label: 'gasUsed',
-      value: tx.gasUsed !== null ? new BigNumber(tx.gasUsed).toFormat() : '-',
+      field: 'gasUsed',
+      content: tx.gasUsed !== null ? new BigNumber(tx.gasUsed).toFormat() : '-',
     },
     {
-      label: 'gasLimit',
-      value: tx.gasLimit !== null ? new BigNumber(tx.gasLimit).toFormat() : '-',
+      field: 'gasLimit',
+      content: tx.gasLimit !== null ? new BigNumber(tx.gasLimit).toFormat() : '-',
     },
     {
-      label: 'fee',
-      value:
+      field: 'fee',
+      content:
         tx.gasPrice !== null && typeof tx.gasUsed !== null ? (
           <span className={styles.gasFee}>{`${new BigNumber(tx.gasUsed)
             .times(new BigNumber(tx.gasPrice))
@@ -269,8 +270,8 @@ const Tx = (initState: State) => {
         ),
     },
     {
-      label: 'timestamp',
-      value:
+      field: 'timestamp',
+      content:
         tx.timestamp >= 0 ? (
           <time dateTime={new Date(tx.timestamp).toISOString()}>{formatDatetime(tx.timestamp)}</time>
         ) : (
@@ -292,18 +293,9 @@ const Tx = (initState: State) => {
           </div>
         </PageTitle>
 
-        <InfoList
-          title={t(`overview`)}
-          list={overview.filter(v => v).map(field => ({ field: t(field.label), content: field.value }))}
-          style={{ marginBottom: '2rem' }}
-        />
+        <InfoList title={t(`overview`)} list={overview} style={{ marginBottom: '2rem' }} />
 
-        <InfoList
-          title={t(`basicInfo`)}
-          list={basicInfo.filter(v => v).map(field => ({ field: t(field.label), content: field.value }))}
-          style={{ marginBottom: '2rem' }}
-          type="two-columns"
-        />
+        <InfoList title={t(`basicInfo`)} list={basicInfo} style={{ marginBottom: '2rem' }} type="two-columns" />
 
         <div className={styles.list}>
           <Tabs

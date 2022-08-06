@@ -1,15 +1,19 @@
+import { useState } from 'react'
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
 import { gql } from 'graphql-request'
 import { SIZES } from 'components/PageSize'
+import Tooltip from 'components/Tooltip'
+import HashLink from 'components/HashLink'
 import Table from 'components/Table'
 import Pagination from 'components/SimplePagination'
 import TokenLogo from 'components/TokenLogo'
 import FilterMenu from 'components/FilterMenu'
 import SortIcon from 'assets/icons/sort.svg'
 import RoundedAmount from 'components/RoundedAmount'
-import { GraphQLSchema, client, formatAmount, parseTokenName } from 'utils'
+import ChangeIcon from 'assets/icons/change.svg'
+import { GraphQLSchema, client } from 'utils'
 import styles from './styles.module.scss'
 
 export type TransferListProps = {
@@ -101,6 +105,7 @@ export const fetchTransferList = (variables: {
     .catch(() => ({ entries: [], metadata: { before: null, after: null, total_count: 0 } }))
 
 const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries, metadata } }) => {
+  const [isShowLogo, setIsShowLogo] = useState(true)
   const [t] = useTranslation('list')
   const {
     query: { id: _, page_size = SIZES[1], log_index_sort = 'ASC', ...query },
@@ -119,6 +124,8 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
       })}`,
     )
   }
+
+  const handleTokenDisplayChange = () => setIsShowLogo(show => !show)
 
   return (
     <div className={styles.container}>
@@ -143,7 +150,12 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
                 <FilterMenu filterKeys={['address_to']} />
               </div>
             </th>
-            <th className={styles.tokenLogo}>{t('token', { ns: 'common' })}</th>
+            <th className={styles.tokenLogo}>
+              <div className={styles.token}>
+                {t('token')}
+                <ChangeIcon onClick={handleTokenDisplayChange} />
+              </div>
+            </th>
             <th>{`${t('value')}`}</th>
           </tr>
         </thead>
@@ -153,25 +165,33 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
               <tr key={`${item.transaction_hash}-${item.log_index}`}>
                 <td>{item.log_index}</td>
                 <td className={styles.address}>
-                  <NextLink href={`/account/${item.from_address}`}>
-                    <a className="mono-font">
-                      <span>{item.from_address}</span>
-                      <span>{`${item.from_address.slice(0, 8)}...${item.from_address.slice(-8)}`}</span>
-                    </a>
-                  </NextLink>
+                  <Tooltip title={item.from_address} placement="top">
+                    <span>
+                      <HashLink
+                        label={`${item.from_address.slice(0, 8)}...${item.from_address.slice(-8)}`}
+                        href={`/account/${item.from_address}`}
+                      />
+                    </span>
+                  </Tooltip>
                 </td>
                 <td className={styles.address}>
-                  <NextLink href={`/account/${item.to_address}`}>
-                    <a className="mono-font">
-                      <span> {item.to_address} </span>
-                      <span> {`${item.to_address.slice(0, 8)}...${item.to_address.slice(-8)}`} </span>
-                    </a>
-                  </NextLink>
+                  <Tooltip title={item.to_address} placement="top">
+                    <span>
+                      <HashLink
+                        label={`${item.to_address.slice(0, 8)}...${item.to_address.slice(-8)}`}
+                        href={`/account/${item.to_address}`}
+                      />
+                    </span>
+                  </Tooltip>
                 </td>
                 <td className={styles.tokenLogo}>
                   <NextLink href={`/token/${item.udt.id}`}>
                     <a>
-                      <TokenLogo name={item.udt.name} logo={item.udt.icon} />
+                      {isShowLogo ? (
+                        <TokenLogo name={item.udt.name} logo={item.udt.icon} />
+                      ) : (
+                        item.udt.symbol.split('.')[0] ?? ''
+                      )}
                     </a>
                   </NextLink>
                 </td>
@@ -182,7 +202,7 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
             ))
           ) : (
             <tr>
-              <td colSpan={4} style={{ textAlign: 'center' }}>
+              <td colSpan={5} style={{ textAlign: 'center' }}>
                 {t(`no_records`)}
               </td>
             </tr>
