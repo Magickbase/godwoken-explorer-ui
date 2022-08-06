@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import { gql } from 'graphql-request'
@@ -8,9 +9,10 @@ import Pagination from 'components/SimplePagination'
 import TxStatusIcon from 'components/TxStatusIcon'
 import TransferDirection from 'components/TransferDirection'
 import RoundedAmount from 'components/RoundedAmount'
+import TokenLogo from 'components/TokenLogo'
+import ChangeIcon from 'assets/icons/change.svg'
 import { client, timeDistance, getBlockStatus, GraphQLSchema } from 'utils'
 import styles from './styles.module.scss'
-import TokenLogo from 'components/TokenLogo'
 
 export type TransferListProps = {
   token_transfers: {
@@ -116,6 +118,8 @@ const tokenTransferListQuery = gql`
           id
           decimal
           symbol
+          icon
+          name
         }
       }
 
@@ -137,9 +141,13 @@ export const fetchTokenTransferList = (variables: Variables) =>
 const TransferList: React.FC<
   TransferListProps & {
     viewer?: string
+    showToken?: boolean
   }
-> = ({ token_transfers, viewer }) => {
+> = ({ token_transfers, viewer, showToken = true }) => {
+  const [isShowLogo, setIsShowLogo] = useState(true)
   const [t, { language }] = useTranslation('list')
+
+  const handleTokenDisplayChange = () => setIsShowLogo(show => !show)
 
   return (
     <div className={styles.container}>
@@ -152,7 +160,14 @@ const TransferList: React.FC<
             <th>{t('from')}</th>
             <th>{t('to')}</th>
             <th className={styles.direction}></th>
-            <th>{t('token')}</th>
+            {showToken ? (
+              <th>
+                <div className={styles.token}>
+                  {t('token')}
+                  <ChangeIcon onClick={handleTokenDisplayChange} />
+                </div>
+              </th>
+            ) : null}
             <th>{`${t('value')}`}</th>
           </tr>
         </thead>
@@ -198,13 +213,19 @@ const TransferList: React.FC<
                   <td className={styles.direction}>
                     <TransferDirection from={item.from_address} to={item.to_address} viewer={viewer ?? ''} />
                   </td>
-                  <td>
-                    <NextLink href={`/token/${item.udt.id}`}>
-                      <a>
-                        <TokenLogo name={item.udt?.name} logo={item.udt?.icon} />
-                      </a>
-                    </NextLink>
-                  </td>
+                  {showToken ? (
+                    <td>
+                      <NextLink href={`/token/${item.udt.id}`}>
+                        <a>
+                          {isShowLogo ? (
+                            <TokenLogo name={item.udt?.name} logo={item.udt?.icon} />
+                          ) : (
+                            item.udt?.symbol.split('.')[0]
+                          )}
+                        </a>
+                      </NextLink>
+                    </td>
+                  ) : null}
                   <td>
                     <RoundedAmount amount={item.amount} udt={item.udt} />
                   </td>
@@ -213,7 +234,7 @@ const TransferList: React.FC<
             })
           ) : (
             <tr>
-              <td colSpan={8} align="center" className={styles.noRecords}>
+              <td colSpan={showToken ? 8 : 7} className={styles.noRecords}>
                 {t(`no_records`)}
               </td>
             </tr>

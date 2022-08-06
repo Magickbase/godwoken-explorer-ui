@@ -30,7 +30,7 @@ const SUDT = ({ udt, script, script_hash }: SudtProps) => {
     { field: t('decimal'), content: udt.decimal },
     script_hash
       ? {
-          field: t(`l2Script`),
+          field: t(`l2ScriptHash`),
           content: <span className="mono-font">{script_hash}</span>,
         }
       : null,
