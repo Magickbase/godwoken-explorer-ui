@@ -138,3 +138,15 @@
     }
   }
 }
+
+@media screen and (max-width: 1024px) {
+  .container {
+    dl[role='listitem'] dd[data-expandable='true'] {
+      overflow: visible !important;
+      pre {
+        max-width: calc(100vw - 56px);
+        margin-left: -116px;
+      }
+    }
+  }
+}

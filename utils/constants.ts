@@ -38,3 +38,10 @@ export const TokenOrigins: Array<Record<'name' | 'logo', string>> = [
   { name: 'BSC', logo: 'https://cryptologos.cc/logos/bnb-bnb-logo.svg' },
   { name: 'CKB', logo: '/logos/nervos.svg' },
 ]
+
+export const TokenLogoWhitelist: Array<Record<'name' | 'logo', string>> = [
+  { name: 'Brainiac ', logo: '/logos/brainiac.png' },
+  { name: 'Brainac ', logo: '/logos/brainiac.png' },
+  { name: 'YokaiSwap LP', logo: '/logos/yok-lp.png' },
+  { name: 'Monster Token', logo: '/logos/monster.png' },
+]

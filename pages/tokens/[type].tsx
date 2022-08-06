@@ -321,7 +321,7 @@ const TokenList = () => {
                             whiteSpace: 'nowrap',
                             textOverflow: 'ellipsis',
                             overflow: 'hidden',
-                            width: type === 'bridge' ? 180 : 220,
+                            width: 180,
                           }}
                         >
                           {supply}
