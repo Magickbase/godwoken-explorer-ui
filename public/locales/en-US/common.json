@@ -27,6 +27,7 @@
   "finalized": "Finalized",
   "addressCopied": "Address copied to clipboard",
   "blockHashCopied": "Block hash copied to clipboard",
+  "clickViewQRCode": "Click to view the QR code",
   "txHashCopied": "Transaction hash copied to clipboard",
   "charts": "Charts",
   "page_size": {
