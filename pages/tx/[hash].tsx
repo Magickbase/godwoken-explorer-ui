@@ -153,7 +153,7 @@ const Tx = (initState: State) => {
 
   const overview = [
     {
-      field: 'hash',
+      field: t('hash'),
       content: (
         <div className={styles.hash}>
           <span className="mono-font">{tx.hash}</span>
@@ -162,21 +162,21 @@ const Tx = (initState: State) => {
       ),
     },
     {
-      field: 'from',
+      field: t('from'),
       content: <HashLink label={tx.from} href={`/address/${tx.from}`} style={{ wordBreak: 'break-all' }} />,
     },
     {
-      field: tx.toAlias ? 'interactedContract' : 'to',
+      field: t(tx.toAlias ? 'interactedContract' : 'to'),
       content: <HashLink label={tx.toAlias || tx.to} href={`/address/${tx.to}`} />,
     },
     tx.contractAddress?.length === ADDR_LENGTH
       ? {
-          field: 'deployed_contract',
+          field: t('deployed_contract'),
           content: <HashLink label={tx.contractAddress} href={`/address/${tx.contractAddress}`} />,
         }
       : null,
     {
-      field: 'value',
+      field: t('value'),
       // FIXME: tx.value is formatted incorrectly
       content: (
         <div className={styles.value}>{`${new BigNumber(tx.value || '0')
@@ -187,7 +187,7 @@ const Tx = (initState: State) => {
     },
     tx.input
       ? {
-          field: 'input',
+          field: t('input'),
           content: (
             <details className={styles.input}>
               <summary>
@@ -210,13 +210,13 @@ const Tx = (initState: State) => {
   ]
 
   const basicInfo = [
-    { field: 'finalizeState', content: t(tx.status) },
+    { field: t('finalizeState'), content: t(tx.status) },
     {
-      field: 'type',
+      field: t('type'),
       content: <TxType type={tx.type} />,
     },
     {
-      field: 'l1Block',
+      field: t('l1Block'),
       content: tx.l1BlockNumber ? (
         <HashLink
           label={tx.l1BlockNumber.toLocaleString('en')}
@@ -228,21 +228,21 @@ const Tx = (initState: State) => {
       ),
     },
     {
-      field: 'l2Block',
+      field: t('l2Block'),
       content: tx.blockNumber ? (
         <HashLink label={tx.blockNumber.toLocaleString('en')} href={`/block/${tx.blockNumber}`} />
       ) : (
         t('pending')
       ),
     },
-    { field: 'index', content: tx.index ?? '-' },
-    { field: 'nonce', content: (tx.nonce || 0).toLocaleString('en') },
+    { field: t('index'), content: tx.index ?? '-' },
+    { field: t('nonce'), content: (tx.nonce || 0).toLocaleString('en') },
     {
-      field: 'status',
+      field: t('status'),
       content: <PolyjuiceStatus status={tx.polyjuiceStatus ?? null} />,
     },
     {
-      field: 'gasPrice',
+      field: t('gasPrice'),
       content:
         tx.gasPrice !== null ? (
           <span className={styles.gasPirce}>{`${new BigNumber(tx.gasPrice).toFormat()} ${PCKB_SYMBOL}`}</span>
@@ -251,15 +251,15 @@ const Tx = (initState: State) => {
         ),
     },
     {
-      field: 'gasUsed',
+      field: t('gasUsed'),
       content: tx.gasUsed !== null ? new BigNumber(tx.gasUsed).toFormat() : '-',
     },
     {
-      field: 'gasLimit',
+      field: t('gasLimit'),
       content: tx.gasLimit !== null ? new BigNumber(tx.gasLimit).toFormat() : '-',
     },
     {
-      field: 'fee',
+      field: t('fee'),
       content:
         tx.gasPrice !== null && typeof tx.gasUsed !== null ? (
           <span className={styles.gasFee}>{`${new BigNumber(tx.gasUsed)
@@ -270,7 +270,7 @@ const Tx = (initState: State) => {
         ),
     },
     {
-      field: 'timestamp',
+      field: t('timestamp'),
       content:
         tx.timestamp >= 0 ? (
           <time dateTime={new Date(tx.timestamp).toISOString()}>{formatDatetime(tx.timestamp)}</time>
