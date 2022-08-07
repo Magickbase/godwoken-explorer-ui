@@ -301,7 +301,7 @@ const TokenList = () => {
                           </NextLink>
                         </Stack>
                       </td>
-                      <td>
+                      <td title={addr}>
                         {addr.length > 42 ? (
                           <Tooltip title={addr} placement="top">
                             <span>
@@ -315,7 +315,7 @@ const TokenList = () => {
                           />
                         )}
                       </td>
-                      <td>
+                      <td title={supply}>
                         <div
                           style={{
                             whiteSpace: 'nowrap',
@@ -327,9 +327,11 @@ const TokenList = () => {
                           {supply}
                         </div>
                       </td>
-                      <td style={{ minWidth: isMobile ? 100 : 125 }}>{token.holders_count || '0'}</td>
-                      <td>{origin || '-'}</td>
-                      <td>{bridge || '-'}</td>
+                      <td style={{ minWidth: isMobile ? 100 : 125 }} title={`${token.holders_count || '0'}`}>
+                        {token.holders_count || '0'}
+                      </td>
+                      <td title={origin}>{origin || '-'}</td>
+                      <td title={bridge}>{bridge || '-'}</td>
                     </tr>
                   )
                 })
