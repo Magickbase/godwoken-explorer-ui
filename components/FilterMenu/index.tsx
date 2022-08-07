@@ -34,7 +34,7 @@ const FilterMenu: React.FC<{ filterKeys: Array<string> }> = ({ filterKeys }) => 
     })
 
     push(`${asPath.split('?')[0] ?? ''}?${new URLSearchParams(q)}`)
-    document.querySelector<HTMLInputElement>('#search')?.focus()
+    document.body.focus()
   }
 
   const handleFilterContentClear = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -66,14 +66,16 @@ const FilterMenu: React.FC<{ filterKeys: Array<string> }> = ({ filterKeys }) => 
       </label>
       <form onSubmit={handleFilterSubmit} className={styles.menu} data-role="filter-menu">
         {filterKeys.map(field => {
+          const isNum = NUM_KEYS.includes(field)
           return (
             <div key={field} className={styles.field}>
               <label>{t(field)}</label>
               <input
-                type={NUM_KEYS.includes(field) ? 'number' : 'text'}
+                type={isNum ? 'number' : 'text'}
                 name={field}
                 placeholder={t(`filter_menu.${field}`)}
                 defaultValue={query[field] ?? ''}
+                inputMode={isNum ? 'numeric' : 'text'}
               />
             </div>
           )
