@@ -11,7 +11,7 @@ const TxLogsList = ({ list }: { list: ParsedEventLog[] }) => {
   return list?.length ? (
     <div className={styles.container}>
       <div className={styles.title}>{t('txReceiptEventLogs')}</div>
-      {list.reverse().map((log, i) => {
+      {list.map((log, i) => {
         const topics = log.topics.map((value, i) => {
           const parsed =
             log.parsedLog?.eventFragment.inputs[i - 1]?.type === 'address'
@@ -79,9 +79,9 @@ const TxLogsList = ({ list }: { list: ParsedEventLog[] }) => {
                 <div className={styles.topicList}>
                   {topics.map((topic, idx) =>
                     topic.value === '0x' ? null : (
-                      <div key={topic.value} className={styles.topicItem}>
+                      <div key={`${topic.value}-${idx}`} className={styles.topicItem}>
                         <div className={styles.topicIndex}>{idx}</div>
-                        <LogFieldItem key={topic.value} {...topic} />
+                        <LogFieldItem {...topic} />
                       </div>
                     ),
                   )}
@@ -90,8 +90,8 @@ const TxLogsList = ({ list }: { list: ParsedEventLog[] }) => {
               <div className={styles.data}>
                 <div className={styles.field}>{t(`data`)}</div>
                 <div className={styles.dataList}>
-                  {dataList.map(d => (
-                    <div key={d.value} className={styles.dataItem}>
+                  {dataList.map((d, idx) => (
+                    <div key={`${d.value}-${idx}`} className={styles.dataItem}>
                       <LogFieldItem {...d} />
                     </div>
                   ))}

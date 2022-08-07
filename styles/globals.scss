@@ -37,7 +37,8 @@ a {
   color: var(--primary-color);
 }
 
-.mono-font {
+.mono-font,
+pre {
   @include mono-font;
 }
 
