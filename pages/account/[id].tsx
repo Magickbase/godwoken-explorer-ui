@@ -31,7 +31,6 @@ import {
   fetchEventLogsListByType,
   isEthAddress,
   GraphQLSchema,
-  NotFoundException,
   API_ENDPOINT,
   CKB_DECIMAL,
 } from 'utils'
@@ -256,10 +255,6 @@ export const getStaticProps: GetStaticProps<State, { id: string }> = async ({ lo
       serverSideTranslations(locale, ['common', 'account', 'list']),
       null,
     ])
-
-    if (!account) {
-      throw new NotFoundException()
-    }
 
     const balance = await fetch(`${API_ENDPOINT}/accounts/${account.eth_address}`)
       .then(r => r.json())

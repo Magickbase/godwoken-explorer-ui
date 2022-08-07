@@ -1,5 +1,5 @@
 import type { GetStaticProps, GetStaticPaths } from 'next'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
@@ -24,6 +24,7 @@ const tabs = ['transactions', 'bridged', 'raw-data']
 
 const Block = () => {
   const [t, { language }] = useTranslation('block')
+  const [isFinalized, setIsFinalized] = useState(false)
   const {
     replace,
     query: { id, tab = 'transactions', before = null, after = null, page = '1' },
@@ -31,13 +32,17 @@ const Block = () => {
 
   const { isLoading: isBlockLoading, data: block } = useQuery(['block', id], () => fetchBlock(id as string), {
     refetchInterval: 10000,
+    enabled: !isFinalized,
   })
 
   useEffect(() => {
     if (!isBlockLoading && !block?.hash) {
       replace(`/${language}/404?query=${id}`)
     }
-  }, [isBlockLoading, block, replace])
+    if (block && block.finalizeState === 'finalized') {
+      setIsFinalized(true)
+    }
+  }, [isBlockLoading, block, replace, setIsFinalized])
 
   const { isLoading: isTxListLoading, data: txList } = useQuery(
     ['block-tx-list', block?.number, before, after],
