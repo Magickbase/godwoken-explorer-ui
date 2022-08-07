@@ -82,7 +82,7 @@ const Tx = (initState: State) => {
 
   const { isLoading: isLogListLoading, data: logsList } = useQuery(
     ['tx-log-list', hash],
-    () => fetchEventLogsListByType('txs', hash as string),
+    () => fetchEventLogsListByType('txs', hash as string).then(logList => logList.reverse()),
     {
       enabled: tab === 'logs',
     },
