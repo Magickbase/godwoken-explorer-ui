@@ -10,9 +10,7 @@ const FilterMenu: React.FC<{ filterKeys: Array<string> }> = ({ filterKeys }) => 
   const [t] = useTranslation('list')
   const { query, push, asPath } = useRouter()
 
-  const menuId = filterKeys.join()
-
-  const handleFilterSubmit = (e: React.FormEvent) => {
+  const handleFilterSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.stopPropagation()
     e.preventDefault()
 
@@ -34,7 +32,9 @@ const FilterMenu: React.FC<{ filterKeys: Array<string> }> = ({ filterKeys }) => 
     })
 
     push(`${asPath.split('?')[0] ?? ''}?${new URLSearchParams(q)}`)
-    document.querySelector<HTMLInputElement>('#search')?.focus()
+    if (['INPUT', 'BUTTON'].includes(document.activeElement.tagName)) {
+      ;(document.activeElement as HTMLInputElement).blur()
+    }
   }
 
   const handleFilterContentClear = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -59,21 +59,23 @@ const FilterMenu: React.FC<{ filterKeys: Array<string> }> = ({ filterKeys }) => 
 
   return (
     <div className={styles.container} data-active={filterKeys.some(field => query[field])}>
-      <label htmlFor={menuId} className={styles.filterBtn}>
+      <label htmlFor={`${filterKeys[0]}_filter`} className={styles.filterBtn}>
         <FilterIcon fontSize="inherit" />
         <ClearIcon className={styles.clearIcon} onClick={handleFilterClear} />
-        <input id={menuId} />
       </label>
       <form onSubmit={handleFilterSubmit} className={styles.menu} data-role="filter-menu">
         {filterKeys.map(field => {
+          const isNum = NUM_KEYS.includes(field)
           return (
             <div key={field} className={styles.field}>
               <label>{t(field)}</label>
               <input
-                type={NUM_KEYS.includes(field) ? 'number' : 'text'}
+                type={isNum ? 'number' : 'text'}
                 name={field}
                 placeholder={t(`filter_menu.${field}`)}
                 defaultValue={query[field] ?? ''}
+                inputMode={isNum ? 'numeric' : 'text'}
+                id={`${field}_filter`}
               />
             </div>
           )
