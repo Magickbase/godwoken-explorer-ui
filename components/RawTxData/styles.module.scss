@@ -15,7 +15,7 @@
     overflow: auto;
     background: #fafafa;
     border-radius: 4px;
-    border-color: #f0f0f0;
+    border-color: var(--border-color);
     font-size: 0.875rem;
     color: #333;
     &:first-of-type {
