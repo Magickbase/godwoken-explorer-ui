@@ -66,9 +66,9 @@ const Search = () => {
       inputRef={searchRef}
       inputMode="search"
       className="search-input"
-      name="search"
-      type="search"
-      id="search"
+      // name="search"
+      // type="search" //FIXME: search type introduce a default clear btn, should be fixed
+      // id="search"
       sx={{
         'fontSize': { xs: 12, md: 14 },
         '& .MuiOutlinedInput-notchedOutline': {
