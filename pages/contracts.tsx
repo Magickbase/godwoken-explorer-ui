@@ -11,7 +11,7 @@ import PageTitle from 'components/PageTitle'
 import SubpageHead from 'components/SubpageHead'
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/Pagination'
-import PageSize, { SIZES } from 'components/PageSize'
+import { SIZES } from 'components/PageSize'
 import Table from 'components/Table'
 import { fetchContractList, PCKB_SYMBOL } from 'utils'
 

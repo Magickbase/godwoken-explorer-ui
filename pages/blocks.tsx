@@ -239,7 +239,7 @@ const BlockList = () => {
             mt={{ xs: 2, md: 2 }}
             px={{ xs: 1.5, md: 3 }}
           >
-            <PageSize pageSize={+page_size} />
+            <PageSize />
             <Typography color="secondary.light" fontSize={{ xs: 12, md: 14 }}>
               {t('showLatestRecords', { ns: 'common', number: matches ? '500k' : '100k' })}
             </Typography>
