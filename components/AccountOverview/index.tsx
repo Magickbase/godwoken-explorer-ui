@@ -130,7 +130,7 @@ export const fetchAccountOverview = (variables: Variables) =>
       data.account ??
       ({
         type: GraphQLSchema.AccountType.Unknown,
-        eth_address: variables['eth_address'] ?? null,
+        eth_address: variables['address'] ?? null,
         script_hash: variables['script_hash'] ?? '',
         transaction_count: 0,
         nonce: 0,
