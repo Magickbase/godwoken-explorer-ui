@@ -8,7 +8,6 @@ const RoundedAmount: React.FC<{ amount: string; udt: { decimal: number; symbol: 
   const a = new BigNumber(amount ?? 0).dividedBy(10 ** decimal)
   const roundedAmount = +a.toFixed(8)
   const [rInt, rFrac] = roundedAmount.toString().split('.')
-  console.log(rInt)
   const isExact = new BigNumber(roundedAmount).isEqualTo(amount)
   return (
     <Tooltip title={`${a.toFormat()} ${symbol?.split('.')[0] ?? ''}`} placement="top">
