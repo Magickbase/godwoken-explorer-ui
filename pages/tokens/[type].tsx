@@ -5,8 +5,7 @@ import NextLink from 'next/link'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { gql } from 'graphql-request'
 import { useQuery } from 'react-query'
-import { Container, Stack, Link, Typography, Skeleton, Box, Button } from '@mui/material'
-import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded'
+import { Container, Stack, Link, Typography, Skeleton, Box } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import SubpageHead from 'components/SubpageHead'
@@ -19,6 +18,7 @@ import Tooltip from 'components/Tooltip'
 import FilterMenu from 'components/FilterMenu'
 // import SortIcon from 'assets/icons/sort.svg'
 import { SIZES } from 'components/PageSize'
+import AddIcon from 'assets/icons/add.svg'
 import { formatAmount, GraphQLSchema, client, parseTokenName } from 'utils'
 import styles from './styles.module.scss'
 
@@ -185,28 +185,35 @@ const TokenList = () => {
                   number: data?.metadata.total_count ?? '-',
                 })}
               </Typography>
-              <Button
-                endIcon={<AddCircleOutlineRoundedIcon sx={{ fontSize: 13 }} />}
-                component={Link}
+              <a
+                className={styles.add}
                 href={type === 'bridge' ? BRIDGED_TOKEN_TEMPLATE_URL : NATIVE_TOKEN_TEMPLATE_URL}
-                target="_blank"
-                rel="noreferrer noopener"
-                sx={{
-                  'bgcolor': theme.palette.primary.light,
-                  'borderRadius': 2,
-                  'textTransform': 'none',
-                  'height': 40,
-                  'lineHeight': 40,
-                  'px': { xs: 1, md: 2 },
-                  'fontWeight': 500,
-                  'fontSize': { xs: 13, md: 14 },
-                  '& .MuiButton-endIcon': {
-                    marginLeft: 0.5,
-                  },
-                }}
               >
                 {t(type === 'bridge' ? 'add-bridged-token' : 'add-native-erc20-token')}
-              </Button>
+                <AddIcon />
+              </a>
+              {/* <Button */}
+              {/*   endIcon={<AddCircleOutlineRoundedIcon sx={{ fontSize: 13 }} />} */}
+              {/*   component={Link} */}
+              {/*   href={type === 'bridge' ? BRIDGED_TOKEN_TEMPLATE_URL : NATIVE_TOKEN_TEMPLATE_URL} */}
+              {/*   target="_blank" */}
+              {/*   rel="noreferrer noopener" */}
+              {/*   sx={{ */}
+              {/*     'bgcolor': theme.palette.primary.light, */}
+              {/*     'borderRadius': 2, */}
+              {/*     'textTransform': 'none', */}
+              {/*     'height': 40, */}
+              {/*     'lineHeight': 40, */}
+              {/*     'px': { xs: 1, md: 2 }, */}
+              {/*     'fontWeight': 500, */}
+              {/*     'fontSize': { xs: 13, md: 14 }, */}
+              {/*     '& .MuiButton-endIcon': { */}
+              {/*       marginLeft: 0.5, */}
+              {/*     }, */}
+              {/*   }} */}
+              {/* > */}
+              {/*   {t(type === 'bridge' ? 'add-bridged-token' : 'add-native-erc20-token')} */}
+              {/* </Button> */}
             </Stack>
           ) : (
             <Stack
@@ -292,7 +299,6 @@ const TokenList = () => {
                                   whiteSpace: 'nowrap',
                                   textOverflow: 'ellipsis',
                                   overflow: 'hidden',
-                                  width: isMobile ? 90 : 120,
                                 }}
                               >
                                 {name || '-'}
