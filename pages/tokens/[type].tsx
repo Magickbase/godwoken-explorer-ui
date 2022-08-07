@@ -355,7 +355,7 @@ const TokenList = () => {
             {!data ? (
               <Skeleton animation="wave" width="calc(100% - 48px)" sx={{ mx: '24px', my: '20px' }} />
             ) : (
-              <Pagination {...data.metadata} pageSize={page_size as string} />
+              <Pagination {...data.metadata} />
             )}
           </div>
         </Box>

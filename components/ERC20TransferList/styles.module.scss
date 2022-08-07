@@ -28,6 +28,13 @@
   }
 }
 
+.tokenUrl {
+  display: block;
+  max-width: 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .direction {
   padding-left: 0 !important;
   padding-right: 0 !important;
