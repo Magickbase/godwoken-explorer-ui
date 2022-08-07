@@ -5,6 +5,7 @@ import { OutlinedInput, InputAdornment, styled, InputBaseProps } from '@mui/mate
 import { useTheme } from '@mui/material/styles'
 import { IMG_URL, SEARCH_FIELDS, handleSearchKeyPress } from 'utils'
 
+// TODO: use search button in virtual keyboard
 const StyledInputBase = styled((props: InputBaseProps) => <OutlinedInput {...props} />)(({ theme }) => ({
   'width': '100%',
   'height': '56px',
@@ -63,7 +64,10 @@ const Search = () => {
       onKeyPress={handleSearch}
       onChange={handleChange}
       inputRef={searchRef}
+      inputMode="search"
       className="search-input"
+      name="search"
+      type="search"
       id="search"
       sx={{
         'fontSize': { xs: 12, md: 14 },
