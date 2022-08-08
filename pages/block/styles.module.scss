@@ -2,14 +2,17 @@
 
 .container {
   @include main-center;
+  & > h5 {
+    margin-top: 0;
+  }
 
   .title {
     width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    @media screen and (max-width: 900px) {
-      margin-bottom: 0.5rem;
+    @media screen and (max-width: 1024px) {
+      margin: 0.5rem auto;
     }
   }
   .blockHash {
@@ -75,7 +78,6 @@
   background-color: #fff;
   border: 1px solid var(--border-color);
   border-radius: 1rem;
-  overflow-y: hidden;
   @media screen and (max-width: 1024px) {
     border-radius: 0.5rem;
   }

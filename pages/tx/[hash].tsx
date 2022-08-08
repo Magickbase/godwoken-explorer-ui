@@ -245,7 +245,7 @@ const Tx = (initState: State) => {
       field: t('gasPrice'),
       content:
         tx.gasPrice !== null ? (
-          <span className={styles.gasPirce}>{`${new BigNumber(tx.gasPrice).toFormat()} ${PCKB_SYMBOL}`}</span>
+          <span className={styles.gasPrice}>{`${new BigNumber(tx.gasPrice).toFormat()} ${PCKB_SYMBOL}`}</span>
         ) : (
           '-'
         ),
