@@ -9,9 +9,8 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 import Table from 'components/Table'
 import PageTitle from 'components/PageTitle'
 import SubpageHead from 'components/SubpageHead'
-// import Pagination from 'components/SimplePagination'
-import { SIZES } from 'components/PageSize'
 import TxListComp, { fetchTxList } from 'components/TxList'
+import { SIZES } from 'components/PageSize'
 import { PCKB_SYMBOL } from 'utils'
 
 const TxList = () => {
@@ -19,7 +18,7 @@ const TxList = () => {
   const {
     query: { page_size = SIZES[1], before = null, after = null, block_from = null, block_to = null },
   } = useRouter()
-  const { isLoading, data: txList } = useQuery(['transactions', before, after, block_from, block_to], () =>
+  const { isLoading, data: txList } = useQuery(['transactions', before, after, block_from, block_to, page_size], () =>
     fetchTxList({
       limit: +page_size as number,
       before: before as string | null,

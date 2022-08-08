@@ -2,7 +2,6 @@
 
 .container {
   @include main-center;
-  margin-top: 0;
 
   h5 {
     margin: 0 !important;
@@ -15,7 +14,7 @@
     align-items: center;
     margin-bottom: 1rem;
     text-transform: capitalize;
-    @media screen and (max-width: 600px) {
+    @media screen and (max-width: 1024px) {
       margin: 0.5rem auto;
     }
   }
@@ -90,7 +89,7 @@
   }
 
   pre {
-    border: 1px solid #f0f0f0;
+    border: 1px solid var(--border-color);
     background: #fafafa;
     padding: 0.875rem 1rem;
     border-radius: 4px;

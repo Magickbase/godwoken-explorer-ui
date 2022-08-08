@@ -26,7 +26,12 @@ const RawBlockData: React.FC<{ no: number }> = ({ no }) => {
         {t(`blockRawData`)}
       </Typography>
       {data ? (
-        <TextareaAutosize defaultValue={JSON.stringify(data, null, 2)} readOnly style={textareaStyle} />
+        <TextareaAutosize
+          defaultValue={JSON.stringify(data, null, 2)}
+          readOnly
+          style={textareaStyle}
+          className="mono-font"
+        />
       ) : isLoading ? (
         <Skeleton variant="rectangular" animation="wave" height="80ch" />
       ) : (

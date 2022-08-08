@@ -216,7 +216,7 @@ const TransferList: React.FC<
                   {showToken ? (
                     <td>
                       <NextLink href={`/token/${item.udt.id}`}>
-                        <a>
+                        <a className={isShowLogo ? undefined : styles.tokenUrl}>
                           {isShowLogo ? (
                             <TokenLogo name={item.udt?.name} logo={item.udt?.icon} />
                           ) : (

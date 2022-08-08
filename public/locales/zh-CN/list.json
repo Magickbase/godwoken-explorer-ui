@@ -49,8 +49,8 @@
     "name": "名称",
     "block_from": "区块高度",
     "block_to": "区块高度",
-    "from": "通过地址搜索",
-    "to": "通过地址搜索"
+    "address_from": "通过地址搜索",
+    "address_to": "通过地址搜索"
   },
   "n_kinds_in_total": "共计 {{number}} 种"
 }
