@@ -145,7 +145,7 @@ const ContractEventListItem = ({ item }: { item: ParsedEventLog; setSearchText: 
                   component="span"
                   className="mono-font"
                   fontSize={14}
-                  my={1}
+                  my={0.8}
                   mr="1ch"
                   noWrap
                 >{`[topic${idx}]`}</Typography>
