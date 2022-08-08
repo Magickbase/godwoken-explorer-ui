@@ -19,6 +19,7 @@ import FilterMenu from 'components/FilterMenu'
 // import SortIcon from 'assets/icons/sort.svg'
 import { SIZES } from 'components/PageSize'
 import AddIcon from 'assets/icons/add.svg'
+import NoDataIcon from 'assets/icons/no-data.svg'
 import { formatAmount, GraphQLSchema, client, parseTokenName } from 'utils'
 import styles from './styles.module.scss'
 
@@ -192,28 +193,6 @@ const TokenList = () => {
                 {t(type === 'bridge' ? 'add-bridged-token' : 'add-native-erc20-token')}
                 <AddIcon />
               </a>
-              {/* <Button */}
-              {/*   endIcon={<AddCircleOutlineRoundedIcon sx={{ fontSize: 13 }} />} */}
-              {/*   component={Link} */}
-              {/*   href={type === 'bridge' ? BRIDGED_TOKEN_TEMPLATE_URL : NATIVE_TOKEN_TEMPLATE_URL} */}
-              {/*   target="_blank" */}
-              {/*   rel="noreferrer noopener" */}
-              {/*   sx={{ */}
-              {/*     'bgcolor': theme.palette.primary.light, */}
-              {/*     'borderRadius': 2, */}
-              {/*     'textTransform': 'none', */}
-              {/*     'height': 40, */}
-              {/*     'lineHeight': 40, */}
-              {/*     'px': { xs: 1, md: 2 }, */}
-              {/*     'fontWeight': 500, */}
-              {/*     'fontSize': { xs: 13, md: 14 }, */}
-              {/*     '& .MuiButton-endIcon': { */}
-              {/*       marginLeft: 0.5, */}
-              {/*     }, */}
-              {/*   }} */}
-              {/* > */}
-              {/*   {t(type === 'bridge' ? 'add-bridged-token' : 'add-native-erc20-token')} */}
-              {/* </Button> */}
             </Stack>
           ) : (
             <Stack
@@ -283,28 +262,57 @@ const TokenList = () => {
                       <td title={name}>
                         <Stack direction="row" alignItems="center">
                           <TokenLogo logo={token.icon} name={token.name} />
-                          <NextLink href={`/token/${id}`} passHref>
-                            <Link
-                              href={`/token/${id}`}
-                              display="flex"
-                              alignItems="center"
-                              underline="none"
-                              color="primary"
-                              ml={1}
-                            >
-                              <Typography
-                                fontSize="inherit"
-                                fontFamily="inherit"
-                                sx={{
-                                  whiteSpace: 'nowrap',
-                                  textOverflow: 'ellipsis',
-                                  overflow: 'hidden',
-                                }}
+                          {type === 'bridge' ? (
+                            <Tooltip title={t(`view-mapped-native-token`)} placement="top">
+                              <span>
+                                <NextLink href={`/token/${id}`} passHref>
+                                  <Link
+                                    href={`/token/${id}`}
+                                    display="flex"
+                                    alignItems="center"
+                                    underline="none"
+                                    color="primary"
+                                    ml={1}
+                                  >
+                                    <Typography
+                                      fontSize="inherit"
+                                      fontFamily="inherit"
+                                      sx={{
+                                        whiteSpace: 'nowrap',
+                                        textOverflow: 'ellipsis',
+                                        overflow: 'hidden',
+                                      }}
+                                    >
+                                      {name || '-'}
+                                    </Typography>
+                                  </Link>
+                                </NextLink>
+                              </span>
+                            </Tooltip>
+                          ) : (
+                            <NextLink href={`/token/${id}`} passHref>
+                              <Link
+                                href={`/token/${id}`}
+                                display="flex"
+                                alignItems="center"
+                                underline="none"
+                                color="primary"
+                                ml={1}
                               >
-                                {name || '-'}
-                              </Typography>
-                            </Link>
-                          </NextLink>
+                                <Typography
+                                  fontSize="inherit"
+                                  fontFamily="inherit"
+                                  sx={{
+                                    whiteSpace: 'nowrap',
+                                    textOverflow: 'ellipsis',
+                                    overflow: 'hidden',
+                                  }}
+                                >
+                                  {name || '-'}
+                                </Typography>
+                              </Link>
+                            </NextLink>
+                          )}
                         </Stack>
                       </td>
                       <td title={addr}>
@@ -343,21 +351,26 @@ const TokenList = () => {
                 })
               ) : (
                 <tr>
-                  <td colSpan={headers.length} className={styles.noRecords}>
-                    {t(`no_records`)}
+                  <td colSpan={headers.length}>
+                    <div className={styles.noRecords}>
+                      <NoDataIcon />
+                      <span>{t(`no_records`)}</span>
+                    </div>
                   </td>
                 </tr>
               )}
             </tbody>
           </Table>
 
-          <div style={{ overflow: 'hidden' }}>
-            {!data ? (
-              <Skeleton animation="wave" width="calc(100% - 48px)" sx={{ mx: '24px', my: '20px' }} />
-            ) : (
-              <Pagination {...data.metadata} />
-            )}
-          </div>
+          {data?.metadata.total_count ? (
+            <div style={{ overflow: 'hidden' }}>
+              {!data ? (
+                <Skeleton animation="wave" width="calc(100% - 48px)" sx={{ mx: '24px', my: '20px' }} />
+              ) : (
+                <Pagination {...data.metadata} />
+              )}
+            </div>
+          ) : null}
         </Box>
       </Container>
     </>

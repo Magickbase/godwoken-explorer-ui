@@ -10,9 +10,10 @@ import Table from 'components/Table'
 import Pagination from 'components/SimplePagination'
 import TokenLogo from 'components/TokenLogo'
 import FilterMenu from 'components/FilterMenu'
-import SortIcon from 'assets/icons/sort.svg'
 import RoundedAmount from 'components/RoundedAmount'
+import SortIcon from 'assets/icons/sort.svg'
 import ChangeIcon from 'assets/icons/change.svg'
+import NoDataIcon from 'assets/icons/no-data.svg'
 import { GraphQLSchema, client } from 'utils'
 import styles from './styles.module.scss'
 
@@ -202,15 +203,17 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
             ))
           ) : (
             <tr>
-              <td colSpan={5} style={{ textAlign: 'center' }}>
-                {t(`no_records`)}
+              <td colSpan={5}>
+                <div className={styles.noRecords}>
+                  <NoDataIcon />
+                  <span>{t(`no_records`)}</span>
+                </div>
               </td>
             </tr>
           )}
         </tbody>
       </Table>
-
-      <Pagination {...metadata} note={t(`last-n-records`, { n: `100k` })} />
+      {metadata.total_count ? <Pagination {...metadata} note={t(`last-n-records`, { n: `100k` })} /> : null}
     </div>
   )
 }

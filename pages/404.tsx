@@ -13,7 +13,7 @@ import NotFoundIcon from '../assets/icons/404.svg'
 const Custom404 = () => {
   const [t] = useTranslation('common')
   const [search, setSearch] = useState('')
-  const { back, query, push } = useRouter()
+  const { back, query } = useRouter()
   const searchRef = useRef<HTMLInputElement | null>(null)
 
   useEffect(() => {

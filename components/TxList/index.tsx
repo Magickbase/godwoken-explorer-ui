@@ -9,9 +9,10 @@ import Pagination from 'components/SimplePagination'
 import TransferDirection from 'components/TransferDirection'
 import Tooltip from 'components/Tooltip'
 import FilterMenu from 'components/FilterMenu'
+import RoundedAmount from 'components/RoundedAmount'
+import NoDataIcon from 'assets/icons/no-data.svg'
 import { getBlockStatus, timeDistance, GraphQLSchema, client, PCKB_SYMBOL } from 'utils'
 import styles from './styles.module.scss'
-import RoundedAmount from 'components/RoundedAmount'
 
 const GCKB_DECIMAL = 18 // FIXME: canonical in constant
 
@@ -202,8 +203,11 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
             })
           ) : (
             <tr>
-              <td colSpan={7} align="center" style={{ textAlign: 'center' }}>
-                {t(`no_records`)}
+              <td colSpan={7} align="center">
+                <div className={styles.noRecords}>
+                  <NoDataIcon />
+                  <span>{t(`no_records`)}</span>
+                </div>
               </td>
             </tr>
           )}

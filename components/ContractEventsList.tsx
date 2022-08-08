@@ -17,8 +17,9 @@ import {
   InputAdornment,
   TextField,
 } from '@mui/material'
-import { ParsedEventLog, IMG_URL, useDebounce } from 'utils'
 import ContractEventListItem from './ContractEventListItem'
+import NoDataIcon from 'assets/icons/no-data.svg'
+import { ParsedEventLog, IMG_URL, useDebounce } from 'utils'
 
 export const EventFilterIcon = ({ setSearchText, tooltip, value }) => (
   <Tooltip title={tooltip} placement="top">
@@ -157,8 +158,20 @@ const ContractEventsList = ({ list }: { list: ParsedEventLog[] }) => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={7} align="center">
-                  {t('no_records')}
+                <TableCell colSpan={7} sx={{ borderBottom: 'none' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      padding: '8.75rem 0',
+                      color: 'var(--primary-color)',
+                    }}
+                  >
+                    <NoDataIcon />
+                    <span style={{ marginTop: '2rem' }}>{t(`no_records`)}</span>
+                  </div>
                 </TableCell>
               </TableRow>
             )}

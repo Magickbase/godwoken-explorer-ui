@@ -106,9 +106,9 @@ const ContractList = () => {
                       </td>
                       <td title={c.name}>{c.name}</td>
                       <td style={{ textTransform: 'capitalize' }} title={c.compiler.fileFormat}>
-                        {c.compiler.fileFormat.split(' ')[0]}
+                        {c.compiler.fileFormat?.split(' ')[0]}
                       </td>
-                      <td title={c.compiler.version}>{c.compiler.version.split('+')[0]}</td>
+                      <td title={c.compiler.version}>{c.compiler.version?.split('+')[0]}</td>
                       <td title={c.balance}>{new BigNumber(c.balance ?? '0').toFormat()}</td>
                       <td style={{ textAlign: 'end' }} title={`${c.txCount}`}>
                         {c.txCount.toLocaleString('en')}
