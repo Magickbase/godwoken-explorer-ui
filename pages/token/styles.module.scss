@@ -2,27 +2,23 @@
 
 .container {
   @include main-center;
-  margin-top: 0;
+  & > h5 {
+    margin: 0;
+    @media screen and (max-width: 600px) {
+      margin-top: 0.5rem;
+    }
+  }
 
   .title {
     width: 100%;
     display: flex;
     align-items: center;
     white-space: nowrap;
-    h5 {
-      margin: 0 !important;
-    }
-    /* & > div { */
-    /*   margin-right: 0.5rem; */
-    /* } */
     .name {
       display: block;
       margin-left: 0.5rem;
       overflow: hidden;
       text-overflow: ellipsis;
-    }
-    h5 {
-      margin: 0;
     }
     @media screen and (max-width: 1024px) {
       margin-bottom: 4px;
