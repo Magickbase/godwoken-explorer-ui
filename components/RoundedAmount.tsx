@@ -6,7 +6,7 @@ const RoundedAmount: React.FC<{ amount: string; udt: { decimal: number; symbol: 
   udt: { decimal, symbol },
 }) => {
   const a = new BigNumber(amount ?? 0).dividedBy(10 ** decimal)
-  const roundedAmount = +a.toFixed(8)
+  const roundedAmount = a.toFixed(8)
   const [rInt, rFrac] = roundedAmount.toString().split('.')
   const isExact = new BigNumber(roundedAmount).isEqualTo(a)
   return (
