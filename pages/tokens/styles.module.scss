@@ -20,6 +20,28 @@
   }
 }
 
+.add {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 12rem;
+  min-height: 2.5rem;
+  color: var(--primary-color);
+  background-color: var(--primary-light-color);
+  font-size: 0.875rem;
+  font-weight: 400;
+  padding: 0 0.75rem;
+  border-radius: 0.5rem;
+
+  svg {
+    margin-left: 0.25rem;
+    pointer-events: none;
+  }
+  &:hover {
+    filter: brightness(0.99);
+  }
+}
+
 .sorter {
   cursor: pointer;
 

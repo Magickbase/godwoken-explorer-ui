@@ -28,7 +28,7 @@
       height: 2rem;
       text-transform: capitalize;
       background-color: #fff;
-      border: 1px solid #f0f0f0;
+      border: 1px solid var(--border-color);
     }
     span:first-child {
       border-top-left-radius: 6px;

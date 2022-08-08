@@ -7,12 +7,14 @@ import NextPageIcon from 'assets/icons/next-page.svg'
 
 export const SIZES = ['15', '30', '50']
 
-const PageSize: React.FC<{ pageSize: number }> = ({ pageSize }) => {
+const PageSize = () => {
   const [t] = useTranslation('common')
   const { query, push, asPath } = useRouter()
   const url = asPath.split('?')[0] ?? ''
   const [open, setOpen] = useState(false)
   const theme = useTheme()
+
+  const pageSize = query.page_size && !Number.isNaN(+query.page_size) ? +query.page_size : +SIZES[1]
 
   const handlePageSizeChange = (e: SelectChangeEvent<number>) => {
     const s = +e.target.value

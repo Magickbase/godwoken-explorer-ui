@@ -84,7 +84,7 @@ const Account = (initState: State) => {
   )
 
   const { isLoading: isTxListLoading, data: txList } = useQuery(
-    ['account-tx-list', id, before, after, block_from, block_to],
+    ['account-tx-list', id, before, after, block_from, block_to, page_size],
     () =>
       fetchTxList({
         ...q,
@@ -92,6 +92,7 @@ const Account = (initState: State) => {
         after: after as string,
         start_block_number: block_from ? +block_from : null,
         end_block_number: block_to ? +block_to : null,
+        limit: +page_size,
       }),
     {
       enabled: tab === 'transactions' && !!id,
@@ -99,7 +100,7 @@ const Account = (initState: State) => {
   )
 
   const { isLoading: isTransferListLoading, data: transferList } = useQuery(
-    ['account-transfer-list', q.address, page],
+    ['account-transfer-list', q.address, before, after, page_size],
     () =>
       fetchTransferList({
         address: q.address,

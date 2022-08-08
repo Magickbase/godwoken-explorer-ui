@@ -210,7 +210,7 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
         </tbody>
       </Table>
 
-      <Pagination {...metadata} pageSize={page_size as string} note={t(`last-n-records`, { n: `100k` })} />
+      <Pagination {...metadata} note={t(`last-n-records`, { n: `100k` })} />
     </div>
   )
 }

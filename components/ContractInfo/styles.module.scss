@@ -38,7 +38,7 @@
       outline: none;
       flex: 1;
       padding: 0.875rem 0.75rem;
-      border: 1px solid #f0f0f0;
+      border: 1px solid var(--border-color);
       border-radius: 8px;
       font-size: 0.875rem;
       font-weight: 400;
@@ -48,7 +48,7 @@
     }
 
     input[readOnly] {
-      border: 1px solid #f0f0f0;
+      border: 1px solid var(--border-color);
       cursor: default;
     }
   }
@@ -90,7 +90,7 @@
   details {
     border-radius: 4px;
     overflow: hidden;
-    border: 1px solid #f0f0f0;
+    border: 1px solid var(--border-color);
     margin: 1rem auto;
     font-size: 0.875rem;
     color: #333;
@@ -182,7 +182,7 @@
 
     &[open] {
       summary {
-        border-bottom: 1px solid #f0f0f0;
+        border-bottom: 1px solid var(--border-color);
         svg {
           transform: rotateX(0);
         }
@@ -191,7 +191,7 @@
   }
 
   pre {
-    border: 1px solid #f0f0f0;
+    border: 1px solid var(--border-color);
     background: #fafafa;
     padding: 0.875rem 1rem;
     border-radius: 4px;
@@ -223,7 +223,7 @@
     align-items: center;
     justify-content: center;
     width: 7.5rem;
-    border: 1px solid #f0f0f0;
+    border: 1px solid var(--border-color);
     white-space: nowrap;
     &:first-child {
       border-top-left-radius: 4px;
@@ -259,7 +259,7 @@
     justify-content: center;
     align-items: center;
     &:not(:first-child) {
-      border-left: 1px solid #f0f0f0;
+      border-left: 1px solid var(--border-color);
     }
   }
   @media screen and (max-width: 1024px) {
@@ -272,7 +272,7 @@
       border-left: none !important;
       justify-content: flex-start;
       &:not(:first-child) {
-        border-top: 1px solid #f0f0f0;
+        border-top: 1px solid var(--border-color);
       }
     }
   }
