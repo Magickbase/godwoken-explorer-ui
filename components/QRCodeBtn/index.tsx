@@ -25,7 +25,12 @@ const QRCodeBtn: React.FC<{ content: string }> = ({ content }) => {
 
   const generateQR = async (text: string) => {
     try {
-      return QRCode.toDataURL(text, { margin: 0 })
+      return QRCode.toDataURL(text, {
+        margin: 0,
+        type: 'image/jpeg',
+        rendererOpts: { quality: 1 },
+        errorCorrectionLevel: 'H',
+      })
     } catch (err) {
       console.log(err)
     }
