@@ -11,6 +11,7 @@
   --primary-light-color: #f0f0fc;
   --secondary-text-color: #999;
   --border-color: #f0f0f0;
+  --selection-color: #d8cff3;
   --amount-frac-color: #aaa;
 }
 
@@ -21,6 +22,7 @@ body {
 
   &[attr-chain-type='testnet'] {
     --primary-color: #2c97e4;
+    --selection-color: #c9e1fe;
   }
 }
 
@@ -51,8 +53,8 @@ pre {
 }
 
 *::selection {
-  color: #fff;
-  background-color: #000;
+  color: var(--primary-text-color);
+  background-color: var(--selection-color);
 }
 
 input {
