@@ -33,6 +33,14 @@ export const handleSearchKeyPress = async (e: React.KeyboardEvent<HTMLInputEleme
   if (key !== 'Enter' || !search) {
     return
   }
+
+  console.log({ search })
+  if (Number.isNaN(+search)) {
+    // could be token name
+    push(`/tokens/native?name=${encodeURIComponent(search)}`)
+    return
+  }
+
   try {
     const res = await fetchSearch(search.toLowerCase())
     push(res)
