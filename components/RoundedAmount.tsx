@@ -14,7 +14,7 @@ const RoundedAmount: React.FC<{ amount: string; udt: { decimal: number; symbol: 
       <div>
         {`${isExact ? '' : '≈ '}`}
         <span>{new BigNumber(rInt).toFormat()}</span>
-        {rFrac ? <span style={{ color: '#aaa' }}>{`.${rFrac}`}</span> : null}
+        {rFrac ? <span style={{ color: 'var(--amount-frac-color)' }}>{`.${rFrac}`}</span> : null}
       </div>
     </Tooltip>
   )

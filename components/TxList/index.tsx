@@ -9,11 +9,9 @@ import Pagination from 'components/SimplePagination'
 import TransferDirection from 'components/TransferDirection'
 import Tooltip from 'components/Tooltip'
 import FilterMenu from 'components/FilterMenu'
-import { getBlockStatus, timeDistance, GraphQLSchema, client, PCKB_SYMBOL } from 'utils'
+import { getBlockStatus, timeDistance, GraphQLSchema, client, PCKB_UDT_INFO } from 'utils'
 import styles from './styles.module.scss'
 import RoundedAmount from 'components/RoundedAmount'
-
-const GCKB_DECIMAL = 18 // FIXME: canonical in constant
 
 export type TxListProps = {
   transactions: {
@@ -134,7 +132,7 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
             <th>{t('from')}</th>
             <th>{t('to')}</th>
             <th className={styles.direction}></th>
-            <th>{`${t('value')} (${PCKB_SYMBOL})`}</th>
+            <th>{`${t('value')} (${PCKB_UDT_INFO.symbol})`}</th>
           </tr>
         </thead>
         <tbody>
@@ -189,13 +187,7 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
                     <TransferDirection from={from} to={to} viewer={viewer ?? ''} />
                   </td>
                   <td>
-                    <RoundedAmount
-                      amount={item.polyjuice?.value ?? '0'}
-                      udt={{
-                        decimal: GCKB_DECIMAL,
-                        symbol: PCKB_SYMBOL,
-                      }}
-                    />
+                    <RoundedAmount amount={item.polyjuice?.value ?? '0'} udt={PCKB_UDT_INFO} />
                   </td>
                 </tr>
               )
