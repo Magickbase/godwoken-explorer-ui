@@ -14,7 +14,8 @@ import BridgedRecordList from 'components/BridgedRecordList'
 import TokenHolderList from 'components/TokenHolderList/index'
 import HashLink from 'components/HashLink'
 import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
-import { fetchToken, fetchBridgedRecordList, fetchTokenHolderList, formatAmount } from 'utils'
+import Amount from 'components/Amount'
+import { fetchToken, fetchBridgedRecordList, fetchTokenHolderList } from 'utils'
 import styles from './styles.module.scss'
 
 import type { API } from 'utils/api/utils'
@@ -120,7 +121,9 @@ const Token: React.FC<Props> = () => {
       content: !token ? (
         <Skeleton animation="wave" />
       ) : token.supply ? (
-        formatAmount(token.supply, { symbol: token.symbol?.split('.')[0] ?? '', decimal: token.decimal })
+        <>
+          <Amount amount={token.supply || '0'} udt={token} showSymbol />
+        </>
       ) : (
         '-'
       ),

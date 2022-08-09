@@ -10,8 +10,9 @@ import Polyjuice from 'components/Polyjuice'
 import SUDT from 'components/SUDT'
 import UnknownAccount from 'components/UnknownAccount'
 import InfoList from 'components/InfoList'
+import Amount from 'components/Amount'
 import styles from './styles.module.scss'
-import { GCKB_DECIMAL, GraphQLSchema, client, provider, PCKB_SYMBOL } from 'utils'
+import { GraphQLSchema, client, provider, PCKB_UDT_INFO } from 'utils'
 
 export type BasicScript = Record<'args' | 'code_hash' | 'hash_type', string>
 export interface AccountBase {
@@ -194,7 +195,7 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({
               <Skeleton animation="wave" />
             ) : (
               <span className={styles.balance}>
-                {new BigNumber(balance || '0').dividedBy(GCKB_DECIMAL).toFormat() + ` ${PCKB_SYMBOL}`}
+                <Amount amount={balance || '0'} udt={PCKB_UDT_INFO} showSymbol />
               </span>
             ),
           },
