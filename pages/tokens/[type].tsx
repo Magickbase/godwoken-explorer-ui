@@ -18,9 +18,10 @@ import Tooltip from 'components/Tooltip'
 import FilterMenu from 'components/FilterMenu'
 // import SortIcon from 'assets/icons/sort.svg'
 import { SIZES } from 'components/PageSize'
+import Amount from 'components/Amount'
 import AddIcon from 'assets/icons/add.svg'
 import NoDataIcon from 'assets/icons/no-data.svg'
-import { formatAmount, GraphQLSchema, client, parseTokenName } from 'utils'
+import { GraphQLSchema, client, parseTokenName } from 'utils'
 import styles from './styles.module.scss'
 
 const BRIDGED_TOKEN_TEMPLATE_URL =
@@ -251,10 +252,6 @@ const TokenList = () => {
                   if (!name) {
                     name = token.name
                   }
-                  const supply = formatAmount(token.supply ?? '0', {
-                    symbol: token.symbol?.split('.')[0] ?? '',
-                    decimal: token.decimal,
-                  })
                   const id = token.bridge_account_id ?? token.id
                   const addr = token.contract_address_hash || token.account.script_hash
                   return (
@@ -329,7 +326,7 @@ const TokenList = () => {
                           />
                         )}
                       </td>
-                      <td title={supply}>
+                      <td>
                         <div
                           style={{
                             whiteSpace: 'nowrap',
@@ -338,7 +335,7 @@ const TokenList = () => {
                             width: 180,
                           }}
                         >
-                          {supply}
+                          <Amount amount={token.supply ?? '0'} udt={token} showSymbol />
                         </div>
                       </td>
                       <td style={{ minWidth: isMobile ? 100 : 125 }} title={`${token.holders_count || '0'}`}>

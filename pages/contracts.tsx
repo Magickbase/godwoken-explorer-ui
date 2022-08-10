@@ -3,7 +3,6 @@ import { useQuery } from 'react-query'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import BigNumber from 'bignumber.js'
 import { Container, Typography, Box, TableContainer, Stack, Skeleton } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
@@ -11,9 +10,10 @@ import PageTitle from 'components/PageTitle'
 import SubpageHead from 'components/SubpageHead'
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/Pagination'
-import { SIZES } from 'components/PageSize'
 import Table from 'components/Table'
-import { fetchContractList, PCKB_SYMBOL } from 'utils'
+import Amount from 'components/Amount'
+import { SIZES } from 'components/PageSize'
+import { fetchContractList, PCKB_UDT_INFO } from 'utils'
 
 const ContractList = () => {
   const [t] = useTranslation(['list', 'common'])
@@ -84,7 +84,7 @@ const ContractList = () => {
                   <th>{t(`compiler_version`)}</th>
                   <th>
                     {t(`balance`)}
-                    <span style={{ textTransform: 'none' }}>{`(${PCKB_SYMBOL})`}</span>
+                    <span style={{ textTransform: 'none' }}>{`(${PCKB_UDT_INFO.symbol})`}</span>
                   </th>
                   <th style={{ textAlign: 'end' }}>{t(`tx_count`)}</th>
                 </tr>
@@ -109,7 +109,9 @@ const ContractList = () => {
                         {c.compiler.fileFormat?.split(' ')[0]}
                       </td>
                       <td title={c.compiler.version}>{c.compiler.version?.split('+')[0]}</td>
-                      <td title={c.balance}>{new BigNumber(c.balance ?? '0').toFormat()}</td>
+                      <td title={c.balance}>
+                        <Amount amount={c.balance ?? '0'} udt={{ symbol: PCKB_UDT_INFO.symbol, decimal: 10 }} />
+                      </td>
                       <td style={{ textAlign: 'end' }} title={`${c.txCount}`}>
                         {c.txCount.toLocaleString('en')}
                       </td>

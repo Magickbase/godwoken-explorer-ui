@@ -18,6 +18,7 @@ import CopyBtn from 'components/CopyBtn'
 import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
 import TxType from 'components/TxType'
 import HashLink from 'components/HashLink'
+import Amount from 'components/Amount'
 import { SIZES } from 'components/PageSize'
 import PolyjuiceStatus from 'components/PolyjuiceStatus'
 import ExpandIcon from 'assets/icons/expand.svg'
@@ -30,10 +31,8 @@ import {
   handleApiError,
   CKB_EXPLORER_URL,
   CHANNEL,
-  CKB_DECIMAL,
-  GCKB_DECIMAL,
-  PCKB_SYMBOL,
   NotFoundException,
+  PCKB_UDT_INFO,
 } from 'utils'
 import styles from './styles.module.scss'
 
@@ -179,10 +178,9 @@ const Tx = (initState: State) => {
       field: t('value'),
       // FIXME: tx.value is formatted incorrectly
       content: (
-        <div className={styles.value}>{`${new BigNumber(tx.value || '0')
-          .multipliedBy(CKB_DECIMAL)
-          .dividedBy(GCKB_DECIMAL)
-          .toFormat()} ${PCKB_SYMBOL}`}</div>
+        <div className={styles.value}>
+          <Amount amount={tx.value ?? '0'} udt={{ decimal: 10, symbol: PCKB_UDT_INFO.symbol }} showSymbol />
+        </div>
       ),
     },
     tx.input
@@ -245,7 +243,7 @@ const Tx = (initState: State) => {
       field: t('gasPrice'),
       content:
         tx.gasPrice !== null ? (
-          <span className={styles.gasPrice}>{`${new BigNumber(tx.gasPrice).toFormat()} ${PCKB_SYMBOL}`}</span>
+          <span className={styles.gasPrice}>{`${new BigNumber(tx.gasPrice).toFormat()} ${PCKB_UDT_INFO.symbol}`}</span>
         ) : (
           '-'
         ),
@@ -262,9 +260,13 @@ const Tx = (initState: State) => {
       field: t('fee'),
       content:
         tx.gasPrice !== null && typeof tx.gasUsed !== null ? (
-          <span className={styles.gasFee}>{`${new BigNumber(tx.gasUsed)
-            .times(new BigNumber(tx.gasPrice))
-            .toFormat()} ${PCKB_SYMBOL}`}</span>
+          <span className={styles.gasFee}>
+            <Amount
+              amount={`${new BigNumber(tx.gasUsed).times(new BigNumber(tx.gasPrice))} `}
+              udt={{ decimal: 0, symbol: PCKB_UDT_INFO.symbol }}
+              showSymbol
+            />
+          </span>
         ) : (
           '-'
         ),

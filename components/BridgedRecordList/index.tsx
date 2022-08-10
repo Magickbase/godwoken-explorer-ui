@@ -1,13 +1,13 @@
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
-import BigNumber from 'bignumber.js'
 import Tooltip from 'components/Tooltip'
 import Table from 'components/Table'
 import HashLink from 'components/HashLink'
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/Pagination'
 import NoDataIcon from 'assets/icons/no-data.svg'
-import { timeDistance, getBridgedRecordListRes, CKB_EXPLORER_URL, CKB_DECIMAL, PCKB_UAN, PCKB_SYMBOL } from 'utils'
+import Amount from 'components/Amount'
+import { timeDistance, getBridgedRecordListRes, CKB_EXPLORER_URL, PCKB_UAN, PCKB_UDT_INFO } from 'utils'
 import styles from './styles.module.scss'
 
 type ParsedList = ReturnType<typeof getBridgedRecordListRes>
@@ -21,7 +21,7 @@ const BridgedRecordList: React.FC<{ list: ParsedList; showUser?: boolean }> = ({
           <tr>
             <th>{t('type')}</th>
             <th>{t('value')} </th>
-            <th>{PCKB_SYMBOL}</th>
+            <th>{PCKB_UDT_INFO.symbol}</th>
             <th>{t('age')} </th>
             {showUser ? <th>{t('account')} </th> : null}
             <th>{t('layer1Txn')} </th>
@@ -34,11 +34,15 @@ const BridgedRecordList: React.FC<{ list: ParsedList; showUser?: boolean }> = ({
               <tr key={r.layer1.output.hash + r.layer1.output.index}>
                 <td>{t(r.type)}</td>
                 <td>
-                  {r.token?.symbol !== PCKB_UAN
-                    ? `${new BigNumber(r.value ?? '0').toFormat()} ${r.token.symbol ?? ''}`
-                    : '0'}
+                  {r.token?.symbol !== PCKB_UAN ? (
+                    <Amount amount={r.value ?? '0'} udt={{ ...r.token, decimal: 0 }} showSymbol />
+                  ) : (
+                    '0'
+                  )}
                 </td>
-                <td>{`${new BigNumber(r.capacity ?? '0').dividedBy(CKB_DECIMAL).toFormat()}`}</td>
+                <td>
+                  <Amount amount={r.capacity ?? '0'} udt={{ decimal: 8, symbol: PCKB_UDT_INFO.symbol }} />
+                </td>
                 <td>
                   {r.timestamp > 0 ? (
                     <time dateTime={new Date(+r.timestamp).toISOString()}>{timeDistance(r.timestamp, language)}</time>
