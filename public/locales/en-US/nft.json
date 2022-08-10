@@ -1,0 +1,12 @@
+{
+  "nft-collection": "NFT Collection",
+  "info": "info",
+  "stats": "stats",
+  "type": "type",
+  "contract": "contract",
+  "holder_count": "Holder Count",
+  "minted_count": "Minted Count",
+  "activity": "activity",
+  "holders": "holders",
+  "inventory": "inventory"
+}
