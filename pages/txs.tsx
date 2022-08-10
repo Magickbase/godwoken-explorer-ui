@@ -11,7 +11,7 @@ import PageTitle from 'components/PageTitle'
 import SubpageHead from 'components/SubpageHead'
 import TxListComp, { fetchTxList } from 'components/TxList'
 import { SIZES } from 'components/PageSize'
-import { PCKB_SYMBOL } from 'utils'
+import { PCKB_UDT_INFO } from 'utils'
 
 const TxList = () => {
   const [t] = useTranslation('list')
@@ -82,7 +82,9 @@ const TxList = () => {
                     <th style={{ display: isMobile ? 'none' : 'table-cell' }}>{t('from')}</th>
                     <th style={{ display: isMobile ? 'none' : 'table-cell' }}>{t('to')}</th>
                     <th style={{ display: isMobile ? 'none' : 'table-cell' }}>{t('transfer')}</th>
-                    <th style={{ whiteSpace: 'nowrap', textTransform: 'none' }}>{`${t('value')} (${PCKB_SYMBOL})`}</th>
+                    <th style={{ whiteSpace: 'nowrap', textTransform: 'none' }}>{`${t('value')} (${
+                      PCKB_UDT_INFO.symbol
+                    })`}</th>
                     <th>{t('type')}</th>
                   </tr>
                 </thead>

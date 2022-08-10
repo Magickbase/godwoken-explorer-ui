@@ -18,12 +18,16 @@ export const NERVOS_URL = process.env.NEXT_PUBLIC_NERVOS_URL
 export const IMG_URL = '/icons/'
 export const PAGE_SIZE = 20
 export const CKB_DECIMAL = new BigNumber(10 ** 8)
-export const GCKB_DECIMAL = new BigNumber(10 ** 18)
 export const PCKB_UAN = 'pCKB.gw|gb.ckb'
-export const PCKB_SYMBOL = 'pCKB'
+// export const SEARCH_FIELDS = 'Block Hash/Txn Hash/Lockhash/ETH Address/Token Name/Token Symbol'
 export const SEARCH_FIELDS = 'Block Hash/Txn Hash/Lockhash/ETH Address/Token Display Name'
 export const MAINNET_HOSTNAME = process.env.NEXT_PUBLIC_MAINNET_EXPLORER_HOSTNAME
 export const TESTNET_HOSTNAME = process.env.NEXT_PUBLIC_TESTNET_EXPLORER_HOSTNAME
+
+export const PCKB_UDT_INFO = {
+  decimal: 18,
+  symbol: 'pCKB',
+}
 
 export enum CHANNEL {
   HOME = 'home:refresh',
