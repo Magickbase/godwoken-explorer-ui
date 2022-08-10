@@ -5,7 +5,7 @@ import NextLink from 'next/link'
 import { ethers } from 'ethers'
 import OpenInNewIcon from 'assets/icons/open-in-new.svg'
 import ExpandIcon from 'assets/icons/expand.svg'
-import { IS_MAINNET, provider } from 'utils'
+import { IS_MAINNET, provider, PCKB_UDT_INFO } from 'utils'
 import styles from './styles.module.scss'
 
 interface ChainConfig {
@@ -27,8 +27,8 @@ const NodeConfigs: Record<'mainnet' | 'testnet', ChainConfig> = {
     chainName: 'Godwoken Mainnet v1',
     nativeCurrency: {
       name: 'pCKB',
-      symbol: 'pCKB',
-      decimals: 18,
+      decimals: PCKB_UDT_INFO.decimal,
+      symbol: PCKB_UDT_INFO.symbol,
     },
     blockExplorerUrls: ['https://v1.gwscan.com'],
   },
@@ -38,8 +38,8 @@ const NodeConfigs: Record<'mainnet' | 'testnet', ChainConfig> = {
     chainName: 'Godwoken Testnet v1',
     nativeCurrency: {
       name: 'pCKB',
-      symbol: 'pCKB',
-      decimals: 18,
+      decimals: PCKB_UDT_INFO.decimal,
+      symbol: PCKB_UDT_INFO.symbol,
     },
     blockExplorerUrls: ['https://v1.testnet.gwscan.com'],
   },
