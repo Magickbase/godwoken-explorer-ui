@@ -20,7 +20,7 @@ export const PAGE_SIZE = 20
 export const CKB_DECIMAL = new BigNumber(10 ** 8)
 export const PCKB_UAN = 'pCKB.gw|gb.ckb'
 // export const SEARCH_FIELDS = 'Block Hash/Txn Hash/Lockhash/ETH Address/Token Name/Token Symbol'
-export const SEARCH_FIELDS = 'Block Hash/Txn Hash/Lockhash/ETH Address' // FIXME: check the search rule
+export const SEARCH_FIELDS = 'Block Hash/Txn Hash/Lockhash/ETH Address/Token Display Name'
 export const MAINNET_HOSTNAME = process.env.NEXT_PUBLIC_MAINNET_EXPLORER_HOSTNAME
 export const TESTNET_HOSTNAME = process.env.NEXT_PUBLIC_TESTNET_EXPLORER_HOSTNAME
 
