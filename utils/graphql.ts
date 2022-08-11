@@ -185,6 +185,17 @@ export namespace GraphQLSchema {
     udt: Udt
   }
 
+  export interface NftCollectionListItem {
+    id: number
+    name: string
+    symbol: string
+    icon: string
+    supply: number
+    holders_count: number
+    contract_address_hash: string
+    // account: Account
+  }
+
   export interface PageMetadata {
     total_count: number
     before: string | null
