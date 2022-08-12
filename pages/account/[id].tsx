@@ -22,6 +22,7 @@ import BridgedRecordList from 'components/BridgedRecordList'
 import ContractInfo from 'components/ContractInfo'
 import ContractEventsList from 'components/ContractEventsList'
 import CopyBtn from 'components/CopyBtn'
+import QRCodeBtn from 'components/QRCodeBtn'
 import PageTitle from 'components/PageTitle'
 import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
 import { SIZES } from 'components/PageSize'
@@ -176,6 +177,7 @@ const Account = (initState: State) => {
         <div className={styles.hash}>
           {id}
           <CopyBtn content={id} />
+          <QRCodeBtn content={id} />
         </div>
         <AccountOverview
           isOverviewLoading={isOverviewLoading}

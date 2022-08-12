@@ -27,6 +27,8 @@
   "finalized": "已确认",
   "addressCopied": "地址已复制",
   "blockHashCopied": "区块哈希已复制",
+  "clickViewQRCode": "点击查看二维码",
+  "saveQrCode": "保存二维码",
   "txHashCopied": "交易哈希已复制",
   "charts": "图表",
   "page_size": {
