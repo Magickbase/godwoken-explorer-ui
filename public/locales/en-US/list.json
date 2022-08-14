@@ -27,6 +27,7 @@
   "gas_used": "gas used",
   "gas_limit": "gas limit",
   "rank": "rank",
+  "quantity": "quantity",
   "address": "address",
   "balance": "Balance",
   "percentage": "percentage",

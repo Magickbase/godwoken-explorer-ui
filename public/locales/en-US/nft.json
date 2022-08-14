@@ -12,5 +12,8 @@
   "token": "Token",
   "address": "Address",
   "erc-721": "ERC 721",
-  "erc-1155": "ERC 1155"
+  "erc-1155": "ERC 1155",
+  "tokenID": "Token Id",
+  "owner": "Owner",
+  "name": "Name"
 }
