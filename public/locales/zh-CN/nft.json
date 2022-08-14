@@ -8,5 +8,8 @@
   "minted_count": "铸造个数",
   "activity": "活动",
   "holders": "持有人",
-  "inventory": "目录"
+  "inventory": "目录",
+  "tokenID": "通证 ID",
+  "owner": "所属人",
+  "name": "名称"
 }

@@ -8,5 +8,8 @@
   "minted_count": "Minted Count",
   "activity": "activity",
   "holders": "holders",
-  "inventory": "inventory"
+  "inventory": "inventory",
+  "tokenID": "Token Id",
+  "owner": "Owner",
+  "name": "Name"
 }
