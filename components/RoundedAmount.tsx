@@ -11,11 +11,11 @@ const RoundedAmount: React.FC<{ amount: string; udt: { decimal: number; symbol: 
   const isExact = new BigNumber(roundedAmount).isEqualTo(a)
   return (
     <Tooltip title={`${a.toFormat()} ${symbol?.split('.')[0] ?? ''}`} placement="top">
-      <div>
+      <b style={{ fontWeight: 500 }}>
         {`${isExact ? '' : '≈ '}`}
         <span>{new BigNumber(rInt).toFormat()}</span>
         {rFrac ? <span style={{ color: 'var(--amount-frac-color)' }}>{`.${rFrac}`}</span> : null}
-      </div>
+      </b>
     </Tooltip>
   )
 }
