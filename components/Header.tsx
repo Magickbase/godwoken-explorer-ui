@@ -265,7 +265,13 @@ const Header = () => {
               }}
             >
               <NextLink href={`/`} passHref>
-                <Link href={`/`} title={t(`home`)} underline="none" color="secondary">
+                <Link
+                  href={`/`}
+                  title={t(`home`)}
+                  underline="none"
+                  color="secondary"
+                  sx={{ '&:hover': { color: 'var(--primary-color) !important' } }}
+                >
                   {t(`home`)}
                 </Link>
               </NextLink>
@@ -279,6 +285,7 @@ const Header = () => {
                 '& .MuiButton-endIcon': { m: 0 },
                 '&.MuiButtonBase-root:hover': {
                   bgcolor: 'transparent',
+                  color: 'var(--primary-color)',
                 },
               }}
               endIcon={tokenPopover.isOpen ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
@@ -301,7 +308,13 @@ const Header = () => {
               }}
             >
               <NextLink href={`/contracts`} passHref>
-                <Link href={`/contracts`} title={t(`contracts`)} underline="none" color="secondary">
+                <Link
+                  href={`/contracts`}
+                  title={t(`contracts`)}
+                  underline="none"
+                  color="secondary"
+                  sx={{ '&:hover': { color: 'var(--primary-color) !important' } }}
+                >
                   {t(`contracts`)}
                 </Link>
               </NextLink>
@@ -318,7 +331,13 @@ const Header = () => {
               }}
             >
               <NextLink href={`/charts`} passHref>
-                <Link href={`/charts`} title={t(`charts`)} underline="none" color="secondary">
+                <Link
+                  href={`/charts`}
+                  title={t(`charts`)}
+                  underline="none"
+                  color="secondary"
+                  sx={{ '&:hover': { color: 'var(--primary-color) !important' } }}
+                >
                   {t(`charts`)}
                 </Link>
               </NextLink>
@@ -332,6 +351,7 @@ const Header = () => {
                 '& .MuiButton-endIcon': { m: 0 },
                 '&.MuiButtonBase-root:hover': {
                   bgcolor: 'transparent',
+                  color: 'var(--primary-color)',
                 },
               }}
               endIcon={chainPopover.isOpen ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
@@ -352,6 +372,7 @@ const Header = () => {
                 'pr': 0,
                 '&.MuiButtonBase-root:hover': {
                   bgcolor: 'transparent',
+                  color: 'var(--primary-color)',
                 },
               }}
               startIcon={<LanguageIcon fontSize="small" />}

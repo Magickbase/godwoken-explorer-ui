@@ -12,7 +12,7 @@
   --secondary-text-color: #999;
   --border-color: #f0f0f0;
   --selection-color: #d8cff3;
-  --amount-frac-color: #aaa;
+  --amount-frac-color: #938dac;
 }
 
 html,
@@ -23,6 +23,7 @@ body {
   &[attr-chain-type='testnet'] {
     --primary-color: #2c97e4;
     --selection-color: #c9e1fe;
+    --amount-frac-color: #8f9fb8;
   }
 }
 

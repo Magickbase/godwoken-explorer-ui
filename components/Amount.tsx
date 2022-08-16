@@ -11,11 +11,11 @@ const Amount: React.FC<{ amount: string; udt: { decimal: number; symbol: string 
   const unit = symbol?.split('.')[0] ?? ''
   return (
     <Tooltip title={`${a} ${unit}`} placement="top">
-      <div style={{ whiteSpace: 'nowrap', display: 'inline' }}>
+      <b style={{ whiteSpace: 'nowrap', fontWeight: 500 }}>
         <span>{rInt}</span>
         {rFrac ? <span style={{ color: 'var(--amount-frac-color)' }}>{`.${rFrac}`}</span> : null}
         {showSymbol ? ` ${unit}` : null}
-      </div>
+      </b>
     </Tooltip>
   )
 }
