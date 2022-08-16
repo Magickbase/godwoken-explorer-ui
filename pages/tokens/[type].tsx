@@ -21,7 +21,7 @@ import { SIZES } from 'components/PageSize'
 import Amount from 'components/Amount'
 import AddIcon from 'assets/icons/add.svg'
 import NoDataIcon from 'assets/icons/no-data.svg'
-import SearchResultEmptyIcon from 'assets/icons/search-result-empty.svg'
+import EmptyFilteredListIcon from 'assets/icons/empty-filtered-list.svg'
 import { GraphQLSchema, client, parseTokenName } from 'utils'
 import styles from './styles.module.scss'
 
@@ -354,7 +354,7 @@ const TokenList = () => {
                   <td colSpan={headers.length}>
                     {isFiltered ? (
                       <div className={styles.noRecords}>
-                        <SearchResultEmptyIcon />
+                        <EmptyFilteredListIcon />
                         <span>{t(`no_related_content`, { ns: 'list' })}</span>
                       </div>
                     ) : (

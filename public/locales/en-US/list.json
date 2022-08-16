@@ -7,7 +7,7 @@
   "age": "Age",
   "transfer": "Transfer",
   "token": "Token",
-  "no_records": "No Records",
+  "no_records": "There're no matching entries",
   "txHash": "Txn Hash",
   "block": "Block",
   "type": "Type",

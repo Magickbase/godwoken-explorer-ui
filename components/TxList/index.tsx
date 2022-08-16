@@ -12,7 +12,7 @@ import Tooltip from 'components/Tooltip'
 import FilterMenu from 'components/FilterMenu'
 import RoundedAmount from 'components/RoundedAmount'
 import NoDataIcon from 'assets/icons/no-data.svg'
-import SearchResultEmptyIcon from 'assets/icons/search-result-empty.svg'
+import EmptyFilteredListIcon from 'assets/icons/empty-filtered-list.svg'
 import { getBlockStatus, timeDistance, GraphQLSchema, client, PCKB_UDT_INFO } from 'utils'
 import styles from './styles.module.scss'
 
@@ -204,7 +204,7 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
               <td colSpan={7} align="center">
                 {isFiltered ? (
                   <div className={styles.noRecords}>
-                    <SearchResultEmptyIcon />
+                    <EmptyFilteredListIcon />
                     <span>{t(`no_related_content`)}</span>
                   </div>
                 ) : (

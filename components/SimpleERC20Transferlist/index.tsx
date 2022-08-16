@@ -14,7 +14,7 @@ import RoundedAmount from 'components/RoundedAmount'
 import SortIcon from 'assets/icons/sort.svg'
 import ChangeIcon from 'assets/icons/change.svg'
 import NoDataIcon from 'assets/icons/no-data.svg'
-import SearchResultEmptyIcon from 'assets/icons/search-result-empty.svg'
+import EmptyFilteredListIcon from 'assets/icons/empty-filtered-list.svg'
 import { GraphQLSchema, client } from 'utils'
 import styles from './styles.module.scss'
 
@@ -211,7 +211,7 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
               <td colSpan={5}>
                 {isFiltered ? (
                   <div className={styles.noRecords}>
-                    <SearchResultEmptyIcon />
+                    <EmptyFilteredListIcon />
                     <span>{t(`no_related_content`)}</span>
                   </div>
                 ) : (
