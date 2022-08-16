@@ -14,6 +14,7 @@ import RoundedAmount from 'components/RoundedAmount'
 import SortIcon from 'assets/icons/sort.svg'
 import ChangeIcon from 'assets/icons/change.svg'
 import NoDataIcon from 'assets/icons/no-data.svg'
+import SearchResultEmptyIcon from 'assets/icons/search-result-empty.svg'
 import { GraphQLSchema, client } from 'utils'
 import styles from './styles.module.scss'
 
@@ -105,6 +106,8 @@ export const fetchTransferList = (variables: {
     .then(data => data.token_transfers)
     .catch(() => ({ entries: [], metadata: { before: null, after: null, total_count: 0 } }))
 
+const FILTER_KEYS = ['address_from', 'address_to']
+
 const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries, metadata } }) => {
   const [isShowLogo, setIsShowLogo] = useState(true)
   const [t] = useTranslation('list')
@@ -113,6 +116,8 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
     push,
     asPath,
   } = useRouter()
+
+  const isFiltered = Object.keys(query).some(key => FILTER_KEYS.includes(key))
 
   const handleLogIndexSortClick = (e: React.MouseEvent<HTMLOrSVGImageElement>) => {
     const {
@@ -142,13 +147,13 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
             <th>
               <div className={styles.from}>
                 {t('from')}
-                <FilterMenu filterKeys={['address_from']} />
+                <FilterMenu filterKeys={[FILTER_KEYS[0]]} />
               </div>
             </th>
             <th>
               <div className={styles.to}>
                 {t('to')}
-                <FilterMenu filterKeys={['address_to']} />
+                <FilterMenu filterKeys={[FILTER_KEYS[1]]} />
               </div>
             </th>
             <th className={styles.tokenLogo}>
@@ -204,10 +209,17 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
           ) : (
             <tr>
               <td colSpan={5}>
-                <div className={styles.noRecords}>
-                  <NoDataIcon />
-                  <span>{t(`no_records`)}</span>
-                </div>
+                {isFiltered ? (
+                  <div className={styles.noRecords}>
+                    <SearchResultEmptyIcon />
+                    <span>{t(`no_related_content`)}</span>
+                  </div>
+                ) : (
+                  <div className={styles.noRecords}>
+                    <NoDataIcon />
+                    <span>{t(`no_records`)}</span>
+                  </div>
+                )}
               </td>
             </tr>
           )}

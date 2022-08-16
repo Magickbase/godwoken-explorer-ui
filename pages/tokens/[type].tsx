@@ -21,6 +21,7 @@ import { SIZES } from 'components/PageSize'
 import Amount from 'components/Amount'
 import AddIcon from 'assets/icons/add.svg'
 import NoDataIcon from 'assets/icons/no-data.svg'
+import SearchResultEmptyIcon from 'assets/icons/search-result-empty.svg'
 import { GraphQLSchema, client, parseTokenName } from 'utils'
 import styles from './styles.module.scss'
 
@@ -91,6 +92,7 @@ const fetchTokenList = (variables: Variables): Promise<TokenListProps['udts']> =
     .then(data => data.udts)
     .catch(() => ({ entries: [], metadata: { before: null, after: null, total_count: 0 } }))
 
+const FILTER_KEYS = ['name']
 const TokenList = () => {
   const [t] = useTranslation(['tokens', 'common', 'list'])
   const {
@@ -107,6 +109,7 @@ const TokenList = () => {
   } = useRouter()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+  const isFiltered = !!name
 
   const headers = [
     { key: 'token' },
@@ -223,7 +226,7 @@ const TokenList = () => {
                     {t(h.label ?? h.key)}
                     {h.key === 'token' ? (
                       <span>
-                        <FilterMenu filterKeys={['name']} />
+                        <FilterMenu filterKeys={[FILTER_KEYS[0]]} />
                       </span>
                     ) : null}
                     {/* {h.key === 'holderCount' ? ( */}
@@ -349,10 +352,17 @@ const TokenList = () => {
               ) : (
                 <tr>
                   <td colSpan={headers.length}>
-                    <div className={styles.noRecords}>
-                      <NoDataIcon />
-                      <span>{t(`no_records`)}</span>
-                    </div>
+                    {isFiltered ? (
+                      <div className={styles.noRecords}>
+                        <SearchResultEmptyIcon />
+                        <span>{t(`no_related_content`, { ns: 'list' })}</span>
+                      </div>
+                    ) : (
+                      <div className={styles.noRecords}>
+                        <NoDataIcon />
+                        <span>{t(`no_records`)}</span>
+                      </div>
+                    )}
                   </td>
                 </tr>
               )}

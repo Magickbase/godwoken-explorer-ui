@@ -170,7 +170,7 @@ const ContractEventsList = ({ list }: { list: ParsedEventLog[] }) => {
                     }}
                   >
                     <NoDataIcon />
-                    <span style={{ marginTop: '2rem' }}>{t(`no_records`)}</span>
+                    <span style={{ marginTop: '2rem', color: 'var(--primary-text-color)' }}>{t(`no_records`)}</span>
                   </div>
                 </TableCell>
               </TableRow>
