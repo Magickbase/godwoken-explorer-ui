@@ -250,7 +250,7 @@ const Tx = (initState: State) => {
     },
     {
       field: t('gasUsed'),
-      content: tx.gasUsed !== null ? new BigNumber(tx.gasUsed).toFormat() : '-',
+      content: tx.gasUsed !== null && tx.polyjuiceStatus !== 'pending' ? new BigNumber(tx.gasUsed).toFormat() : '-',
     },
     {
       field: t('gasLimit'),
@@ -259,7 +259,7 @@ const Tx = (initState: State) => {
     {
       field: t('fee'),
       content:
-        tx.gasPrice !== null && typeof tx.gasUsed !== null ? (
+        tx.gasPrice !== null && typeof tx.gasUsed !== null && tx.polyjuiceStatus !== 'pending' ? (
           <span className={styles.gasFee}>
             <Amount
               amount={`${new BigNumber(tx.gasUsed).times(new BigNumber(tx.gasPrice))} `}
