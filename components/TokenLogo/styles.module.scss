@@ -1,5 +1,6 @@
-$size: 1.875rem;
-$offset: 8px;
+$size: 2rem;
+$offset-x: 10px;
+$offset-y: 6px;
 
 .token,
 .origin {
@@ -13,19 +14,18 @@ $offset: 8px;
   height: $size;
   background: #f9f8ff;
   border-radius: 100%;
-  cursor: pointer;
 }
 
 .origin {
-  width: 0.7 * $size;
-  height: 0.7 * $size;
+  width: 0.68 * $size;
+  height: 0.68 * $size;
   background: #f0f0f0;
   z-index: 0;
 }
 
 .overlap {
-  width: calc($size + $offset);
-  height: calc($size + $offset);
+  width: calc($size - 2px + $offset-x);
+  height: calc($size - 2px + $offset-y);
   position: relative;
   .origin,
   .token {
@@ -39,10 +39,13 @@ $offset: 8px;
     transform-origin: 110% 110%;
   }
   .token {
-    top: $offset;
-    left: $offset;
+    top: $offset-y;
+    left: $offset-x;
     filter: drop-shadow(0px 0px 2px #00000033);
     transform-origin: -10% -10%;
+    width: calc($size - 2px);
+    height: calc($size - 2px);
+    border: 1px solid #fff;
   }
 
   &:hover {
@@ -50,6 +53,7 @@ $offset: 8px;
     .token {
       transform: scale(1.3);
       filter: drop-shadow(0px 0px 4px #00000033);
+      border: none;
     }
   }
 }

@@ -279,7 +279,9 @@ const TokenList = () => {
                     <tr key={id}>
                       <td title={name}>
                         <Stack direction="row" alignItems="center">
-                          <TokenLogo logo={token.icon} name={token.name} />
+                          <div className={styles.logo}>
+                            <TokenLogo logo={token.icon} name={token.name} />
+                          </div>
                           <NextLink href={`/token/${id}`} passHref>
                             <Link
                               href={`/token/${id}`}
