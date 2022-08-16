@@ -310,3 +310,11 @@
     white-space: break-spaces;
   }
 }
+
+.methodGroupTitle {
+  font-weight: 500;
+  font-size: 1rem;
+  color: var(--primary-text-color);
+  margin: 1rem 0;
+  line-height: 1em;
+}
