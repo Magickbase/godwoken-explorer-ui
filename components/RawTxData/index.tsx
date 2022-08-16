@@ -1,17 +1,50 @@
 import { Skeleton } from '@mui/material'
 import { useQuery } from 'react-query'
 import { useTranslation } from 'next-i18next'
-import { provider } from 'utils'
+import { NODE_URL } from 'utils'
 import styles from './styles.module.scss'
 
 const RawTxData: React.FC<{ hash: string }> = ({ hash }) => {
   const [t] = useTranslation('tx')
-  const { isLoading: isTxLoading, data: tx } = useQuery(['tx-raw-data', hash], () => provider.getTransaction(hash), {
-    enabled: !!hash,
-  })
+  const { isLoading: isTxLoading, data: tx } = useQuery(
+    ['tx-raw-data', hash],
+    () =>
+      fetch(NODE_URL, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: 1,
+          jsonrpc: '2.0',
+          method: 'eth_getTransactionByHash',
+          params: [hash],
+        }),
+      })
+        .then(res => res.json())
+        .catch(() => null),
+    {
+      enabled: !!hash,
+    },
+  )
+
   const { isLoading: isTxReceiptLoading, data: txReceipt } = useQuery(
     ['tx-receipt-raw-data', hash],
-    () => provider.getTransactionReceipt(hash),
+    () =>
+      fetch(NODE_URL, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: 1,
+          jsonrpc: '2.0',
+          method: 'eth_getTransactionReceipt',
+          params: [hash],
+        }),
+      })
+        .then(res => res.json())
+        .catch(() => null),
     { enabled: !!hash },
   )
 
