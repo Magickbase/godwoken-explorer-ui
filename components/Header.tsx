@@ -33,8 +33,7 @@ import HoverMenu from 'material-ui-popup-state/HoverMenu'
 const CHAIN_LINKS = [
   { label: 'mainnet_v1', href: 'https://v1.gwscan.com' },
   { label: 'testnet_v1', href: 'https://v1.testnet.gwscan.com' },
-  { label: 'mainnet_v0', href: 'https://gwscan.com' },
-  { label: 'testnet_v0', href: 'https://pudge.gwscan.com' },
+  { label: 'mainnet_v0', href: 'https://v0.gwscan.com' },
 ]
 const TOKEN_TYPE_LIST = ['bridge', 'native']
 const LOCALE_LIST = ['zh-CN', 'en-US']
@@ -265,7 +264,13 @@ const Header = () => {
               }}
             >
               <NextLink href={`/`} passHref>
-                <Link href={`/`} title={t(`home`)} underline="none" color="secondary">
+                <Link
+                  href={`/`}
+                  title={t(`home`)}
+                  underline="none"
+                  color="secondary"
+                  sx={{ '&:hover': { color: 'var(--primary-color) !important' } }}
+                >
                   {t(`home`)}
                 </Link>
               </NextLink>
@@ -279,6 +284,7 @@ const Header = () => {
                 '& .MuiButton-endIcon': { m: 0 },
                 '&.MuiButtonBase-root:hover': {
                   bgcolor: 'transparent',
+                  color: 'var(--primary-color)',
                 },
               }}
               endIcon={tokenPopover.isOpen ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
@@ -301,7 +307,13 @@ const Header = () => {
               }}
             >
               <NextLink href={`/contracts`} passHref>
-                <Link href={`/contracts`} title={t(`contracts`)} underline="none" color="secondary">
+                <Link
+                  href={`/contracts`}
+                  title={t(`contracts`)}
+                  underline="none"
+                  color="secondary"
+                  sx={{ '&:hover': { color: 'var(--primary-color) !important' } }}
+                >
                   {t(`contracts`)}
                 </Link>
               </NextLink>
@@ -318,7 +330,13 @@ const Header = () => {
               }}
             >
               <NextLink href={`/charts`} passHref>
-                <Link href={`/charts`} title={t(`charts`)} underline="none" color="secondary">
+                <Link
+                  href={`/charts`}
+                  title={t(`charts`)}
+                  underline="none"
+                  color="secondary"
+                  sx={{ '&:hover': { color: 'var(--primary-color) !important' } }}
+                >
                   {t(`charts`)}
                 </Link>
               </NextLink>
@@ -332,6 +350,7 @@ const Header = () => {
                 '& .MuiButton-endIcon': { m: 0 },
                 '&.MuiButtonBase-root:hover': {
                   bgcolor: 'transparent',
+                  color: 'var(--primary-color)',
                 },
               }}
               endIcon={chainPopover.isOpen ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
@@ -352,6 +371,7 @@ const Header = () => {
                 'pr': 0,
                 '&.MuiButtonBase-root:hover': {
                   bgcolor: 'transparent',
+                  color: 'var(--primary-color)',
                 },
               }}
               startIcon={<LanguageIcon fontSize="small" />}
