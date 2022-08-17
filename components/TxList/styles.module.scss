@@ -7,6 +7,13 @@
       text-align: right;
     }
   }
+  &[data-is-filter-unnecessary='true'] {
+    th {
+      svg {
+        display: none;
+      }
+    }
+  }
 }
 .direction {
   padding-left: 0 !important;

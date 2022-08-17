@@ -122,9 +122,10 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
   const [t, { language }] = useTranslation('list')
   const { query } = useRouter()
   const isFiltered = Object.keys(query).some(key => FILTER_KEYS.includes(key))
+  const isFilterUnnecessary = !metadata.total_count && !isFiltered
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} data-is-filter-unnecessary={isFilterUnnecessary}>
       <Table>
         <thead>
           <tr>

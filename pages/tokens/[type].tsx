@@ -109,7 +109,6 @@ const TokenList = () => {
   } = useRouter()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
-  const isFiltered = !!name
 
   const headers = [
     { key: 'token' },
@@ -136,6 +135,9 @@ const TokenList = () => {
     },
   )
 
+  const isFiltered = !!name
+  const isFilterUnnecessary = !data?.metadata.total_count && !isFiltered
+
   const handleHolderCountSortClick = (e: React.MouseEvent<HTMLOrSVGElement>) => {
     const {
       dataset: { order },
@@ -154,7 +156,11 @@ const TokenList = () => {
   return (
     <>
       <SubpageHead subtitle={title} />
-      <Container sx={{ px: { xs: 2, sm: 3, md: 2, lg: 0 }, pb: { xs: 5.5, md: 11 } }} className={styles.container}>
+      <Container
+        sx={{ px: { xs: 2, sm: 3, md: 2, lg: 0 }, pb: { xs: 5.5, md: 11 } }}
+        className={styles.container}
+        data-is-filter-unnecessary={isFilterUnnecessary}
+      >
         <PageTitle>
           <Typography variant="inherit" display="inline" pr={1}>
             {title}

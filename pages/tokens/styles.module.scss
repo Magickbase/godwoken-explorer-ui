@@ -20,6 +20,13 @@
     left: 0;
     transform: translateX(-20px);
   }
+  &[data-is-filter-unnecessary='true'] {
+    th {
+      svg {
+        display: none;
+      }
+    }
+  }
 }
 
 .add {

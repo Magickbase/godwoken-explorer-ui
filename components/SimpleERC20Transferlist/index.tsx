@@ -118,6 +118,7 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
   } = useRouter()
 
   const isFiltered = Object.keys(query).some(key => FILTER_KEYS.includes(key))
+  const isFilterUnnecessary = !metadata.total_count && !isFiltered
 
   const handleLogIndexSortClick = (e: React.MouseEvent<HTMLOrSVGImageElement>) => {
     const {
@@ -134,7 +135,7 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
   const handleTokenDisplayChange = () => setIsShowLogo(show => !show)
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} data-is-filter-unnecessary={isFilterUnnecessary}>
       <Table>
         <thead>
           <tr>
