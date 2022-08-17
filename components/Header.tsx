@@ -81,8 +81,8 @@ const LOCALE_LIST = ['zh-CN', 'en-US']
 const CHAIN_LINKS = [
   { label: 'mainnet_v1', href: 'https://v1.gwscan.com' },
   { label: 'testnet_v1', href: 'https://v1.testnet.gwscan.com' },
-  { label: 'mainnet_v0', href: 'https://gwscan.com' },
-  { label: 'testnet_v0', href: 'https://pudge.gwscan.com' },
+  { label: 'mainnet_v0', href: 'https://v0.gwscan.com' },
+  // { label: 'testnet_v0', href: 'https://pudge.gwscan.com' },
 ]
 
 const Header = () => {
