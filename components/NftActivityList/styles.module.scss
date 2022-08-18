@@ -1,0 +1,44 @@
+.container {
+  th,
+  td {
+    &:last-child {
+      text-align: right;
+      padding-left: 0 !important;
+    }
+  }
+  .hash {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    a {
+      padding-right: 4px;
+    }
+  }
+  .noRecords {
+    text-align: center !important;
+  }
+}
+
+.token {
+  display: flex;
+  align-items: center;
+  svg {
+    margin-left: 0.25rem;
+    cursor: pointer;
+  }
+}
+
+.tokenUrl {
+  display: block;
+  max-width: 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.direction {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+.amount {
+  margin-right: 0.25rem;
+}
