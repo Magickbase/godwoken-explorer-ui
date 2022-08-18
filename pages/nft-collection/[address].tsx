@@ -10,9 +10,11 @@ import PageTitle from 'components/PageTitle'
 import InfoList from 'components/InfoList'
 import HashLink from 'components/HashLink'
 import Tabs from 'components/Tabs'
+import NftActivityList, { fetchNftActivityList } from 'components/NftActivityList'
 import TokenLogo from 'components/TokenLogo'
 import { client } from 'utils'
 import styles from './styles.module.scss'
+import { SIZES } from 'components/PageSize'
 
 const nftCollectionQuery = gql`
   query ($address: String!, $before: String, $after: String) {
@@ -42,7 +44,7 @@ const tabs = ['activity', 'holders', 'inventory']
 const NftCollection = () => {
   const [t] = useTranslation('nft')
   const {
-    query: { address, tab = tabs[0] },
+    query: { address, tab = tabs[0], before = null, after = null, page_size = SIZES[1] },
   } = useRouter()
 
   const mockNftInfo = {
@@ -55,6 +57,20 @@ const NftCollection = () => {
   //     address: address as string,
   //   }),
   // )
+
+  const { isLoading: isNftActivityListLoading, data: nftActivityList } = useQuery(
+    ['nft-collection-activity', address, before, after, page_size],
+    () =>
+      fetchNftActivityList({
+        contract_address: address as string,
+        before: before as string,
+        after: after as string,
+        limit: Number.isNaN(+page_size) ? +SIZES[1] : +page_size,
+      }),
+    {
+      enabled: address && tab === tabs[0],
+    },
+  )
 
   const infoList: Array<{
     field: string
@@ -99,6 +115,13 @@ const NftCollection = () => {
               href: `/nft-collection/${address}?tab=${tabs[idx]}`,
             }))}
           />
+          {tab === tabs[0] ? (
+            isNftActivityListLoading || !nftActivityList ? (
+              <Skeleton animation="wave" />
+            ) : (
+              <NftActivityList token_transfers={nftActivityList} />
+            )
+          ) : null}
         </div>
       </div>
     </>
