@@ -134,7 +134,8 @@ const ContractEventsList = ({ list }: { list: ParsedEventLog[] }) => {
                         <Link
                           href={`/block/${item.blockNumber}`}
                           underline="none"
-                          color="secondary"
+                          color="primary"
+                          className="mono-font"
                           sx={{ fontSize: 14 }}
                         >
                           # {item.blockNumber}
