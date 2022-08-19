@@ -313,6 +313,7 @@ const TokenList = () => {
                                     whiteSpace: 'nowrap',
                                     textOverflow: 'ellipsis',
                                     overflow: 'hidden',
+                                    maxWidth: '16ch',
                                   }}
                                 >
                                   {name || '-'}
