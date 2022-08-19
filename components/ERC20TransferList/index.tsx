@@ -11,6 +11,7 @@ import TransferDirection from 'components/TransferDirection'
 import RoundedAmount from 'components/RoundedAmount'
 import TokenLogo from 'components/TokenLogo'
 import ChangeIcon from 'assets/icons/change.svg'
+import NoDataIcon from 'assets/icons/no-data.svg'
 import { client, timeDistance, getBlockStatus, GraphQLSchema } from 'utils'
 import styles from './styles.module.scss'
 
@@ -234,14 +235,17 @@ const TransferList: React.FC<
             })
           ) : (
             <tr>
-              <td colSpan={showToken ? 8 : 7} className={styles.noRecords}>
-                {t(`no_records`)}
+              <td colSpan={showToken ? 8 : 7}>
+                <div className={styles.noRecords}>
+                  <NoDataIcon />
+                  <span>{t(`no_records`)}</span>
+                </div>
               </td>
             </tr>
           )}
         </tbody>
       </Table>
-      <Pagination {...token_transfers.metadata} />
+      {token_transfers.metadata.total_count ? <Pagination {...token_transfers.metadata} /> : null}
     </div>
   )
 }

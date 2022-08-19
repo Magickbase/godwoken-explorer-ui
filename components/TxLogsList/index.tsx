@@ -3,6 +3,7 @@ import NextLink from 'next/link'
 import { Link } from '@mui/material'
 import { ParsedEventLog } from 'utils'
 import LogFieldItem from 'components/LogItemField'
+import NoDataIcon from 'assets/icons/no-data.svg'
 import styles from './styles.module.scss'
 
 const TxLogsList = ({ list }: { list: ParsedEventLog[] }) => {
@@ -104,6 +105,7 @@ const TxLogsList = ({ list }: { list: ParsedEventLog[] }) => {
     </div>
   ) : (
     <div className={styles.noRecords}>
+      <NoDataIcon />
       <span>{t('noLogs')}</span>
     </div>
   )

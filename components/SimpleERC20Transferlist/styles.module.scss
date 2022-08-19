@@ -1,3 +1,5 @@
+@import '../../styles/mixin.scss';
+
 .container {
   th {
     text-transform: capitalize;
@@ -6,6 +8,13 @@
   td {
     &:last-child {
       text-align: right;
+    }
+  }
+  &[data-is-filter-unnecessary='true'] {
+    th {
+      svg {
+        display: none;
+      }
     }
   }
 }
@@ -39,4 +48,8 @@
 .to {
   display: flex;
   align-items: center;
+}
+
+.noRecords {
+  @include empty-list;
 }
