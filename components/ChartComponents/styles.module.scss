@@ -20,7 +20,7 @@
     }
     li span {
       font-size: 14px;
-      color: #333;
+      color: var(--primary-text-color);
     }
     li::before {
       position: absolute;
