@@ -12,7 +12,7 @@
     font-family: Roboto;
     font-weight: 400;
     font-size: 0.875rem;
-    color: #333;
+    color: var(--primary-text-color);
     border-radius: 4px;
     border-color: #ddd;
   }
@@ -42,7 +42,7 @@
       border-radius: 8px;
       font-size: 0.875rem;
       font-weight: 400;
-      color: #999;
+      color: var(--primary-text-color);
       background-color: transparent;
       margin: 0 0 1rem;
     }
@@ -65,7 +65,7 @@
 
   .params,
   .response {
-    color: #333;
+    color: var(--primary-text-color);
     font-size: 0.875rem;
     font-weight: 500;
     margin-top: 0.5rem;
@@ -93,7 +93,7 @@
     border: 1px solid var(--border-color);
     margin: 1rem auto;
     font-size: 0.875rem;
-    color: #333;
+    color: var(--primary-text-color);
 
     summary {
       display: flex;
@@ -252,7 +252,7 @@
   padding: 1rem 0;
   font-size: 0.875rem;
   font-weight: 400;
-  color: #333;
+  color: var(--primary-text-color);
   & > div {
     flex: 1;
     display: flex;
@@ -284,7 +284,7 @@
   h6 {
     font-size: 1rem;
     font-weight: 500;
-    color: #333;
+    color: var(--primary-text-color);
     margin: 0;
   }
   .title {

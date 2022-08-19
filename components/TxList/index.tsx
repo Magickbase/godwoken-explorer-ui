@@ -1,4 +1,5 @@
 import { useTranslation } from 'next-i18next'
+import { useRouter } from 'next/router'
 import NextLink from 'next/link'
 import { gql } from 'graphql-request'
 import Table from 'components/Table'
@@ -9,9 +10,11 @@ import Pagination from 'components/SimplePagination'
 import TransferDirection from 'components/TransferDirection'
 import Tooltip from 'components/Tooltip'
 import FilterMenu from 'components/FilterMenu'
+import RoundedAmount from 'components/RoundedAmount'
+import NoDataIcon from 'assets/icons/no-data.svg'
+import EmptyFilteredListIcon from 'assets/icons/empty-filtered-list.svg'
 import { getBlockStatus, timeDistance, GraphQLSchema, client, PCKB_UDT_INFO } from 'utils'
 import styles from './styles.module.scss'
-import RoundedAmount from 'components/RoundedAmount'
 
 export type TxListProps = {
   transactions: {
@@ -108,6 +111,8 @@ export const fetchTxList = (variables: Variables) =>
     .then(data => data.transactions)
     .catch(() => ({ entries: [], metadata: { before: null, after: null, total_count: 0 } }))
 
+const FILTER_KEYS = ['block_from', 'block_to']
+
 const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> = ({
   transactions: { entries, metadata },
   maxCount,
@@ -115,9 +120,12 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
   viewer,
 }) => {
   const [t, { language }] = useTranslation('list')
+  const { query } = useRouter()
+  const isFiltered = Object.keys(query).some(key => FILTER_KEYS.includes(key))
+  const isFilterUnnecessary = !metadata.total_count && !isFiltered
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} data-is-filter-unnecessary={isFilterUnnecessary}>
       <Table>
         <thead>
           <tr>
@@ -125,7 +133,7 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
             <th>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 {t('block')}
-                <FilterMenu filterKeys={['block_from', 'block_to']} />
+                <FilterMenu filterKeys={FILTER_KEYS} />
               </div>
             </th>
             <th>{t('age')}</th>
@@ -194,14 +202,25 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
             })
           ) : (
             <tr>
-              <td colSpan={7} align="center" style={{ textAlign: 'center' }}>
-                {t(`no_records`)}
+              <td colSpan={7} align="center">
+                {isFiltered ? (
+                  <div className={styles.noRecords}>
+                    <EmptyFilteredListIcon />
+                    <span>{t(`no_related_content`)}</span>
+                  </div>
+                ) : (
+                  <div className={styles.noRecords}>
+                    <NoDataIcon />
+                    <span>{t(`no_records`)}</span>
+                  </div>
+                )}
               </td>
             </tr>
           )}
         </tbody>
       </Table>
-      {pageSize ? (
+
+      {!metadata.total_count ? null : pageSize ? (
         <Pagination {...metadata} note={maxCount ? t(`last-n-records`, { n: maxCount }) : ''} />
       ) : (
         <Pagination {...metadata} note={maxCount ? t(`last-n-records`, { n: maxCount }) : ''} />
