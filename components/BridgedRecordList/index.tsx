@@ -5,6 +5,7 @@ import Table from 'components/Table'
 import HashLink from 'components/HashLink'
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/Pagination'
+import NoDataIcon from 'assets/icons/no-data.svg'
 import Amount from 'components/Amount'
 import { timeDistance, getBridgedRecordListRes, CKB_EXPLORER_URL, PCKB_UAN, PCKB_UDT_INFO } from 'utils'
 import styles from './styles.module.scss'
@@ -84,16 +85,21 @@ const BridgedRecordList: React.FC<{ list: ParsedList; showUser?: boolean }> = ({
             ))
           ) : (
             <tr>
-              <td colSpan={showUser ? 7 : 6} align="center" style={{ textAlign: 'center' }}>
-                {t(`no_records`)}
+              <td colSpan={showUser ? 7 : 6}>
+                <div className={styles.noRecords}>
+                  <NoDataIcon />
+                  <span>{t(`no_records`)}</span>
+                </div>
               </td>
             </tr>
           )}
         </tbody>
       </Table>
-      <div className={styles.pagination}>
-        <Pagination total={+list.meta.total} page={+list.meta.page} />
-      </div>
+      {+list.meta.total ? (
+        <div className={styles.pagination}>
+          <Pagination total={+list.meta.total} page={+list.meta.page} />
+        </div>
+      ) : null}
     </>
   )
 }

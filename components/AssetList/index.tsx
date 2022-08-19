@@ -1,11 +1,12 @@
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import { gql } from 'graphql-request'
+import BigNumber from 'bignumber.js'
 import Table from 'components/Table'
 import TokenLogo from 'components/TokenLogo'
-import { parseTokenName, client, formatAmount, GraphQLSchema } from 'utils'
+import { parseTokenName, client, GraphQLSchema } from 'utils'
+import NoDataIcon from 'assets/icons/no-data.svg'
 import styles from './styles.module.scss'
-import BigNumber from 'bignumber.js'
 
 export type UdtList = Array<{
   value: string
@@ -89,8 +90,11 @@ const AssetList = ({ list = [] }: { list: UdtList }) => {
           })
         ) : (
           <tr>
-            <td colSpan={3} align="center" className={styles.noRecords}>
-              {t(`emptyAssetList`)}
+            <td colSpan={3} align="center">
+              <div className={styles.noRecords}>
+                <NoDataIcon />
+                <span>{t(`emptyAssetList`)}</span>
+              </div>
             </td>
           </tr>
         )}

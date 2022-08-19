@@ -25,6 +25,7 @@ import Pagination from 'components/Pagination'
 import PageSize, { SIZES } from 'components/PageSize'
 import BlockStateIcon from 'components/BlockStateIcon'
 import TableCell from 'components/TableCell'
+import NoDataIcon from 'assets/icons/no-data.svg'
 import { fetchBlockList, timeDistance } from 'utils'
 
 const BlockList = () => {
@@ -223,7 +224,19 @@ const BlockList = () => {
                 ) : (
                   <TableRow>
                     <TableCell colSpan={5} align="center">
-                      {t(`no_records`)}
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          padding: '8.75rem 0',
+                          color: 'var(--primary-color)',
+                        }}
+                      >
+                        <NoDataIcon />
+                        <span style={{ marginTop: '2rem' }}>{t(`no_records`)}</span>
+                      </div>
                     </TableCell>
                   </TableRow>
                 )}

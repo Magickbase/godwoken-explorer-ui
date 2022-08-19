@@ -10,9 +10,11 @@ import Table from 'components/Table'
 import Pagination from 'components/SimplePagination'
 import TokenLogo from 'components/TokenLogo'
 import FilterMenu from 'components/FilterMenu'
-import SortIcon from 'assets/icons/sort.svg'
 import RoundedAmount from 'components/RoundedAmount'
+import SortIcon from 'assets/icons/sort.svg'
 import ChangeIcon from 'assets/icons/change.svg'
+import NoDataIcon from 'assets/icons/no-data.svg'
+import EmptyFilteredListIcon from 'assets/icons/empty-filtered-list.svg'
 import { GraphQLSchema, client } from 'utils'
 import styles from './styles.module.scss'
 
@@ -104,6 +106,8 @@ export const fetchTransferList = (variables: {
     .then(data => data.token_transfers)
     .catch(() => ({ entries: [], metadata: { before: null, after: null, total_count: 0 } }))
 
+const FILTER_KEYS = ['address_from', 'address_to']
+
 const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries, metadata } }) => {
   const [isShowLogo, setIsShowLogo] = useState(true)
   const [t] = useTranslation('list')
@@ -112,6 +116,9 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
     push,
     asPath,
   } = useRouter()
+
+  const isFiltered = Object.keys(query).some(key => FILTER_KEYS.includes(key))
+  const isFilterUnnecessary = !metadata.total_count && !isFiltered
 
   const handleLogIndexSortClick = (e: React.MouseEvent<HTMLOrSVGImageElement>) => {
     const {
@@ -128,7 +135,7 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
   const handleTokenDisplayChange = () => setIsShowLogo(show => !show)
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} data-is-filter-unnecessary={isFilterUnnecessary}>
       <Table>
         <thead>
           <tr>
@@ -141,13 +148,13 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
             <th>
               <div className={styles.from}>
                 {t('from')}
-                <FilterMenu filterKeys={['address_from']} />
+                <FilterMenu filterKeys={[FILTER_KEYS[0]]} />
               </div>
             </th>
             <th>
               <div className={styles.to}>
                 {t('to')}
-                <FilterMenu filterKeys={['address_to']} />
+                <FilterMenu filterKeys={[FILTER_KEYS[1]]} />
               </div>
             </th>
             <th className={styles.tokenLogo}>
@@ -202,15 +209,24 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
             ))
           ) : (
             <tr>
-              <td colSpan={5} style={{ textAlign: 'center' }}>
-                {t(`no_records`)}
+              <td colSpan={5}>
+                {isFiltered ? (
+                  <div className={styles.noRecords}>
+                    <EmptyFilteredListIcon />
+                    <span>{t(`no_related_content`)}</span>
+                  </div>
+                ) : (
+                  <div className={styles.noRecords}>
+                    <NoDataIcon />
+                    <span>{t(`no_records`)}</span>
+                  </div>
+                )}
               </td>
             </tr>
           )}
         </tbody>
       </Table>
-
-      <Pagination {...metadata} note={t(`last-n-records`, { n: `100k` })} />
+      {metadata.total_count ? <Pagination {...metadata} note={t(`last-n-records`, { n: `100k` })} /> : null}
     </div>
   )
 }
