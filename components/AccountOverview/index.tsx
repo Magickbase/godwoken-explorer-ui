@@ -13,6 +13,7 @@ import InfoList from 'components/InfoList'
 import Amount from 'components/Amount'
 import styles from './styles.module.scss'
 import { GraphQLSchema, client, provider, PCKB_UDT_INFO } from 'utils'
+import { useQuery } from 'react-query'
 
 export type BasicScript = Record<'args' | 'code_hash' | 'hash_type', string>
 export interface AccountBase {
@@ -83,6 +84,7 @@ export type AccountOverviewProps = {
   isBalanceLoading?: boolean
   balance: string
   deployerAddr?: string
+  isContractVerified?: boolean
 }
 
 const accountOverviewQuery = gql`
@@ -123,6 +125,16 @@ const deployAddrQuery = gql`
   }
 `
 
+const checkSourcify = gql`
+  query checkSourcify($address: String!) {
+    sourcify_check_by_addresses(input: { addresses: [$address] }) {
+      address
+      chain_ids
+      status
+    }
+  }
+`
+
 type Variables = { address: string } | { script_hash: string }
 
 export const fetchAccountOverview = (variables: Variables) =>
@@ -145,14 +157,32 @@ export const fetchDeployAddress = (variables: { eth_hash: string }) =>
     .request<{ transaction: { from_account: Pick<GraphQLSchema.Account, 'eth_address'> } }>(deployAddrQuery, variables)
     .then(data => data.transaction.from_account.eth_address)
 
-const OverviewPlaceHolderCount = {
-  [GraphQLSchema.AccountType.EthUser]: 0,
-  [GraphQLSchema.AccountType.PolyjuiceCreator]: 1,
-  [GraphQLSchema.AccountType.PolyjuiceContract]: 3,
-  [GraphQLSchema.AccountType.MetaContract]: 6,
-  [GraphQLSchema.AccountType.EthAddrReg]: 0,
-  [GraphQLSchema.AccountType.Udt]: 4,
+export const fetchSourcifyStatus = (address: string) =>
+  client
+    .request<{ sourcify_check_by_addresses: { status: string | null } }>(checkSourcify, { address })
+    .then(data => data.sourcify_check_by_addresses.status)
+
+const overviewPlaceHolderCount = (account: AccountOverviewProps['account']) => {
+  switch (account.type) {
+    case GraphQLSchema.AccountType.EthUser:
+      return 0
+    case GraphQLSchema.AccountType.PolyjuiceCreator:
+      return 1
+    case GraphQLSchema.AccountType.PolyjuiceContract:
+      if (!!account.smart_contract?.deployment_tx_hash) {
+        return 2
+      } else {
+        return 1
+      }
+    case GraphQLSchema.AccountType.MetaContract:
+      return 6
+    case GraphQLSchema.AccountType.EthAddrReg:
+      return 0
+    case GraphQLSchema.AccountType.Udt:
+      return 4
+  }
 }
+
 const AccountOverview: React.FC<AccountOverviewProps> = ({
   account,
   balance,
@@ -161,6 +191,15 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({
   isOverviewLoading,
 }) => {
   const [t] = useTranslation(['account', 'common'])
+
+  const {
+    isLoading: isSourcifyCheckLoading,
+    data: verifyStatus,
+    refetch: refetchStatus,
+  } = useQuery(['sourcify-check', account.eth_address], () => fetchSourcifyStatus(account.eth_address), {
+    retry: false,
+  })
+
   return (
     <div className={styles.container} data-account-type={account.type}>
       {account.type === GraphQLSchema.AccountType.MetaContract ? (
@@ -175,7 +214,11 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({
           deployer={deployerAddr}
           deployTxHash={account.smart_contract?.deployment_tx_hash}
           udt={account.udt}
-          isVerified={!!account.smart_contract?.abi}
+          address={account.eth_address}
+          isSourcifyCheckLoading={isSourcifyCheckLoading}
+          isVerified={verifyStatus === 'perfect'}
+          isSubmitted={!!account.smart_contract?.deployment_tx_hash}
+          refetchStatus={refetchStatus}
         />
       ) : null}
       {account.type === GraphQLSchema.AccountType.PolyjuiceCreator ? (
@@ -207,13 +250,13 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({
               new BigNumber(Math.max(account.nonce ?? 0, account.transaction_count ?? 0)).toFormat()
             ),
           },
-          OverviewPlaceHolderCount[account.type]
+          overviewPlaceHolderCount(account)
             ? {
                 field: '',
                 content: (
                   <div
                     data-role="placeholder"
-                    style={{ height: `calc(${3.5 * OverviewPlaceHolderCount[account.type]}rem - 2rem)` }}
+                    style={{ height: `calc(${3.5 * overviewPlaceHolderCount(account)}rem - 2rem)` }}
                   ></div>
                 ),
               }
