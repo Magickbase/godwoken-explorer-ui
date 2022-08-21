@@ -636,7 +636,7 @@ const Home = () => {
   return (
     <Box sx={{ pb: { xs: 5, md: 11 } }}>
       <Box sx={{ bgcolor: 'primary.light' }}>
-        <Container sx={{ px: { md: 3, lg: 1 } }}>
+        <Container sx={{ px: { md: 3, lg: 0 } }}>
           <Search />
         </Container>
         <Container sx={{ px: { md: 3, lg: 1 }, pr: { xs: 0 } }}>
