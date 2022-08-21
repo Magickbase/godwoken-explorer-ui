@@ -196,7 +196,7 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({
     ['sourcify-check', account.eth_address],
     () => fetchSourcifyStatus(account.eth_address),
     {
-      retry: false,
+      enabled: !!account.eth_address,
     },
   )
 
