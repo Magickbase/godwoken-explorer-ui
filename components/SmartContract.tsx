@@ -33,12 +33,12 @@ const SmartContract: React.FC<{
   udt: Pick<GraphQLSchema.Udt, 'id' | 'name'> | null
   isVerified: boolean
   isSubmitted: boolean
-  isSourcifyCheckLoading: boolean
   refetchStatus: any
   address: string
-}> = ({ deployer, deployTxHash, udt, isVerified, isSubmitted, isSourcifyCheckLoading, refetchStatus, address }) => {
+}> = ({ deployer, deployTxHash, udt, isVerified, isSubmitted, refetchStatus, address }) => {
   const [t] = useTranslation('account')
   const [checkAgain, setCheckAgain] = useState(false)
+  const [isSourcifyCheckLoading, setIsSourcifyCheckLoading] = useState(false)
 
   const submmitedInfo = isSubmitted
     ? [
@@ -89,7 +89,7 @@ const SmartContract: React.FC<{
       content: 'Smart Contract',
     },
     ...submmitedInfo,
-    isSourcifyCheckLoading || !isVerified
+    !isVerified
       ? {
           field: t('verify_status'),
           content: isSourcifyCheckLoading ? (
@@ -97,12 +97,17 @@ const SmartContract: React.FC<{
           ) : (
             <a
               onClick={async () => {
-                const res = await recheckVerifyStatus(address)
-                if (res) {
-                  refetchStatus()
-                } else {
-                  window.open('https://sourcify.dev/#/verifier', '_blank').focus()
-                  setCheckAgain(true)
+                try {
+                  setIsSourcifyCheckLoading(true)
+                  const res = await recheckVerifyStatus(address)
+                  if (res) {
+                    await refetchStatus()
+                  } else {
+                    window.open('https://sourcify.dev/#/verifier', '_blank').focus()
+                    setCheckAgain(true)
+                  }
+                } catch {
+                  setIsSourcifyCheckLoading(false)
                 }
               }}
               style={{ display: 'flex', alignItems: 'center' }}

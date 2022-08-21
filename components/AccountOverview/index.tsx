@@ -192,13 +192,13 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({
 }) => {
   const [t] = useTranslation(['account', 'common'])
 
-  const {
-    isLoading: isSourcifyCheckLoading,
-    data: verifyStatus,
-    refetch: refetchStatus,
-  } = useQuery(['sourcify-check', account.eth_address], () => fetchSourcifyStatus(account.eth_address), {
-    retry: false,
-  })
+  const { data: verifyStatus, refetch: refetchStatus } = useQuery(
+    ['sourcify-check', account.eth_address],
+    () => fetchSourcifyStatus(account.eth_address),
+    {
+      retry: false,
+    },
+  )
 
   return (
     <div className={styles.container} data-account-type={account.type}>
@@ -215,7 +215,6 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({
           deployTxHash={account.smart_contract?.deployment_tx_hash}
           udt={account.udt}
           address={account.eth_address}
-          isSourcifyCheckLoading={isSourcifyCheckLoading}
           isVerified={verifyStatus === 'perfect'}
           isSubmitted={!!account.smart_contract?.deployment_tx_hash}
           refetchStatus={refetchStatus}
