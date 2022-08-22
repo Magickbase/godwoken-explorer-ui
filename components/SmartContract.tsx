@@ -106,6 +106,7 @@ const SmartContract: React.FC<{
                     window.open('https://sourcify.dev/#/verifier', '_blank').focus()
                     setCheckAgain(true)
                   }
+                  setIsSourcifyCheckLoading(false)
                 } catch {
                   setIsSourcifyCheckLoading(false)
                 }
