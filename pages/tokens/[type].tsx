@@ -20,6 +20,8 @@ import FilterMenu from 'components/FilterMenu'
 import { SIZES } from 'components/PageSize'
 import Amount from 'components/Amount'
 import AddIcon from 'assets/icons/add.svg'
+import NoDataIcon from 'assets/icons/no-data.svg'
+import EmptyFilteredListIcon from 'assets/icons/empty-filtered-list.svg'
 import { GraphQLSchema, client, parseTokenName } from 'utils'
 import styles from './styles.module.scss'
 
@@ -90,6 +92,7 @@ const fetchTokenList = (variables: Variables): Promise<TokenListProps['udts']> =
     .then(data => data.udts)
     .catch(() => ({ entries: [], metadata: { before: null, after: null, total_count: 0 } }))
 
+const FILTER_KEYS = ['name']
 const TokenList = () => {
   const [t] = useTranslation(['tokens', 'common', 'list'])
   const {
@@ -132,6 +135,9 @@ const TokenList = () => {
     },
   )
 
+  const isFiltered = !!name
+  const isFilterUnnecessary = !data?.metadata.total_count && !isFiltered
+
   const handleHolderCountSortClick = (e: React.MouseEvent<HTMLOrSVGElement>) => {
     const {
       dataset: { order },
@@ -150,7 +156,11 @@ const TokenList = () => {
   return (
     <>
       <SubpageHead subtitle={title} />
-      <Container sx={{ px: { xs: 2, sm: 3, md: 2, lg: 0 }, pb: { xs: 5.5, md: 11 } }} className={styles.container}>
+      <Container
+        sx={{ px: { xs: 2, sm: 3, md: 2, lg: 0 }, pb: { xs: 5.5, md: 11 } }}
+        className={styles.container}
+        data-is-filter-unnecessary={isFilterUnnecessary}
+      >
         <PageTitle>
           <Typography variant="inherit" display="inline" pr={1}>
             {title}
@@ -193,28 +203,6 @@ const TokenList = () => {
                 {t(type === 'bridge' ? 'add-bridged-token' : 'add-native-erc20-token')}
                 <AddIcon />
               </a>
-              {/* <Button */}
-              {/*   endIcon={<AddCircleOutlineRoundedIcon sx={{ fontSize: 13 }} />} */}
-              {/*   component={Link} */}
-              {/*   href={type === 'bridge' ? BRIDGED_TOKEN_TEMPLATE_URL : NATIVE_TOKEN_TEMPLATE_URL} */}
-              {/*   target="_blank" */}
-              {/*   rel="noreferrer noopener" */}
-              {/*   sx={{ */}
-              {/*     'bgcolor': theme.palette.primary.light, */}
-              {/*     'borderRadius': 2, */}
-              {/*     'textTransform': 'none', */}
-              {/*     'height': 40, */}
-              {/*     'lineHeight': 40, */}
-              {/*     'px': { xs: 1, md: 2 }, */}
-              {/*     'fontWeight': 500, */}
-              {/*     'fontSize': { xs: 13, md: 14 }, */}
-              {/*     '& .MuiButton-endIcon': { */}
-              {/*       marginLeft: 0.5, */}
-              {/*     }, */}
-              {/*   }} */}
-              {/* > */}
-              {/*   {t(type === 'bridge' ? 'add-bridged-token' : 'add-native-erc20-token')} */}
-              {/* </Button> */}
             </Stack>
           ) : (
             <Stack
@@ -244,7 +232,7 @@ const TokenList = () => {
                     {t(h.label ?? h.key)}
                     {h.key === 'token' ? (
                       <span>
-                        <FilterMenu filterKeys={['name']} />
+                        <FilterMenu filterKeys={[FILTER_KEYS[0]]} />
                       </span>
                     ) : null}
                     {/* {h.key === 'holderCount' ? ( */}
@@ -280,28 +268,59 @@ const TokenList = () => {
                       <td title={name}>
                         <Stack direction="row" alignItems="center">
                           <TokenLogo logo={token.icon} name={token.name} />
-                          <NextLink href={`/token/${id}`} passHref>
-                            <Link
-                              href={`/token/${id}`}
-                              display="flex"
-                              alignItems="center"
-                              underline="none"
-                              color="primary"
-                              ml={1}
-                            >
-                              <Typography
-                                fontSize="inherit"
-                                fontFamily="inherit"
-                                sx={{
-                                  whiteSpace: 'nowrap',
-                                  textOverflow: 'ellipsis',
-                                  overflow: 'hidden',
-                                }}
+                          {type === 'bridge' ? (
+                            <Tooltip title={t(`view-mapped-native-token`)} placement="top">
+                              <span>
+                                <NextLink href={`/token/${id}`} passHref>
+                                  <Link
+                                    href={`/token/${id}`}
+                                    display="flex"
+                                    alignItems="center"
+                                    underline="none"
+                                    color="primary"
+                                    ml={1}
+                                  >
+                                    <Typography
+                                      fontSize="inherit"
+                                      fontFamily="inherit"
+                                      sx={{
+                                        whiteSpace: 'nowrap',
+                                        textOverflow: 'ellipsis',
+                                        overflow: 'hidden',
+                                        maxWidth: '16ch',
+                                      }}
+                                    >
+                                      {name || '-'}
+                                    </Typography>
+                                  </Link>
+                                </NextLink>
+                              </span>
+                            </Tooltip>
+                          ) : (
+                            <NextLink href={`/token/${id}`} passHref>
+                              <Link
+                                href={`/token/${id}`}
+                                display="flex"
+                                alignItems="center"
+                                underline="none"
+                                color="primary"
+                                ml={1}
                               >
-                                {name || '-'}
-                              </Typography>
-                            </Link>
-                          </NextLink>
+                                <Typography
+                                  fontSize="inherit"
+                                  fontFamily="inherit"
+                                  sx={{
+                                    whiteSpace: 'nowrap',
+                                    textOverflow: 'ellipsis',
+                                    overflow: 'hidden',
+                                    maxWidth: '16ch',
+                                  }}
+                                >
+                                  {name || '-'}
+                                </Typography>
+                              </Link>
+                            </NextLink>
+                          )}
                         </Stack>
                       </td>
                       <td title={addr}>
@@ -340,21 +359,33 @@ const TokenList = () => {
                 })
               ) : (
                 <tr>
-                  <td colSpan={headers.length} className={styles.noRecords}>
-                    {t(`no_records`)}
+                  <td colSpan={headers.length}>
+                    {isFiltered ? (
+                      <div className={styles.noRecords}>
+                        <EmptyFilteredListIcon />
+                        <span>{t(`no_related_content`, { ns: 'list' })}</span>
+                      </div>
+                    ) : (
+                      <div className={styles.noRecords}>
+                        <NoDataIcon />
+                        <span>{t(`no_records`)}</span>
+                      </div>
+                    )}
                   </td>
                 </tr>
               )}
             </tbody>
           </Table>
 
-          <div style={{ overflow: 'hidden' }}>
-            {!data ? (
-              <Skeleton animation="wave" width="calc(100% - 48px)" sx={{ mx: '24px', my: '20px' }} />
-            ) : (
-              <Pagination {...data.metadata} />
-            )}
-          </div>
+          {data?.metadata.total_count ? (
+            <div style={{ overflow: 'hidden' }}>
+              {!data ? (
+                <Skeleton animation="wave" width="calc(100% - 48px)" sx={{ mx: '24px', my: '20px' }} />
+              ) : (
+                <Pagination {...data.metadata} />
+              )}
+            </div>
+          ) : null}
         </Box>
       </Container>
     </>

@@ -108,7 +108,7 @@ const ContractList = () => {
                       <td style={{ textTransform: 'capitalize' }} title={c.compiler.fileFormat}>
                         {c.compiler.fileFormat?.split(' ')[0] ?? '-'}
                       </td>
-                      <td title={c.compiler.version}>{c.compiler.version.split('+')[0]}</td>
+                      <td title={c.compiler.version}>{c.compiler.version?.split('+')[0]}</td>
                       <td title={c.balance}>
                         <Amount amount={c.balance ?? '0'} udt={{ symbol: PCKB_UDT_INFO.symbol, decimal: 10 }} />
                       </td>

@@ -53,5 +53,6 @@
     "address_from": "通过地址搜索",
     "address_to": "通过地址搜索"
   },
-  "n_kinds_in_total": "共计 {{number}} 种"
+  "n_kinds_in_total": "共计 {{number}} 种",
+  "no_related_content": "没有相关数据"
 }

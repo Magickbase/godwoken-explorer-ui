@@ -1,3 +1,5 @@
+@import '../../styles/mixin.scss';
+
 .container {
   th,
   td {
@@ -5,8 +7,19 @@
       text-align: right;
     }
   }
+  &[data-is-filter-unnecessary='true'] {
+    th {
+      svg {
+        display: none;
+      }
+    }
+  }
 }
 .direction {
   padding-left: 0 !important;
   padding-right: 0 !important;
+}
+
+.noRecords {
+  @include empty-list;
 }

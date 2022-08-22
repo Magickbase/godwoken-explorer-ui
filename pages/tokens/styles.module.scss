@@ -1,3 +1,5 @@
+@import '../../styles/mixin.scss';
+
 .container {
   table {
     th {
@@ -17,6 +19,13 @@
   form[data-role='filter-menu']:first-of-type {
     left: 0;
     transform: translateX(-20px);
+  }
+  &[data-is-filter-unnecessary='true'] {
+    th {
+      svg {
+        display: none;
+      }
+    }
   }
 }
 
@@ -51,5 +60,5 @@
 }
 
 .noRecords {
-  text-align: center !important;
+  @include empty-list;
 }
