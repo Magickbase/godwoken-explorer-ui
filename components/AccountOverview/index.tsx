@@ -172,10 +172,12 @@ const overviewPlaceHolderCount = (account: AccountOverviewProps['account'], veri
     case GraphQLSchema.AccountType.PolyjuiceContract:
       if (!!account.smart_contract?.deployment_tx_hash && isVerified) {
         return 2
-      } else if (!!account.smart_contract?.deployment_tx_hash) {
+      } else if (!!account.smart_contract?.deployment_tx_hash && !isVerified) {
         return 3
-      } else {
+      } else if (!account.smart_contract?.deployment_tx_hash && isVerified) {
         return 0
+      } else {
+        return 1
       }
     case GraphQLSchema.AccountType.MetaContract:
       return 6

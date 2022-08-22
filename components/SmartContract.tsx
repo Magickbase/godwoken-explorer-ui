@@ -101,7 +101,7 @@ const SmartContract: React.FC<{
                   setIsSourcifyCheckLoading(true)
                   const res = await recheckVerifyStatus(address)
                   if (res) {
-                    await refetchStatus()
+                    if (checkAgain) await refetchStatus()
                   } else {
                     window.open('https://sourcify.dev/#/verifier', '_blank').focus()
                     setCheckAgain(true)
