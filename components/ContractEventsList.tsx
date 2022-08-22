@@ -122,7 +122,7 @@ const ContractEventsList = ({ list }: { list: ParsedEventLog[] }) => {
                       <Link
                         href={`/tx/${item.txHash}`}
                         underline="none"
-                        color="secondary"
+                        color="primary"
                         className="mono-font"
                         sx={{ fontSize: 14 }}
                       >
