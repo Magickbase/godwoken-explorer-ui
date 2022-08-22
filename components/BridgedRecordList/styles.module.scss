@@ -1,5 +1,10 @@
+@import '../../styles/mixin.scss';
+
 .pagination {
   display: flex;
   justify-content: flex-end;
   padding: 1.125rem 1.5rem;
+}
+.noRecords {
+  @include empty-list;
 }

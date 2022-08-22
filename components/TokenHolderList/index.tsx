@@ -1,12 +1,14 @@
 import { useTranslation } from 'next-i18next'
 import BigNumber from 'bignumber.js'
+import { Stack } from '@mui/material'
+import { useTheme } from '@mui/material/styles'
+import useMediaQuery from '@mui/material/useMediaQuery'
 import Table from 'components/Table'
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/Pagination'
-import { useTheme } from '@mui/material/styles'
-import useMediaQuery from '@mui/material/useMediaQuery'
-import { Stack } from '@mui/material'
+import NoDataIcon from 'assets/icons/no-data.svg'
 import { getTokenHolderListRes } from 'utils'
+import styles from './styles.module.scss'
 
 type ParsedTokenHolderList = ReturnType<typeof getTokenHolderListRes>
 
@@ -45,29 +47,34 @@ const TokenHolderList: React.FC<{
             ))
           ) : (
             <tr>
-              <td colSpan={7} align="center" style={{ textAlign: 'center' }}>
-                {t(`no_records`)}
+              <td colSpan={7}>
+                <div className={styles.noRecords}>
+                  <NoDataIcon />
+                  <span>{t(`no_records`)}</span>
+                </div>
               </td>
             </tr>
           )}
         </tbody>
       </Table>
-      <Stack
-        direction="row"
-        flexWrap="wrap"
-        justifyContent={isMobile ? 'center' : 'end'}
-        alignItems="center"
-        mt={{ xs: 0, md: 2 }}
-        pb={{ xs: 1.5, md: 2 }}
-        px={{ xs: 1.5, md: 3 }}
-      >
-        {/* TODO: pagesize */}
-        {/* <PageSize pageSize={+page_size} /> */}
-        {/* <Typography color="secondary.light" fontSize={{ xs: 12, md: 14 }}>
+      {+list.meta.total ? (
+        <Stack
+          direction="row"
+          flexWrap="wrap"
+          justifyContent={isMobile ? 'center' : 'end'}
+          alignItems="center"
+          mt={{ xs: 0, md: 2 }}
+          pb={{ xs: 1.5, md: 2 }}
+          px={{ xs: 1.5, md: 3 }}
+        >
+          {/* TODO: pagesize */}
+          {/* <PageSize pageSize={+page_size} /> */}
+          {/* <Typography color="secondary.light" fontSize={{ xs: 12, md: 14 }}>
           {t('showLatestRecords', { ns: 'common', number: isMobile ? '100k' : '500k' })}
         </Typography> */}
-        <Pagination total={+list.meta.total} page={+list.meta.page} />
-      </Stack>
+          <Pagination total={+list.meta.total} page={+list.meta.page} />
+        </Stack>
+      ) : null}
     </>
   )
 }

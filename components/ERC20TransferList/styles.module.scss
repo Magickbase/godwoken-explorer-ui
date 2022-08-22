@@ -1,3 +1,5 @@
+@import '../../styles/mixin.scss';
+
 .container {
   th,
   td {
@@ -15,7 +17,7 @@
     }
   }
   .noRecords {
-    text-align: center !important;
+    @include empty-list;
   }
 }
 

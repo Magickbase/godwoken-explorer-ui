@@ -2,6 +2,7 @@
   font-weight: 400;
   font-size: 0.875rem;
   font-family: 'Roboto';
+  overflow-x: auto; // FIXME: will make filter menu partially invisible
   z-index: 1;
 
   table {

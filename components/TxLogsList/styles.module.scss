@@ -1,18 +1,17 @@
+@import '../../styles/mixin.scss';
+
 .container {
   font-size: 14px;
   margin: 24px;
   overflow: auto;
   .title {
-    color: #333;
+    color: var(--primary-text-color);
     font-weight: 400;
   }
 }
 
 .noRecords {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 50px;
+  @include empty-list;
 }
 
 .topicItem {
@@ -72,7 +71,7 @@
   flex-basis: 100px;
   flex-shrink: 0;
   font-size: 16px;
-  color: #333;
+  color: var(--primary-text-color);
   display: flex;
   justify-content: flex-end;
   padding-right: 30px;
@@ -82,7 +81,7 @@
 }
 
 .eventSignature {
-  color: #333;
+  color: var(--primary-text-color);
   display: flex;
   align-items: flex-start;
   min-height: 40px;

@@ -14,3 +14,21 @@
   font-family: 'JetBrains Mono', monospace, 'Courier New' !important;
   user-select: all;
 }
+
+@mixin empty-list {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 8.25rem 0;
+  color: var(--primary-color);
+  font-size: 0.875rem;
+  font-weight: 400;
+  span {
+    margin-top: 2rem;
+    color: var(--primary-text-color);
+  }
+  @media screen and (max-width: 1024px) {
+    padding: 5.625rem 0;
+  }
+}
