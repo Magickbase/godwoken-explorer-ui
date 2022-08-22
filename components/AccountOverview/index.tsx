@@ -158,21 +158,24 @@ export const fetchDeployAddress = (variables: { eth_hash: string }) =>
     .then(data => data.transaction.from_account.eth_address)
 
 export const fetchSourcifyStatus = (address: string) =>
-  client
-    .request<{ sourcify_check_by_addresses: { status: string | null } }>(checkSourcify, { address })
-    .then(data => data.sourcify_check_by_addresses.status)
+  client.request<{ sourcify_check_by_addresses: { status: string | null } }>(checkSourcify, { address }).then(data => {
+    return data.sourcify_check_by_addresses[0].status
+  })
 
-const overviewPlaceHolderCount = (account: AccountOverviewProps['account']) => {
+const overviewPlaceHolderCount = (account: AccountOverviewProps['account'], verifyStatus: string) => {
+  const isVerified = verifyStatus === 'perfect'
   switch (account.type) {
     case GraphQLSchema.AccountType.EthUser:
       return 0
     case GraphQLSchema.AccountType.PolyjuiceCreator:
       return 1
     case GraphQLSchema.AccountType.PolyjuiceContract:
-      if (!!account.smart_contract?.deployment_tx_hash) {
+      if (!!account.smart_contract?.deployment_tx_hash && isVerified) {
         return 2
+      } else if (!!account.smart_contract?.deployment_tx_hash) {
+        return 3
       } else {
-        return 1
+        return 0
       }
     case GraphQLSchema.AccountType.MetaContract:
       return 6
@@ -249,13 +252,13 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({
               new BigNumber(Math.max(account.nonce ?? 0, account.transaction_count ?? 0)).toFormat()
             ),
           },
-          overviewPlaceHolderCount(account)
+          overviewPlaceHolderCount(account, verifyStatus)
             ? {
                 field: '',
                 content: (
                   <div
                     data-role="placeholder"
-                    style={{ height: `calc(${3.5 * overviewPlaceHolderCount(account)}rem - 2rem)` }}
+                    style={{ height: `calc(${3.5 * overviewPlaceHolderCount(account, verifyStatus)}rem - 2rem)` }}
                   ></div>
                 ),
               }

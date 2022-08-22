@@ -108,6 +108,9 @@ const SmartContract: React.FC<{
                   }
                   setIsSourcifyCheckLoading(false)
                 } catch {
+                  // TODO: remove next 2 lines after api has error handling other than 500
+                  window.open('https://sourcify.dev/#/verifier', '_blank').focus()
+                  setCheckAgain(true)
                   setIsSourcifyCheckLoading(false)
                 }
               }}
