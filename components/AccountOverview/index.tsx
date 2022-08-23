@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { gql } from 'graphql-request'
 import { useTranslation } from 'next-i18next'
 import BigNumber from 'bignumber.js'
@@ -165,13 +164,14 @@ export const fetchSourcifyStatus = (address: string) =>
     return data.sourcify_check_by_addresses[0].status
   })
 
-const overviewPlaceHolderCount = (account: AccountOverviewProps['account'], isVerified: boolean) => {
+const overviewPlaceHolderCount = (account: AccountOverviewProps['account']) => {
   switch (account.type) {
     case GraphQLSchema.AccountType.EthUser:
       return 0
     case GraphQLSchema.AccountType.PolyjuiceCreator:
       return 1
     case GraphQLSchema.AccountType.PolyjuiceContract:
+      const isVerified = !!account.smart_contract?.contract_source_code
       if (!!account.smart_contract?.deployment_tx_hash && isVerified) {
         return 2
       } else if (!!account.smart_contract?.deployment_tx_hash && !isVerified) {
@@ -198,7 +198,6 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({
   isOverviewLoading,
 }) => {
   const [t] = useTranslation(['account', 'common'])
-  const [isContractVerified, setIsContractVerified] = useState(false)
 
   const { data: verifyStatus, refetch: refetchStatus } = useQuery(
     ['sourcify-check', account.eth_address],
@@ -207,12 +206,6 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({
       enabled: !!account.eth_address,
     },
   )
-
-  useEffect(() => {
-    if (account.type === GraphQLSchema.AccountType.PolyjuiceContract) {
-      setIsContractVerified(!!account.smart_contract?.contract_source_code)
-    }
-  }, [account])
 
   return (
     <div className={styles.container} data-account-type={account.type}>
@@ -229,7 +222,7 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({
           deployTxHash={account.smart_contract?.deployment_tx_hash}
           udt={account.udt}
           address={account.eth_address}
-          isVerified={isContractVerified}
+          isVerified={!!account.smart_contract?.contract_source_code}
           refetchStatus={refetchStatus}
         />
       ) : null}
@@ -262,13 +255,13 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({
               new BigNumber(Math.max(account.nonce ?? 0, account.transaction_count ?? 0)).toFormat()
             ),
           },
-          overviewPlaceHolderCount(account, isContractVerified)
+          overviewPlaceHolderCount(account)
             ? {
                 field: '',
                 content: (
                   <div
                     data-role="placeholder"
-                    style={{ height: `calc(${3.5 * overviewPlaceHolderCount(account, isContractVerified)}rem - 2rem)` }}
+                    style={{ height: `calc(${3.5 * overviewPlaceHolderCount(account)}rem - 2rem)` }}
                   ></div>
                 ),
               }
