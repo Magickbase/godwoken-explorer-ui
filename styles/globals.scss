@@ -16,7 +16,8 @@
 }
 
 html {
-  overflow-y: scroll;
+  overflow: hidden scroll;
+  width: 100vw;
 }
 
 html,
