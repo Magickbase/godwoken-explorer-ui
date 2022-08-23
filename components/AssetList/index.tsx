@@ -66,7 +66,7 @@ const AssetList = ({ list = [] }: { list: UdtList }) => {
                 <td>
                   <div className={styles.name}>
                     <NextLink href={`/token/${item.udt.id}`}>
-                      <a>
+                      <a className={styles.logo}>
                         <TokenLogo name={item.udt.name} logo={item.udt.icon} />
                       </a>
                     </NextLink>

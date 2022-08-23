@@ -38,3 +38,11 @@
 .noRecords {
   @include empty-list;
 }
+
+.logo {
+  min-width: 40px;
+  text-align: center;
+  img {
+    margin: 0 auto;
+  }
+}
