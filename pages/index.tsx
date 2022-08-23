@@ -636,10 +636,10 @@ const Home = () => {
   return (
     <Box sx={{ pb: { xs: 5, md: 11 } }}>
       <Box sx={{ bgcolor: 'primary.light' }}>
-        <Container sx={{ px: { md: 3, lg: 1 } }}>
+        <Container sx={{ px: { md: 3, lg: 0 } }}>
           <Search />
         </Container>
-        <Container sx={{ px: { md: 3, lg: 1 }, pr: { xs: 0 } }}>
+        <Container sx={{ px: { md: 3, lg: 0 }, pr: { xs: 0 } }}>
           <Stack
             direction="row"
             sx={{ pt: 2.5, pb: 1, overflow: 'hidden' }}
@@ -670,7 +670,7 @@ const Home = () => {
           </Stack>
         </Container>
       </Box>
-      <Container sx={{ px: { md: 2, lg: 1 } }}>
+      <Container sx={{ px: { md: 2, lg: 0 } }}>
         <Stack
           direction={{ xs: 'column', sm: 'column', md: 'column', lg: 'row' }}
           spacing={4}
