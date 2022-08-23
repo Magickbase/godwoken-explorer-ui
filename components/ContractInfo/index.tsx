@@ -220,6 +220,7 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
 
       {tabIdx === 1 && contract ? (
         <div>
+          <div className={styles.methodGroupTitle}>Pure and View</div>
           {viewMethodSignatures.map(signature => {
             const { inputs = [], outputs = [] } = contract.interface.functions[signature] ?? {}
             return (
@@ -264,7 +265,11 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
               </details>
             )
           })}
-          {writeMethodSignatures.length ? <div className={styles.callStatic}>Call Static</div> : null}
+          {writeMethodSignatures.length ? (
+            <div className={styles.methodGroupTitle} style={{ marginTop: '1.5rem' }}>
+              Call Static
+            </div>
+          ) : null}
           {writeMethodSignatures.map(signature => {
             const { inputs = [], outputs = [] } = contract.interface.functions[signature] ?? {}
             return (
@@ -324,6 +329,7 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
               </NextLink>
             </div>
           ) : null}
+          <div className={styles.methodGroupTitle}>Non-payable and Payable</div>
           {writeMethodSignatures.map(signature => {
             const { inputs = [], outputs = [] } = contract.interface.functions[signature] ?? {}
             return (
