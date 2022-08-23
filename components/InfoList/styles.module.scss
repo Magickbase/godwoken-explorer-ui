@@ -42,20 +42,8 @@
     font-size: 1rem;
     color: var(--primary-text-color);
     border-bottom: 1px solid var(--border-color);
-
-    dd {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      width: 100%;
-      padding-right: 1.5rem;
-      column-gap: 0.75rem;
-      & div {
-        height: 1.5rem;
-        & svg:hover {
-          filter: drop-shadow(0px 4px 8px rgba(0, 0, 0, 0.1));
-        }
-      }
+    dt {
+      flex: 1 0 100% !important;
     }
   }
 

@@ -1,12 +1,11 @@
 import styles from './styles.module.scss'
 
 const InfoList: React.FC<{
-  title?: string
+  title?: string | React.ReactNode
   list: Array<{ field: string; content: React.ReactNode; expandable?: boolean }>
   style?: React.CSSProperties
   type?: 'one-column' | 'two-columns'
-  titleSuffix?: Array<React.ReactNode>
-}> = ({ title, list, style, type = 'one-column', titleSuffix }) => {
+}> = ({ title, list, style, type = 'one-column' }) => {
   const midIndex = Math.floor(list.length / 2)
 
   return (
@@ -15,7 +14,6 @@ const InfoList: React.FC<{
         {title ? (
           <dl role="listitem" className={styles.title}>
             <dt>{title}</dt>
-            <dd>{titleSuffix}</dd>
           </dl>
         ) : null}
         {list

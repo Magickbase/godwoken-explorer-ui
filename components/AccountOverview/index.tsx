@@ -5,7 +5,7 @@ import { Skeleton } from '@mui/material'
 import User from 'components/User'
 import EthAddrReg from 'components/EthAddrReg'
 import MetaContract from 'components/MetaContract'
-import SmartContract from 'components/SmartContract'
+import SmartContract from 'components/SmartContractInfo'
 import Polyjuice from 'components/Polyjuice'
 import SUDT from 'components/SUDT'
 import UnknownAccount from 'components/UnknownAccount'
@@ -48,7 +48,7 @@ export interface PolyjuiceContract extends AccountBase {
     | 'abi'
     | 'constructor_arguments'
   > | null
-  udt: Pick<GraphQLSchema.Udt, 'id' | 'name' | 'decimal' | 'symbol'> | null
+  udt: Pick<GraphQLSchema.Udt, 'id' | 'name' | 'official_site' | 'description' | 'symbol'> | null
 }
 export interface PolyjuiceCreator extends AccountBase {
   type: GraphQLSchema.AccountType.PolyjuiceCreator
@@ -101,6 +101,8 @@ const accountOverviewQuery = gql`
         name
         decimal
         symbol
+        description
+        official_site
       }
       smart_contract {
         name
@@ -221,7 +223,6 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({
           udt={account.udt}
           address={account.eth_address}
           isVerified={verifyStatus === 'perfect'}
-          isSubmitted={!!account.smart_contract?.deployment_tx_hash}
           refetchStatus={refetchStatus}
         />
       ) : null}

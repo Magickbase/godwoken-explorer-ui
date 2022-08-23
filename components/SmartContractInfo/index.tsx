@@ -1,7 +1,7 @@
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import Tooltip from 'components/Tooltip'
-import InfoList from './InfoList'
+import InfoList from '../InfoList'
 import { client, GraphQLSchema } from 'utils'
 import NextPageIcon from 'assets/icons/next-page.svg'
 import VerifiedIcon from 'assets/icons/check-success.svg'
@@ -9,6 +9,7 @@ import SubmittedIcon from 'assets/icons/submit-success.svg'
 import { Skeleton } from '@mui/material'
 import { useState } from 'react'
 import { gql } from 'graphql-request'
+import styles from './styles.module.scss'
 
 const CONTRACT_FORM_URL = `https://github.com/Magickbase/godwoken_explorer/issues/new/choose`
 
@@ -30,65 +31,61 @@ export const recheckVerifyStatus = (address: string) =>
 const SmartContract: React.FC<{
   deployer: string
   deployTxHash: string
-  udt: Pick<GraphQLSchema.Udt, 'id' | 'name'> | null
+  udt: Pick<GraphQLSchema.Udt, 'id' | 'name' | 'official_site' | 'description' | 'symbol'> | null
   isVerified: boolean
-  isSubmitted: boolean
   refetchStatus: any
   address: string
-}> = ({ deployer, deployTxHash, udt, isVerified, isSubmitted, refetchStatus, address }) => {
+}> = ({ deployer, deployTxHash, udt, isVerified, refetchStatus, address }) => {
   const [t] = useTranslation('account')
   const [checkAgain, setCheckAgain] = useState(false)
   const [isSourcifyCheckLoading, setIsSourcifyCheckLoading] = useState(false)
 
-  const submmitedInfo = isSubmitted
-    ? [
-        deployer
-          ? {
-              field: t('deployer'),
-              content: (
-                <Tooltip title={deployer} placement="top">
-                  <span>
-                    <NextLink href={`/account/${deployer}`}>
-                      <a className="mono-font">{deployer}</a>
-                    </NextLink>
-                  </span>
-                </Tooltip>
-              ),
-            }
-          : null,
-        deployTxHash
-          ? {
-              field: t('deployTx'),
-              content: (
-                <Tooltip title={deployTxHash} placement="top">
-                  <span>
-                    <NextLink href={`/tx/${deployTxHash}`}>
-                      <a className="mono-font">{deployTxHash}</a>
-                    </NextLink>
-                  </span>
-                </Tooltip>
-              ),
-            }
-          : null,
-        udt?.id
-          ? {
-              field: t('token'),
-              content: (
-                <NextLink href={`/token/${udt.id}`}>
-                  <a className="mono-font">{udt.name ?? '-'}</a>
-                </NextLink>
-              ),
-            }
-          : null,
-      ]
-    : []
+  const { name, official_site, description, symbol } = udt || {}
+  const isSubmitted = name || official_site || description || symbol
 
   const list = [
     {
       field: t('type'),
       content: 'Smart Contract',
     },
-    ...submmitedInfo,
+    deployer
+      ? {
+          field: t('deployer'),
+          content: (
+            <Tooltip title={deployer} placement="top">
+              <span>
+                <NextLink href={`/account/${deployer}`}>
+                  <a className="mono-font">{deployer}</a>
+                </NextLink>
+              </span>
+            </Tooltip>
+          ),
+        }
+      : null,
+    deployTxHash
+      ? {
+          field: t('deployTx'),
+          content: (
+            <Tooltip title={deployTxHash} placement="top">
+              <span>
+                <NextLink href={`/tx/${deployTxHash}`}>
+                  <a className="mono-font">{deployTxHash}</a>
+                </NextLink>
+              </span>
+            </Tooltip>
+          ),
+        }
+      : null,
+    udt?.id
+      ? {
+          field: t('token'),
+          content: (
+            <NextLink href={`/token/${udt.id}`}>
+              <a className="mono-font">{udt.name ?? '-'}</a>
+            </NextLink>
+          ),
+        }
+      : null,
     !isVerified
       ? {
           field: t('verify_status'),
@@ -139,24 +136,31 @@ const SmartContract: React.FC<{
       : null,
   ]
 
-  const icons = [
-    isVerified ? (
-      <Tooltip title={t('verified')} placement="top" key="verified">
+  const TitleWithIcons = () => {
+    return (
+      <div className={styles.title}>
+        <span>{t(`basicInfo`)}</span>
         <div>
-          <VerifiedIcon />
+          {isVerified ? (
+            <Tooltip title={t('verified')} placement="top" key="verified">
+              <div>
+                <VerifiedIcon />
+              </div>
+            </Tooltip>
+          ) : null}
+          {isSubmitted ? (
+            <Tooltip title={t('submitted')} placement="top" key="submitted">
+              <div>
+                <SubmittedIcon />
+              </div>
+            </Tooltip>
+          ) : null}
         </div>
-      </Tooltip>
-    ) : null,
-    isSubmitted ? (
-      <Tooltip title={t('submitted')} placement="top" key="submitted">
-        <div>
-          <SubmittedIcon />
-        </div>
-      </Tooltip>
-    ) : null,
-  ]
+      </div>
+    )
+  }
 
-  return <InfoList title={t(`basicInfo`)} list={list} titleSuffix={icons} />
+  return <InfoList title={<TitleWithIcons />} list={list} />
 }
 
 export default SmartContract
