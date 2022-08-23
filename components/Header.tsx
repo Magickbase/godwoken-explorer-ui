@@ -76,7 +76,7 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
   },
 }))
 
-const StyledMenu = styled((props: MenuProps) => <HoverMenu {...props} />)(({ theme }) => ({
+const StyledMenu = styled((props: MenuProps) => <HoverMenu disableScrollLock={true} {...props} />)(({ theme }) => ({
   '& .MuiPaper-root': {
     borderRadius: theme.spacing(1),
     boxShadow: `0px 4px 9px ${theme.palette.primary.light}`,
