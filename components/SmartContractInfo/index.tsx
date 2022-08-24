@@ -31,7 +31,7 @@ export const recheckVerifyStatus = (address: string) =>
 const SmartContract: React.FC<{
   deployer: string
   deployTxHash: string
-  udt: Pick<GraphQLSchema.Udt, 'id' | 'name' | 'official_site' | 'description' | 'symbol'> | null
+  udt: Pick<GraphQLSchema.Udt, 'id' | 'name' | 'official_site' | 'description' | 'icon'> | null
   isVerified: boolean
   refetchStatus: any
   address: string
@@ -40,8 +40,8 @@ const SmartContract: React.FC<{
   const [checkAgain, setCheckAgain] = useState(false)
   const [isSourcifyCheckLoading, setIsSourcifyCheckLoading] = useState(false)
 
-  const { official_site, description } = udt || {}
-  const isSubmitted = official_site || description
+  const { official_site, description, icon } = udt || {}
+  const isSubmitted = official_site || description || icon
 
   const list = [
     {
