@@ -40,8 +40,8 @@ const SmartContract: React.FC<{
   const [checkAgain, setCheckAgain] = useState(false)
   const [isSourcifyCheckLoading, setIsSourcifyCheckLoading] = useState(false)
 
-  const { name, official_site, description, symbol } = udt || {}
-  const isSubmitted = name || official_site || description || symbol
+  const { official_site, description } = udt || {}
+  const isSubmitted = official_site || description
 
   const list = [
     {
