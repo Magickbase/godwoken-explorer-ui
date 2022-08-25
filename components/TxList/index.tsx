@@ -21,6 +21,8 @@ export type TxListProps = {
     entries: Array<{
       hash: string
       eth_hash: string | null
+      method_id: string | null
+      method_name: string | null
       type: GraphQLSchema.TransactionType
       block?: Pick<GraphQLSchema.Block, 'hash' | 'number' | 'status' | 'timestamp'>
       from_account: Pick<GraphQLSchema.Account, 'eth_address' | 'script_hash' | 'type'>
@@ -59,6 +61,8 @@ const txListQuery = gql`
       entries {
         hash
         eth_hash
+        method_id
+        method_name
         block {
           hash
           number
@@ -130,6 +134,7 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
         <thead>
           <tr>
             <th>{t('txHash')}</th>
+            <th>{t('method')}</th>
             <th>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 {t('block')}
@@ -149,6 +154,7 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
               const hash = item.eth_hash || item.hash
               const from = item.from_account.eth_address || item.from_account.script_hash
               const to = item.to_account.eth_address || item.to_account.script_hash
+              const method = item.method_name || item.method_id
 
               return (
                 <tr key={hash}>
@@ -166,6 +172,15 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
                         }
                       />
                     </div>
+                  </td>
+                  <td>
+                    {method ? (
+                      <div className={styles.method} title={method}>
+                        {method}
+                      </div>
+                    ) : (
+                      '-'
+                    )}
                   </td>
                   <td>
                     {item.block ? (
@@ -202,7 +217,7 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
             })
           ) : (
             <tr>
-              <td colSpan={7} align="center">
+              <td colSpan={8} align="center">
                 {isFiltered ? (
                   <div className={styles.noRecords}>
                     <EmptyFilteredListIcon />
