@@ -175,9 +175,11 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
                   </td>
                   <td>
                     {method ? (
-                      <div className={styles.method} title={method}>
-                        {method}
-                      </div>
+                      <Tooltip title={item.method_id} placement="top">
+                        <div className={styles.method} title={method}>
+                          {method}
+                        </div>
+                      </Tooltip>
                     ) : (
                       '-'
                     )}
