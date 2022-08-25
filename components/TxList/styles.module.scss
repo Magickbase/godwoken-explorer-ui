@@ -20,6 +20,21 @@
   padding-right: 0 !important;
 }
 
+.method {
+  width: min-content;
+  max-width: 95px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.875rem;
+  color: var(--primary-text-color);
+  padding: 6px 8px;
+  background: #fafafa;
+  line-height: 1;
+  border-radius: 8px;
+  user-select: all;
+  cursor: default;
+}
+
 .noRecords {
   @include empty-list;
 }
