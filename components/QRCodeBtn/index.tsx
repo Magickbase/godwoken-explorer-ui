@@ -32,7 +32,7 @@ const QRCodeBtn: React.FC<{ content: string }> = ({ content }) => {
         errorCorrectionLevel: 'H',
       })
     } catch (err) {
-      console.log(err)
+      console.error(err)
     }
   }
 
