@@ -35,6 +35,10 @@
 
 .balance {
   text-transform: none;
+  b,
+  span {
+    font-weight: 400 !important;
+  }
 }
 
 @media screen and (max-width: 1024px) {
