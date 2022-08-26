@@ -1,10 +1,8 @@
 import type { GetStaticPaths, GetStaticProps } from 'next'
-import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useQuery } from 'react-query'
-import BigNumber from 'bignumber.js'
 import { Skeleton } from '@mui/material'
 import SubpageHead from 'components/SubpageHead'
 import AccountOverview, {
@@ -26,26 +24,17 @@ import QRCodeBtn from 'components/QRCodeBtn'
 import PageTitle from 'components/PageTitle'
 import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
 import { SIZES } from 'components/PageSize'
-import {
-  handleApiError,
-  fetchBridgedRecordList,
-  fetchEventLogsListByType,
-  isEthAddress,
-  GraphQLSchema,
-  API_ENDPOINT,
-  CKB_DECIMAL,
-} from 'utils'
+import { fetchBridgedRecordList, fetchEventLogsListByType, isEthAddress, GraphQLSchema } from 'utils'
 import styles from './styles.module.scss'
-
-type State = AccountOverviewProps
 
 const isSmartContractAccount = (account: AccountOverviewProps['account']): account is PolyjuiceContract => {
   return !!(account as PolyjuiceContract)?.smart_contract
 }
 
-const Account = (initState: State) => {
+const Account = () => {
   const {
     query: {
+      id,
       tab = 'transactions',
       before = null,
       after = null,
@@ -55,16 +44,30 @@ const Account = (initState: State) => {
       page_size = SIZES[1],
     },
   } = useRouter()
-  const [accountAndList, setAccountAndList] = useState(initState)
   const [t] = useTranslation(['account', 'common'])
 
-  const id = accountAndList.account.eth_address || accountAndList.account.script_hash
+  const q = isEthAddress(id as string) ? { address: id as string } : { script_hash: id as string }
 
-  useEffect(() => {
-    setAccountAndList(initState)
-  }, [setAccountAndList, initState])
+  const { isLoading: _isAccountLoading, data: accountAndList } = useQuery(
+    ['account', id],
+    () => fetchAccountOverview(q),
+    {
+      refetchInterval: 10000,
+      enabled: !!id,
+    },
+  )
 
-  const q = isEthAddress(id) ? { address: id } : { script_hash: id }
+  const deployment_tx_hash =
+    isSmartContractAccount(accountAndList) && accountAndList?.smart_contract?.deployment_tx_hash
+
+  const { data: deployerAddr } = useQuery(
+    ['deployer', deployment_tx_hash],
+    () =>
+      fetchDeployAddress({
+        eth_hash: deployment_tx_hash,
+      }),
+    { enabled: !!deployment_tx_hash },
+  )
 
   const { isLoading: isOverviewLoading, data: overview } = useQuery(
     ['account-overview', id],
@@ -77,10 +80,10 @@ const Account = (initState: State) => {
 
   const { isLoading: isBalanceLoading, data: balance = '0' } = useQuery(
     ['account-balance', id],
-    () => fetchAccountBalance(id),
+    () => fetchAccountBalance(id as string),
     {
       refetchInterval: 10000,
-      enabled: !!id && isEthAddress(id),
+      enabled: !!id && isEthAddress(id as string),
     },
   )
 
@@ -126,14 +129,14 @@ const Account = (initState: State) => {
 
   const { isLoading: isUdtListLoading, data: udtList } = useQuery(
     ['account-udt-list', id],
-    () => fetchUdtList(q.address ? { address_hashes: [id] } : { script_hashes: [id] }),
+    () => fetchUdtList(q.address ? { address_hashes: [id as string] } : { script_hashes: [id as string] }),
     { enabled: tab === 'assets' && !!(q.address || q.script_hash) },
   )
 
-  const account = overview ?? accountAndList.account
+  const account = overview ?? accountAndList ?? null
 
   /* is script hash supported? */
-  const downloadItems = account.eth_address
+  const downloadItems = account?.eth_address
     ? [
         { label: t('transactionRecords'), href: DOWNLOAD_HREF_LIST.accountTxList(account.eth_address) },
         { label: t('ERC20Records'), href: DOWNLOAD_HREF_LIST.accountTransferList(account.eth_address) },
@@ -144,10 +147,9 @@ const Account = (initState: State) => {
       ]
     : []
 
-  const title = t(`accountType.${account.type}`)
-  const accountType = account.type
+  const title = account ? t(`accountType.${account.type}`) : <Skeleton animation="wave" width="200px" />
+  const accountType = account?.type
 
-  // const tabs = ['transactions', 'erc20', 'bridged', 'assets', 'contract', 'events']
   const tabs = [
     { label: t('transactionRecords'), key: 'transactions' },
     [GraphQLSchema.AccountType.EthUser, GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType)
@@ -176,16 +178,18 @@ const Account = (initState: State) => {
         </div>
         <div className={styles.hash}>
           {id}
-          <CopyBtn content={id} />
-          <QRCodeBtn content={id} />
+          <CopyBtn content={id as string} />
+          <QRCodeBtn content={id as string} />
         </div>
-        <AccountOverview
-          isOverviewLoading={isOverviewLoading}
-          isBalanceLoading={isBalanceLoading}
-          account={account}
-          balance={balance}
-          deployerAddr={accountAndList.deployerAddr}
-        />
+        {account ? (
+          <AccountOverview
+            isOverviewLoading={isOverviewLoading}
+            isBalanceLoading={isBalanceLoading}
+            account={account}
+            balance={balance}
+            deployerAddr={deployerAddr}
+          />
+        ) : null}
         <div className={styles.list}>
           <Tabs
             value={tabs.findIndex(tabItem => tabItem.key === tab)}
@@ -199,7 +203,7 @@ const Account = (initState: State) => {
               <TxList
                 transactions={txList ?? { entries: [], metadata: { total_count: 0, before: null, after: null } }}
                 maxCount="100k"
-                viewer={id}
+                viewer={id as string}
               />
             ) : (
               <Skeleton animation="wave" />
@@ -207,7 +211,7 @@ const Account = (initState: State) => {
           ) : null}
           {tab === 'erc20' ? (
             !isTransferListLoading && transferList ? (
-              <ERC20TransferList token_transfers={transferList} viewer={id} />
+              <ERC20TransferList token_transfers={transferList} viewer={id as string} />
             ) : (
               <Skeleton animation="wave" />
             )
@@ -247,31 +251,8 @@ export const getStaticPaths: GetStaticPaths = () => ({
   fallback: 'blocking',
 })
 
-export const getStaticProps: GetStaticProps<State, { id: string }> = async ({ locale, params }) => {
-  const { id } = params
-
-  try {
-    const q = isEthAddress(id) ? { address: id } : { script_hash: id }
-
-    const [account, lng] = await Promise.all([
-      fetchAccountOverview(q),
-      serverSideTranslations(locale, ['common', 'account', 'list']),
-      null,
-    ])
-
-    const balance = await fetch(`${API_ENDPOINT}/accounts/${account.eth_address}`)
-      .then(r => r.json())
-      .then(a => new BigNumber(a.ckb).multipliedBy(new BigNumber(CKB_DECIMAL)).toString())
-      .catch(() => '0')
-
-    const deployerAddr =
-      isSmartContractAccount(account) && account.smart_contract?.deployment_tx_hash
-        ? await fetchDeployAddress({ eth_hash: account.smart_contract.deployment_tx_hash })
-        : null
-
-    return { props: { ...lng, account, deployerAddr, balance } }
-  } catch (err) {
-    return handleApiError(err, null, locale, id)
-  }
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+  const lng = await serverSideTranslations(locale, ['common', 'account', 'list'])
+  return { props: lng }
 }
 export default Account
