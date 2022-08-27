@@ -13,7 +13,6 @@ import InfoList from 'components/InfoList'
 import Amount from 'components/Amount'
 import styles from './styles.module.scss'
 import { GraphQLSchema, client, provider, PCKB_UDT_INFO } from 'utils'
-import { useQuery } from 'react-query'
 
 export type BasicScript = Record<'args' | 'code_hash' | 'hash_type', string>
 export interface AccountBase {
@@ -191,22 +190,15 @@ const overviewPlaceHolderCount = (account: AccountOverviewProps['account']) => {
   }
 }
 
-const AccountOverview: React.FC<AccountOverviewProps> = ({
+const AccountOverview: React.FC<AccountOverviewProps & { refetch: () => Promise<any> }> = ({
   account,
   balance,
   deployerAddr,
   isBalanceLoading,
   isOverviewLoading,
+  refetch,
 }) => {
   const [t] = useTranslation(['account', 'common'])
-
-  const { data: verifyStatus, refetch: refetchStatus } = useQuery(
-    ['sourcify-check', account.eth_address],
-    () => fetchSourcifyStatus(account.eth_address),
-    {
-      enabled: !!account.eth_address,
-    },
-  )
 
   return (
     <div className={styles.container} data-account-type={account.type}>
@@ -224,7 +216,7 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({
           udt={account.udt}
           address={account.eth_address}
           isVerified={!!account.smart_contract?.contract_source_code}
-          refetchStatus={refetchStatus}
+          refetch={refetch}
         />
       ) : null}
       {account.type === GraphQLSchema.AccountType.PolyjuiceCreator ? (
