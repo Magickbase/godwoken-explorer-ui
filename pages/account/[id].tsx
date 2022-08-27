@@ -181,16 +181,14 @@ const Account = () => {
           <CopyBtn content={id as string} />
           <QRCodeBtn content={id as string} />
         </div>
-        {account ? (
-          <AccountOverview
-            isOverviewLoading={isOverviewLoading}
-            isBalanceLoading={isBalanceLoading}
-            account={account}
-            balance={balance}
-            deployerAddr={deployerAddr}
-            refetch={refetchAccountOverview}
-          />
-        ) : null}
+        <AccountOverview
+          isOverviewLoading={isOverviewLoading}
+          isBalanceLoading={isBalanceLoading}
+          account={account}
+          balance={balance}
+          deployerAddr={deployerAddr}
+          refetch={refetchAccountOverview}
+        />
         <div className={styles.list}>
           <Tabs
             value={tabs.findIndex(tabItem => tabItem.key === tab)}
