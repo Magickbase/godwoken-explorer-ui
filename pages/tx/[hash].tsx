@@ -1,5 +1,5 @@
 import type { GetStaticPaths, GetStaticProps } from 'next'
-import { useMemo } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
@@ -42,11 +42,12 @@ const Tx = () => {
     },
     replace,
   } = useRouter()
-  const [t] = useTranslation('tx')
+  const [t, { language }] = useTranslation('tx')
+  const [isFinalized, setIsFinalized] = useState(false)
 
   const { isLoading: isTxLoading, data: tx } = useQuery(['tx', hash], () => fetchTx(hash as string), {
     enabled: !!hash,
-    refetchInterval: 10000,
+    refetchInterval: isFinalized ? undefined : 10000,
   })
 
   const { isLoading: isTransferListLoading, data: transferList } = useQuery(
@@ -75,8 +76,14 @@ const Tx = () => {
     },
   )
 
+  useEffect(() => {
+    if (tx?.status === 'finalized') {
+      setIsFinalized(true)
+    }
+  }, [tx, setIsFinalized])
+
   if (!isTxLoading && !tx?.hash) {
-    replace(`/404?search=${hash}`)
+    replace(`${language}/404?query=${hash}`)
   }
 
   const downloadItems = [{ label: t('ERC20Records'), href: DOWNLOAD_HREF_LIST.txTransferList(hash as string) }]
