@@ -75,9 +75,14 @@
   "events": "事件",
   "token": "代币",
   "verify_status": "验证状态",
-  "verified": " 已验证",
-  "unverified": "去验证",
+  "verified": "状态已验证",
+  "submitted": "信息已提交",
+  "verifyBySourcify": "Sourcify 已验证",
+  "register": "注册",
+  "submit_info": "提交信息",
+  "verify_again": "再次验证",
   "anonymous_param": "匿名参数",
   "anonymous_response": " 匿名返回值",
-  "connected_addr": " 已连接地址:"
+  "connected_addr": " 已连接地址:",
+  "checking": "检查中..."
 }

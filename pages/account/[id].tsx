@@ -48,14 +48,14 @@ const Account = () => {
 
   const q = isEthAddress(id as string) ? { address: id as string } : { script_hash: id as string }
 
-  const { isLoading: _isAccountLoading, data: accountAndList } = useQuery(
-    ['account', id],
-    () => fetchAccountOverview(q),
-    {
-      refetchInterval: 10000,
-      enabled: !!id,
-    },
-  )
+  const {
+    isLoading: _isAccountLoading,
+    data: accountAndList,
+    refetch: refetchAccountOverview,
+  } = useQuery(['account', id], () => fetchAccountOverview(q), {
+    refetchInterval: 10000,
+    enabled: !!id,
+  })
 
   const deployment_tx_hash =
     isSmartContractAccount(accountAndList) && accountAndList?.smart_contract?.deployment_tx_hash
@@ -170,7 +170,7 @@ const Account = () => {
   ].filter(v => v)
   return (
     <>
-      <SubpageHead subtitle={`${title} ${id}`} />
+      <SubpageHead subtitle={account ? `${title} ${id}` : (id as string)} />
       <div className={styles.container}>
         <div className={styles.title}>
           <PageTitle>{title}</PageTitle>
@@ -188,6 +188,7 @@ const Account = () => {
             account={account}
             balance={balance}
             deployerAddr={deployerAddr}
+            refetch={refetchAccountOverview}
           />
         ) : null}
         <div className={styles.list}>
