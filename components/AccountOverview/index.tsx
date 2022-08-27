@@ -5,7 +5,7 @@ import { Skeleton } from '@mui/material'
 import User from 'components/User'
 import EthAddrReg from 'components/EthAddrReg'
 import MetaContract from 'components/MetaContract'
-import SmartContract from 'components/SmartContract'
+import SmartContract from 'components/SmartContractInfo'
 import Polyjuice from 'components/Polyjuice'
 import SUDT from 'components/SUDT'
 import UnknownAccount from 'components/UnknownAccount'
@@ -47,7 +47,7 @@ export interface PolyjuiceContract extends AccountBase {
     | 'abi'
     | 'constructor_arguments'
   > | null
-  udt: Pick<GraphQLSchema.Udt, 'id' | 'name' | 'decimal' | 'symbol'> | null
+  udt: Pick<GraphQLSchema.Udt, 'id' | 'name' | 'official_site' | 'description' | 'icon'> | null
 }
 export interface PolyjuiceCreator extends AccountBase {
   type: GraphQLSchema.AccountType.PolyjuiceCreator
@@ -83,6 +83,7 @@ export type AccountOverviewProps = {
   isBalanceLoading?: boolean
   balance: string
   deployerAddr?: string
+  isContractVerified?: boolean
 }
 
 const accountOverviewQuery = gql`
@@ -99,6 +100,9 @@ const accountOverviewQuery = gql`
         name
         decimal
         symbol
+        description
+        official_site
+        icon
       }
       smart_contract {
         name
@@ -119,6 +123,16 @@ const deployAddrQuery = gql`
       from_account {
         eth_address
       }
+    }
+  }
+`
+
+const checkSourcify = gql`
+  query checkSourcify($address: String!) {
+    sourcify_check_by_addresses(input: { addresses: [$address] }) {
+      address
+      chain_ids
+      status
     }
   }
 `
@@ -145,22 +159,47 @@ export const fetchDeployAddress = (variables: { eth_hash: string }) =>
     .request<{ transaction: { from_account: Pick<GraphQLSchema.Account, 'eth_address'> } }>(deployAddrQuery, variables)
     .then(data => data.transaction.from_account.eth_address)
 
-const OverviewPlaceHolderCount = {
-  [GraphQLSchema.AccountType.EthUser]: 0,
-  [GraphQLSchema.AccountType.PolyjuiceCreator]: 1,
-  [GraphQLSchema.AccountType.PolyjuiceContract]: 3,
-  [GraphQLSchema.AccountType.MetaContract]: 6,
-  [GraphQLSchema.AccountType.EthAddrReg]: 0,
-  [GraphQLSchema.AccountType.Udt]: 4,
+export const fetchSourcifyStatus = (address: string) =>
+  client.request<{ sourcify_check_by_addresses: { status: string | null } }>(checkSourcify, { address }).then(data => {
+    return data.sourcify_check_by_addresses[0].status
+  })
+
+const overviewPlaceHolderCount = (account: AccountOverviewProps['account']) => {
+  switch (account.type) {
+    case GraphQLSchema.AccountType.EthUser:
+      return 0
+    case GraphQLSchema.AccountType.PolyjuiceCreator:
+      return 1
+    case GraphQLSchema.AccountType.PolyjuiceContract:
+      const isVerified = !!account.smart_contract?.contract_source_code
+      if (!!account.smart_contract?.deployment_tx_hash && isVerified) {
+        return 2
+      } else if (!!account.smart_contract?.deployment_tx_hash && !isVerified) {
+        return 3
+      } else if (!account.smart_contract?.deployment_tx_hash && isVerified) {
+        return 0
+      } else {
+        return 1
+      }
+    case GraphQLSchema.AccountType.MetaContract:
+      return 6
+    case GraphQLSchema.AccountType.EthAddrReg:
+      return 0
+    case GraphQLSchema.AccountType.Udt:
+      return 4
+  }
 }
-const AccountOverview: React.FC<AccountOverviewProps> = ({
+
+const AccountOverview: React.FC<AccountOverviewProps & { refetch: () => Promise<any> }> = ({
   account,
   balance,
   deployerAddr,
   isBalanceLoading,
   isOverviewLoading,
+  refetch,
 }) => {
   const [t] = useTranslation(['account', 'common'])
+
   return (
     <div className={styles.container} data-account-type={account.type}>
       {account.type === GraphQLSchema.AccountType.MetaContract ? (
@@ -175,7 +214,9 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({
           deployer={deployerAddr}
           deployTxHash={account.smart_contract?.deployment_tx_hash}
           udt={account.udt}
-          isVerified={!!account.smart_contract?.abi}
+          address={account.eth_address}
+          isVerified={!!account.smart_contract?.contract_source_code}
+          refetch={refetch}
         />
       ) : null}
       {account.type === GraphQLSchema.AccountType.PolyjuiceCreator ? (
@@ -207,13 +248,13 @@ const AccountOverview: React.FC<AccountOverviewProps> = ({
               new BigNumber(Math.max(account.nonce ?? 0, account.transaction_count ?? 0)).toFormat()
             ),
           },
-          OverviewPlaceHolderCount[account.type]
+          overviewPlaceHolderCount(account)
             ? {
                 field: '',
                 content: (
                   <div
                     data-role="placeholder"
-                    style={{ height: `calc(${3.5 * OverviewPlaceHolderCount[account.type]}rem - 2rem)` }}
+                    style={{ height: `calc(${3.5 * overviewPlaceHolderCount(account)}rem - 2rem)` }}
                   ></div>
                 ),
               }

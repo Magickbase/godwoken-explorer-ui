@@ -1,7 +1,7 @@
 import styles from './styles.module.scss'
 
 const InfoList: React.FC<{
-  title?: string
+  title?: string | React.ReactNode
   list: Array<{ field: string; content: React.ReactNode; expandable?: boolean }>
   style?: React.CSSProperties
   type?: 'one-column' | 'two-columns'
