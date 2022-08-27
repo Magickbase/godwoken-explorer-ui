@@ -1,5 +1,6 @@
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
+import { Skeleton } from '@mui/material'
 import Tooltip from 'components/Tooltip'
 import InfoList from '../InfoList'
 import { client, GraphQLSchema } from 'utils'
@@ -66,34 +67,34 @@ const SmartContract: React.FC<{
       field: t('type'),
       content: 'Smart Contract',
     },
-    deployer
-      ? {
-          field: t('deployer'),
-          content: (
-            <Tooltip title={deployer} placement="top">
-              <span>
-                <NextLink href={`/account/${deployer}`}>
-                  <a className="mono-font">{deployer}</a>
-                </NextLink>
-              </span>
-            </Tooltip>
-          ),
-        }
-      : null,
-    deployTxHash
-      ? {
-          field: t('deployTx'),
-          content: (
-            <Tooltip title={deployTxHash} placement="top">
-              <span>
-                <NextLink href={`/tx/${deployTxHash}`}>
-                  <a className="mono-font">{deployTxHash}</a>
-                </NextLink>
-              </span>
-            </Tooltip>
-          ),
-        }
-      : null,
+    {
+      field: t('deployer'),
+      content: deployer ? (
+        <Tooltip title={deployer} placement="top">
+          <span>
+            <NextLink href={`/account/${deployer}`}>
+              <a className="mono-font">{deployer}</a>
+            </NextLink>
+          </span>
+        </Tooltip>
+      ) : (
+        <Skeleton animation="wave" />
+      ),
+    },
+    {
+      field: t('deployTx'),
+      content: deployTxHash ? (
+        <Tooltip title={deployTxHash} placement="top">
+          <span>
+            <NextLink href={`/tx/${deployTxHash}`}>
+              <a className="mono-font">{deployTxHash}</a>
+            </NextLink>
+          </span>
+        </Tooltip>
+      ) : (
+        <Skeleton animation="wave" />
+      ),
+    },
     udt?.id
       ? {
           field: t('token'),
