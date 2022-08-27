@@ -31,8 +31,7 @@ const Block = () => {
   } = useRouter()
 
   const { isLoading: isBlockLoading, data: block } = useQuery(['block', id], () => fetchBlock(id as string), {
-    refetchInterval: 10000,
-    enabled: !isFinalized,
+    refetchInterval: isFinalized ? undefined : 10000,
   })
 
   useEffect(() => {
