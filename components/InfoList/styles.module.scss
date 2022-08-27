@@ -42,6 +42,9 @@
     font-size: 1rem;
     color: var(--primary-text-color);
     border-bottom: 1px solid var(--border-color);
+    dt {
+      flex: 1 0 100% !important;
+    }
   }
 
   dl.item {
