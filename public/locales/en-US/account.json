@@ -83,5 +83,6 @@
   "verify_again": "Verify again",
   "anonymous_param": "anonymous parameter",
   "anonymous_response": "anonymous response",
-  "connected_addr": "Connected Address:"
+  "connected_addr": "Connected Address:",
+  "checking": "Checking..."
 }

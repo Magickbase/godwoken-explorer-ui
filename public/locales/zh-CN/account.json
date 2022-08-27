@@ -83,5 +83,6 @@
   "verify_again": "再次验证",
   "anonymous_param": "匿名参数",
   "anonymous_response": " 匿名返回值",
-  "connected_addr": " 已连接地址:"
+  "connected_addr": " 已连接地址:",
+  "checking": "检查中..."
 }

@@ -6,7 +6,6 @@ import { client, GraphQLSchema } from 'utils'
 import NextPageIcon from 'assets/icons/next-page.svg'
 import VerifiedIcon from 'assets/icons/check-success.svg'
 import SubmittedIcon from 'assets/icons/submit-success.svg'
-import { Skeleton } from '@mui/material'
 import { useState } from 'react'
 import { gql } from 'graphql-request'
 import styles from './styles.module.scss'
@@ -16,32 +15,51 @@ const CONTRACT_FORM_URL = `https://github.com/Magickbase/godwoken_explorer/issue
 const verifyAndUpdateFromSourcify = gql`
   mutation verifyAndUpdateFromSourcify($address: HashAddress!) {
     verify_and_update_from_sourcify(input: { address: $address }) {
-      account_id
+      abi
     }
   }
 `
 
-export const recheckVerifyStatus = (address: string) =>
+const verifyAndCheckSourcify = (address: string) =>
   client
-    .request<{ verify_and_update_from_sourcify: { account_id: string | null } }>(verifyAndUpdateFromSourcify, {
+    .request<{ verify_and_update_from_sourcify: { abi: Array<any> | null } }>(verifyAndUpdateFromSourcify, {
       address: address,
     })
-    .then(data => data.verify_and_update_from_sourcify.account_id)
+    .then(data => data.verify_and_update_from_sourcify.abi)
 
 const SmartContract: React.FC<{
   deployer: string
   deployTxHash: string
   udt: Pick<GraphQLSchema.Udt, 'id' | 'name' | 'official_site' | 'description' | 'icon'> | null
   isVerified: boolean
-  refetchStatus: any
   address: string
-}> = ({ deployer, deployTxHash, udt, isVerified, refetchStatus, address }) => {
+  refetch: () => Promise<void>
+}> = ({ deployer, deployTxHash, udt, isVerified, address, refetch }) => {
   const [t] = useTranslation('account')
-  const [checkAgain, setCheckAgain] = useState(false)
+  const [isCheckAgain, setIsCheckAgain] = useState(false)
   const [isSourcifyCheckLoading, setIsSourcifyCheckLoading] = useState(false)
 
   const { official_site, description, icon } = udt || {}
   const isSubmitted = official_site || description || icon
+
+  const handleCheckClick = async (e: React.SyntheticEvent) => {
+    e.stopPropagation()
+    e.preventDefault()
+    try {
+      setIsSourcifyCheckLoading(true)
+      const abi = await verifyAndCheckSourcify(address)
+      if (!abi) {
+        setIsCheckAgain(true)
+        window.open('https://sourcify.dev/#/verifier', '_blank').focus()
+        return
+      }
+      await refetch()
+    } catch {
+      // ignore
+    } finally {
+      setIsSourcifyCheckLoading(false)
+    }
+  }
 
   const list = [
     {
@@ -90,30 +108,10 @@ const SmartContract: React.FC<{
       ? {
           field: t('verify_status'),
           content: isSourcifyCheckLoading ? (
-            <Skeleton animation="wave" />
+            <span style={{ color: 'var(--primary-text-color)' }}>{t(`checking`)}</span>
           ) : (
-            <a
-              onClick={async () => {
-                try {
-                  setIsSourcifyCheckLoading(true)
-                  const res = await recheckVerifyStatus(address)
-                  if (res) {
-                    if (checkAgain) await refetchStatus()
-                  } else {
-                    window.open('https://sourcify.dev/#/verifier', '_blank').focus()
-                    setCheckAgain(true)
-                  }
-                  setIsSourcifyCheckLoading(false)
-                } catch {
-                  // TODO: remove next 2 lines after api has error handling other than 500
-                  window.open('https://sourcify.dev/#/verifier', '_blank').focus()
-                  setCheckAgain(true)
-                  setIsSourcifyCheckLoading(false)
-                }
-              }}
-              style={{ display: 'flex', alignItems: 'center' }}
-            >
-              {checkAgain ? t(`verify_again`) : t(`verifyBySourcify`)}{' '}
+            <a onClick={handleCheckClick} style={{ display: 'flex', alignItems: 'center' }}>
+              {isCheckAgain ? t(`verify_again`) : t(`verifyBySourcify`)}{' '}
               <NextPageIcon color="primary" style={{ marginLeft: 4, scale: '0.85' }} />
             </a>
           ),
@@ -143,9 +141,9 @@ const SmartContract: React.FC<{
         <div>
           {isVerified ? (
             <Tooltip title={t('verified')} placement="top" key="verified">
-              <div>
+              <a href="https://sourcify.dev/#/lookup" target="_blank" rel="noopener noreferrer">
                 <VerifiedIcon />
-              </div>
+              </a>
             </Tooltip>
           ) : null}
           {isSubmitted ? (
