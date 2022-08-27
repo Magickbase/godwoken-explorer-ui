@@ -171,16 +171,19 @@ const overviewPlaceHolderCount = (account: AccountOverviewProps['account']) => {
     case GraphQLSchema.AccountType.PolyjuiceCreator:
       return 1
     case GraphQLSchema.AccountType.PolyjuiceContract:
-      const isVerified = !!account.smart_contract?.contract_source_code
-      if (!!account.smart_contract?.deployment_tx_hash && isVerified) {
-        return 2
-      } else if (!!account.smart_contract?.deployment_tx_hash && !isVerified) {
-        return 3
-      } else if (!account.smart_contract?.deployment_tx_hash && isVerified) {
-        return 0
-      } else {
-        return 1
+      let count = 1
+      if (account.udt?.id) {
+        count++
       }
+
+      if (!account.smart_contract?.contract_source_code) {
+        count++
+      }
+
+      if (!account.udt?.icon && !account.udt?.description && !account.udt?.official_site) {
+        count++
+      }
+      return count
     case GraphQLSchema.AccountType.MetaContract:
       return 6
     case GraphQLSchema.AccountType.EthAddrReg:
