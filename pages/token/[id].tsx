@@ -110,7 +110,7 @@ const Token: React.FC<Props> = () => {
       ),
     },
     {
-      field: 'description',
+      field: t('description'),
       content: token ? token.description || '-' : <Skeleton animation="wave" />,
     },
   ]

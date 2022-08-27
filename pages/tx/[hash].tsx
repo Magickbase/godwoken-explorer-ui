@@ -1,5 +1,5 @@
-import { useEffect, useState, useMemo } from 'react'
-import { GetStaticPaths, GetStaticProps } from 'next'
+import type { GetStaticPaths, GetStaticProps } from 'next'
+import { useMemo, useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
@@ -22,29 +22,13 @@ import Amount from 'components/Amount'
 import { SIZES } from 'components/PageSize'
 import PolyjuiceStatus from 'components/PolyjuiceStatus'
 import ExpandIcon from 'assets/icons/expand.svg'
-import {
-  formatDatetime,
-  fetchTx,
-  useWS,
-  getTxRes,
-  fetchEventLogsListByType,
-  handleApiError,
-  CKB_EXPLORER_URL,
-  CHANNEL,
-  NotFoundException,
-  PCKB_UDT_INFO,
-} from 'utils'
+import { formatDatetime, fetchTx, fetchEventLogsListByType, CKB_EXPLORER_URL, PCKB_UDT_INFO } from 'utils'
 import styles from './styles.module.scss'
 
-type RawTx = Parameters<typeof getTxRes>[0]
-type ParsedTx = ReturnType<typeof getTxRes>
-
 const tabs = ['erc20', 'logs', 'raw-data']
-type State = ParsedTx
 const ADDR_LENGTH = 42
 
-const Tx = (initState: State) => {
-  const [tx, setTx] = useState(initState)
+const Tx = () => {
   const {
     query: {
       hash,
@@ -56,10 +40,15 @@ const Tx = (initState: State) => {
       page_size = SIZES[1],
       log_index_sort = 'ASC',
     },
+    replace,
   } = useRouter()
-  const [t] = useTranslation('tx')
+  const [t, { language }] = useTranslation('tx')
+  const [isFinalized, setIsFinalized] = useState(false)
 
-  const downloadItems = [{ label: t('ERC20Records'), href: DOWNLOAD_HREF_LIST.txTransferList(tx.hash) }]
+  const { isLoading: isTxLoading, data: tx } = useQuery(['tx', hash], () => fetchTx(hash as string), {
+    enabled: !!hash,
+    refetchInterval: isFinalized ? undefined : 10000,
+  })
 
   const { isLoading: isTransferListLoading, data: transferList } = useQuery(
     ['tx-transfer-list', hash, before, after, address_from, address_to, log_index_sort, page_size],
@@ -88,57 +77,43 @@ const Tx = (initState: State) => {
   )
 
   useEffect(() => {
-    setTx(initState)
-  }, [setTx, initState])
+    if (tx?.status === 'finalized') {
+      setIsFinalized(true)
+    }
+  }, [tx, setIsFinalized])
 
-  useWS(
-    `${CHANNEL.TX_INFO}${tx.hash}`,
-    (init: RawTx) => {
-      if (init) {
-        setTx(prev => ({ ...getTxRes(init), gasUsed: prev.gasUsed, gasLimit: prev.gasLimit }))
-      }
-    },
-    ({
-      status = 'pending',
-      l1_block_number,
-      polyjuice_status,
-    }: Partial<Pick<RawTx, 'status' | 'l1_block_number' | 'polyjuice_status'>>) => {
-      setTx(prev => ({
-        ...prev,
-        status,
-        l1BlockNumber: l1_block_number,
-        polyjuiceStatus: polyjuice_status ?? prev.polyjuiceStatus,
-      }))
-    },
-    [setTx, tx.hash],
-  )
+  if (!isTxLoading && !tx?.hash) {
+    replace(`${language}/404?query=${hash}`)
+  }
+
+  const downloadItems = [{ label: t('ERC20Records'), href: DOWNLOAD_HREF_LIST.txTransferList(hash as string) }]
 
   const decodedInput = useMemo(() => {
-    if (initState.contractAbi && initState.contractAbi.length && initState.input) {
+    if (tx && tx.contractAbi && tx.contractAbi.length && tx.input) {
       try {
-        const i = new ethers.utils.Interface(initState.contractAbi)
-        return i.parseTransaction({ data: initState.input })
+        const i = new ethers.utils.Interface(tx.contractAbi)
+        return i.parseTransaction({ data: tx.input })
       } catch (err) {
         console.error(err)
         return null
       }
     }
     return null
-  }, [initState.contractAbi, initState.input])
+  }, [tx?.contractAbi, tx?.input])
 
   const utf8Input = useMemo(() => {
-    if (initState.input) {
+    if (tx?.input) {
       try {
-        return ethers.utils.toUtf8String(initState.input)
+        return ethers.utils.toUtf8String(tx.input)
       } catch {
         return null
       }
     }
     return null
-  }, [initState.input])
+  }, [tx?.input])
 
   const inputContents = [
-    { type: 'raw', text: tx.input },
+    { type: 'raw', text: tx?.input },
     decodedInput
       ? {
           type: 'decoded',
@@ -155,20 +130,32 @@ const Tx = (initState: State) => {
       field: t('hash'),
       content: (
         <div className={styles.hash}>
-          <span className="mono-font">{tx.hash}</span>
-          <CopyBtn content={tx.hash} />
+          <span className="mono-font">{hash as string}</span>
+          <CopyBtn content={hash as string} />
         </div>
       ),
     },
     {
       field: t('from'),
-      content: <HashLink label={tx.from} href={`/address/${tx.from}`} style={{ wordBreak: 'break-all' }} />,
+      content: isTxLoading ? (
+        <Skeleton animation="wave" />
+      ) : tx ? (
+        <HashLink label={tx.from} href={`/address/${tx.from}`} style={{ wordBreak: 'break-all' }} />
+      ) : (
+        '-'
+      ),
     },
     {
-      field: t(tx.toAlias ? 'interactedContract' : 'to'),
-      content: <HashLink label={tx.toAlias || tx.to} href={`/address/${tx.to}`} />,
+      field: t(tx?.toAlias ? 'interactedContract' : 'to'),
+      content: isTxLoading ? (
+        <Skeleton animation="wave" />
+      ) : tx ? (
+        <HashLink label={tx.toAlias || tx.to} href={`/address/${tx.to}`} />
+      ) : (
+        '-'
+      ),
     },
-    tx.contractAddress?.length === ADDR_LENGTH
+    tx?.contractAddress?.length === ADDR_LENGTH
       ? {
           field: t('deployed_contract'),
           content: <HashLink label={tx.contractAddress} href={`/address/${tx.contractAddress}`} />,
@@ -179,11 +166,11 @@ const Tx = (initState: State) => {
       // FIXME: tx.value is formatted incorrectly
       content: (
         <div className={styles.value}>
-          <Amount amount={tx.value ?? '0'} udt={{ decimal: 10, symbol: PCKB_UDT_INFO.symbol }} showSymbol />
+          <Amount amount={tx?.value ?? '0'} udt={{ decimal: 10, symbol: PCKB_UDT_INFO.symbol }} showSymbol />
         </div>
       ),
     },
-    tx.input
+    tx?.input
       ? {
           field: t('input'),
           content: (
@@ -208,14 +195,14 @@ const Tx = (initState: State) => {
   ]
 
   const basicInfo = [
-    { field: t('finalizeState'), content: t(tx.status) },
+    { field: t('finalizeState'), content: tx ? t(tx.status) : <Skeleton animation="wave" /> },
     {
       field: t('type'),
-      content: <TxType type={tx.type} />,
+      content: tx ? <TxType type={tx.type} /> : <Skeleton animation="wave" />,
     },
     {
       field: t('l1Block'),
-      content: tx.l1BlockNumber ? (
+      content: tx?.l1BlockNumber ? (
         <HashLink
           label={tx.l1BlockNumber.toLocaleString('en')}
           href={`${CKB_EXPLORER_URL}/block/${tx.l1BlockNumber}`}
@@ -227,39 +214,55 @@ const Tx = (initState: State) => {
     },
     {
       field: t('l2Block'),
-      content: tx.blockNumber ? (
+      content: tx?.blockNumber ? (
         <HashLink label={tx.blockNumber.toLocaleString('en')} href={`/block/${tx.blockNumber}`} />
       ) : (
         t('pending')
       ),
     },
-    { field: t('index'), content: tx.index ?? '-' },
-    { field: t('nonce'), content: (tx.nonce || 0).toLocaleString('en') },
+    { field: t('index'), content: tx?.index ?? '-' },
+    { field: t('nonce'), content: tx ? (tx.nonce || 0).toLocaleString('en') : <Skeleton animation="wave" /> },
     {
       field: t('status'),
-      content: <PolyjuiceStatus status={tx.polyjuiceStatus ?? null} />,
+      content: tx ? <PolyjuiceStatus status={tx.polyjuiceStatus ?? null} /> : <Skeleton animation="wave" />,
     },
     {
       field: t('gasPrice'),
       content:
-        tx.gasPrice !== null ? (
+        tx && tx.gasPrice !== null ? (
           <span className={styles.gasPrice}>{`${new BigNumber(tx.gasPrice).toFormat()} ${PCKB_UDT_INFO.symbol}`}</span>
+        ) : isTxLoading ? (
+          <Skeleton animation="wave" />
         ) : (
           '-'
         ),
     },
     {
       field: t('gasUsed'),
-      content: tx.gasUsed !== null && tx.polyjuiceStatus !== 'pending' ? new BigNumber(tx.gasUsed).toFormat() : '-',
+      content:
+        tx && tx.gasUsed !== null && tx.polyjuiceStatus !== 'pending' ? (
+          new BigNumber(tx.gasUsed).toFormat()
+        ) : isTxLoading ? (
+          <Skeleton animation="wave" />
+        ) : (
+          '-'
+        ),
     },
     {
       field: t('gasLimit'),
-      content: tx.gasLimit !== null ? new BigNumber(tx.gasLimit).toFormat() : '-',
+      content:
+        tx && tx.gasLimit !== null ? (
+          new BigNumber(tx.gasLimit).toFormat()
+        ) : isTxLoading ? (
+          <Skeleton animation="wave" />
+        ) : (
+          '-'
+        ),
     },
     {
       field: t('fee'),
       content:
-        tx.gasPrice !== null && typeof tx.gasUsed !== null && tx.polyjuiceStatus !== 'pending' ? (
+        tx && tx.gasPrice !== null && typeof tx.gasUsed !== null && tx.polyjuiceStatus !== 'pending' ? (
           <span className={styles.gasFee}>
             <Amount
               amount={`${new BigNumber(tx.gasUsed).times(new BigNumber(tx.gasPrice))} `}
@@ -267,6 +270,8 @@ const Tx = (initState: State) => {
               showSymbol
             />
           </span>
+        ) : isTxLoading ? (
+          <Skeleton animation="wave" />
         ) : (
           '-'
         ),
@@ -274,7 +279,7 @@ const Tx = (initState: State) => {
     {
       field: t('timestamp'),
       content:
-        tx.timestamp >= 0 ? (
+        tx?.timestamp >= 0 ? (
           <time dateTime={new Date(tx.timestamp).toISOString()}>{formatDatetime(tx.timestamp)}</time>
         ) : (
           t('pending')
@@ -286,7 +291,7 @@ const Tx = (initState: State) => {
 
   return (
     <>
-      <SubpageHead subtitle={`${title} ${tx.hash}`} />
+      <SubpageHead subtitle={`${title} ${hash}`} />
       <div className={styles.container}>
         <PageTitle>
           <div className={styles.title}>
@@ -304,7 +309,7 @@ const Tx = (initState: State) => {
             value={tabs.indexOf(tab as string)}
             tabs={['erc20_records', 'logs', 'rawData'].map((label, idx) => ({
               label: t(label),
-              href: `/tx/${tx.hash}?tab=${tabs[idx]}`,
+              href: `/tx/${hash}?tab=${tabs[idx]}`,
             }))}
           />
           {tab === 'erc20' ? (
@@ -321,7 +326,7 @@ const Tx = (initState: State) => {
               <Skeleton animation="wave" />
             )
           ) : null}
-          {tab === 'raw-data' && tx ? <RawTxData hash={tx.hash} /> : null}
+          {tab === 'raw-data' && tx ? <RawTxData hash={hash as string} /> : null}
         </div>
       </div>
     </>
@@ -333,17 +338,9 @@ export const getStaticPaths: GetStaticPaths = () => ({
   fallback: 'blocking',
 })
 
-export const getStaticProps: GetStaticProps<State, { hash: string }> = async ({ locale, params }) => {
-  const { hash } = params
-
-  try {
-    const [tx, lng] = await Promise.all([fetchTx(hash), await serverSideTranslations(locale, ['common', 'tx', 'list'])])
-    if (!tx?.hash) {
-      throw new NotFoundException()
-    }
-    return { props: { ...tx, ...lng } }
-  } catch (err) {
-    return handleApiError(err, null, locale, hash)
-  }
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+  const lng = await serverSideTranslations(locale, ['common', 'tx', 'list'])
+  return { props: lng }
 }
+
 export default Tx
