@@ -78,7 +78,7 @@ export interface MetaContract extends AccountBase {
 }
 
 export type AccountOverviewProps = {
-  account: EthUser | EthAddrReg | PolyjuiceCreator | PolyjuiceContract | Udt | MetaContract | UnknownUser
+  account: EthUser | EthAddrReg | PolyjuiceCreator | PolyjuiceContract | Udt | MetaContract | UnknownUser | null
   isOverviewLoading?: boolean
   isBalanceLoading?: boolean
   balance: string
@@ -202,6 +202,31 @@ const AccountOverview: React.FC<AccountOverviewProps & { refetch: () => Promise<
   refetch,
 }) => {
   const [t] = useTranslation(['account', 'common'])
+
+  if (!account) {
+    return (
+      <div className={styles.container}>
+        <InfoList
+          title={t('basicInfo')}
+          list={[
+            {
+              field: t('type'),
+              content: <Skeleton animation="wave" width="100%" />,
+            },
+          ]}
+        />
+        <InfoList
+          title={t('overview')}
+          list={[
+            {
+              field: t('ckbBalance'),
+              content: <Skeleton animation="wave" />,
+            },
+          ]}
+        />
+      </div>
+    )
+  }
 
   return (
     <div className={styles.container} data-account-type={account.type}>
