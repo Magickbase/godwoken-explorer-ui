@@ -245,6 +245,7 @@ const AccountOverview: React.FC<AccountOverviewProps & { refetch: () => Promise<
           address={account.eth_address}
           isVerified={!!account.smart_contract?.contract_source_code}
           refetch={refetch}
+          isLoading={isOverviewLoading}
         />
       ) : null}
       {account.type === GraphQLSchema.AccountType.PolyjuiceCreator ? (
