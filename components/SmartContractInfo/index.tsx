@@ -34,8 +34,9 @@ const SmartContract: React.FC<{
   udt: Pick<GraphQLSchema.Udt, 'id' | 'name' | 'official_site' | 'description' | 'icon'> | null
   isVerified: boolean
   address: string
+  isLoading: boolean
   refetch: () => Promise<void>
-}> = ({ deployer, deployTxHash, udt, isVerified, address, refetch }) => {
+}> = ({ deployer, deployTxHash, udt, isVerified, address, refetch, isLoading }) => {
   const [t] = useTranslation('account')
   const [isCheckAgain, setIsCheckAgain] = useState(false)
   const [isSourcifyCheckLoading, setIsSourcifyCheckLoading] = useState(false)
@@ -77,8 +78,10 @@ const SmartContract: React.FC<{
             </NextLink>
           </span>
         </Tooltip>
-      ) : (
+      ) : isLoading ? (
         <Skeleton animation="wave" />
+      ) : (
+        '-'
       ),
     },
     {
@@ -91,8 +94,10 @@ const SmartContract: React.FC<{
             </NextLink>
           </span>
         </Tooltip>
-      ) : (
+      ) : isLoading ? (
         <Skeleton animation="wave" />
+      ) : (
+        '-'
       ),
     },
     udt?.id
