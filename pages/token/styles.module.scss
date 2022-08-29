@@ -42,6 +42,10 @@
   }
   dd {
     text-transform: none;
+    span,
+    b {
+      font-weight: 400 !important;
+    }
   }
 }
 
