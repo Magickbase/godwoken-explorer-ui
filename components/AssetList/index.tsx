@@ -1,7 +1,6 @@
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import { gql } from 'graphql-request'
-import BigNumber from 'bignumber.js'
 import Table from 'components/Table'
 import TokenLogo from 'components/TokenLogo'
 import Amount from 'components/Amount'

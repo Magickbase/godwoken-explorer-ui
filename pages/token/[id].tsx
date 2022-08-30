@@ -1,5 +1,5 @@
 import type { GetStaticProps, GetStaticPaths } from 'next'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useRouter } from 'next/router'
@@ -15,14 +15,20 @@ import TokenHolderList from 'components/TokenHolderList/index'
 import HashLink from 'components/HashLink'
 import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
 import Amount from 'components/Amount'
+import Alert from 'components/Alert'
 import { fetchToken, fetchBridgedRecordList, fetchTokenHolderList } from 'utils'
 import styles from './styles.module.scss'
 
 import type { API } from 'utils/api/utils'
 import { SIZES } from 'components/PageSize'
 import TokenLogo from 'components/TokenLogo'
+import Tooltip from 'components/Tooltip'
 
 const tabs = ['transfers', 'bridged', 'holders']
+
+const isEtheremInjected = (ethereum: any): ethereum is { request: Function } => {
+  return ethereum && 'request' in ethereum && typeof ethereum.request === 'function'
+}
 
 type Props = {
   token: API.Token.Parsed
@@ -30,6 +36,7 @@ type Props = {
 
 const Token: React.FC<Props> = () => {
   const [t, { language }] = useTranslation('tokens')
+  const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string }>(null)
   const {
     replace,
     query: { id, tab = 'transfers', page = '1', before = null, after = null, page_size = SIZES[1] },
@@ -142,6 +149,35 @@ const Token: React.FC<Props> = () => {
     },
   ]
 
+  const handleImportIntoMetamask = async () => {
+    const ethereum: unknown | undefined = window['ethereum']
+    if (isEtheremInjected(ethereum)) {
+      try {
+        await ethereum.request({
+          method: 'wallet_watchAsset',
+          params: {
+            type: 'ERC20',
+            options: {
+              address: token.address,
+              symbol: token.symbol,
+              decimals: token.decimal,
+              image: token.icon,
+            },
+          },
+        })
+        setMsg({ type: 'success', text: t(`import-token-success`) })
+      } catch (err) {
+        if (err.code === 4001) {
+          setMsg({ type: 'error', text: t(`rejected-by-metamask`) })
+          return
+        }
+        setMsg({ type: 'error', text: err.message })
+      }
+      return
+    }
+    setMsg({ type: 'error', text: t(`ethereum-is-not-injected`) })
+  }
+
   return (
     <>
       <SubpageHead subtitle={`${t('token')} ${token?.name || token?.symbol || '-'}`} />
@@ -158,7 +194,23 @@ const Token: React.FC<Props> = () => {
           <DownloadMenu items={downloadItems} />
         </PageTitle>
         <div className={styles.overview}>
-          <InfoList title={t(`tokenInfo`)} list={tokenInfo} />
+          <InfoList
+            title={
+              <div className={styles.infoTitle}>
+                {t(`tokenInfo`)}
+                <Tooltip title={t('import-token-into-metamask')} placement="top">
+                  <img
+                    src="/logos/metamask.png"
+                    alt="MetaMask"
+                    className={styles.metamask}
+                    title={t('import-into-metamask')}
+                    onClick={handleImportIntoMetamask}
+                  />
+                </Tooltip>
+              </div>
+            }
+            list={tokenInfo}
+          />
           <InfoList title={t(`tokenData`)} list={tokenData} />
         </div>
 
@@ -193,6 +245,7 @@ const Token: React.FC<Props> = () => {
           ) : null}
         </div>
       </div>
+      <Alert open={!!msg} onClose={() => setMsg(null)} content={msg?.text} type={msg?.type} />
     </>
   )
 }
