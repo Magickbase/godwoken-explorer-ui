@@ -152,6 +152,7 @@ const Token: React.FC<Props> = () => {
   const handleImportIntoMetamask = async () => {
     const ethereum: unknown | undefined = window['ethereum']
     if (isEtheremInjected(ethereum)) {
+      const symbol = token.symbol.split('.')[0] || ''
       try {
         await ethereum.request({
           method: 'wallet_watchAsset',
@@ -159,7 +160,7 @@ const Token: React.FC<Props> = () => {
             type: 'ERC20',
             options: {
               address: token.address,
-              symbol: token.symbol,
+              symbol,
               decimals: token.decimal,
               image: token.icon,
             },
