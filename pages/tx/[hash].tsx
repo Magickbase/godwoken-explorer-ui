@@ -196,6 +196,8 @@ const Tx = () => {
       : null,
   ]
 
+  const isPolyjuiceTx = tx?.type === 'polyjuice'
+
   const basicInfo = [
     { field: t('finalizeState'), content: tx ? t(tx.status) : <Skeleton animation="wave" /> },
     {
@@ -222,7 +224,7 @@ const Tx = () => {
         t('pending')
       ),
     },
-    { field: t('index'), content: tx?.index ?? t('pending') },
+    { field: t('index'), content: tx?.index ?? (isPolyjuiceTx ? t('pending') : '-') },
     { field: t('nonce'), content: tx ? (tx.nonce || 0).toLocaleString('en') : <Skeleton animation="wave" /> },
     {
       field: t('status'),
@@ -234,8 +236,10 @@ const Tx = () => {
         <span className={styles.gasPrice}>{`${new BigNumber(tx.gasPrice).toFormat()} ${PCKB_UDT_INFO.symbol}`}</span>
       ) : isTxLoading ? (
         <Skeleton animation="wave" />
-      ) : (
+      ) : isPolyjuiceTx ? (
         t('pending')
+      ) : (
+        '-'
       ),
     },
     {
@@ -245,8 +249,10 @@ const Tx = () => {
           new BigNumber(tx.gasUsed).toFormat()
         ) : isTxLoading ? (
           <Skeleton animation="wave" />
-        ) : (
+        ) : isPolyjuiceTx ? (
           t('pending')
+        ) : (
+          '-'
         ),
     },
     {
@@ -255,8 +261,10 @@ const Tx = () => {
         new BigNumber(tx.gasLimit).toFormat()
       ) : isTxLoading ? (
         <Skeleton animation="wave" />
-      ) : (
+      ) : isPolyjuiceTx ? (
         t('pending')
+      ) : (
+        '-'
       ),
     },
     {
@@ -272,8 +280,10 @@ const Tx = () => {
           </span>
         ) : isTxLoading ? (
           <Skeleton animation="wave" />
-        ) : (
+        ) : isPolyjuiceTx ? (
           t('pending')
+        ) : (
+          '-'
         ),
     },
     {
