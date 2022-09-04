@@ -7,28 +7,25 @@ import Address from 'components/TruncatedAddress'
 import Pagination from 'components/SimplePagination'
 import TxStatusIcon from 'components/TxStatusIcon'
 import TransferDirection from 'components/TransferDirection'
+import NoDataIcon from 'assets/icons/no-data.svg'
 import { client, timeDistance, getBlockStatus, GraphQLSchema } from 'utils'
 import styles from './styles.module.scss'
 
 // TODO: update empty list style after PR https://github.com/Magickbase/godwoken-explorer-ui/pull/417 is merged
 
 export type NftActivityListProps = {
-  token_transfers: {
+  erc721_token_transfers: {
     entries: Array<{
-      amount: string
+      transaction: Pick<GraphQLSchema.Transaction, 'hash' | 'method_id' | 'method_name'>
       block: Pick<GraphQLSchema.Block, 'number' | 'status' | 'timestamp'>
       from_address: string
+      from_account?: Pick<GraphQLSchema.Account, 'type'>
       to_address: string
-      from_account: Pick<GraphQLSchema.Account, 'type'>
-      to_account: Pick<GraphQLSchema.Account, 'type'>
+      to_account?: Pick<GraphQLSchema.Account, 'type'>
       log_index: number
       polyjuice: Pick<GraphQLSchema.Polyjuice, 'status'>
-      transaction_hash: string
-      method: string
-      nft: {
-        contract_address: string
-        token_id: number
-      }
+      token_id: number
+      token_contract_address_hash: string
     }>
     metadata: GraphQLSchema.PageMetadata
   }
@@ -41,38 +38,46 @@ interface Cursor {
 }
 
 export interface TokenTransferListVariables extends Nullable<Cursor> {
-  contract_address: string
+  address: string
 }
 type Variables = TokenTransferListVariables
 
 const nftActivityListQuery = gql`
-  query ($address: HashAddress, $before: String, $after: String, $limit: Int) {
-    token_transfers(input: { token_contract_address_hash: $address, before: $before, after: $after, limit: $limit }) {
+  query ($address: HashAddress, $before: String, $after: String, $limit: Int, $token_id: Int) {
+    erc721_token_transfers(
+      input: {
+        token_contract_address_hash: $address
+        before: $before
+        after: $after
+        limit: $limit
+        token_id: $token_id
+      }
+    ) {
       entries {
-        amount
-        transaction_hash
-        method
-        log_index
-        polyjuice {
-          status
+        transaction {
+          method_id
+          method_name
+          hash
         }
         from_address
-        to_address
         from_account {
           type
         }
+        to_address
         to_account {
           type
         }
+        log_index
         block {
           number
           timestamp
           status
         }
-        nft {
-          token_id
-          contract_address
+        polyjuice {
+          status
         }
+        token_id
+        token_contract_address_hash
       }
 
       metadata {
@@ -85,13 +90,13 @@ const nftActivityListQuery = gql`
 `
 
 export const fetchNftActivityList = (variables: Variables) =>
-  client.request<NftActivityListProps>(nftActivityListQuery, variables).then(data => data.token_transfers)
+  client.request<NftActivityListProps>(nftActivityListQuery, variables).then(data => data.erc721_token_transfers)
 
 const NftActivityList: React.FC<
   NftActivityListProps & {
     viewer?: string
   }
-> = ({ token_transfers, viewer }) => {
+> = ({ erc721_token_transfers, viewer }) => {
   const [t, { language }] = useTranslation('list')
 
   return (
@@ -104,24 +109,26 @@ const NftActivityList: React.FC<
             <th>{t('age')} </th>
             <th>{t('from')}</th>
             <th>{t('to')}</th>
-            <th className={styles.direction}></th>
+            {viewer ? <th></th> : null}
             <th>{`${t('token_id')}`}</th>
           </tr>
         </thead>
         <tbody>
-          {token_transfers.metadata.total_count ? (
-            token_transfers.entries.map(item => {
+          {erc721_token_transfers?.metadata.total_count ? (
+            erc721_token_transfers.entries.map(item => {
+              const method = item.transaction.method_name || item.transaction.method_id
+
               return (
-                <tr key={item.transaction_hash + item.log_index}>
+                <tr key={item.transaction.hash + item.log_index}>
                   <td>
                     <div className={styles.hash}>
-                      <Tooltip title={item.transaction_hash} placement="top">
+                      <Tooltip title={item.transaction.hash} placement="top">
                         <span>
-                          <NextLink href={`/tx/${item.transaction_hash}`}>
-                            <a className="mono-font">{`${item.transaction_hash.slice(
+                          <NextLink href={`/tx/${item.transaction.hash}`}>
+                            <a className="mono-font">{`${item.transaction.hash.slice(
                               0,
                               8,
-                            )}...${item.transaction_hash.slice(-8)}`}</a>
+                            )}...${item.transaction.hash.slice(-8)}`}</a>
                           </NextLink>
                         </span>
                       </Tooltip>
@@ -131,24 +138,32 @@ const NftActivityList: React.FC<
                       />
                     </div>
                   </td>
-                  <td>{item.method}</td>
+                  <td>
+                    {method ? (
+                      <Tooltip title={item.transaction.method_id} placement="top">
+                        <div className={styles.method} title={method}>
+                          {method}
+                        </div>
+                      </Tooltip>
+                    ) : (
+                      '-'
+                    )}
+                  </td>
                   <td>
                     <time dateTime={item.block.timestamp}>
                       {timeDistance(new Date(item.block.timestamp).getTime(), language)}
                     </time>
                   </td>
+                  <td>{<Address address={item.from_address} type={item.from_account?.type} />}</td>
+                  <td>{<Address address={item.to_address} type={item.to_account?.type} />}</td>
+                  {viewer ? (
+                    <td>
+                      <TransferDirection from={item.from_address} to={item.to_address} viewer={viewer ?? ''} />
+                    </td>
+                  ) : null}
                   <td>
-                    <Address address={item.from_address} type={item.from_account?.type} />
-                  </td>
-                  <td>
-                    <Address address={item.to_address} type={item.to_account?.type} />
-                  </td>
-                  <td className={styles.direction}>
-                    <TransferDirection from={item.from_address} to={item.to_address} viewer={viewer ?? ''} />
-                  </td>
-                  <td>
-                    <NextLink href={`/nft-collection/${item.nft.contract_address}/${item.nft.token_id}`}>
-                      <a>{(+item.nft.token_id).toLocaleString('en')}</a>
+                    <NextLink href={`/nft-collection/${item.token_contract_address_hash}/${item.token_id}`}>
+                      <a>{(+item.token_id).toLocaleString('en')}</a>
                     </NextLink>
                   </td>
                 </tr>
@@ -156,14 +171,19 @@ const NftActivityList: React.FC<
             })
           ) : (
             <tr>
-              <td colSpan={6} className={styles.noRecords}>
-                {t(`no_records`)}
+              <td colSpan={viewer ? 7 : 6}>
+                <div className={styles.noRecords}>
+                  <NoDataIcon />
+                  <span>{t(`no_records`)}</span>
+                </div>
               </td>
             </tr>
           )}
         </tbody>
       </Table>
-      <Pagination {...token_transfers.metadata} note={t(`last-n-records`, { n: '10k' })} />
+      {erc721_token_transfers ? (
+        <Pagination {...erc721_token_transfers.metadata} note={t(`last-n-records`, { n: '10k' })} />
+      ) : null}
     </div>
   )
 }

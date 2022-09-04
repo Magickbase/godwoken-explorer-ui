@@ -2,6 +2,17 @@
 
 .container {
   @include main-center;
+  form[data-role='filter-menu']:first-of-type {
+    left: 0;
+    transform: translateX(-20px);
+  }
+  &[data-is-filter-unnecessary='true'] {
+    th {
+      svg {
+        display: none;
+      }
+    }
+  }
 }
 
 .subheader {
@@ -66,4 +77,16 @@
     border-radius: 0.5rem;
     margin-top: 1rem;
   }
+}
+
+.sorter {
+  cursor: pointer;
+
+  &[data-order='DESC'] {
+    transform: rotate(0.5turn);
+  }
+}
+
+.noRecords {
+  @include empty-list;
 }

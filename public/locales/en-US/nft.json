@@ -1,5 +1,5 @@
 {
-  "nft-collection": "NFT Collection",
+  "nft-collections": "NFT Collections",
   "info": "info",
   "stats": "stats",
   "type": "type",
@@ -8,5 +8,9 @@
   "minted_count": "Minted Count",
   "activity": "activity",
   "holders": "holders",
-  "inventory": "inventory"
+  "inventory": "inventory",
+  "token": "Token",
+  "address": "Address",
+  "erc-721": "ERC 721",
+  "erc-1155": "ERC 1155"
 }

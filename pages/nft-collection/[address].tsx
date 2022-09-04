@@ -12,32 +12,43 @@ import HashLink from 'components/HashLink'
 import Tabs from 'components/Tabs'
 import NftActivityList, { fetchNftActivityList } from 'components/NftActivityList'
 import TokenLogo from 'components/TokenLogo'
-import { client } from 'utils'
+import { client, GraphQLSchema } from 'utils'
 import styles from './styles.module.scss'
 import { SIZES } from 'components/PageSize'
 
-const nftCollectionQuery = gql`
-  query ($address: String!, $before: String, $after: String) {
-    nft_collection(input: { address: $address, before: $before, after: $after }) {
-      holder_count
-      minted_count
-      contract {
-        eth_address
-      }
-    }
-  }
-`
+type NftCollectionInfoProps = Omit<GraphQLSchema.NftCollectionListItem, 'id' | 'account'> | undefined
 
 interface NftCollectionProps {
-  holder_count: number
-  minted_count: number
+  erc721_udts: {
+    entries: [NftCollectionInfoProps]
+  }
 }
 
 interface Variables {
   address: string
 }
 
-const fetchNftCollection = (variables: Variables) => client.request<NftCollectionProps>(nftCollectionQuery, variables)
+const nftCollectionInfoQuery = gql`
+  query ($address: HashAddress) {
+    erc721_udts(input: { contract_address: $address }) {
+      entries {
+        name
+        symbol
+        icon
+        holders_count
+        minted_count
+      }
+    }
+  }
+`
+const fetchNftCollection = (variables: Variables): Promise<NftCollectionInfoProps> =>
+  client
+    .request<NftCollectionProps>(nftCollectionInfoQuery, variables)
+    .then(data => data.erc721_udts.entries[0])
+    .catch(error => {
+      console.error(error)
+      return undefined
+    })
 
 const tabs = ['activity', 'holders', 'inventory']
 
@@ -47,26 +58,27 @@ const NftCollection = () => {
     query: { address, tab = tabs[0], before = null, after = null, page_size = SIZES[1] },
   } = useRouter()
 
-  const mockNftInfo = {
-    name: 'NFT name',
+  const { isLoading: isCollectionInfoLoading, data: collectionInfo } = useQuery(
+    ['nft-collection', address],
+    () =>
+      fetchNftCollection({
+        address: address as string,
+      }),
+    {
+      enabled: !!address,
+      refetchInterval: 10000,
+    },
+  )
+  const listParams = {
+    address: address as string,
+    before: before as string,
+    after: after as string,
+    limit: Number.isNaN(+page_size) ? +SIZES[1] : +page_size,
   }
-
-  // TODO: wait for API
-  // const { isLoading, data } = useQuery(['nft-collection', address], () =>
-  //   fetchNftCollection({
-  //     address: address as string,
-  //   }),
-  // )
 
   const { isLoading: isNftActivityListLoading, data: nftActivityList } = useQuery(
     ['nft-collection-activity', address, before, after, page_size],
-    () =>
-      fetchNftActivityList({
-        contract_address: address as string,
-        before: before as string,
-        after: after as string,
-        limit: Number.isNaN(+page_size) ? +SIZES[1] : +page_size,
-      }),
+    () => fetchNftActivityList(listParams),
     {
       enabled: address && tab === tabs[0],
     },
@@ -78,7 +90,7 @@ const NftCollection = () => {
   }> = [
     {
       field: t('type'),
-      content: 'erc-721',
+      content: t('erc-721'),
     },
     {
       field: t('contract'),
@@ -87,19 +99,33 @@ const NftCollection = () => {
   ]
 
   const stats: Array<{ field: string; content: React.ReactNode }> = [
-    { field: t('holder_count'), content: 100 },
-    { field: t('minted_count'), content: 2000 },
+    {
+      field: t('holder_count'),
+      content: isCollectionInfoLoading ? (
+        <Skeleton animation="wave" />
+      ) : (
+        collectionInfo?.holders_count.toLocaleString('en') ?? '-'
+      ),
+    },
+    {
+      field: t('minted_count'),
+      content: isCollectionInfoLoading ? (
+        <Skeleton animation="wave" />
+      ) : (
+        collectionInfo?.minted_count.toLocaleString('en') ?? '-'
+      ),
+    },
   ]
 
   const title = t(`nft-collection`)
   return (
     <>
-      <SubpageHead subtitle={`${title} ${mockNftInfo.name}`} />
+      <SubpageHead subtitle={`${title} ${collectionInfo?.name || address}`} />
       <div className={styles.container}>
         <PageTitle>
           <div className={styles.title}>
-            <TokenLogo name={mockNftInfo.name} logo="" />
-            <span>{mockNftInfo.name}</span>
+            <TokenLogo name={collectionInfo?.name} logo={collectionInfo?.icon} />
+            <span>{collectionInfo?.name}</span>
           </div>
         </PageTitle>
         <div className={styles.overview}>
@@ -107,7 +133,7 @@ const NftCollection = () => {
           <InfoList title={t(`stats`)} list={stats} />
         </div>
 
-        <div className={styles.list}>
+        <div className={styles.list} data-tab={tab}>
           <Tabs
             value={tabs.indexOf(tab as string)}
             tabs={tabs.map((tabItem, idx) => ({
@@ -119,7 +145,7 @@ const NftCollection = () => {
             isNftActivityListLoading || !nftActivityList ? (
               <Skeleton animation="wave" />
             ) : (
-              <NftActivityList token_transfers={nftActivityList} />
+              <NftActivityList erc721_token_transfers={nftActivityList} />
             )
           ) : null}
         </div>
@@ -134,7 +160,7 @@ export const getStaticPaths: GetStaticPaths = () => ({
 })
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
-  const lng = await serverSideTranslations(locale, ['common', 'nft'])
+  const lng = await serverSideTranslations(locale, ['common', 'nft', 'list'])
   return { props: lng }
 }
 

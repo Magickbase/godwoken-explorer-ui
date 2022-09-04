@@ -120,6 +120,8 @@ export namespace GraphQLSchema {
   export interface Transaction {
     args: string
     block: Block
+    method_id: string | null
+    method_name: string | null
     block_hash: string
     block_number: number
     from_account: Account
@@ -190,10 +192,9 @@ export namespace GraphQLSchema {
     name: string
     symbol: string
     icon: string
-    supply: number
+    account: Pick<Account, 'eth_address'>
     holders_count: number
-    contract_address_hash: string
-    // account: Account
+    minted_count: number
   }
 
   export interface PageMetadata {

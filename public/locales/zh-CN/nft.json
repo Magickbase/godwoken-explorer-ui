@@ -1,5 +1,5 @@
 {
-  "nft-collection": "NFT 集合",
+  "nft-collections": "NFT 集合",
   "info": "基本信息",
   "stats": "统计数据",
   "type": "类型",
@@ -8,5 +8,9 @@
   "minted_count": "铸造个数",
   "activity": "活动",
   "holders": "持有人",
-  "inventory": "目录"
+  "inventory": "目录",
+  "token": "NFT",
+  "address": "地址",
+  "erc-721": "ERC 721",
+  "erc-1155": "ERC 1155"
 }

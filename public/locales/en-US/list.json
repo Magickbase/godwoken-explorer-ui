@@ -55,5 +55,6 @@
     "address_to": "Search by address"
   },
   "n_kinds_in_total": "{{number}} Kinds in Total",
-  "no_related_content": "No related content"
+  "no_related_content": "No related content",
+  "token_id": "Token ID"
 }
