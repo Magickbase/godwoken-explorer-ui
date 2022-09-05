@@ -34,6 +34,27 @@ export namespace GraphQLSchema {
     PolyjuiceCreator = 'POLYJUICE_CREATOR',
   }
 
+  export enum ApprovalType {
+    Approval = 'APPROVAL',
+    ApprovalAll = 'APPROVAL_ALL',
+  }
+
+  export enum SortType {
+    Asc = 'ASC',
+    Desc = 'DESC',
+  }
+
+  export enum TokenApprovalsSorter {
+    BlockNumber = 'BLOCK_NUMBER',
+    Id = 'ID',
+  }
+
+  export enum EthType {
+    ERC1155 = 'ERC1155',
+    ERC20 = 'ERC20',
+    ERC721 = 'ERC721',
+  }
+
   export interface Udt {
     account: Account
     bridge_account_id: number
@@ -50,6 +71,7 @@ export namespace GraphQLSchema {
     type: UdtType
     type_script: object
     value: string
+    eth_type: EthType
   }
 
   export interface SmartContract {
@@ -183,6 +205,11 @@ export namespace GraphQLSchema {
     transaction: Transaction
     transaction_hash: string
     udt: Udt
+  }
+
+  export interface TokenApprovalsSorterInput {
+    sort_type: SortType
+    sort_value: TokenApprovalsSorter
   }
 
   export interface PageMetadata {

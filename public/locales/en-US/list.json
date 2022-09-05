@@ -52,8 +52,18 @@
     "block_from": "Block Number",
     "block_to": "Block Number",
     "address_from": "Search by address",
-    "address_to": "Search by address"
+    "address_to": "Search by address",
+    "asset": "Asset",
+    "token_type": "Token Type"
   },
   "n_kinds_in_total": "{{number}} Kinds in Total",
-  "no_related_content": "No related content"
+  "no_related_content": "No related content",
+  "last_update_time": "Last Update Time",
+  "asset": "Asset",
+  "token_type": "Token Type",
+  "approved_type": "Approved Type",
+  "approved_spender": "Approved spender",
+  "revoke": "Revoke",
+  "click_to_revoke": "Click to revoke",
+  "connect-mm-fail": "Connect MetaMask failed"
 }

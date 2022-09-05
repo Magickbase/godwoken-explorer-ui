@@ -51,8 +51,18 @@
     "block_from": "区块高度",
     "block_to": "区块高度",
     "address_from": "通过地址搜索",
-    "address_to": "通过地址搜索"
+    "address_to": "通过地址搜索",
+    "asset": "资产",
+    "token_type": "代币类型"
   },
   "n_kinds_in_total": "共计 {{number}} 种",
-  "no_related_content": "没有相关数据"
+  "no_related_content": "没有相关数据",
+  "last_update_time": "最近更新时间",
+  "asset": "资产",
+  "token_type": "代币类型",
+  "approved_type": "许可类型",
+  "approved_spender": "许可使用者",
+  "revoke": "撤销",
+  "click_to_revoke": "点击撤销许可",
+  "connect-mm-fail": "连接 MetaMask 失败"
 }

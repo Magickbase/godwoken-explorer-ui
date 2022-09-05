@@ -57,6 +57,7 @@
   "transactionRecords": "交易记录",
   "ERC20Records": "ERC20 交易记录",
   "bridgedRecords": "桥接交易记录",
+  "tokenApproval": "代币许可",
   "contract_name": "合约名称",
   "compiler_version": "编译器版本",
   "compiler_file_format": "合约文件格式",

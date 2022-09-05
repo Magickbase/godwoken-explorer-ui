@@ -6,7 +6,8 @@ import Layout from 'components/Layout'
 import { appWithTranslation } from 'next-i18next'
 import { AppProps } from 'next/app'
 import ErrorBoundary from 'components/ErrorBoundary'
-import { theme } from '../utils'
+import { WagmiConfig } from 'wagmi'
+import { theme, wagmiClient } from '../utils'
 import '../styles/globals.scss'
 import '@fontsource/roboto/300.css'
 import '@fontsource/roboto/400.css'
@@ -94,9 +95,11 @@ const Agera = ({ Component, pageProps }: AppProps) => {
               }}
             />
           ) : null}
-          <QueryClientProvider client={queryClient}>
-            <Component {...pageProps} />
-          </QueryClientProvider>
+          <WagmiConfig client={wagmiClient}>
+            <QueryClientProvider client={queryClient}>
+              <Component {...pageProps} />
+            </QueryClientProvider>
+          </WagmiConfig>
         </ErrorBoundary>
       </Layout>
     </ThemeProvider>

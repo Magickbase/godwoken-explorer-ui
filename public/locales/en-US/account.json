@@ -57,6 +57,7 @@
   "transactionRecords": "Transactions",
   "ERC20Records": "ERC20 Transfers",
   "bridgedRecords": "Bridged Transfers",
+  "tokenApproval": "Token Approval",
   "contract_name": "Contract Name",
   "compiler_version": "Compiler Version",
   "compiler_file_format": "Code File Format",

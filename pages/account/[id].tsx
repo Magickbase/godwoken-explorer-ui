@@ -23,6 +23,7 @@ import CopyBtn from 'components/CopyBtn'
 import QRCodeBtn from 'components/QRCodeBtn'
 import PageTitle from 'components/PageTitle'
 import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
+import TokenApprovalList, { fetchTokenApprovalList } from 'components/TokenApprovalList'
 import { SIZES } from 'components/PageSize'
 import { fetchBridgedRecordList, fetchEventLogsListByType, isEthAddress, GraphQLSchema } from 'utils'
 import styles from './styles.module.scss'
@@ -42,6 +43,10 @@ const Account = () => {
       block_to = null,
       page = '1',
       page_size = SIZES[1],
+      sort_time = 'ASC',
+      sort_asset = 'ASC',
+      sort_token_type = 'ASC',
+      token_type = null,
     },
   } = useRouter()
   const [t] = useTranslation(['account', 'common'])
@@ -133,6 +138,26 @@ const Account = () => {
     { enabled: tab === 'assets' && !!(q.address || q.script_hash) },
   )
 
+  const { isLoading: isTokenApprovalsLoading, data: tokenApprovalsList } = useQuery(
+    // TODO: add sorter after api ready
+    ['account-token-approvals-list', id, token_type],
+    () =>
+      fetchTokenApprovalList({
+        address: id as string,
+        before: before as string,
+        after: after as string,
+        limit: +page_size,
+        token_type: token_type as GraphQLSchema.EthType,
+        // TODO: add sorter after api ready
+        // sorter: [
+        //   { sort_type: sort_time as GraphQLSchema.SortType, sort_value: GraphQLSchema.TokenApprovalsSorter.Id },
+        //   { sort_type: sort_asset as GraphQLSchema.SortType, sort_value: GraphQLSchema.TokenApprovalsSorter.Id },
+        //   { sort_type: sort_token_type as GraphQLSchema.SortType, sort_value: GraphQLSchema.TokenApprovalsSorter.Id },
+        // ],
+      }),
+    { enabled: tab === 'token-approvals' && !!id },
+  )
+
   const account = overview ?? accountAndList ?? null
 
   /* is script hash supported? */
@@ -160,6 +185,9 @@ const Account = () => {
       : null,
     [GraphQLSchema.AccountType.EthUser, GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType)
       ? { label: t('userDefinedAssets'), key: 'assets' }
+      : null,
+    [GraphQLSchema.AccountType.EthUser].includes(accountType)
+      ? { label: t('tokenApproval'), key: 'token-approvals' }
       : null,
     [GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType) &&
     isSmartContractAccount(account) &&
@@ -226,6 +254,13 @@ const Account = () => {
           {tab === 'assets' ? (
             !isUdtListLoading && udtList ? (
               <AssetList list={udtList} />
+            ) : (
+              <Skeleton animation="wave" />
+            )
+          ) : null}
+          {tab === 'token-approvals' ? (
+            !isTokenApprovalsLoading && tokenApprovalsList ? (
+              <TokenApprovalList list={tokenApprovalsList} />
             ) : (
               <Skeleton animation="wave" />
             )
