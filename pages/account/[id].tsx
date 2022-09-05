@@ -53,17 +53,15 @@ const Account = () => {
 
   const q = isEthAddress(id as string) ? { address: id as string } : { script_hash: id as string }
 
-  const { isLoading: _isAccountLoading, data: accountAndList } = useQuery(
-    ['account', id],
-    () => fetchAccountOverview(q),
-    {
-      refetchInterval: 10000,
-      enabled: !!id,
-    },
-  )
-
-  const deployment_tx_hash =
-    isSmartContractAccount(accountAndList) && accountAndList?.smart_contract?.deployment_tx_hash
+  const {
+    isLoading: isOverviewLoading,
+    data: account,
+    refetch: refetchAccountOverview,
+  } = useQuery(['account-overview', id], () => fetchAccountOverview(q), {
+    refetchInterval: 10000,
+    enabled: !!id,
+  })
+  const deployment_tx_hash = isSmartContractAccount(account) && account?.smart_contract?.deployment_tx_hash
 
   const { data: deployerAddr } = useQuery(
     ['deployer', deployment_tx_hash],
@@ -72,15 +70,6 @@ const Account = () => {
         eth_hash: deployment_tx_hash,
       }),
     { enabled: !!deployment_tx_hash },
-  )
-
-  const { isLoading: isOverviewLoading, data: overview } = useQuery(
-    ['account-overview', id],
-    () => fetchAccountOverview(q),
-    {
-      refetchInterval: 10000,
-      enabled: !!id,
-    },
   )
 
   const { isLoading: isBalanceLoading, data: balance = '0' } = useQuery(
@@ -158,8 +147,6 @@ const Account = () => {
     { enabled: tab === 'token-approvals' && !!id },
   )
 
-  const account = overview ?? accountAndList ?? null
-
   /* is script hash supported? */
   const downloadItems = account?.eth_address
     ? [
@@ -198,7 +185,7 @@ const Account = () => {
   ].filter(v => v)
   return (
     <>
-      <SubpageHead subtitle={`${title} ${id}`} />
+      <SubpageHead subtitle={account ? `${title} ${id}` : (id as string)} />
       <div className={styles.container}>
         <div className={styles.title}>
           <PageTitle>{title}</PageTitle>
@@ -209,15 +196,14 @@ const Account = () => {
           <CopyBtn content={id as string} />
           <QRCodeBtn content={id as string} />
         </div>
-        {account ? (
-          <AccountOverview
-            isOverviewLoading={isOverviewLoading}
-            isBalanceLoading={isBalanceLoading}
-            account={account}
-            balance={balance}
-            deployerAddr={deployerAddr}
-          />
-        ) : null}
+        <AccountOverview
+          isOverviewLoading={isOverviewLoading}
+          isBalanceLoading={isBalanceLoading}
+          account={account}
+          balance={balance}
+          deployerAddr={deployerAddr}
+          refetch={refetchAccountOverview}
+        />
         <div className={styles.list}>
           <Tabs
             value={tabs.findIndex(tabItem => tabItem.key === tab)}

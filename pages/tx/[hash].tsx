@@ -1,5 +1,5 @@
 import type { GetStaticPaths, GetStaticProps } from 'next'
-import { useMemo } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
@@ -42,11 +42,12 @@ const Tx = () => {
     },
     replace,
   } = useRouter()
-  const [t] = useTranslation('tx')
+  const [t, { language }] = useTranslation('tx')
+  const [isFinalized, setIsFinalized] = useState(false)
 
   const { isLoading: isTxLoading, data: tx } = useQuery(['tx', hash], () => fetchTx(hash as string), {
     enabled: !!hash,
-    refetchInterval: 10000,
+    refetchInterval: isFinalized ? undefined : 10000,
   })
 
   const { isLoading: isTransferListLoading, data: transferList } = useQuery(
@@ -75,8 +76,14 @@ const Tx = () => {
     },
   )
 
+  useEffect(() => {
+    if (tx?.status === 'finalized') {
+      setIsFinalized(true)
+    }
+  }, [tx, setIsFinalized])
+
   if (!isTxLoading && !tx?.hash) {
-    replace(`/404?search=${hash}`)
+    replace(`${language}/404?query=${hash}`)
   }
 
   const downloadItems = [{ label: t('ERC20Records'), href: DOWNLOAD_HREF_LIST.txTransferList(hash as string) }]
@@ -135,7 +142,7 @@ const Tx = () => {
       ) : tx ? (
         <HashLink label={tx.from} href={`/address/${tx.from}`} style={{ wordBreak: 'break-all' }} />
       ) : (
-        '-'
+        t('pending')
       ),
     },
     {
@@ -145,7 +152,7 @@ const Tx = () => {
       ) : tx ? (
         <HashLink label={tx.toAlias || tx.to} href={`/address/${tx.to}`} />
       ) : (
-        '-'
+        t('pending')
       ),
     },
     tx?.contractAddress?.length === ADDR_LENGTH
@@ -157,10 +164,12 @@ const Tx = () => {
     {
       field: t('value'),
       // FIXME: tx.value is formatted incorrectly
-      content: (
+      content: tx?.value ? (
         <div className={styles.value}>
-          <Amount amount={tx?.value ?? '0'} udt={{ decimal: 10, symbol: PCKB_UDT_INFO.symbol }} showSymbol />
+          <Amount amount={tx?.value || '0'} udt={{ decimal: 10, symbol: PCKB_UDT_INFO.symbol }} showSymbol />
         </div>
+      ) : (
+        t('pending')
       ),
     },
     tx?.input
@@ -186,6 +195,8 @@ const Tx = () => {
         }
       : null,
   ]
+
+  const isPolyjuiceTx = tx?.type === 'polyjuice'
 
   const basicInfo = [
     { field: t('finalizeState'), content: tx ? t(tx.status) : <Skeleton animation="wave" /> },
@@ -213,7 +224,7 @@ const Tx = () => {
         t('pending')
       ),
     },
-    { field: t('index'), content: tx?.index ?? '-' },
+    { field: t('index'), content: tx?.index ?? (isPolyjuiceTx ? t('pending') : '-') },
     { field: t('nonce'), content: tx ? (tx.nonce || 0).toLocaleString('en') : <Skeleton animation="wave" /> },
     {
       field: t('status'),
@@ -221,50 +232,56 @@ const Tx = () => {
     },
     {
       field: t('gasPrice'),
-      content:
-        tx && tx.gasPrice !== null ? (
-          <span className={styles.gasPrice}>{`${new BigNumber(tx.gasPrice).toFormat()} ${PCKB_UDT_INFO.symbol}`}</span>
-        ) : isTxLoading ? (
-          <Skeleton animation="wave" />
-        ) : (
-          '-'
-        ),
+      content: tx?.gasPrice ? (
+        <span className={styles.gasPrice}>{`${new BigNumber(tx.gasPrice).toFormat()} ${PCKB_UDT_INFO.symbol}`}</span>
+      ) : isTxLoading ? (
+        <Skeleton animation="wave" />
+      ) : isPolyjuiceTx ? (
+        t('pending')
+      ) : (
+        '-'
+      ),
     },
     {
       field: t('gasUsed'),
       content:
-        tx && tx.gasUsed !== null && tx.polyjuiceStatus !== 'pending' ? (
+        tx && tx.gasUsed ? (
           new BigNumber(tx.gasUsed).toFormat()
         ) : isTxLoading ? (
           <Skeleton animation="wave" />
+        ) : isPolyjuiceTx ? (
+          t('pending')
         ) : (
           '-'
         ),
     },
     {
       field: t('gasLimit'),
-      content:
-        tx && tx.gasLimit !== null ? (
-          new BigNumber(tx.gasLimit).toFormat()
-        ) : isTxLoading ? (
-          <Skeleton animation="wave" />
-        ) : (
-          '-'
-        ),
+      content: tx?.gasLimit ? (
+        new BigNumber(tx.gasLimit).toFormat()
+      ) : isTxLoading ? (
+        <Skeleton animation="wave" />
+      ) : isPolyjuiceTx ? (
+        t('pending')
+      ) : (
+        '-'
+      ),
     },
     {
       field: t('fee'),
       content:
-        tx && tx.gasPrice !== null && typeof tx.gasUsed !== null && tx.polyjuiceStatus !== 'pending' ? (
+        tx && tx.gasPrice && tx.gasUsed ? (
           <span className={styles.gasFee}>
             <Amount
-              amount={`${new BigNumber(tx.gasUsed).times(new BigNumber(tx.gasPrice))} `}
+              amount={`${new BigNumber(tx.gasUsed).times(new BigNumber(tx.gasPrice))}`}
               udt={{ decimal: 0, symbol: PCKB_UDT_INFO.symbol }}
               showSymbol
             />
           </span>
         ) : isTxLoading ? (
           <Skeleton animation="wave" />
+        ) : isPolyjuiceTx ? (
+          t('pending')
         ) : (
           '-'
         ),

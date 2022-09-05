@@ -30,6 +30,11 @@
   .gasPrice,
   .gasFee {
     text-transform: none;
+
+    b,
+    span {
+      font-weight: 400 !important;
+    }
   }
 
   a {

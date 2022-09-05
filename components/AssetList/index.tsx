@@ -1,11 +1,11 @@
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import { gql } from 'graphql-request'
-import BigNumber from 'bignumber.js'
 import Table from 'components/Table'
 import TokenLogo from 'components/TokenLogo'
-import { parseTokenName, client, GraphQLSchema } from 'utils'
+import Amount from 'components/Amount'
 import NoDataIcon from 'assets/icons/no-data.svg'
+import { parseTokenName, client, GraphQLSchema } from 'utils'
 import styles from './styles.module.scss'
 
 export type UdtList = Array<{
@@ -57,10 +57,6 @@ const AssetList = ({ list = [] }: { list: UdtList }) => {
       <tbody className={styles.tableBody}>
         {list.length ? (
           list.map(item => {
-            const [amountInt, amountFrac] = new BigNumber(item.value ?? '0')
-              .dividedBy(10 ** (item.udt.decimal ?? 0))
-              .toFormat()
-              .split('.')
             return (
               <tr key={item.udt.id}>
                 <td>
@@ -79,11 +75,7 @@ const AssetList = ({ list = [] }: { list: UdtList }) => {
                   {t(item.udt.type === GraphQLSchema.UdtType.Native ? 'native' : 'bridged')}
                 </td>
                 <td>
-                  <div className={styles.amount}>
-                    <span>{amountInt}</span>
-                    {amountFrac ? <span className={styles.frac}>{`.${amountFrac}`}</span> : null}
-                  </div>
-                  <span className={styles.symbol}>{item.udt.symbol ?? ''}</span>
+                  <Amount amount={item.value} udt={item.udt} />
                 </td>
               </tr>
             )

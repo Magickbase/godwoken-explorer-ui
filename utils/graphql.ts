@@ -63,7 +63,7 @@ export namespace GraphQLSchema {
     icon: string
     id: string
     name: string
-    official_size: string
+    official_site: string
     price: string
     script_hash: string
     supply: string
