@@ -506,9 +506,13 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
                         pt={0.5}
                         color="secondary.light"
                       >
-                        <time dateTime={new Date(tx.block.timestamp).toISOString()} title={t('timestamp')}>
-                          {timeDistance(tx.block.timestamp, language)}
-                        </time>
+                        {tx.block ? (
+                          <time dateTime={new Date(tx.block.timestamp).toISOString()} title={t('timestamp')}>
+                            {timeDistance(tx.block.timestamp, language)}
+                          </time>
+                        ) : (
+                          t('pending')
+                        )}
                       </Box>
                     </Stack>
                     <Stack
