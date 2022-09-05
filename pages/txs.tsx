@@ -155,7 +155,7 @@ const TxList = () => {
             >
               <Typography variant="inherit" color="secondary" fontWeight={500} fontSize={{ xs: 14, md: 16 }}>
                 {t(`tx_in_block_from_to`, {
-                  to: txList.entries[0].block.number,
+                  to: txList.entries.find(t => t.block)?.block.number ?? '-',
                   from: txList.entries[txList.entries.length - 1].block.number,
                 })}
               </Typography>
