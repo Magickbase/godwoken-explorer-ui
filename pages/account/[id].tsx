@@ -86,6 +86,7 @@ const Account = () => {
         start_block_number: block_from ? +block_from : null,
         end_block_number: block_to ? +block_to : null,
         limit: +page_size,
+        status: null,
       }),
     {
       enabled: tab === 'transactions' && !!id,
