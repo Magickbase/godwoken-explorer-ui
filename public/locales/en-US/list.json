@@ -55,5 +55,8 @@
     "address_to": "Search by address"
   },
   "n_kinds_in_total": "{{number}} Kinds in Total",
-  "no_related_content": "No related content"
+  "no_related_content": "No related content",
+  "tx_in_mem_pool": "Txns in pool",
+  "view-filter": "View Filter",
+  "view-pending-txs": "View pending transactions"
 }

@@ -67,7 +67,7 @@ const VIDEO_NAME = IS_MAINNET ? 'home-video' : 'testnet-home-video'
 
 const queryHomeLists = gql`
   query {
-    transactions(input: { limit: 10 }) {
+    transactions(input: { limit: 10, status: ON_CHAINED }) {
       entries {
         eth_hash
         hash
@@ -447,9 +447,9 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
       {list?.slice(0, length).map((tx, idx) => {
         const hash = tx.eth_hash ?? tx.hash
         const from = tx.from_account.eth_address || tx.from_account.script_hash
-        const to = tx.to_account.eth_address || tx.to_account.script_hash
+        const to = tx.to_account?.eth_address || tx.to_account?.script_hash || '-'
         const isSpecialFrom = SPECIAL_ADDR_TYPES.includes(tx.from_account.type)
-        const isSpecialTo = SPECIAL_ADDR_TYPES.includes(tx.to_account.type)
+        const isSpecialTo = SPECIAL_ADDR_TYPES.includes(tx.to_account?.type)
         return (
           <Box key={hash} sx={{ '& :hover': { backgroundColor: 'primary.light' } }}>
             {idx !== 0 && <Divider variant="middle" color="#f0f0f0" sx={{ borderColor: 'transparent' }} />}
