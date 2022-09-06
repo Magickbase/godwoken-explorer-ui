@@ -5,6 +5,7 @@ export const client = new GraphQLClient(GRAPHQL_ENDPOINT, { headers: { Accept: '
 
 export namespace GraphQLSchema {
   export enum BlockStatus {
+    Pending = 'PENDING',
     Committed = 'COMMITTED',
     Finalized = 'FINALIZED',
   }

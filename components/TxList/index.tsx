@@ -43,6 +43,7 @@ const txListQuery = gql`
     $limit: Int
     $start_block_number: Int
     $end_block_number: Int
+    $status: Status
   ) {
     transactions(
       input: {
@@ -56,6 +57,7 @@ const txListQuery = gql`
         start_block_number: $start_block_number
         end_block_number: $end_block_number
         combine_from_to: true
+        status: $status
       }
     ) {
       entries {
@@ -93,25 +95,27 @@ const txListQuery = gql`
     }
   }
 `
-interface Cursor {
+type Status = 'PENDING' | 'ON_CHAINED' | null
+interface Filter {
   limit?: number
   before: string
   after: string
   start_block_number?: number | null
   end_block_number?: number | null
+  status?: Status
 }
-interface EthAccountTxListVariables extends Nullable<Cursor> {
+interface EthAccountTxListVariables extends Nullable<Filter> {
   address?: string | null
 }
-interface GwAccountTxListVariables extends Nullable<Cursor> {
+interface GwAccountTxListVariables extends Nullable<Filter> {
   script_hash?: string | null
 }
-interface BlockTxListVariables extends Nullable<Cursor> {}
-type Variables = Cursor | EthAccountTxListVariables | GwAccountTxListVariables | BlockTxListVariables
+interface BlockTxListVariables extends Nullable<Filter> {}
+type Variables = Filter | EthAccountTxListVariables | GwAccountTxListVariables | BlockTxListVariables
 
-export const fetchTxList = (variables: Variables) =>
+export const fetchTxList = ({ status = 'ON_CHAINED', ...variables }: Variables) =>
   client
-    .request<TxListProps>(txListQuery, variables)
+    .request<TxListProps>(txListQuery, { status, ...variables })
     .then(data => data.transactions)
     .catch(() => ({ entries: [], metadata: { before: null, after: null, total_count: 0 } }))
 
@@ -153,7 +157,7 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
             entries.map(item => {
               const hash = item.eth_hash || item.hash
               const from = item.from_account.eth_address || item.from_account.script_hash
-              const to = item.to_account.eth_address || item.to_account.script_hash
+              const to = item.to_account?.eth_address || item.to_account?.script_hash || '-'
               const method = item.method_name || item.method_id
 
               return (
@@ -166,7 +170,7 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
                         </div>
                       </Tooltip>
                       <TxStatusIcon
-                        status={getBlockStatus(item.block?.status)}
+                        status={getBlockStatus(item.block?.status ?? GraphQLSchema.BlockStatus.Pending)}
                         isSuccess={
                           item.polyjuice ? item.polyjuice.status === GraphQLSchema.PolyjuiceStatus.Succeed : true
                         }
@@ -203,10 +207,10 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
                     )}
                   </td>
                   <td>
-                    <Address address={from} type={item.from_account.type} />
+                    <Address address={from} type={item.from_account?.type} />
                   </td>
                   <td>
-                    <Address address={to} type={item.to_account.type} />
+                    <Address address={to} type={item.to_account?.type} />
                   </td>
                   <td className={styles.direction}>
                     <TransferDirection from={from} to={to} viewer={viewer ?? ''} />
