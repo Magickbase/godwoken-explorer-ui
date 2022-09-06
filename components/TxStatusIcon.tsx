@@ -8,9 +8,6 @@ import type { TxStatus } from 'utils'
 
 const TxStatusIcon: React.FC<{ status: TxStatus; isSuccess?: boolean }> = ({ status, isSuccess = false }) => {
   const [t] = useTranslation('common')
-  if (!isSuccess) {
-    return <FailedIcon style={{ flexShrink: 0 }} />
-  }
 
   if (status === 'pending') {
     return (
@@ -19,6 +16,11 @@ const TxStatusIcon: React.FC<{ status: TxStatus; isSuccess?: boolean }> = ({ sta
       </Tooltip>
     )
   }
+
+  if (!isSuccess) {
+    return <FailedIcon style={{ flexShrink: 0 }} />
+  }
+
   if (status === 'committed') {
     return (
       <Tooltip title={t(status)} placement="top">
@@ -37,6 +39,7 @@ const TxStatusIcon: React.FC<{ status: TxStatus; isSuccess?: boolean }> = ({ sta
       </Tooltip>
     )
   }
+
   return <FailedIcon style={{ flexShrink: 0 }} />
 }
 

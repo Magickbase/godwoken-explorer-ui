@@ -1,5 +1,7 @@
 import type { GetStaticProps } from 'next'
+import { useEffect } from 'react'
 import { useRouter } from 'next/router'
+import NextLink from 'next/link'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useQuery } from 'react-query'
@@ -10,22 +12,45 @@ import Table from 'components/Table'
 import PageTitle from 'components/PageTitle'
 import SubpageHead from 'components/SubpageHead'
 import TxListComp, { fetchTxList } from 'components/TxList'
+import Tooltip from 'components/Tooltip'
+import FilterIcon from 'assets/icons/filter.svg'
+import PendingIcon from 'assets/icons/pending.svg'
+import IsPendingListIcon from 'assets/icons/is-pending-tx-list.svg'
 import { SIZES } from 'components/PageSize'
 import { PCKB_UDT_INFO } from 'utils'
+import styles from './styles.module.scss'
 
 const TxList = () => {
   const [t] = useTranslation('list')
   const {
-    query: { page_size = SIZES[1], before = null, after = null, block_from = null, block_to = null },
+    query: {
+      page_size = SIZES[1],
+      before = null,
+      after = null,
+      block_from = null,
+      block_to = null,
+      status = 'ON_CHAINED',
+    },
   } = useRouter()
-  const { isLoading, data: txList } = useQuery(['transactions', before, after, block_from, block_to, page_size], () =>
-    fetchTxList({
-      limit: +page_size as number,
-      before: before as string | null,
-      after: after as string | null,
-      start_block_number: block_from ? +block_from : null,
-      end_block_number: block_to ? +block_to : null,
-    }),
+
+  useEffect(() => {
+    if (['A'].includes(document.activeElement.tagName)) {
+      ;(document.activeElement as HTMLInputElement).blur()
+    }
+  }, [status])
+
+  const isPendingList = status === 'pending'
+  const { isLoading, data: txList } = useQuery(
+    ['transactions', before, after, block_from, block_to, page_size, status],
+    () =>
+      fetchTxList({
+        limit: +page_size as number,
+        before: before as string | null,
+        after: after as string | null,
+        start_block_number: block_from ? +block_from : null,
+        end_block_number: block_to ? +block_to : null,
+        status: isPendingList ? 'PENDING' : 'ON_CHAINED',
+      }),
   )
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
@@ -139,27 +164,39 @@ const TxList = () => {
               md: '1px solid #F0F0F0',
             },
             pt: { xs: 1.5, md: 2 },
-            // pb: 2,
             mt: { xs: 2, md: 3 },
             bgcolor: '#fff',
           }}
         >
           {txList.entries.length >= 2 ? (
-            <Stack
-              direction="row"
-              flexWrap="wrap"
-              justifyContent="space-between"
-              alignItems="center"
-              mb={{ xs: 1.5, md: 2 }}
-              px={{ xs: 1.5, md: 3 }}
-            >
+            <Stack direction="row" flexWrap="wrap" alignItems="center" mb={{ xs: 1.5, md: 2 }} px={{ xs: 1.5, md: 3 }}>
               <Typography variant="inherit" color="secondary" fontWeight={500} fontSize={{ xs: 14, md: 16 }}>
-                {t(`tx_in_block_from_to`, {
-                  to: txList.entries.find(t => t.block)?.block.number ?? '-',
-                  from: txList.entries[txList.entries.length - 1].block.number,
-                })}
+                {isPendingList
+                  ? t('tx_in_mem_pool')
+                  : t(`tx_in_block_from_to`, {
+                      to: txList.entries.find(t => t.block)?.block?.number ?? '-',
+                      from: txList.entries[txList.entries.length - 1].block?.number ?? '-',
+                    })}
               </Typography>
-              {/* <Pagination {...txList.metadata} pageSize={page_size as string} /> */}
+              <div className={styles.filter}>
+                <Tooltip title={t('view-filter')} placement="top">
+                  <label htmlFor="filter">
+                    <FilterIcon />
+                    <input id="filter" readOnly />
+                  </label>
+                </Tooltip>
+                <ul>
+                  <li data-active={isPendingList}>
+                    <NextLink href={isPendingList ? '/txs' : 'txs?status=pending'}>
+                      <a>
+                        <PendingIcon />
+                        <span>{t(`view-pending-txs`)}</span>
+                        <IsPendingListIcon />
+                      </a>
+                    </NextLink>
+                  </li>
+                </ul>
+              </div>
             </Stack>
           ) : null}
 
