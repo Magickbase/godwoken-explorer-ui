@@ -84,5 +84,7 @@
   "anonymous_param": "匿名参数",
   "anonymous_response": " 匿名返回值",
   "connected_addr": " 已连接地址:",
-  "checking": "检查中..."
+  "checking": "检查中...",
+  "erc721Assets": "ERC 721 资产",
+  "erc20Assets": "ERC 20 资产"
 }

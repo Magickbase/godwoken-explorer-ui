@@ -11,12 +11,12 @@ import InfoList from 'components/InfoList'
 import HashLink from 'components/HashLink'
 import Tabs from 'components/Tabs'
 import NftActivityList, { fetchNftActivityList } from 'components/NftActivityList'
+import NFTHolderList, { fetchNftHoldersList } from 'components/NFTHolderList'
+import NFTInventoryList, { fetchNftCollectionInventoryList } from 'components/NFTInventoryList'
 import TokenLogo from 'components/TokenLogo'
 import { client, GraphQLSchema } from 'utils'
 import styles from './styles.module.scss'
 import { SIZES } from 'components/PageSize'
-import NFTHolderList, { fetchNftHoldersList } from 'components/NFTHolderList'
-import NFTInventoryList, { fetchNftInventoryList } from 'components/NFTInventoryList'
 
 type NftCollectionInfoProps = Omit<GraphQLSchema.NftCollectionListItem, 'id' | 'account'> | undefined
 
@@ -88,27 +88,13 @@ const NftCollection = () => {
 
   const { isLoading: isHoldersListLoading, data: nftHoldersList } = useQuery(
     ['nft-holders-list', address, before, after, page_size],
-    () =>
-      fetchNftHoldersList({
-        address: address as string,
-        before: before as string,
-        after: after as string,
-        limit: +page_size,
-      }),
-    { enabled: tab === tabs[1] },
+    () => fetchNftHoldersList(listParams),
+    { enabled: address && tab === tabs[1] },
   )
 
   const { isLoading: isInventoryListLoading, data: nftInventoryList } = useQuery(
     ['nft-inventory-list', address, before, after, page_size],
-    () =>
-      fetchNftInventoryList({
-        address: address as string,
-        before: before as string,
-        after: after as string,
-        // limit: +limit
-        // sorters: { sort_type: string, sort_value: string }
-        // filters: { sort_type: string, sort_value: string }
-      }),
+    () => fetchNftCollectionInventoryList(listParams),
     { enabled: tab === tabs[2] },
   )
 
@@ -178,14 +164,14 @@ const NftCollection = () => {
           ) : null}
           {tab === tabs[1] ? (
             !isHoldersListLoading && nftHoldersList ? (
-              <NFTHolderList holders_list={nftHoldersList} />
+              <NFTHolderList holders={nftHoldersList} />
             ) : (
               <Skeleton animation="wave" />
             )
           ) : null}
           {tab === tabs[2] ? (
             !isInventoryListLoading && nftInventoryList ? (
-              <NFTInventoryList nft_inventory_list={nftInventoryList} />
+              <NFTInventoryList inventory={nftInventoryList} />
             ) : (
               <Skeleton animation="wave" />
             )

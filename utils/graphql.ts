@@ -128,6 +128,7 @@ export namespace GraphQLSchema {
     from_account: Account
     to_account: Account
     hash: string
+    eth_hash: string
     nonce: number
     polyjuice: Polyjuice
     polyjuice_creator: PolyjuiceCreator

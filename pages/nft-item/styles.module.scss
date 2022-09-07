@@ -2,86 +2,81 @@
 
 .container {
   @include main-center;
-  h2 {
-    color: var(--primary-text-color);
-    margin: 0;
-    display: flex;
-    align-items: center;
-    font-weight: 500;
-  }
 }
 
 .overview {
-  background: #ffffff;
-  border: 1px solid #f0f0f0;
-  border-radius: 1rem;
   display: flex;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
   margin-bottom: 24px;
   margin-top: 24px;
   padding: 24px;
-
-  .imgContainer {
-    background-color: var(--primary-light-color);
-    width: 440px;
-    height: 440px;
-    border-radius: 1rem;
+  font-size: 0.875rem;
+  .info {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-bottom: 2rem;
+    padding-left: 2rem;
+  }
+  h2 {
+    margin: 0;
+    color: var(--primary-text-color);
+    font-size: 1.5rem;
+    font-weight: 500;
+    white-space: nowrap;
     overflow: hidden;
-    margin-right: 1rem;
-    display: grid;
-    place-items: center;
-    .imgPlaceholder {
-      width: 184px;
+    text-overflow: ellipsis;
+  }
+  .item {
+    & > div:first-of-type {
+      color: var(--secondary-text-color);
+      text-transform: capitalize;
+      margin-bottom: 20px;
+    }
+    svg {
+      margin-left: 4px;
     }
   }
 
-  .infoContainer {
-    flex: 1;
-    margin-left: 1rem;
-    .item {
-      margin-top: 32px;
-      .field {
-        font-size: 14px;
-        color: var(--secondary-text-color);
-      }
-      .content {
-        margin-top: 16px;
-        & > div {
-          display: flex;
-          column-gap: 8px;
-          svg {
-            vertical-align: middle;
-          }
-        }
-      }
-    }
+  img {
+    width: 440px;
+    height: 440px;
+    object-fit: cover;
+    border-radius: 1rem;
   }
 
   @media screen and (max-width: 1024px) {
     flex-direction: column;
+    align-items: stretch;
     padding: 0;
-    margin-bottom: 16px;
-    margin-top: 16px;
-    border-radius: 0.5rem;
-
-    .imgContainer {
-      width: calc(100vw - 56px);
-      height: auto;
-      min-height: 319px;
-      margin-bottom: 1rem;
-      margin: 12px;
+    .info {
+      padding: 0;
+      a {
+        word-break: break-all;
+      }
     }
+    img {
+      width: calc(100vw - 58px);
+      height: calc(100vw - 58px);
+      margin: 0.75rem;
+      border-radius: 0.5rem;
+    }
+    h2 {
+      padding: 1rem 0.75rem;
+      line-height: 1;
+    }
+    .item {
+      border-top: 1px solid #f0f0f0;
+      display: flex;
+      padding: 1rem 12px;
+      align-items: center;
 
-    & > div {
-      &:last-child {
-        border: none;
-        dd {
-          white-space: breaks-spaces;
-          word-break: break-all;
-          svg {
-            margin-left: 0.5rem;
-            vertical-align: middle;
-          }
-        }
+      & > div:first-of-type {
+        margin: 0;
+        flex-basis: 100px;
+        flex-shrink: 0;
       }
     }
   }

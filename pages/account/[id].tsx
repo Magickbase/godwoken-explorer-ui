@@ -17,6 +17,7 @@ import ERC20TransferList, { fetchTransferList } from 'components/ERC20TransferLi
 import AssetList, { fetchUdtList } from 'components/AssetList'
 import TxList, { fetchTxList } from 'components/TxList'
 import BridgedRecordList from 'components/BridgedRecordList'
+import NFTInventoryList, { fetchAccountNftInventoryList } from 'components/NFTInventoryList'
 import ContractInfo from 'components/ContractInfo'
 import ContractEventsList from 'components/ContractEventsList'
 import CopyBtn from 'components/CopyBtn'
@@ -48,6 +49,8 @@ const Account = () => {
 
   const q = isEthAddress(id as string) ? { address: id as string } : { script_hash: id as string }
 
+  const pageSize = Number.isNaN(+page_size) ? +SIZES[1] : +page_size
+
   const {
     isLoading: isOverviewLoading,
     data: account,
@@ -77,7 +80,7 @@ const Account = () => {
   )
 
   const { isLoading: isTxListLoading, data: txList } = useQuery(
-    ['account-tx-list', id, before, after, block_from, block_to, page_size],
+    ['account-tx-list', id, before, after, block_from, block_to, pageSize],
     () =>
       fetchTxList({
         ...q,
@@ -85,7 +88,7 @@ const Account = () => {
         after: after as string,
         start_block_number: block_from ? +block_from : null,
         end_block_number: block_to ? +block_to : null,
-        limit: +page_size,
+        limit: pageSize,
         status: null,
       }),
     {
@@ -94,11 +97,11 @@ const Account = () => {
   )
 
   const { isLoading: isTransferListLoading, data: transferList } = useQuery(
-    ['account-transfer-list', q.address, before, after, page_size],
+    ['account-transfer-list', q.address, before, after, pageSize],
     () =>
       fetchTransferList({
         address: q.address,
-        limit: +page_size,
+        limit: pageSize,
         before: before as string,
         after: after as string,
       }),
@@ -121,6 +124,18 @@ const Account = () => {
     ['account-udt-list', id],
     () => fetchUdtList(q.address ? { address_hashes: [id as string] } : { script_hashes: [id as string] }),
     { enabled: tab === 'assets' && !!(q.address || q.script_hash) },
+  )
+
+  const { isLoading: isInventoryListLoading, data: erc721InventoryList } = useQuery(
+    ['erc-721-inventory-list', id, before, after, pageSize],
+    () =>
+      fetchAccountNftInventoryList({
+        address: q.address,
+        before: before as string,
+        after: after as string,
+        limit: pageSize,
+      }),
+    { enabled: tab === 'erc-721-assets' && !!q.address },
   )
 
   /* is script hash supported? */
@@ -147,7 +162,10 @@ const Account = () => {
       ? { label: t(`bridgedRecords`), key: 'bridged' }
       : null,
     [GraphQLSchema.AccountType.EthUser, GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType)
-      ? { label: t('userDefinedAssets'), key: 'assets' }
+      ? { label: t('erc20Assets'), key: 'assets' }
+      : null,
+    [GraphQLSchema.AccountType.EthUser, GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType)
+      ? { label: t('erc721Assets'), key: 'erc-721-assets' }
       : null,
     [GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType) &&
     isSmartContractAccount(account) &&
@@ -166,7 +184,7 @@ const Account = () => {
         </div>
         <div className={styles.hash}>
           {id}
-          <CopyBtn content={id as string} />
+          <CopyBtn content={id as string} field={t('address', { ns: 'common' })} />
           <QRCodeBtn content={id as string} />
         </div>
         <AccountOverview
@@ -217,6 +235,13 @@ const Account = () => {
               <Skeleton animation="wave" />
             )
           ) : null}
+          {tab === 'erc-721-assets' ? (
+            !isInventoryListLoading && erc721InventoryList ? (
+              <NFTInventoryList inventory={erc721InventoryList} viewer={q.address} />
+            ) : (
+              <Skeleton animation="wave" />
+            )
+          ) : null}
           {tab === 'contract' && isSmartContractAccount(account) && account.smart_contract?.abi ? (
             <ContractInfo address={account.eth_address} contract={account.smart_contract} />
           ) : null}
@@ -239,7 +264,7 @@ export const getStaticPaths: GetStaticPaths = () => ({
 })
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
-  const lng = await serverSideTranslations(locale, ['common', 'account', 'list'])
+  const lng = await serverSideTranslations(locale, ['common', 'account', 'list', 'nft'])
   return { props: lng }
 }
 export default Account

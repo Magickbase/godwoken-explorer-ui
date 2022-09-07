@@ -16,7 +16,7 @@ import styles from './styles.module.scss'
 export type NftActivityListProps = {
   erc721_token_transfers: {
     entries: Array<{
-      transaction: Pick<GraphQLSchema.Transaction, 'hash' | 'method_id' | 'method_name'>
+      transaction: Pick<GraphQLSchema.Transaction, 'eth_hash' | 'method_id' | 'method_name'>
       block: Pick<GraphQLSchema.Block, 'number' | 'status' | 'timestamp'>
       from_address: string
       from_account?: Pick<GraphQLSchema.Account, 'type'>
@@ -37,10 +37,10 @@ interface Cursor {
   after: string
 }
 
-export interface TokenTransferListVariables extends Nullable<Cursor> {
+export interface CollectionTransferListVariables extends Nullable<Cursor> {
   address: string
+  token_id?: string
 }
-type Variables = TokenTransferListVariables
 
 const nftActivityListQuery = gql`
   query ($address: HashAddress, $before: String, $after: String, $limit: Int, $token_id: Int) {
@@ -57,7 +57,7 @@ const nftActivityListQuery = gql`
         transaction {
           method_id
           method_name
-          hash
+          eth_hash
         }
         from_address
         from_account {
@@ -89,14 +89,15 @@ const nftActivityListQuery = gql`
   }
 `
 
-export const fetchNftActivityList = (variables: Variables) =>
+export const fetchNftActivityList = (variables: CollectionTransferListVariables) =>
   client.request<NftActivityListProps>(nftActivityListQuery, variables).then(data => data.erc721_token_transfers)
 
 const NftActivityList: React.FC<
   NftActivityListProps & {
     viewer?: string
+    token_id?: string
   }
-> = ({ erc721_token_transfers, viewer }) => {
+> = ({ erc721_token_transfers, viewer, token_id }) => {
   const [t, { language }] = useTranslation('list')
 
   return (
@@ -110,7 +111,7 @@ const NftActivityList: React.FC<
             <th>{t('from')}</th>
             <th>{t('to')}</th>
             {viewer ? <th></th> : null}
-            <th>{`${t('token_id')}`}</th>
+            {token_id ? null : <th>{`${t('token_id')}`}</th>}
           </tr>
         </thead>
         <tbody>
@@ -119,16 +120,16 @@ const NftActivityList: React.FC<
               const method = item.transaction.method_name || item.transaction.method_id
 
               return (
-                <tr key={item.transaction.hash + item.log_index}>
+                <tr key={item.transaction.eth_hash + item.log_index}>
                   <td>
                     <div className={styles.hash}>
-                      <Tooltip title={item.transaction.hash} placement="top">
+                      <Tooltip title={item.transaction.eth_hash} placement="top">
                         <span>
-                          <NextLink href={`/tx/${item.transaction.hash}`}>
-                            <a className="mono-font">{`${item.transaction.hash.slice(
+                          <NextLink href={`/tx/${item.transaction.eth_hash}`}>
+                            <a className="mono-font">{`${item.transaction.eth_hash.slice(
                               0,
                               8,
-                            )}...${item.transaction.hash.slice(-8)}`}</a>
+                            )}...${item.transaction.eth_hash.slice(-8)}`}</a>
                           </NextLink>
                         </span>
                       </Tooltip>
@@ -161,17 +162,19 @@ const NftActivityList: React.FC<
                       <TransferDirection from={item.from_address} to={item.to_address} viewer={viewer ?? ''} />
                     </td>
                   ) : null}
-                  <td>
-                    <NextLink href={`/nft-collection/${item.token_contract_address_hash}/${item.token_id}`}>
-                      <a>{(+item.token_id).toLocaleString('en')}</a>
-                    </NextLink>
-                  </td>
+                  {token_id ? null : (
+                    <td>
+                      <NextLink href={`/nft-item/${item.token_contract_address_hash}/${item.token_id}`}>
+                        <a>{(+item.token_id).toLocaleString('en')}</a>
+                      </NextLink>
+                    </td>
+                  )}
                 </tr>
               )
             })
           ) : (
             <tr>
-              <td colSpan={viewer ? 7 : 6}>
+              <td colSpan={7 - +!!viewer - +!!token_id}>
                 <div className={styles.noRecords}>
                   <NoDataIcon />
                   <span>{t(`no_records`)}</span>

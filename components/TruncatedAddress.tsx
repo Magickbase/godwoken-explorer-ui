@@ -18,6 +18,17 @@ const TruncatedAddress = ({
   type?: GraphQLSchema.AccountType
   monoFont?: boolean
 }) => {
+  if (address === '0x0000000000000000000000000000000000000000') {
+    return (
+      <Tooltip title={address} placement="top" sx={sx}>
+        <Box sx={sx}>
+          <span className="mono-font" style={{ color: 'var(--primary-text-color)', userSelect: 'none' }}>
+            zero address
+          </span>
+        </Box>
+      </Tooltip>
+    )
+  }
   const getDisplayText = (type, address: string) => {
     if (
       [

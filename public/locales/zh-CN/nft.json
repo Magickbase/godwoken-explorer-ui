@@ -1,5 +1,6 @@
 {
   "nft-collections": "NFT 集合",
+  "nft-collection": "NFT 集合",
   "info": "基本信息",
   "stats": "统计数据",
   "type": "类型",
@@ -13,7 +14,7 @@
   "address": "地址",
   "erc-721": "ERC 721",
   "erc-1155": "ERC 1155",
-  "tokenID": "通证 ID",
+  "token-id": "通证 ID",
   "owner": "所属人",
   "name": "名称"
 }

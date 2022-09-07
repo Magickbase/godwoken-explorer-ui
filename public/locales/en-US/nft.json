@@ -1,5 +1,6 @@
 {
   "nft-collections": "NFT Collections",
+  "nft-collection": "NFT Collection",
   "info": "info",
   "stats": "stats",
   "type": "type",
@@ -13,7 +14,7 @@
   "address": "Address",
   "erc-721": "ERC 721",
   "erc-1155": "ERC 1155",
-  "tokenID": "Token Id",
+  "token-id": "Token ID",
   "owner": "Owner",
   "name": "Name"
 }

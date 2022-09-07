@@ -173,6 +173,20 @@ const Header = () => {
           </NextLink>
         </MenuItem>
       ))}
+
+      <MenuItem onClick={handleMenuListClose} sx={{ p: 0 }}>
+        <NextLink href={`/nft-collections`} passHref>
+          <Link
+            href={`/nft-collections`}
+            title={t(`nft-collections`)}
+            underline="none"
+            sx={{ width: '100%', padding: '6px 16px' }}
+            color="secondary"
+          >
+            {t(`nft-collections`)}
+          </Link>
+        </NextLink>
+      </MenuItem>
     </MenuList>
   )
 
