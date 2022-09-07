@@ -54,5 +54,8 @@
     "address_to": "通过地址搜索"
   },
   "n_kinds_in_total": "共计 {{number}} 种",
-  "no_related_content": "没有相关数据"
+  "no_related_content": "没有相关数据",
+  "tx_in_mem_pool": "交易池中的交易",
+  "view-filter": "查看筛选条件",
+  "view-pending-txs": "查看交易池中的交易"
 }
