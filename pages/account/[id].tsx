@@ -49,16 +49,14 @@ const Account = () => {
   const q = isEthAddress(id as string) ? { address: id as string } : { script_hash: id as string }
 
   const {
-    isLoading: _isAccountLoading,
-    data: accountAndList,
+    isLoading: isOverviewLoading,
+    data: account,
     refetch: refetchAccountOverview,
-  } = useQuery(['account', id], () => fetchAccountOverview(q), {
+  } = useQuery(['account-overview', id], () => fetchAccountOverview(q), {
     refetchInterval: 10000,
     enabled: !!id,
   })
-
-  const deployment_tx_hash =
-    isSmartContractAccount(accountAndList) && accountAndList?.smart_contract?.deployment_tx_hash
+  const deployment_tx_hash = isSmartContractAccount(account) && account?.smart_contract?.deployment_tx_hash
 
   const { data: deployerAddr } = useQuery(
     ['deployer', deployment_tx_hash],
@@ -67,15 +65,6 @@ const Account = () => {
         eth_hash: deployment_tx_hash,
       }),
     { enabled: !!deployment_tx_hash },
-  )
-
-  const { isLoading: isOverviewLoading, data: overview } = useQuery(
-    ['account-overview', id],
-    () => fetchAccountOverview(q),
-    {
-      refetchInterval: 10000,
-      enabled: !!id,
-    },
   )
 
   const { isLoading: isBalanceLoading, data: balance = '0' } = useQuery(
@@ -97,6 +86,7 @@ const Account = () => {
         start_block_number: block_from ? +block_from : null,
         end_block_number: block_to ? +block_to : null,
         limit: +page_size,
+        status: null,
       }),
     {
       enabled: tab === 'transactions' && !!id,
@@ -132,8 +122,6 @@ const Account = () => {
     () => fetchUdtList(q.address ? { address_hashes: [id as string] } : { script_hashes: [id as string] }),
     { enabled: tab === 'assets' && !!(q.address || q.script_hash) },
   )
-
-  const account = overview ?? accountAndList ?? null
 
   /* is script hash supported? */
   const downloadItems = account?.eth_address
