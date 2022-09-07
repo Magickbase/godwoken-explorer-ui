@@ -25,7 +25,8 @@ import PageTitle from 'components/PageTitle'
 import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
 import TokenApprovalList, { fetchTokenApprovalList } from 'components/TokenApprovalList'
 import { SIZES } from 'components/PageSize'
-import { fetchBridgedRecordList, fetchEventLogsListByType, isEthAddress, GraphQLSchema } from 'utils'
+import { fetchBridgedRecordList, fetchEventLogsListByType, isEthAddress, GraphQLSchema, wagmiClient } from 'utils'
+import { WagmiConfig } from 'wagmi'
 import styles from './styles.module.scss'
 
 const isSmartContractAccount = (account: AccountOverviewProps['account']): account is PolyjuiceContract => {
@@ -246,7 +247,9 @@ const Account = () => {
           ) : null}
           {tab === 'token-approvals' ? (
             !isTokenApprovalsLoading && tokenApprovalsList ? (
-              <TokenApprovalList list={tokenApprovalsList} />
+              <WagmiConfig client={wagmiClient}>
+                <TokenApprovalList list={tokenApprovalsList} />
+              </WagmiConfig>
             ) : (
               <Skeleton animation="wave" />
             )

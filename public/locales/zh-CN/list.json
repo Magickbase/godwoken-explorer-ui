@@ -64,5 +64,9 @@
   "approved_spender": "许可使用者",
   "revoke": "撤销",
   "click_to_revoke": "点击撤销许可",
-  "connect-mm-fail": "连接 MetaMask 失败"
+  "not_owner": "只有账户持有人可以撤销",
+  "connect-mm-fail": "连接 MetaMask 失败",
+  "revoke-success": "撤销成功",
+  "user-rejected": "请求被拒绝",
+  "please-connect-mm": "请先连接到 MetaMask"
 }
