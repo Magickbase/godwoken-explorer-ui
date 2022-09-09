@@ -23,7 +23,7 @@ import Tooltip from 'components/Tooltip'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import EmptyFilteredListIcon from 'assets/icons/empty-filtered-list.svg'
 import FilterMenu from 'components/FilterMenu'
-import { GraphQLSchema, client, formatDatetime, parseTokenName, erc1155ABI, IS_MAINNET } from 'utils'
+import { GraphQLSchema, client, formatDatetime, parseTokenName, erc1155ABI, IS_MAINNET, mainnet, testnet } from 'utils'
 import { SIZES } from 'components/PageSize'
 import TokenLogo from 'components/TokenLogo'
 import Alert from 'components/Alert'
@@ -210,8 +210,8 @@ const TokenApprovalList: React.FC<TokenApprovalListProps & { maxCount?: string; 
   })
 
   /* wagmi hooks */
-  const { chain, chains } = useNetwork()
-  const targetChainId = IS_MAINNET ? chains[0].id : chains[1].id
+  const { chain } = useNetwork()
+  const targetChainId = IS_MAINNET ? mainnet.id : testnet.id
   const { switchNetwork, isLoading: isSwitchingNetwork } = useSwitchNetwork()
   const { config, isLoading: isPreparingContract } = usePrepareContractWrite({
     chainId: targetChainId,

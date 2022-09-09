@@ -42,7 +42,7 @@ export const parseTokenName = (name: string) => {
   }
 }
 
-const mainnet: Chain = {
+export const mainnet: Chain = {
   id: 71_402,
   name: 'Godwoken Mainnet v1',
   network: '0x116ea',
@@ -60,7 +60,7 @@ const mainnet: Chain = {
   testnet: false,
 }
 
-const testnet: Chain = {
+export const testnet: Chain = {
   id: 71_401,
   name: 'Godwoken Testnet v1',
   network: '0x116e9',
