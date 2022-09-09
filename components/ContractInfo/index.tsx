@@ -1,107 +1,82 @@
 import type { PolyjuiceContract as PolyjuiceContractProps } from 'components/AccountOverview'
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
-import { ethers } from 'ethers'
 import OpenInNewIcon from 'assets/icons/open-in-new.svg'
 import ExpandIcon from 'assets/icons/expand.svg'
-import { IS_MAINNET, provider, PCKB_UDT_INFO } from 'utils'
+import { IS_MAINNET, provider, mainnet, testnet } from 'utils'
 import styles from './styles.module.scss'
-
-interface ChainConfig {
-  chainId: string
-  rpcUrls: Array<string>
-  chainName: string
-  nativeCurrency: {
-    name: string
-    symbol: string
-    decimals: number
-  }
-  blockExplorerUrls: Array<string>
-}
-
-const NodeConfigs: Record<'mainnet' | 'testnet', ChainConfig> = {
-  mainnet: {
-    chainId: '0x116ea',
-    rpcUrls: ['https://v1.mainnet.godwoken.io/rpc'],
-    chainName: 'Godwoken Mainnet v1',
-    nativeCurrency: {
-      name: 'pCKB',
-      decimals: PCKB_UDT_INFO.decimal,
-      symbol: PCKB_UDT_INFO.symbol,
-    },
-    blockExplorerUrls: ['https://v1.gwscan.com'],
-  },
-  testnet: {
-    chainId: '0x116e9',
-    rpcUrls: ['https://godwoken-testnet-v1.ckbapp.dev'],
-    chainName: 'Godwoken Testnet v1',
-    nativeCurrency: {
-      name: 'pCKB',
-      decimals: PCKB_UDT_INFO.decimal,
-      symbol: PCKB_UDT_INFO.symbol,
-    },
-    blockExplorerUrls: ['https://v1.testnet.gwscan.com'],
-  },
-}
+import {
+  ConnectorAlreadyConnectedError,
+  ConnectorNotFoundError,
+  useConnect,
+  useAccount,
+  useSigner,
+  useNetwork,
+  useContract,
+} from 'wagmi'
+import Alert from 'components/Alert'
 
 const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps['smart_contract'] }> = ({
   address,
   contract: { abi, compiler_file_format, compiler_version, name, contract_source_code, constructor_arguments },
 }) => {
+  const [t] = useTranslation(['account', 'tokens'])
   const [tabIdx, setTabIdx] = useState(0)
-  const [signer, setSigner] = useState<ethers.providers.JsonRpcSigner | null>(null)
-  const [addr, setAddr] = useState<string | null>(null)
-  const [t] = useTranslation('account')
+  const vm = compiler_file_format?.split(' ')[0]
+  const chips = [
+    name ? `${t('contract_name')}: ${name}` : null,
+    compiler_version ? `${t('compiler_version')}: ${compiler_version}` : null,
+    compiler_file_format ? `${t('compiler_file_format')}: ${compiler_file_format}` : null,
+  ].filter(c => c)
+  const [alert, setAlert] = useState<{ open: boolean; type?: 'success' | 'error' | 'warning'; msg?: string }>({
+    open: false,
+    type: 'success',
+    msg: '',
+  })
+  const [viewMethods, setViewMethods] = useState({})
+  const [writeMethods, setWriteMethods] = useState({})
+
+  // wagmi hooks
+  const targetChain = IS_MAINNET ? mainnet : testnet
+  const { connect, connectors } = useConnect({
+    chainId: targetChain.id,
+    onError(error) {
+      if (error instanceof ConnectorAlreadyConnectedError) {
+        return
+      } else if (error instanceof ConnectorNotFoundError) {
+        setAlert({ open: true, type: 'error', msg: t('ethereum-is-not-injected', { ns: 'tokens' }) })
+      } else {
+        setAlert({ open: true, type: 'error', msg: t('connect-mm-fail') })
+      }
+    },
+  })
+  const connector = connectors[0] // only have metamask
+  const { address: addr } = useAccount()
+  const { data: signer } = useSigner()
+  const { chain } = useNetwork()
+  const contract = useContract({
+    addressOrName: address,
+    contractInterface: abi,
+    signerOrProvider: tabIdx === 2 ? signer : provider,
+  })
 
   useEffect(() => {
-    const mmProvider = window['ethereum']
-    if (!mmProvider) return
-
-    const nodeConfig = IS_MAINNET ? NodeConfigs.mainnet : NodeConfigs.testnet
-    const requestAccounts = () => {
-      const mm = new ethers.providers.Web3Provider(mmProvider)
-      mm.send(`eth_requestAccounts`, []).then(() => {
-        const signer = mm.getSigner()
-        if (signer) {
-          setSigner(signer)
-          signer.getAddress().then(a => setAddr(a))
-        } else {
-          setAddr(null)
-        }
-      })
+    if (chain?.id !== targetChain.id) {
+      setAlert({ open: true, type: 'warning', msg: t('switch-to-network', { network: targetChain.name }) })
     }
+  }, [chain?.id, t, targetChain])
 
-    const handleChainIdChanged = (chainId: string) => {
-      if (chainId !== nodeConfig.chainId) {
-        window.alert(`Please connect to ${nodeConfig.chainName}`)
-      }
-    }
-
-    const handleAccountsChanged = (accounts: Array<string>) => {
-      if (accounts.length) {
-        requestAccounts()
-      } else {
-        setSigner(null)
-        setAddr(null)
-      }
-    }
-
+  useEffect(() => {
     if (tabIdx === 2) {
-      mmProvider.request({ method: 'wallet_addEthereumChain', params: [nodeConfig] }).then(requestAccounts)
+      connect({ connector, chainId: targetChain.id })
     }
-    mmProvider.on('chainChanged', handleChainIdChanged)
-    mmProvider.on('accountsChanged', handleAccountsChanged)
-    return () => {
-      mmProvider.removeListener('chainChanged', handleChainIdChanged)
-      mmProvider.removeListener('accountsChanged', handleAccountsChanged)
-    }
-  }, [tabIdx, setSigner])
+  }, [connect, connector, tabIdx, targetChain.id])
 
-  const [contract, viewMethods, writeMethods] = useMemo(() => {
+  useEffect(() => {
     try {
       if (Array.isArray(abi)) {
-        const c = new ethers.Contract(address, abi, tabIdx === 2 ? signer : provider)
+        const c = contract
         const vMethods = {}
         const wMethods = {}
         Object.keys(c.interface.functions).forEach(name => {
@@ -111,23 +86,17 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
             wMethods[name] = c.interface.functions[name]
           }
         })
-        return [c, vMethods, wMethods]
+        setViewMethods(vMethods)
+        setWriteMethods(wMethods)
+      } else {
+        setViewMethods({})
+        setWriteMethods({})
       }
-      return [null, {}, {}]
     } catch {
-      return [null, {}, {}]
+      setViewMethods({})
+      setWriteMethods({})
     }
-  }, [abi, signer, tabIdx])
-
-  const vm = compiler_file_format?.split(' ')[0]
-  const chips = [
-    name ? `${t('contract_name')}: ${name}` : null,
-    compiler_version ? `${t('compiler_version')}: ${compiler_version}` : null,
-    compiler_file_format ? `${t('compiler_file_format')}: ${compiler_file_format}` : null,
-  ].filter(c => c)
-
-  const viewMethodSignatures = Object.keys(viewMethods)
-  const writeMethodSignatures = Object.keys(writeMethods)
+  }, [abi, contract])
 
   const handleMethodCall = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.stopPropagation()
@@ -171,7 +140,11 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
       }
     } catch (err: any) {
       const message = err.data?.message ?? err.message
-      window.alert(message)
+      if (message.length > 60) {
+        window.alert(message)
+      } else {
+        setAlert({ open: true, type: 'error', msg: message })
+      }
     } finally {
       btn.disabled = false
       form.removeAttribute(LOADING_ATTRIBUTE)
@@ -180,6 +153,12 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
 
   return (
     <div className={styles.container}>
+      <Alert
+        open={alert?.open}
+        onClose={() => setAlert({ ...alert, open: false })}
+        content={alert.msg}
+        type={alert.type}
+      />
       <div className={styles.tabs}>
         {['code', 'read_contract', 'write_contract'].map((tab, idx) => (
           <div key={tab} onClick={() => setTabIdx(idx)} data-active={idx === tabIdx}>
@@ -221,7 +200,7 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
       {tabIdx === 1 && contract ? (
         <div>
           <div className={styles.methodGroupTitle}>Pure and View</div>
-          {viewMethodSignatures.map(signature => {
+          {Object.keys(viewMethods).map(signature => {
             const { inputs = [], outputs = [] } = contract.interface.functions[signature] ?? {}
             return (
               <details key={signature}>
@@ -265,12 +244,12 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
               </details>
             )
           })}
-          {writeMethodSignatures.length ? (
+          {Object.keys(writeMethods).length ? (
             <div className={styles.methodGroupTitle} style={{ marginTop: '1.5rem' }}>
               Call Static
             </div>
           ) : null}
-          {writeMethodSignatures.map(signature => {
+          {Object.keys(writeMethods).map(signature => {
             const { inputs = [], outputs = [] } = contract.interface.functions[signature] ?? {}
             return (
               <details key={signature}>
@@ -330,7 +309,7 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
             </div>
           ) : null}
           <div className={styles.methodGroupTitle}>Non-payable and Payable</div>
-          {writeMethodSignatures.map(signature => {
+          {Object.keys(writeMethods).map(signature => {
             const { inputs = [], outputs = [] } = contract.interface.functions[signature] ?? {}
             return (
               <details key={signature}>

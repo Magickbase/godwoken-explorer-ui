@@ -69,8 +69,5 @@
   "revoke": "Revoke",
   "click_to_revoke": "Click to revoke",
   "not_owner": "Only account owner can revoke",
-  "connect-mm-fail": "Connect MetaMask failed",
-  "revoke-success": "Revoke success",
-  "user-rejected": "User rejected request",
-  "please-connect-mm": "Please connect to MetaMask first"
+  "revoke-success": "Revoke success"
 }

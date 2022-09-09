@@ -256,7 +256,9 @@ const Account = () => {
             )
           ) : null}
           {tab === 'contract' && isSmartContractAccount(account) && account.smart_contract?.abi ? (
-            <ContractInfo address={account.eth_address} contract={account.smart_contract} />
+            <WagmiConfig client={wagmiClient}>
+              <ContractInfo address={account.eth_address} contract={account.smart_contract} />
+            </WagmiConfig>
           ) : null}
           {tab === 'events' ? (
             !isEventListLoading && eventsList ? (

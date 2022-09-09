@@ -85,5 +85,9 @@
   "anonymous_param": "anonymous parameter",
   "anonymous_response": "anonymous response",
   "connected_addr": "Connected Address:",
-  "checking": "Checking..."
+  "checking": "Checking...",
+  "connect-mm-fail": "Connect MetaMask failed",
+  "user-rejected": "User rejected request",
+  "please-connect-mm": "Please connect to MetaMask first",
+  "switch-to-network": "Please connect to {{network}}"
 }

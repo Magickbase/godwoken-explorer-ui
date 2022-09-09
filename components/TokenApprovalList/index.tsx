@@ -189,7 +189,7 @@ const TokenApprovalList: React.FC<TokenApprovalListProps & { maxCount?: string; 
     push,
     asPath,
   } = useRouter()
-  const [t, { language }] = useTranslation(['list', 'tokens'])
+  const [t, { language }] = useTranslation(['list', 'account', 'tokens'])
   const isFiltered = Object.keys(query).some(key => FILTER_KEYS.includes(key))
   const isFilterUnnecessary = !metadata.total_count && !isFiltered
   const [alert, setAlert] = useState<{ open: boolean; type?: 'success' | 'error' | 'warning'; msg?: string }>({
