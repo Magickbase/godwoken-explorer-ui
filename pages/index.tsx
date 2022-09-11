@@ -149,7 +149,7 @@ const Statistic: React.FC<State['statistic'] & { isLoading: boolean }> = ({
       setStats(start => ({
         blockHeight: calclateCurValue(progress, +blockCount - 1, +start.blockHeight),
         txCount: calclateCurValue(progress, +txCount, +start.txCount),
-        tps: calclateCurValue(progress, +tps, +start.tps),
+        tps: calclateCurValue(progress, +tps * 10, +start.tps * 10) / 10,
         accountCount: calclateCurValue(progress, +accountCount, +start.accountCount),
         averageBlockTime: calclateCurValue(progress, +averageBlockTime, start.averageBlockTime),
       }))
