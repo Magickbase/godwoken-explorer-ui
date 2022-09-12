@@ -17,7 +17,12 @@ import ERC20TransferList, { fetchTransferList } from 'components/ERC20TransferLi
 import AssetList, { fetchUdtList } from 'components/AssetList'
 import TxList, { fetchTxList } from 'components/TxList'
 import BridgedRecordList from 'components/BridgedRecordList'
-import NFTInventoryList, { fetchAccountNftInventoryList } from 'components/NFTInventoryList'
+import ERC721InventoryList, {
+  fetchInventoryListOfAccount as fetchERC721InventoryListOfAccount,
+} from 'components/NFTInventoryList'
+import ERC1155InventoryList, {
+  fetchInventoryListOfAccount as fetchERC1155InventoryListOfAccount,
+} from 'components/MultiTokenInventoryList'
 import ContractInfo from 'components/ContractInfo'
 import ContractEventsList from 'components/ContractEventsList'
 import CopyBtn from 'components/CopyBtn'
@@ -126,16 +131,28 @@ const Account = () => {
     { enabled: tab === 'assets' && !!(q.address || q.script_hash) },
   )
 
-  const { isLoading: isInventoryListLoading, data: erc721InventoryList } = useQuery(
+  const { isLoading: isERC721InventoryListLoading, data: erc721InventoryList } = useQuery(
     ['erc-721-inventory-list', id, before, after, pageSize],
     () =>
-      fetchAccountNftInventoryList({
+      fetchERC721InventoryListOfAccount({
         address: q.address,
         before: before as string,
         after: after as string,
         limit: pageSize,
       }),
     { enabled: tab === 'erc-721-assets' && !!q.address },
+  )
+
+  const { isLoading: isERC1155InventoryListLoading, data: erc1155InventoryList } = useQuery(
+    ['erc-1155-inventory-list', id, before, after, pageSize],
+    () =>
+      fetchERC1155InventoryListOfAccount({
+        address: q.address,
+        before: before as string,
+        after: after as string,
+        limit: pageSize,
+      }),
+    { enabled: tab === 'erc-1155-assets' && !!q.address },
   )
 
   /* is script hash supported? */
@@ -166,6 +183,9 @@ const Account = () => {
       : null,
     [GraphQLSchema.AccountType.EthUser, GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType)
       ? { label: t('erc721Assets'), key: 'erc-721-assets' }
+      : null,
+    [GraphQLSchema.AccountType.EthUser, GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType)
+      ? { label: t('erc1155Assets'), key: 'erc-1155-assets' }
       : null,
     [GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType) &&
     isSmartContractAccount(account) &&
@@ -236,8 +256,15 @@ const Account = () => {
             )
           ) : null}
           {tab === 'erc-721-assets' ? (
-            !isInventoryListLoading && erc721InventoryList ? (
-              <NFTInventoryList inventory={erc721InventoryList} viewer={q.address} />
+            !isERC721InventoryListLoading && erc721InventoryList ? (
+              <ERC721InventoryList inventory={erc721InventoryList} viewer={q.address} />
+            ) : (
+              <Skeleton animation="wave" />
+            )
+          ) : null}
+          {tab === 'erc-1155-assets' ? (
+            !isERC1155InventoryListLoading && erc1155InventoryList ? (
+              <ERC1155InventoryList inventory={erc1155InventoryList} viewer={q.address} />
             ) : (
               <Skeleton animation="wave" />
             )
@@ -264,7 +291,7 @@ export const getStaticPaths: GetStaticPaths = () => ({
 })
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
-  const lng = await serverSideTranslations(locale, ['common', 'account', 'list', 'nft'])
+  const lng = await serverSideTranslations(locale, ['common', 'account', 'list', 'nft', 'multi-token'])
   return { props: lng }
 }
 export default Account

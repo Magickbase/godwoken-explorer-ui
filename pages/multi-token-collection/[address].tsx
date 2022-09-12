@@ -12,16 +12,16 @@ import HashLink from 'components/HashLink'
 import Tabs from 'components/Tabs'
 import TokenLogo from 'components/TokenLogo'
 import { SIZES } from 'components/PageSize'
-import ActivityList, { fetchActivityList } from 'components/NFTActivityList'
-import HolderList, { fetchHoldersList } from 'components/NFTHolderList'
-import InventoryList, { fetchInventoryListOfCollection } from 'components/NFTInventoryList'
+import ActivityList, { fetchActivityList } from 'components/MultiTokenActivityList'
+import HolderList, { fetchHoldersList } from 'components/MultiTokenHolderList'
+import InventoryList, { fetchInventoryListOfCollection } from 'components/MultiTokenInventoryList'
 import { client, GraphQLSchema } from 'utils'
 import styles from './styles.module.scss'
 
 type CollectionInfoProps = Omit<GraphQLSchema.NftCollectionListItem, 'id' | 'account'> | undefined
 
-interface CollectionProps {
-  erc721_udts: {
+interface InfoProps {
+  erc1155_udts: {
     entries: [CollectionInfoProps]
   }
 }
@@ -32,7 +32,7 @@ interface Variables {
 
 const infoQuery = gql`
   query ($address: HashAddress) {
-    erc721_udts(input: { contract_address: $address }) {
+    erc1155_udts(input: { contract_address: $address }) {
       entries {
         name
         symbol
@@ -45,8 +45,8 @@ const infoQuery = gql`
 `
 const fetchInfo = (variables: Variables): Promise<CollectionInfoProps> =>
   client
-    .request<CollectionProps>(infoQuery, variables)
-    .then(data => data.erc721_udts.entries[0])
+    .request<InfoProps>(infoQuery, variables)
+    .then(data => data.erc1155_udts.entries[0])
     .catch(error => {
       console.error(error)
       return undefined
@@ -54,14 +54,14 @@ const fetchInfo = (variables: Variables): Promise<CollectionInfoProps> =>
 
 const tabs = ['activity', 'holders', 'inventory']
 
-const NftCollection = () => {
-  const [t] = useTranslation('nft')
+const MultiTokenCollection = () => {
+  const [t] = useTranslation('multi-token')
   const {
     query: { address, tab = tabs[0], before = null, after = null, page_size = SIZES[1] },
   } = useRouter()
 
   const { isLoading: isInfoLoading, data: info } = useQuery(
-    ['nft-collection', address],
+    ['multi-token-info', address],
     () =>
       fetchInfo({
         address: address as string,
@@ -79,21 +79,21 @@ const NftCollection = () => {
   }
 
   const { isLoading: isActivityListLoading, data: activityList } = useQuery(
-    ['nft-collection-activity', address, before, after, page_size],
+    ['multi-token-collection-activity', address, before, after, page_size],
     () => fetchActivityList(listParams),
     {
       enabled: address && tab === tabs[0],
     },
   )
 
-  const { isLoading: isHoldersListLoading, data: holderList } = useQuery(
-    ['nft-holders-list', address, before, after, page_size],
+  const { isLoading: isHoldersListLoading, data: holdersList } = useQuery(
+    ['multi-token-holders-list', address, before, after, page_size],
     () => fetchHoldersList(listParams),
     { enabled: address && tab === tabs[1] },
   )
 
   const { isLoading: isInventoryListLoading, data: inventoryList } = useQuery(
-    ['nft-inventory-list', address, before, after, page_size],
+    ['multi-token-inventory-list', address, before, after, page_size],
     () => fetchInventoryListOfCollection(listParams),
     { enabled: tab === tabs[2] },
   )
@@ -104,7 +104,7 @@ const NftCollection = () => {
   }> = [
     {
       field: t('type'),
-      content: t('erc-721'),
+      content: t('erc-1155'),
     },
     {
       field: t('contract'),
@@ -123,7 +123,7 @@ const NftCollection = () => {
     },
   ]
 
-  const title = t(`nft-collection`)
+  const title = t(`multi-token-collection`)
   return (
     <>
       <SubpageHead subtitle={`${title} ${info?.name || address}`} />
@@ -144,7 +144,7 @@ const NftCollection = () => {
             value={tabs.indexOf(tab as string)}
             tabs={tabs.map((tabItem, idx) => ({
               label: t(tabItem),
-              href: `/nft-collection/${address}?tab=${tabs[idx]}`,
+              href: `/multi-token-collection/${address}?tab=${tabs[idx]}`,
             }))}
           />
           {tab === tabs[0] ? (
@@ -155,8 +155,8 @@ const NftCollection = () => {
             )
           ) : null}
           {tab === tabs[1] ? (
-            !isHoldersListLoading && holderList ? (
-              <HolderList holders={holderList} />
+            !isHoldersListLoading && holdersList ? (
+              <HolderList holders={holdersList} />
             ) : (
               <Skeleton animation="wave" />
             )
@@ -180,8 +180,8 @@ export const getStaticPaths: GetStaticPaths = () => ({
 })
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
-  const lng = await serverSideTranslations(locale, ['common', 'nft', 'list'])
+  const lng = await serverSideTranslations(locale, ['common', 'multi-token', 'list'])
   return { props: lng }
 }
 
-export default NftCollection
+export default MultiTokenCollection

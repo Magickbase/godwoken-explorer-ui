@@ -12,6 +12,7 @@
   "bridge-udt": "Bridged Token",
   "native-udt": "Layer 2 Native Token",
   "nft-collections": "NFT Collections",
+  "multi-token-collections": "Multi-token Collections",
   "contracts": "Contracts",
   "registered_contracts": "Registered Contracts",
   "testnetAnnotation": "This is for testnet, and mainnet data are available on",

@@ -12,7 +12,7 @@ export type HolderListProps = {
     entries: Array<{
       rank: number
       address_hash: string
-      quantity: string
+      quantity: number
     }>
     metadata: GraphQLSchema.PageMetadata
   }
@@ -20,7 +20,7 @@ export type HolderListProps = {
 
 const holdersListQuery = gql`
   query ($address: HashAddress!, $before: String, $after: String, $limit: Int) {
-    holders: erc721_holders(input: { contract_address: $address, before: $before, after: $after, limit: $limit }) {
+    holders: erc1155_holders(input: { contract_address: $address, before: $before, after: $after, limit: $limit }) {
       entries {
         rank
         address_hash

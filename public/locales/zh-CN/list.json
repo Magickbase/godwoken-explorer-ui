@@ -59,5 +59,6 @@
   "token_id": "Token ID",
   "tx_in_mem_pool": "交易池中的交易",
   "view-filter": "查看筛选条件",
-  "view-pending-txs": "查看交易池中的交易"
+  "view-pending-txs": "查看交易池中的交易",
+  "token_amount": "数量"
 }

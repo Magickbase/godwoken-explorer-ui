@@ -11,10 +11,8 @@ import NoDataIcon from 'assets/icons/no-data.svg'
 import { client, timeDistance, getBlockStatus, GraphQLSchema } from 'utils'
 import styles from './styles.module.scss'
 
-// TODO: update empty list style after PR https://github.com/Magickbase/godwoken-explorer-ui/pull/417 is merged
-
-export type NftActivityListProps = {
-  erc721_token_transfers: {
+type ActivityListProps = {
+  transfers: {
     entries: Array<{
       transaction: Pick<GraphQLSchema.Transaction, 'eth_hash' | 'method_id' | 'method_name'>
       block: Pick<GraphQLSchema.Block, 'number' | 'status' | 'timestamp'>
@@ -26,6 +24,7 @@ export type NftActivityListProps = {
       polyjuice: Pick<GraphQLSchema.Polyjuice, 'status'>
       token_id: number
       token_contract_address_hash: string
+      amount: string | null
     }>
     metadata: GraphQLSchema.PageMetadata
   }
@@ -42,9 +41,9 @@ export interface CollectionTransferListVariables extends Nullable<Cursor> {
   token_id?: string
 }
 
-const nftActivityListQuery = gql`
+const activityListQuery = gql`
   query ($address: HashAddress, $before: String, $after: String, $limit: Int, $token_id: Int) {
-    erc721_token_transfers(
+    transfers: erc1155_token_transfers(
       input: {
         token_contract_address_hash: $address
         before: $before
@@ -78,6 +77,7 @@ const nftActivityListQuery = gql`
         }
         token_id
         token_contract_address_hash
+        amount
       }
 
       metadata {
@@ -89,15 +89,15 @@ const nftActivityListQuery = gql`
   }
 `
 
-export const fetchNftActivityList = (variables: CollectionTransferListVariables) =>
-  client.request<NftActivityListProps>(nftActivityListQuery, variables).then(data => data.erc721_token_transfers)
+export const fetchActivityList = (variables: CollectionTransferListVariables) =>
+  client.request<ActivityListProps>(activityListQuery, variables).then(data => data.transfers)
 
-const NftActivityList: React.FC<
-  NftActivityListProps & {
+const ActivityList: React.FC<
+  ActivityListProps & {
     viewer?: string
     token_id?: string
   }
-> = ({ erc721_token_transfers, viewer, token_id }) => {
+> = ({ transfers, viewer, token_id }) => {
   const [t, { language }] = useTranslation('list')
 
   return (
@@ -112,11 +112,12 @@ const NftActivityList: React.FC<
             <th>{t('to')}</th>
             {viewer ? <th></th> : null}
             {token_id ? null : <th>{`${t('token_id')}`}</th>}
+            <th>{t('token_amount')}</th>
           </tr>
         </thead>
         <tbody>
-          {erc721_token_transfers?.metadata.total_count ? (
-            erc721_token_transfers.entries.map(item => {
+          {transfers?.metadata.total_count ? (
+            transfers.entries.map(item => {
               const method = item.transaction.method_name || item.transaction.method_id
 
               return (
@@ -164,11 +165,12 @@ const NftActivityList: React.FC<
                   ) : null}
                   {token_id ? null : (
                     <td>
-                      <NextLink href={`/nft-item/${item.token_contract_address_hash}/${item.token_id}`}>
+                      <NextLink href={`/multi-token-item/${item.token_contract_address_hash}/${item.token_id}`}>
                         <a>{(+item.token_id).toLocaleString('en')}</a>
                       </NextLink>
                     </td>
                   )}
+                  <td>{+(item.amount ?? 0).toLocaleString('en')}</td>
                 </tr>
               )
             })
@@ -184,10 +186,8 @@ const NftActivityList: React.FC<
           )}
         </tbody>
       </Table>
-      {erc721_token_transfers ? (
-        <Pagination {...erc721_token_transfers.metadata} note={t(`last-n-records`, { n: '10k' })} />
-      ) : null}
+      {transfers ? <Pagination {...transfers.metadata} note={t(`last-n-records`, { n: '10k' })} /> : null}
     </div>
   )
 }
-export default NftActivityList
+export default ActivityList

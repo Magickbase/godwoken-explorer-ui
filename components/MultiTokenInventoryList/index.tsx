@@ -19,6 +19,7 @@ type InventoryListProps = {
         name: string | null
         icon: string | null
       }
+      value: string
     }>
     metadata: GraphQLSchema.PageMetadata
   }
@@ -39,6 +40,7 @@ const inventoryListOfCollectionQuery = gql`
           name
           icon
         }
+        value
       }
       metadata {
         before
@@ -51,7 +53,7 @@ const inventoryListOfCollectionQuery = gql`
 
 const inventoryListOfAccountQuery = gql`
   query ($address: HashAddress!, $before: String, $after: String, $limit: Int) {
-    inventory: user_erc721_assets(input: { user_address: $address, before: $before, after: $after, limit: $limit }) {
+    inventory: user_erc1155_assets(input: { user_address: $address, before: $before, after: $after, limit: $limit }) {
       entries {
         token_id
         token_contract_address_hash
@@ -89,7 +91,7 @@ export const fetchInventoryListOfAccount = (variables: Variables) =>
     .catch(() => ({ entries: [], metadata: { before: null, after: null, total_count: 0 } }))
 
 const NFTInventoryList: React.FC<InventoryListProps> = ({ inventory, viewer }) => {
-  const [t] = useTranslation(['nft', 'list'])
+  const [t] = useTranslation(['multi-token', 'list'])
   if (!inventory?.metadata.total_count) {
     return (
       <div>
@@ -106,7 +108,7 @@ const NFTInventoryList: React.FC<InventoryListProps> = ({ inventory, viewer }) =
       <div className={styles.container}>
         {inventory.entries.map(item => (
           <div key={item.token_id} className={styles.card}>
-            <NextLink href={`/nft-item/${item.token_contract_address_hash}/${item.token_id}`}>
+            <NextLink href={`/multi-token-item/${item.token_contract_address_hash}/${item.token_id}`}>
               <a className={styles.cover}>
                 <img
                   src={item.udt?.icon ?? '/images/nft-placeholder.svg'}
@@ -121,25 +123,22 @@ const NFTInventoryList: React.FC<InventoryListProps> = ({ inventory, viewer }) =
                 <span>{t('name')}</span>
                 <span>{item.udt.name?.length > 15 ? item.udt.name.slice(0, 15) + '...' : item.udt.name || '-'}</span>
               </div>
-            ) : null}
+            ) : (
+              <div className={styles.info}>
+                <span>{t('quantity')}</span>
+                <span>{(+item.value || 0).toLocaleString('en')}</span>
+              </div>
+            )}
 
             <div className={styles.info}>
               <span>{t('token-id')}</span>
               <HashLink
                 label={item.token_id}
-                href={`/nft-item/${item.token_contract_address_hash}/${item.token_id}`}
+                href={`/multi-token-item/${item.token_contract_address_hash}/${item.token_id}`}
                 monoFont={false}
                 style={{ fontSize: 14 }}
               />
             </div>
-            {!viewer ? (
-              <Tooltip title={item.address_hash} placement="bottom">
-                <div className={styles.info}>
-                  <span>{t('owner')}</span>
-                  <HashLink href={`/account/${item.address_hash}`} label={item.address_hash} />
-                </div>
-              </Tooltip>
-            ) : null}
           </div>
         ))}
       </div>

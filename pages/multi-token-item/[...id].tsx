@@ -9,14 +9,14 @@ import SubpageHead from 'components/SubpageHead'
 import HashLink from 'components/HashLink'
 import Tabs from 'components/Tabs'
 import { SIZES } from 'components/PageSize'
-import ActivityList, { fetchActivityList } from 'components/NFTActivityList'
+import ActivityList, { fetchActivityList } from 'components/MultiTokenActivityList'
 import CopyBtn from 'components/CopyBtn'
 import { client, handleNftImageLoadError } from 'utils'
 import styles from './styles.module.scss'
 
-const collectionInfoQuery = gql`
+const infoQuery = gql`
   query ($address: HashAddress, $token_id: String) {
-    erc721_udts(input: { contract_address: $address, limit: 1 }) {
+    erc1155_udts(input: { contract_address: $address, limit: 1 }) {
       entries {
         name
         symbol
@@ -43,8 +43,8 @@ interface CollectionInfo {
   owner: string | null
 }
 
-interface NftCollectionProps {
-  erc721_udts: {
+interface InfoProps {
+  erc1155_udts: {
     entries: Array<CollectionInfo>
   }
   holders: {
@@ -57,19 +57,19 @@ interface Variables {
   token_id: string
 }
 
-const fetchNftCollection = (variables: Variables): Promise<CollectionInfo | undefined> =>
+const fetchInfo = (variables: Variables): Promise<CollectionInfo | undefined> =>
   client
-    .request<NftCollectionProps>(collectionInfoQuery, variables)
+    .request<InfoProps>(infoQuery, variables)
     .then(data => ({
-      ...data.erc721_udts.entries[0],
+      ...data.erc1155_udts.entries[0],
       owner: data.holders.entries[0]?.address_hash ?? null,
     }))
     .catch(() => undefined)
 
 const tabs = ['activity']
 
-const NftItem = () => {
-  const [t] = useTranslation('nft')
+const MultiTokenItem = () => {
+  const [t] = useTranslation('multi-token')
   const {
     query: { id, before = null, after = null, page_size = SIZES[1], tab = tabs[0] },
   } = useRouter()
@@ -85,16 +85,16 @@ const NftItem = () => {
   }
 
   const { isLoading: isInfoLoading, data: info } = useQuery(
-    ['nft-collection-info', address, id],
-    () => fetchNftCollection({ address, token_id: token_id as string }),
+    ['multi-token-item-info', address, id],
+    () => fetchInfo({ address, token_id: token_id as string }),
     {
       enabled: !!address && !!token_id,
       refetchInterval: 10000,
     },
   )
 
-  const { isLoading: isNftActivityListLoading, data: nftActivityList } = useQuery(
-    ['nft-collection-activity', address, token_id, before, after, page_size],
+  const { isLoading: isActivityListLoading, data: activityList } = useQuery(
+    ['multi-token-item-activity', address, token_id, before, after, page_size],
     () => fetchActivityList(listParams),
     {
       enabled: address && token_id && tab === tabs[0],
@@ -138,11 +138,11 @@ const NftItem = () => {
     },
     {
       field: t('type'),
-      content: t('erc-721'),
+      content: t('erc-1155'),
     },
   ]
 
-  const title = `${t('nft-collection')} ${info?.name ?? '-'}`
+  const title = `${t('multi-token-collection')} ${info?.name ?? '-'}`
 
   return (
     <>
@@ -166,12 +166,12 @@ const NftItem = () => {
             value={tabs.indexOf(tab as string)}
             tabs={tabs.map((tabItem, idx) => ({
               label: t(tabItem),
-              href: `/nft-item/${id}?tab=${tabs[idx]}`,
+              href: `/multi-token-item/${id}?tab=${tabs[idx]}`,
             }))}
           />
           {tab === tabs[0] ? (
-            !isNftActivityListLoading && nftActivityList ? (
-              <ActivityList transfers={nftActivityList} token_id={token_id} />
+            !isActivityListLoading && activityList ? (
+              <ActivityList transfers={activityList} token_id={token_id} />
             ) : (
               <Skeleton animation="wave" />
             )
@@ -188,8 +188,8 @@ export const getStaticPaths: GetStaticPaths = () => ({
 })
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
-  const lng = await serverSideTranslations(locale, ['common', 'nft', 'list'])
+  const lng = await serverSideTranslations(locale, ['common', 'multi-token', 'list'])
   return { props: lng }
 }
 
-export default NftItem
+export default MultiTokenItem

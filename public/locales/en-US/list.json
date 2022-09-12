@@ -60,5 +60,6 @@
   "token_id": "Token ID",
   "tx_in_mem_pool": "Txns in pool",
   "view-filter": "View Filter",
-  "view-pending-txs": "View pending transactions"
+  "view-pending-txs": "View pending transactions",
+  "token_amount": "Token Amount"
 }

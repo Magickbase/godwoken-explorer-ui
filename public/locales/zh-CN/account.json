@@ -86,5 +86,6 @@
   "connected_addr": " 已连接地址:",
   "checking": "检查中...",
   "erc721Assets": "ERC 721 资产",
+  "erc1155Assets": "ERC 1155 资产",
   "erc20Assets": "ERC 20 资产"
 }

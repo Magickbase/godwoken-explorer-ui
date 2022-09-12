@@ -1,19 +1,20 @@
 {
-  "nft-collections": "NFT Collections",
-  "nft-collection": "NFT Collection",
+  "multi-token-collection": "Multi-token Collections",
+  "multi-token-collections": "Multi-token Collection",
   "info": "info",
   "stats": "stats",
   "type": "type",
   "contract": "contract",
+  "erc-1155": "ERC 1155",
   "holder_count": "Holder Count",
   "minted_count": "Minted Count",
   "activity": "activity",
   "holders": "holders",
   "inventory": "inventory",
-  "token": "Token",
+  "token": "Multi-token",
   "address": "Address",
-  "erc-721": "ERC 721",
   "token-id": "Token ID",
   "owner": "Owner",
-  "name": "Name"
+  "name": "Name",
+  "quantity": "Quantity"
 }
