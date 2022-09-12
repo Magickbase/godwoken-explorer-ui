@@ -1,4 +1,6 @@
 import type { GetStaticPaths, GetStaticProps } from 'next'
+import { useState, useEffect } from 'react'
+import { erc721ABI } from 'wagmi'
 import { useQuery } from 'react-query'
 import { gql } from 'graphql-request'
 import { useRouter } from 'next/router'
@@ -11,8 +13,10 @@ import Tabs from 'components/Tabs'
 import { SIZES } from 'components/PageSize'
 import ActivityList, { fetchActivityList } from 'components/NFTActivityList'
 import CopyBtn from 'components/CopyBtn'
-import { client, handleNftImageLoadError } from 'utils'
+import Metadata from 'components/Metadata'
+import { client, handleNftImageLoadError, provider } from 'utils'
 import styles from './styles.module.scss'
+import { ethers } from 'ethers'
 
 const collectionInfoQuery = gql`
   query ($address: HashAddress, $token_id: String) {
@@ -57,6 +61,8 @@ interface Variables {
   token_id: string
 }
 
+type MetadataProps = Record<'name' | 'description' | 'image', string>
+
 const fetchNftCollection = (variables: Variables): Promise<CollectionInfo | undefined> =>
   client
     .request<NftCollectionProps>(collectionInfoQuery, variables)
@@ -66,15 +72,26 @@ const fetchNftCollection = (variables: Variables): Promise<CollectionInfo | unde
     }))
     .catch(() => undefined)
 
-const tabs = ['activity']
+const tabs = ['activity', 'metadata']
 
 const NftItem = () => {
   const [t] = useTranslation('nft')
+  const [metadata, setMetadata] = useState<Metadata | null>(null)
   const {
     query: { id, before = null, after = null, page_size = SIZES[1], tab = tabs[0] },
   } = useRouter()
 
   const [address, token_id] = Array.isArray(id) ? id : [null, null]
+  useEffect(() => {
+    if (!address || !token_id) return
+    const contract = new ethers.Contract(address, erc721ABI, provider)
+    contract
+      .tokenURI(token_id)
+      .then((url: string) => fetch(url))
+      .then(res => res.json())
+      .then((metadata: MetadataProps) => setMetadata(metadata))
+      .catch(console.warn)
+  }, [address, token_id, setMetadata])
 
   const listParams = {
     address: address as string,
@@ -149,7 +166,11 @@ const NftItem = () => {
       <SubpageHead subtitle={title} />
       <div className={styles.container}>
         <div className={styles.overview}>
-          <img src={'/images/nft-placeholder.svg'} onError={handleNftImageLoadError} alt="nft-cover" />
+          <img
+            src={metadata?.image ?? '/images/nft-placeholder.svg'}
+            onError={handleNftImageLoadError}
+            alt="nft-cover"
+          />
           <div className={styles.info}>
             {isInfoLoading ? <Skeleton animation="wave" /> : <h2>{info?.name || '-'}</h2>}
             {infoList.map(({ field, content }, i) => (
@@ -164,9 +185,9 @@ const NftItem = () => {
         <div className={styles.list}>
           <Tabs
             value={tabs.indexOf(tab as string)}
-            tabs={tabs.map((tabItem, idx) => ({
+            tabs={tabs.slice(0, metadata ? 2 : -1).map((tabItem, idx) => ({
               label: t(tabItem),
-              href: `/nft-item/${id}?tab=${tabs[idx]}`,
+              href: `/nft-item/${address}/${token_id}?tab=${tabs[idx]}`,
             }))}
           />
           {tab === tabs[0] ? (
@@ -176,6 +197,7 @@ const NftItem = () => {
               <Skeleton animation="wave" />
             )
           ) : null}
+          {tab === tabs[1] && metadata ? <Metadata {...metadata} /> : null}
         </div>
       </div>
     </>

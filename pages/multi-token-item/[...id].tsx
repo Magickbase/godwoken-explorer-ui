@@ -13,6 +13,7 @@ import ActivityList, { fetchActivityList } from 'components/MultiTokenActivityLi
 import CopyBtn from 'components/CopyBtn'
 import { client, handleNftImageLoadError } from 'utils'
 import styles from './styles.module.scss'
+// TODO: add metadata display after PR https://github.com/Magickbase/godwoken-explorer-ui/pull/542 is merged, that PR introduces ABI of ERC 1155
 
 const infoQuery = gql`
   query ($address: HashAddress, $token_id: String) {
