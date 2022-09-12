@@ -184,9 +184,9 @@ const Account = () => {
     [GraphQLSchema.AccountType.EthUser, GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType)
       ? { label: t('erc721Assets'), key: 'erc-721-assets' }
       : null,
-    [GraphQLSchema.AccountType.EthUser, GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType)
-      ? { label: t('erc1155Assets'), key: 'erc-1155-assets' }
-      : null,
+    // [GraphQLSchema.AccountType.EthUser, GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType)
+    //   ? { label: t('erc1155Assets'), key: 'erc-1155-assets' }
+    //   : null,
     [GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType) &&
     isSmartContractAccount(account) &&
     account.smart_contract?.abi

@@ -188,19 +188,19 @@ const Header = () => {
         </NextLink>
       </MenuItem>
 
-      <MenuItem onClick={handleMenuListClose} sx={{ p: 0 }}>
-        <NextLink href={`/multi-token-collections`} passHref>
-          <Link
-            href={`/multi-token-collections`}
-            title={t(`multi-token-collections`)}
-            underline="none"
-            sx={{ width: '100%', padding: '6px 16px' }}
-            color="secondary"
-          >
-            {t(`multi-token-collections`)}
-          </Link>
-        </NextLink>
-      </MenuItem>
+      {/* <MenuItem onClick={handleMenuListClose} sx={{ p: 0 }}> */}
+      {/*   <NextLink href={`/multi-token-collections`} passHref> */}
+      {/*     <Link */}
+      {/*       href={`/multi-token-collections`} */}
+      {/*       title={t(`multi-token-collections`)} */}
+      {/*       underline="none" */}
+      {/*       sx={{ width: '100%', padding: '6px 16px' }} */}
+      {/*       color="secondary" */}
+      {/*     > */}
+      {/*       {t(`multi-token-collections`)} */}
+      {/*     </Link> */}
+      {/*   </NextLink> */}
+      {/* </MenuItem> */}
     </MenuList>
   )
 
