@@ -189,7 +189,7 @@ const TokenApprovalList: React.FC<TokenApprovalListProps & { maxCount?: string; 
     push,
     asPath,
   } = useRouter()
-  const [t, { language }] = useTranslation(['list', 'tokens'])
+  const [t, { language }] = useTranslation(['list', 'tokens', 'account'])
   const isFiltered = Object.keys(query).some(key => FILTER_KEYS.includes(key))
   const isFilterUnnecessary = !metadata.total_count && !isFiltered
   const [alert, setAlert] = useState<{ open: boolean; type?: 'success' | 'error' | 'warning'; msg?: string }>({
@@ -259,6 +259,15 @@ const TokenApprovalList: React.FC<TokenApprovalListProps & { maxCount?: string; 
     )
   }
 
+  const isOwner = connectedAddr ? id === connectedAddr : true
+  const disabled =
+    !isOwner ||
+    isSwitchingNetwork ||
+    isPreparingContract ||
+    isConnectingAccount ||
+    !connector.ready ||
+    isRevokeTxnLoading
+
   return (
     <div className={styles.container} data-is-filter-unnecessary={isFilterUnnecessary}>
       <Alert
@@ -295,27 +304,25 @@ const TokenApprovalList: React.FC<TokenApprovalListProps & { maxCount?: string; 
             entries.map(item => {
               const txnHash = item.transaction_hash
               const lastUpdateTime = formatDatetime(Date.parse(item.block?.timestamp), 'YYYY-MM-DD HH:mm:ss')
-              const isOwner = connectedAddr ? id === connectedAddr : true
-              const disabled =
-                !isOwner ||
-                isSwitchingNetwork ||
-                isPreparingContract ||
-                isConnectingAccount ||
-                !connector.ready ||
-                isRevokeTxnLoading
 
               return (
                 <tr key={txnHash}>
                   <td>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <Address address={txnHash} />
+                      <Tooltip title={txnHash} placement="top">
+                        <span>
+                          <NextLink href={`/tx/${txnHash}`}>
+                            <a className="mono-font">{`${txnHash.slice(0, 8)}...${item.transaction_hash.slice(-8)}`}</a>
+                          </NextLink>
+                        </span>
+                      </Tooltip>
                     </div>
                   </td>
                   <td>
                     {lastUpdateTime ? (
-                      <div className={styles.lastUpdateTime} title={lastUpdateTime}>
+                      <time className={styles.lastUpdateTime} title={lastUpdateTime}>
                         {lastUpdateTime}
-                      </div>
+                      </time>
                     ) : (
                       '-'
                     )}
@@ -332,13 +339,13 @@ const TokenApprovalList: React.FC<TokenApprovalListProps & { maxCount?: string; 
                       </NextLink>
                     </div>
                   </td>
-                  <td>{item.udt.eth_type.replace('C', 'C-')}</td>
+                  <td>{t(item.udt.eth_type)}</td>
                   <td>{item.type === GraphQLSchema.ApprovalType.Approval ? 'approve' : 'approve for all'}</td>
                   <td>
                     <Address address={item.spender_address_hash} />
                   </td>
                   <td>
-                    <Tooltip title={disabled ? t('not_owner') : t('click_to_revoke')} placement="top">
+                    <Tooltip title={!isOwner ? t('not_owner') : t('click_to_revoke')} placement="top">
                       <span>
                         <button
                           className={styles.revoke}

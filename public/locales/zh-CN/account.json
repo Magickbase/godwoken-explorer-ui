@@ -85,5 +85,8 @@
   "anonymous_param": "匿名参数",
   "anonymous_response": " 匿名返回值",
   "connected_addr": " 已连接地址:",
-  "checking": "检查中..."
+  "checking": "检查中...",
+  "ERC1155": "ERC-1155",
+  "ERC20": "ERC-20",
+  "ERC721": "ERC-721"
 }
