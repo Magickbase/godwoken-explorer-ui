@@ -6,6 +6,7 @@ import { gql } from 'graphql-request'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { ethers } from 'ethers'
 import { Skeleton } from '@mui/material'
 import SubpageHead from 'components/SubpageHead'
 import HashLink from 'components/HashLink'
@@ -14,9 +15,8 @@ import { SIZES } from 'components/PageSize'
 import ActivityList, { fetchActivityList } from 'components/NFTActivityList'
 import CopyBtn from 'components/CopyBtn'
 import Metadata from 'components/Metadata'
-import { client, handleNftImageLoadError, provider } from 'utils'
+import { client, handleNftImageLoadError, provider, getIpfsUrl } from 'utils'
 import styles from './styles.module.scss'
-import { ethers } from 'ethers'
 
 const collectionInfoQuery = gql`
   query ($address: HashAddress, $token_id: String) {
@@ -87,7 +87,7 @@ const NftItem = () => {
     const contract = new ethers.Contract(address, erc721ABI, provider)
     contract
       .tokenURI(token_id)
-      .then((url: string) => fetch(url))
+      .then((url: string) => fetch(getIpfsUrl(url)))
       .then(res => res.json())
       .then((metadata: MetadataProps) => setMetadata(metadata))
       .catch(console.warn)
@@ -167,7 +167,7 @@ const NftItem = () => {
       <div className={styles.container}>
         <div className={styles.overview}>
           <img
-            src={metadata?.image ?? '/images/nft-placeholder.svg'}
+            src={getIpfsUrl(metadata?.image ?? '/images/nft-placeholder.svg')}
             onError={handleNftImageLoadError}
             alt="nft-cover"
           />
