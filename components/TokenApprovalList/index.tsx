@@ -339,7 +339,7 @@ const TokenApprovalList: React.FC<TokenApprovalListProps & { maxCount?: string; 
                       </NextLink>
                     </div>
                   </td>
-                  <td>{t(item.udt.eth_type)}</td>
+                  <td>{t(item.udt.eth_type as string, { ns: 'account' })}</td>
                   <td>{item.type === GraphQLSchema.ApprovalType.Approval ? 'approve' : 'approve for all'}</td>
                   <td>
                     <Address address={item.spender_address_hash} />
@@ -379,7 +379,6 @@ const TokenApprovalList: React.FC<TokenApprovalListProps & { maxCount?: string; 
                               // switch chain if connect to another chain
                               switchNetwork?.(targetChainId)
                             }
-                            console.log(connectedAddr)
                             connect({ connector, chainId: targetChainId })
                           }}
                         >
