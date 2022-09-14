@@ -1,10 +1,10 @@
 @mixin main-center {
   width: 100%;
   max-width: var(--main-center-width);
-  margin: 0rem auto 1rem;
+  margin: 0rem auto 5.5rem;
   @media screen and (max-width: 1232px) {
     box-sizing: border-box;
-    margin: 0 0 1rem;
+    margin: 0 0 2.75rem;
     padding: 0 1rem;
     max-width: unset;
   }

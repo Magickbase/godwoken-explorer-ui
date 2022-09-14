@@ -130,8 +130,8 @@ const ContractEventListItem = ({ item }: { item: ParsedEventLog; setSearchText: 
           </AccordionDetails>
         </Accordion>
       ) : null}
-      <Stack direction="column" spacing={1}>
-        <Stack>
+      <Stack direction="column" spacing={0.2}>
+        <Stack spacing={0.2}>
           {topics.map((topic, idx) =>
             topic.value === '0x' ? null : (
               <div
