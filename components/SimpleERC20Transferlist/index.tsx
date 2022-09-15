@@ -15,7 +15,7 @@ import SortIcon from 'assets/icons/sort.svg'
 import ChangeIcon from 'assets/icons/change.svg'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import EmptyFilteredListIcon from 'assets/icons/empty-filtered-list.svg'
-import { GraphQLSchema, client } from 'utils'
+import { GraphQLSchema, client, ZERO_ADDRESS } from 'utils'
 import styles from './styles.module.scss'
 
 export type TransferListProps = {
@@ -173,21 +173,29 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
                 <td>{item.log_index}</td>
                 <td className={styles.address}>
                   <Tooltip title={item.from_address} placement="top">
-                    <span>
-                      <HashLink
-                        label={`${item.from_address.slice(0, 8)}...${item.from_address.slice(-8)}`}
-                        href={`/account/${item.from_address}`}
-                      />
+                    <span className="mono-font">
+                      {item.from_address === ZERO_ADDRESS ? (
+                        'zero address'
+                      ) : (
+                        <HashLink
+                          label={`${item.from_address.slice(0, 8)}...${item.from_address.slice(-8)}`}
+                          href={`/account/${item.from_address}`}
+                        />
+                      )}
                     </span>
                   </Tooltip>
                 </td>
                 <td className={styles.address}>
                   <Tooltip title={item.to_address} placement="top">
-                    <span>
-                      <HashLink
-                        label={`${item.to_address.slice(0, 8)}...${item.to_address.slice(-8)}`}
-                        href={`/account/${item.to_address}`}
-                      />
+                    <span className="mono-font">
+                      {item.to_address === ZERO_ADDRESS ? (
+                        'zero address'
+                      ) : (
+                        <HashLink
+                          label={`${item.to_address.slice(0, 8)}...${item.to_address.slice(-8)}`}
+                          href={`/account/${item.to_address}`}
+                        />
+                      )}
                     </span>
                   </Tooltip>
                 </td>

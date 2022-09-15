@@ -1,7 +1,7 @@
 import { Box, SxProps } from '@mui/material'
 import Tooltip from 'components/Tooltip'
 import HashLink from './HashLink'
-import { GraphQLSchema } from 'utils'
+import { GraphQLSchema, ZERO_ADDRESS } from 'utils'
 
 const TruncatedAddress = ({
   address,
@@ -18,7 +18,7 @@ const TruncatedAddress = ({
   type?: GraphQLSchema.AccountType
   monoFont?: boolean
 }) => {
-  if (address === '0x0000000000000000000000000000000000000000') {
+  if (address === ZERO_ADDRESS) {
     return (
       <Tooltip title={address} placement="top" sx={sx}>
         <Box sx={sx}>
