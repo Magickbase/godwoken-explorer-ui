@@ -22,7 +22,7 @@ import Amount from 'components/Amount'
 import { SIZES } from 'components/PageSize'
 import PolyjuiceStatus from 'components/PolyjuiceStatus'
 import ExpandIcon from 'assets/icons/expand.svg'
-import { formatDatetime, fetchTx, fetchEventLogsListByType, CKB_EXPLORER_URL, PCKB_UDT_INFO } from 'utils'
+import { formatDatetime, fetchTx, fetchEventLogsListByType, CKB_EXPLORER_URL, PCKB_UDT_INFO, ZERO_ADDRESS } from 'utils'
 import styles from './styles.module.scss'
 
 const tabs = ['erc20', 'logs', 'raw-data']
@@ -150,7 +150,7 @@ const Tx = () => {
       content: isTxLoading ? (
         <Skeleton animation="wave" />
       ) : tx ? (
-        <HashLink label={tx.toAlias || tx.to} href={`/address/${tx.to}`} />
+        <HashLink label={tx.toAlias || (tx.to === ZERO_ADDRESS ? 'zero address' : tx.to)} href={`/address/${tx.to}`} />
       ) : (
         t('pending')
       ),
