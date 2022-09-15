@@ -157,7 +157,7 @@ const TokenList = () => {
     <>
       <SubpageHead subtitle={title} />
       <Container
-        sx={{ px: { xs: 2, sm: 3, md: 2, lg: 0 }, pb: { xs: 5.5, md: 11 } }}
+        sx={{ px: { xs: 2, lg: 0 }, pb: { xs: 5.5, md: 11 } }}
         className={styles.container}
         data-is-filter-unnecessary={isFilterUnnecessary}
       >
