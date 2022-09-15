@@ -3,15 +3,21 @@ import NextLink from 'next/link'
 import { Skeleton } from '@mui/material'
 import Tooltip from 'components/Tooltip'
 import InfoList from '../InfoList'
-import { client, GraphQLSchema } from 'utils'
 import NextPageIcon from 'assets/icons/next-page.svg'
 import VerifiedIcon from 'assets/icons/check-success.svg'
 import SubmittedIcon from 'assets/icons/submit-success.svg'
 import { useState } from 'react'
 import { gql } from 'graphql-request'
+import { client, GraphQLSchema } from 'utils'
 import styles from './styles.module.scss'
 
 const CONTRACT_FORM_URL = `https://github.com/Magickbase/godwoken_explorer/issues/new/choose`
+
+const tokenSubPath: Record<GraphQLSchema.TokenType, string> = {
+  ERC20: 'token',
+  ERC721: 'nft-collection',
+  ERC1155: 'multi-token-collection',
+}
 
 const verifyAndUpdateFromSourcify = gql`
   mutation verifyAndUpdateFromSourcify($address: HashAddress!) {
@@ -31,7 +37,7 @@ const verifyAndCheckSourcify = (address: string) =>
 const SmartContract: React.FC<{
   deployer: string
   deployTxHash: string
-  udt: Pick<GraphQLSchema.Udt, 'id' | 'name' | 'official_site' | 'description' | 'icon'> | null
+  udt: Pick<GraphQLSchema.Udt, 'id' | 'name' | 'official_site' | 'description' | 'icon' | 'eth_type'> | null
   isVerified: boolean
   address: string
   isLoading: boolean
@@ -60,6 +66,25 @@ const SmartContract: React.FC<{
       // ignore
     } finally {
       setIsSourcifyCheckLoading(false)
+    }
+  }
+
+  let tokenUrl: string | null = null
+  switch (udt?.eth_type) {
+    case GraphQLSchema.TokenType.ERC20: {
+      tokenUrl = `/token/${udt.id}`
+      break
+    }
+    case GraphQLSchema.TokenType.ERC721: {
+      tokenUrl = `/nft-collection/${address}`
+      break
+    }
+    case GraphQLSchema.TokenType.ERC1155: {
+      tokenUrl = `/multi-token-collection/${address}`
+      break
+    }
+    default: {
+      // ignore
     }
   }
 
@@ -100,16 +125,16 @@ const SmartContract: React.FC<{
         '-'
       ),
     },
-    udt?.id
-      ? {
-          field: t('token'),
-          content: (
-            <NextLink href={`/token/${udt.id}`}>
-              <a className="mono-font">{udt.name ?? '-'}</a>
-            </NextLink>
-          ),
-        }
-      : null,
+    {
+      field: t('token'),
+      content: tokenUrl ? (
+        <NextLink href={tokenUrl}>
+          <a className="mono-font">{udt?.name ?? '-'}</a>
+        </NextLink>
+      ) : (
+        '-'
+      ),
+    },
     !isVerified
       ? {
           field: t('verify_status'),
