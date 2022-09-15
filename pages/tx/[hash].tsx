@@ -131,7 +131,7 @@ const Tx = () => {
       content: (
         <div className={styles.hash}>
           <span className="mono-font">{hash as string}</span>
-          <CopyBtn content={hash as string} />
+          <CopyBtn content={hash as string} field={t('transaction')} />
         </div>
       ),
     },

@@ -84,5 +84,8 @@
   "anonymous_param": "anonymous parameter",
   "anonymous_response": "anonymous response",
   "connected_addr": "Connected Address:",
-  "checking": "Checking..."
+  "checking": "Checking...",
+  "erc721Assets": "ERC 721 Assets",
+  "erc1155Assets": "ERC 1155 Assets",
+  "erc20Assets": "ERC 20 Assets"
 }
