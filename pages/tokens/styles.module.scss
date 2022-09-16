@@ -15,6 +15,11 @@
         text-align: right;
       }
     }
+    th span {
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+    }
   }
   form[data-role='filter-menu']:first-of-type {
     left: 0;
@@ -54,8 +59,6 @@
 .sorter {
   cursor: pointer;
   margin-left: 4px;
-  display: inline-flex;
-  align-items: center;
 
   &[data-order='DESC'] {
     transform: rotate(0.5turn);
