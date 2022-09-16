@@ -142,7 +142,7 @@ interface Cursor {
 interface TokenApprovalListVariables extends Nullable<Cursor> {
   address?: string | null
   sorter?: GraphQLSchema.TokenApprovalsSorterInput[]
-  token_type?: GraphQLSchema.EthType | null
+  token_type?: GraphQLSchema.TokenType | null
 }
 
 type TokenApprovalResultList = {
@@ -352,19 +352,19 @@ const TokenApprovalList: React.FC<TokenApprovalListProps & { maxCount?: string; 
                           disabled={disabled}
                           onClick={async () => {
                             const mapEthTypeToABI = {
-                              [GraphQLSchema.EthType.ERC20]: {
+                              [GraphQLSchema.TokenType.ERC20]: {
                                 address: item.token_contract_address_hash,
                                 abi: erc20ABI,
                                 function: 'approve',
                                 args: [item.spender_address_hash, 0],
                               },
-                              [GraphQLSchema.EthType.ERC721]: {
+                              [GraphQLSchema.TokenType.ERC721]: {
                                 address: item.token_contract_address_hash,
                                 abi: erc721ABI,
                                 function: 'setApprovalForAll',
                                 args: [item.spender_address_hash, false],
                               },
-                              [GraphQLSchema.EthType.ERC1155]: {
+                              [GraphQLSchema.TokenType.ERC1155]: {
                                 address: item.token_contract_address_hash,
                                 abi: erc1155ABI,
                                 function: 'setApprovalForAll',

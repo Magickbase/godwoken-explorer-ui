@@ -170,7 +170,7 @@ const Account = () => {
         before: before as string,
         after: after as string,
         limit: +page_size,
-        token_type: token_type as GraphQLSchema.EthType,
+        token_type: token_type as GraphQLSchema.TokenType,
         // TODO: add sorter after api ready
         // sorter: [
         //   { sort_type: sort_time as GraphQLSchema.SortType, sort_value: GraphQLSchema.TokenApprovalsSorter.Id },

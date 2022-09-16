@@ -57,12 +57,6 @@ export namespace GraphQLSchema {
     Id = 'ID',
   }
 
-  export enum EthType {
-    ERC1155 = 'ERC1155',
-    ERC20 = 'ERC20',
-    ERC721 = 'ERC721',
-  }
-
   export interface Udt {
     account: Account
     bridge_account_id: number
@@ -80,7 +74,6 @@ export namespace GraphQLSchema {
     eth_type: TokenType
     type_script: object
     value: string
-    eth_type: EthType
   }
 
   export interface SmartContract {
