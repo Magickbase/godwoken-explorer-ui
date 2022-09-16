@@ -16,7 +16,7 @@ import HashLink from 'components/HashLink'
 import TokenLogo from 'components/TokenLogo'
 import Tooltip from 'components/Tooltip'
 import FilterMenu from 'components/FilterMenu'
-// import SortIcon from 'assets/icons/sort.svg'
+import SortIcon from 'assets/icons/sort.svg'
 import { SIZES } from 'components/PageSize'
 import Amount from 'components/Amount'
 import AddIcon from 'assets/icons/add.svg'
@@ -50,8 +50,17 @@ type TokenListProps = {
 }
 
 const tokenListQuery = gql`
-  query ($name: String, $type: UdtType, $before: String, $after: String, $limit: Int) {
-    udts(input: { type: $type, before: $before, after: $after, limit: $limit, fuzzy_name: $name }) {
+  query ($name: String, $type: UdtType, $before: String, $after: String, $limit: Int, $holder_count_sort: SortType) {
+    udts(
+      input: {
+        type: $type
+        before: $before
+        after: $after
+        limit: $limit
+        fuzzy_name: $name
+        sorter: [{ sort_type: $holder_count_sort, sort_value: EX_HOLDERS_COUNT }]
+      }
+    ) {
       entries {
         id
         bridge_account_id
@@ -83,7 +92,7 @@ interface Variables {
   name: string | null
   type: string
   limit: number
-  // holder_count_sort: string
+  holder_count_sort: string
 }
 
 const fetchTokenList = (variables: Variables): Promise<TokenListProps['udts']> =>
@@ -104,7 +113,8 @@ const TokenList = () => {
       after = null,
       name = null,
       page_size = SIZES[1],
-      /* holder_count_sort = 'DESC',*/ ...query
+      holder_count_sort = 'DESC',
+      ...query
     },
   } = useRouter()
   const theme = useTheme()
@@ -120,7 +130,7 @@ const TokenList = () => {
   ]
 
   const { isLoading, data } = useQuery(
-    ['tokens', type, before, after, name],
+    ['tokens', type, before, after, name, page_size, holder_count_sort],
     () =>
       fetchTokenList({
         type: type.toString().toUpperCase(),
@@ -128,7 +138,7 @@ const TokenList = () => {
         after: after as string,
         name: name ? `${name}%` : null,
         limit: Number.isNaN(+page_size) ? +SIZES[1] : +page_size,
-        // holder_count_sort: holder_count_sort as string,
+        holder_count_sort: holder_count_sort as string,
       }),
     {
       refetchInterval: 10000,
@@ -222,26 +232,22 @@ const TokenList = () => {
             <thead style={{ textTransform: 'capitalize', fontSize: isMobile ? 12 : 14 }}>
               <tr style={{ borderTop: '1px solid #f0f0f0', borderBottom: '1px solid #f0f0f0' }}>
                 {headers.map(h => (
-                  <th
-                    key={h.key}
-                    title={t(h.label ?? h.key)}
-                    style={{
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {t(h.label ?? h.key)}
-                    {h.key === 'token' ? (
-                      <span>
-                        <FilterMenu filterKeys={[FILTER_KEYS[0]]} />
-                      </span>
-                    ) : null}
-                    {/* {h.key === 'holderCount' ? ( */}
-                    {/*   <SortIcon */}
-                    {/*     onClick={handleHolderCountSortClick} */}
-                    {/*     data-order={holder_count_sort} */}
-                    {/*     className={styles.sorter} */}
-                    {/*   /> */}
-                    {/* ) : null} */}
+                  <th key={h.key} title={t(h.label ?? h.key)}>
+                    <div>
+                      {t(h.label ?? h.key)}
+                      {h.key === 'token' ? (
+                        <span>
+                          <FilterMenu filterKeys={[FILTER_KEYS[0]]} />
+                        </span>
+                      ) : null}
+                      {h.key === 'holderCount' ? (
+                        <SortIcon
+                          onClick={handleHolderCountSortClick}
+                          data-order={holder_count_sort}
+                          className={styles.sorter}
+                        />
+                      ) : null}
+                    </div>
                   </th>
                 ))}
               </tr>
