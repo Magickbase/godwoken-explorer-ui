@@ -17,6 +17,12 @@ import ERC20TransferList, { fetchTransferList } from 'components/ERC20TransferLi
 import AssetList, { fetchUdtList } from 'components/AssetList'
 import TxList, { fetchTxList } from 'components/TxList'
 import BridgedRecordList from 'components/BridgedRecordList'
+import ERC721InventoryList, {
+  fetchInventoryListOfAccount as fetchERC721InventoryListOfAccount,
+} from 'components/NFTInventoryList'
+import ERC1155InventoryList, {
+  fetchInventoryListOfAccount as fetchERC1155InventoryListOfAccount,
+} from 'components/MultiTokenInventoryList'
 import ContractInfo from 'components/ContractInfo'
 import ContractEventsList from 'components/ContractEventsList'
 import CopyBtn from 'components/CopyBtn'
@@ -54,6 +60,8 @@ const Account = () => {
 
   const q = isEthAddress(id as string) ? { address: id as string } : { script_hash: id as string }
 
+  const pageSize = Number.isNaN(+page_size) ? +SIZES[1] : +page_size
+
   const {
     isLoading: isOverviewLoading,
     data: account,
@@ -83,7 +91,7 @@ const Account = () => {
   )
 
   const { isLoading: isTxListLoading, data: txList } = useQuery(
-    ['account-tx-list', id, before, after, block_from, block_to, page_size],
+    ['account-tx-list', id, before, after, block_from, block_to, pageSize],
     () =>
       fetchTxList({
         ...q,
@@ -91,7 +99,7 @@ const Account = () => {
         after: after as string,
         start_block_number: block_from ? +block_from : null,
         end_block_number: block_to ? +block_to : null,
-        limit: +page_size,
+        limit: pageSize,
         status: null,
       }),
     {
@@ -100,11 +108,11 @@ const Account = () => {
   )
 
   const { isLoading: isTransferListLoading, data: transferList } = useQuery(
-    ['account-transfer-list', q.address, before, after, page_size],
+    ['account-transfer-list', q.address, before, after, pageSize],
     () =>
       fetchTransferList({
         address: q.address,
-        limit: +page_size,
+        limit: pageSize,
         before: before as string,
         after: after as string,
       }),
@@ -127,6 +135,30 @@ const Account = () => {
     ['account-udt-list', id],
     () => fetchUdtList(q.address ? { address_hashes: [id as string] } : { script_hashes: [id as string] }),
     { enabled: tab === 'assets' && !!(q.address || q.script_hash) },
+  )
+
+  const { isLoading: isERC721InventoryListLoading, data: erc721InventoryList } = useQuery(
+    ['erc-721-inventory-list', id, before, after, pageSize],
+    () =>
+      fetchERC721InventoryListOfAccount({
+        address: q.address,
+        before: before as string,
+        after: after as string,
+        limit: pageSize,
+      }),
+    { enabled: tab === 'erc-721-assets' && !!q.address },
+  )
+
+  const { isLoading: isERC1155InventoryListLoading, data: erc1155InventoryList } = useQuery(
+    ['erc-1155-inventory-list', id, before, after, pageSize],
+    () =>
+      fetchERC1155InventoryListOfAccount({
+        address: q.address,
+        before: before as string,
+        after: after as string,
+        limit: pageSize,
+      }),
+    { enabled: tab === 'erc-1155-assets' && !!q.address },
   )
 
   const { isLoading: isTokenApprovalsLoading, data: tokenApprovalsList } = useQuery(
@@ -173,8 +205,14 @@ const Account = () => {
       ? { label: t(`bridgedRecords`), key: 'bridged' }
       : null,
     [GraphQLSchema.AccountType.EthUser, GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType)
-      ? { label: t('userDefinedAssets'), key: 'assets' }
+      ? { label: t('erc20Assets'), key: 'assets' }
       : null,
+    [GraphQLSchema.AccountType.EthUser, GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType)
+      ? { label: t('erc721Assets'), key: 'erc-721-assets' }
+      : null,
+    // [GraphQLSchema.AccountType.EthUser, GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType)
+    //   ? { label: t('erc1155Assets'), key: 'erc-1155-assets' }
+    //   : null,
     [GraphQLSchema.AccountType.EthUser].includes(accountType)
       ? { label: t('tokenApproval'), key: 'token-approvals' }
       : null,
@@ -195,7 +233,7 @@ const Account = () => {
         </div>
         <div className={styles.hash}>
           {id}
-          <CopyBtn content={id as string} />
+          <CopyBtn content={id as string} field={t('address', { ns: 'common' })} />
           <QRCodeBtn content={id as string} />
         </div>
         <AccountOverview
@@ -246,6 +284,20 @@ const Account = () => {
               <Skeleton animation="wave" />
             )
           ) : null}
+          {tab === 'erc-721-assets' ? (
+            !isERC721InventoryListLoading && erc721InventoryList ? (
+              <ERC721InventoryList inventory={erc721InventoryList} viewer={q.address} />
+            ) : (
+              <Skeleton animation="wave" />
+            )
+          ) : null}
+          {tab === 'erc-1155-assets' ? (
+            !isERC1155InventoryListLoading && erc1155InventoryList ? (
+              <ERC1155InventoryList inventory={erc1155InventoryList} viewer={q.address} />
+            ) : (
+              <Skeleton animation="wave" />
+            )
+          ) : null}
           {tab === 'token-approvals' ? (
             !isTokenApprovalsLoading && tokenApprovalsList ? (
               <WagmiConfig client={wagmiClient}>
@@ -277,7 +329,7 @@ export const getStaticPaths: GetStaticPaths = () => ({
 })
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
-  const lng = await serverSideTranslations(locale, ['common', 'account', 'list'])
+  const lng = await serverSideTranslations(locale, ['common', 'account', 'list', 'nft', 'multi-token'])
   return { props: lng }
 }
 export default Account

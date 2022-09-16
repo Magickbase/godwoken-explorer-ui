@@ -88,5 +88,8 @@
   "checking": "Checking...",
   "ERC1155": "ERC-1155",
   "ERC20": "ERC-20",
-  "ERC721": "ERC-721"
+  "ERC721": "ERC-721",
+  "erc721Assets": "ERC 721 Assets",
+  "erc1155Assets": "ERC 1155 Assets",
+  "erc20Assets": "ERC 20 Assets"
 }

@@ -7,14 +7,15 @@ interface HashLinkProps {
   href: string
   external?: boolean
   style?: React.CSSProperties
+  monoFont?: boolean
 }
 
-const HashLink: React.FC<HashLinkProps> = ({ label, href, external = false, style }) => (
+const HashLink: React.FC<HashLinkProps> = ({ label, href, external = false, style, monoFont = true }) => (
   <NextLink href={href}>
     <a
       href={href}
       title={label}
-      className={`${styles.container} mono-font`}
+      className={`${styles.container} ${monoFont ? 'mono-font' : ''}`}
       style={style}
       target={external ? '_blank' : '_self'}
       rel="noopener noreferrer"

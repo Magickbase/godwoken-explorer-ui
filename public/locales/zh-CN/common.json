@@ -11,6 +11,8 @@
   "token": "代币",
   "bridge-udt": "桥接代币",
   "native-udt": "二层原生代币",
+  "nft-collections": "NFT 藏品",
+  "multi-token-collections": "Multi-token 藏品",
   "contracts": "合约",
   "registered_contracts": "已登记合约",
   "testnetAnnotation": "当前为测试网浏览器, 主网数据请访问:",
@@ -29,7 +31,6 @@
   "blockHashCopied": "区块哈希已复制",
   "clickViewQRCode": "点击查看二维码",
   "saveQrCode": "保存二维码",
-  "txHashCopied": "交易哈希已复制",
   "charts": "图表",
   "page_size": {
     "show": "显示",
@@ -40,5 +41,10 @@
   "view_all_blocks": "查看所有区块",
   "view_all_transactions": "查看所有交易",
   "download": "下载",
-  "up_to_5k_records_will_be_exported": "最多可下载 5,000 条记录"
+  "up_to_5k_records_will_be_exported": "最多可下载 5,000 条记录",
+  "address": "地址",
+  "block-hash": "区块哈希",
+  "transaction-hash": "交易哈希",
+  "token-id": "代币 ID",
+  "field-copied": "{{field}}已复制到剪贴板"
 }

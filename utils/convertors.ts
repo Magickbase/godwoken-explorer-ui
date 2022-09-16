@@ -73,3 +73,15 @@ export const formatAmount = (value: string, udt: Pick<GraphQLSchema.Udt, 'decima
 export { scriptToHash }
 
 export const nameToColor = (name: string = '') => '#' + 2 * (name?.[0] ?? '?').charCodeAt(0)
+
+export const getIpfsUrl = (url: string) => {
+  try {
+    const u = new URL(url)
+    if (u.protocol === 'ipfs:') {
+      return `https://ipfs.io/ipfs/${url.slice(7)}`
+    }
+    return url
+  } catch {
+    return url
+  }
+}

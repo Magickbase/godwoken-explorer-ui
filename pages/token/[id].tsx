@@ -4,6 +4,7 @@ import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useRouter } from 'next/router'
 import { useQuery } from 'react-query'
+import { gql } from 'graphql-request'
 import { Skeleton } from '@mui/material'
 import SubpageHead from 'components/SubpageHead'
 import PageTitle from 'components/PageTitle'
@@ -16,7 +17,7 @@ import HashLink from 'components/HashLink'
 import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
 import Amount from 'components/Amount'
 import Alert from 'components/Alert'
-import { fetchToken, fetchBridgedRecordList, fetchTokenHolderList } from 'utils'
+import { fetchToken, fetchBridgedRecordList, fetchTokenHolderList, client } from 'utils'
 import styles from './styles.module.scss'
 
 import type { API } from 'utils/api/utils'
@@ -34,6 +35,56 @@ type Props = {
   token: API.Token.Parsed
 }
 
+interface TokenInfoProps {
+  token: {
+    id: number
+    name: string
+    symbol: string | null
+    icon: string | null
+    type: 'NATIVE' | 'BRIDGE'
+    bridge_account_id: null
+    eth_type: 'ERC20' | 'ERC721' | 'ERC1155'
+    decimal: null
+    official_site: string | null
+    description: string | null
+    supply: string
+    holders_count: number
+    minted_count: number
+    contract_address_hash: string
+  }
+}
+
+const tokenInfoQuery = gql`
+  query ($id: Int) {
+    token: udt(input: { id: $id }) {
+      id
+      name
+      symbol
+      icon
+      type
+      bridge_account_id
+      eth_type
+      decimal
+      official_site
+      description
+      supply
+      holders_count
+      minted_count
+      contract_address_hash
+    }
+  }
+`
+
+interface Variables {
+  id: number
+}
+
+const fetchTokenInfo = (variables: Variables): Promise<TokenInfoProps['token'] | undefined> =>
+  client
+    .request<TokenInfoProps>(tokenInfoQuery, variables)
+    .then(data => data.token)
+    .catch(() => undefined)
+
 const Token: React.FC<Props> = () => {
   const [t, { language }] = useTranslation('tokens')
   const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string }>(null)
@@ -42,17 +93,18 @@ const Token: React.FC<Props> = () => {
     query: { id, tab = 'transfers', page = '1', before = null, after = null, page_size = SIZES[1] },
   } = useRouter()
 
-  const { isLoading: isTokenLoading, data: token } = useQuery(['token', id], () => fetchToken(id.toString()))
+  const { data: stats } = useQuery(['token-basic-info', id], () => fetchToken(id.toString()))
+  const { isLoading: isTokenLoading, data: token } = useQuery(['token', id], () => fetchTokenInfo({ id: +id }), {
+    refetchInterval: 10000,
+  })
 
-  const downloadItems = token
-    ? [
-        { label: t('transferRecords'), href: DOWNLOAD_HREF_LIST.udtTransferList(token.address) },
-        token.type === 'bridge'
-          ? { label: t('bridgedRecords'), href: DOWNLOAD_HREF_LIST.udtBridgeRecordList(token.id.toString()) }
-          : null,
-        { label: t('tokenHolders'), href: DOWNLOAD_HREF_LIST.udtHolderList(token.id.toString()) },
-      ].filter(i => i)
-    : []
+  const downloadItems = [
+    token
+      ? { label: t('transferRecords'), href: DOWNLOAD_HREF_LIST.udtTransferList(token.contract_address_hash) }
+      : null,
+    { label: t('bridgedRecords'), href: DOWNLOAD_HREF_LIST.udtBridgeRecordList(id as string) },
+    { label: t('tokenHolders'), href: DOWNLOAD_HREF_LIST.udtHolderList(id as string) },
+  ].filter(i => i)
 
   useEffect(() => {
     if (!isTokenLoading && !token) {
@@ -62,15 +114,15 @@ const Token: React.FC<Props> = () => {
   }, [isTokenLoading, token, replace])
 
   const { isLoading: isTransferListLoading, data: transferList } = useQuery(
-    ['token-transfer-list', token?.address, page_size, before, after],
+    ['token-transfer-list', token?.contract_address_hash, page_size, before, after],
     () =>
       fetchTokenTransferList({
-        address: token?.address,
+        address: token?.contract_address_hash,
         limit: +page_size,
         before: before as string,
         after: after as string,
       }),
-    { enabled: tab === tabs[0] && !!token?.address },
+    { enabled: tab === tabs[0] && !!token?.contract_address_hash },
   )
 
   const { isLoading: isBridgedListLoading, data: bridgedRecordList } = useQuery(
@@ -92,14 +144,14 @@ const Token: React.FC<Props> = () => {
     },
     {
       field: t('type'),
-      content: token ? t(token.type) : <Skeleton animation="wave" />,
+      content: token ? t(token.eth_type) : <Skeleton animation="wave" />,
     },
     {
       field: t('contract'),
       content: !token ? (
         <Skeleton animation="wave" />
-      ) : token.address ? (
-        <HashLink label={token.address} href={`/account/${token.address}`} />
+      ) : token.contract_address_hash ? (
+        <HashLink label={token.contract_address_hash} href={`/account/${token.contract_address_hash}`} />
       ) : (
         '-'
       ),
@@ -107,8 +159,8 @@ const Token: React.FC<Props> = () => {
     {
       field: t('officialSite'),
       content: token ? (
-        token.officialSite ? (
-          <HashLink label={token.officialSite} href={token.officialSite} external />
+        token.official_site ? (
+          <HashLink label={token.official_site} href={token.official_site} external />
         ) : (
           '-'
         )
@@ -124,7 +176,7 @@ const Token: React.FC<Props> = () => {
 
   const tokenData = [
     {
-      field: t(token?.type === 'bridge' ? 'circulatingSupply' : 'totalSupply'),
+      field: t(token?.type === 'BRIDGE' ? 'circulatingSupply' : 'totalSupply'),
       content: !token ? (
         <Skeleton animation="wave" />
       ) : token.supply ? (
@@ -137,11 +189,11 @@ const Token: React.FC<Props> = () => {
     },
     {
       field: t('holderCount'),
-      content: token ? token.holderCount || '-' : <Skeleton animation="wave" />,
+      content: token ? token.holders_count || '-' : <Skeleton animation="wave" />,
     },
     {
       field: t('transferCount'),
-      content: token ? token.transferCount || '-' : <Skeleton animation="wave" />,
+      content: stats ? stats.transferCount || '-' : <Skeleton animation="wave" />,
     },
     {
       field: '',
@@ -150,16 +202,20 @@ const Token: React.FC<Props> = () => {
   ]
 
   const handleImportIntoMetamask = async () => {
+    if (!token) {
+      setMsg({ type: 'error', text: t(`wait-for-token-info`) })
+    }
+
     const ethereum: unknown | undefined = window['ethereum']
     if (isEtheremInjected(ethereum)) {
-      const symbol = token.symbol.split('.')[0] || ''
+      const symbol = token.symbol?.split('.')[0] || ''
       try {
         await ethereum.request({
           method: 'wallet_watchAsset',
           params: {
-            type: 'ERC20',
+            type: token.eth_type,
             options: {
-              address: token.address,
+              address: token.contract_address_hash,
               symbol,
               decimals: token.decimal,
               image: token.icon,
@@ -199,15 +255,17 @@ const Token: React.FC<Props> = () => {
             title={
               <div className={styles.infoTitle}>
                 {t(`tokenInfo`)}
-                <Tooltip title={t('import-token-into-metamask')} placement="top">
-                  <img
-                    src="/logos/metamask.png"
-                    alt="MetaMask"
-                    className={styles.metamask}
-                    title={t('import-into-metamask')}
-                    onClick={handleImportIntoMetamask}
-                  />
-                </Tooltip>
+                {token?.eth_type === 'ERC20' ? (
+                  <Tooltip title={t('import-token-into-metamask')} placement="top">
+                    <img
+                      src="/logos/metamask.png"
+                      alt="MetaMask"
+                      className={styles.metamask}
+                      title={t('import-into-metamask')}
+                      onClick={handleImportIntoMetamask}
+                    />
+                  </Tooltip>
+                ) : null}
               </div>
             }
             list={tokenInfo}
