@@ -65,3 +65,7 @@ export const handleCopy = async (value: string) => {
     document.body.removeChild(input)
   }
 }
+
+export const handleNftImageLoadError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+  e.currentTarget.src = '/images/nft-placeholder.svg'
+}
