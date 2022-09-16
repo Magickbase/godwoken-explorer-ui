@@ -98,3 +98,8 @@ video {
   font-weight: 900;
   src: local(''), url('../assets/fonts/D-DIN-PRO-900-Heavy.otf') format('opentype');
 }
+
+/* patch alert of mui */
+.MuiAlert-message::first-letter {
+  text-transform: uppercase;
+}

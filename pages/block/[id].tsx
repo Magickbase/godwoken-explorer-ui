@@ -78,7 +78,7 @@ const Block = () => {
       value: block ? (
         <div className={styles.blockHash}>
           <span className="mono-font">{block.hash}</span>
-          <CopyBtn content={block.hash} />
+          <CopyBtn content={block.hash} field={t('block-hash', { ns: 'common' })} />
         </div>
       ) : (
         <Skeleton animation="wave" width="66ch" />

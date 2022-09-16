@@ -1,0 +1,20 @@
+{
+  "multi-token-collection": "Multi-token Collections",
+  "multi-token-collections": "Multi-token Collection",
+  "info": "info",
+  "stats": "stats",
+  "type": "type",
+  "contract": "contract",
+  "erc-1155": "ERC 1155",
+  "holder_count": "Holder Count",
+  "minted_count": "Minted Count",
+  "activity": "activity",
+  "holders": "holders",
+  "inventory": "inventory",
+  "token": "Multi-token",
+  "address": "Address",
+  "token-id": "Token ID",
+  "owner": "Owner",
+  "name": "Name",
+  "quantity": "Quantity"
+}

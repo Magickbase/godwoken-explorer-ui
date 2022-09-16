@@ -11,6 +11,8 @@
   "token": "Token",
   "bridge-udt": "Bridged Token",
   "native-udt": "Layer 2 Native Token",
+  "nft-collections": "NFT Collections",
+  "multi-token-collections": "Multi-token Collections",
   "contracts": "Contracts",
   "registered_contracts": "Registered Contracts",
   "testnetAnnotation": "This is for testnet, and mainnet data are available on",
@@ -25,11 +27,8 @@
   "pending": "Pending",
   "committed": "Committed",
   "finalized": "Finalized",
-  "addressCopied": "Address copied to clipboard",
-  "blockHashCopied": "Block hash copied to clipboard",
   "clickViewQRCode": "Click to view the QR code",
   "saveQrCode": "Save QR code",
-  "txHashCopied": "Transaction hash copied to clipboard",
   "charts": "Charts",
   "page_size": {
     "show": "Show",
@@ -40,5 +39,10 @@
   "view_all_blocks": "View all blocks",
   "view_all_transactions": "View all transactions",
   "download": "download",
-  "up_to_5k_records_will_be_exported": "Up to 5,000 records will be downloaded"
+  "up_to_5k_records_will_be_exported": "Up to 5,000 records will be downloaded",
+  "address": "address",
+  "block-hash": "block hash",
+  "transaction-hash": "Transaction hash",
+  "token-id": "Token ID",
+  "field-copied": "{{field}} has been copied to clipbaord"
 }

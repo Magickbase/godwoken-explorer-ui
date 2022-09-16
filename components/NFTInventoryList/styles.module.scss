@@ -1,0 +1,79 @@
+@import '../../styles/mixin.scss';
+
+.container {
+  --cover-size: 192px;
+  --card-padding: 12px;
+  --gap: 20px;
+  --columns: 5;
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  padding: calc(var(--gap) / 2);
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    width: calc((100% / var(--columns) - var(--gap)));
+    overflow: hidden;
+    padding: var(--card-padding);
+    font-size: 0.875rem;
+    font-weight: 400;
+    border: 1px solid var(--border-color);
+    margin: 10px;
+    box-sizing: border-box;
+    border-radius: 16px;
+    transition: all 0.1s linear;
+    &:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    }
+  }
+
+  .cover {
+    flex: 1;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+  }
+  .cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .info {
+    display: flex;
+    justify-content: space-between;
+    span:first-of-type {
+      flex-basis: 80px;
+      flex-shrink: 0;
+      color: var(--secondary-text-color);
+      cursor: default;
+    }
+    a {
+      text-align: right;
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+  @media screen and (max-width: 1024px) {
+    --columns: 4;
+  }
+
+  @media screen and (max-width: 750px) {
+    --columns: 3;
+  }
+
+  @media screen and (max-width: 512px) {
+    --columns: 2;
+  }
+
+  @media screen and (max-width: 450px) {
+    --columns: 1;
+  }
+}
+.noRecords {
+  @include empty-list;
+}

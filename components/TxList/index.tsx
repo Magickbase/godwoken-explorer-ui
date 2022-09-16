@@ -156,7 +156,7 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
           {metadata.total_count ? (
             entries.map(item => {
               const hash = item.eth_hash || item.hash
-              const from = item.from_account.eth_address || item.from_account.script_hash
+              const from = item.from_account?.eth_address || item.from_account?.script_hash || '-'
               const to = item.to_account?.eth_address || item.to_account?.script_hash || '-'
               const method = item.method_name || item.method_id
 
