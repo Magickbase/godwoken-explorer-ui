@@ -233,7 +233,7 @@ const TokenList = () => {
               <tr style={{ borderTop: '1px solid #f0f0f0', borderBottom: '1px solid #f0f0f0' }}>
                 {headers.map(h => (
                   <th key={h.key} title={t(h.label ?? h.key)}>
-                    <div>
+                    <span>
                       {t(h.label ?? h.key)}
                       {h.key === 'token' ? (
                         <span>
@@ -247,7 +247,7 @@ const TokenList = () => {
                           className={styles.sorter}
                         />
                       ) : null}
-                    </div>
+                    </span>
                   </th>
                 ))}
               </tr>
