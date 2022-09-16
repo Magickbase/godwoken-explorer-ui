@@ -24,6 +24,8 @@ export const SEARCH_FIELDS = 'Block Hash/Txn Hash/Lockhash/ETH Address/Token Dis
 export const MAINNET_HOSTNAME = process.env.NEXT_PUBLIC_MAINNET_EXPLORER_HOSTNAME
 export const TESTNET_HOSTNAME = process.env.NEXT_PUBLIC_TESTNET_EXPLORER_HOSTNAME
 
+export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
+
 export const PCKB_UDT_INFO = {
   decimal: 18,
   symbol: 'pCKB',

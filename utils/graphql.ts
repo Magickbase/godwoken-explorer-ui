@@ -9,9 +9,16 @@ export namespace GraphQLSchema {
     Committed = 'COMMITTED',
     Finalized = 'FINALIZED',
   }
+
   export enum UdtType {
     Bridge = 'BRIDGE',
     Native = 'NATIVE',
+  }
+
+  export enum TokenType {
+    ERC20 = 'ERC20',
+    ERC721 = 'ERC721',
+    ERC1155 = 'ERC1155',
   }
 
   export enum AccountType {
@@ -49,6 +56,7 @@ export namespace GraphQLSchema {
     supply: string
     symbol: string
     type: UdtType
+    eth_type: TokenType
     type_script: object
     value: string
   }
@@ -121,11 +129,14 @@ export namespace GraphQLSchema {
   export interface Transaction {
     args: string
     block: Block
+    method_id: string | null
+    method_name: string | null
     block_hash: string
     block_number: number
     from_account: Account
     to_account: Account
     hash: string
+    eth_hash: string
     nonce: number
     polyjuice: Polyjuice
     polyjuice_creator: PolyjuiceCreator
@@ -184,6 +195,26 @@ export namespace GraphQLSchema {
     transaction: Transaction
     transaction_hash: string
     udt: Udt
+  }
+
+  export interface NftCollectionListItem {
+    id: number
+    name: string
+    symbol: string
+    icon: string
+    account: Pick<Account, 'eth_address'>
+    holders_count: number
+    minted_count: number
+  }
+
+  export interface MultiTokenCollectionListItem {
+    id: number
+    name: string
+    symbol: string
+    icon: string
+    account: Pick<Account, 'eth_address'>
+    holders_count: number
+    minted_count: number
   }
 
   export interface PageMetadata {
