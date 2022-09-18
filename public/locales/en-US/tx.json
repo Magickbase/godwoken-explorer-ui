@@ -40,6 +40,7 @@
   "utf8Input": "UTF8",
   "erc20_records": "ERC20 Transfers",
   "deployed_contract": "Deployed Contract",
+  "created_account": "Created Account",
   "logs": "Logs",
   "txReceiptEventLogs": "Transaction Receipt Event Logs",
   "noLogs": "No logs from this transaction",

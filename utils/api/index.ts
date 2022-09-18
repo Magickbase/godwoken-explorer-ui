@@ -3,8 +3,6 @@ export * from './home'
 export * from './block'
 export * from './blocks'
 
-export * from './tx'
-
 export * from './bridged'
 
 export * from './token'
