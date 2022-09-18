@@ -36,7 +36,7 @@ dayjs.updateLocale('en', {
   },
 })
 
-export const formatDatetime = (datetime: number, format = 'YYYY/MM/DD HH:mm:ss') => {
+export const formatDatetime = (datetime: Parameters<typeof dayjs>[0], format = 'YYYY/MM/DD HH:mm:ss') => {
   return dayjs(datetime).format(format)
 }
 

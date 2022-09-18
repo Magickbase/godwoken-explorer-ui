@@ -1,7 +1,5 @@
 import { utils, providers } from 'ethers'
 import { NODE_URL, PCKB_UDT_INFO } from './constants'
-import { TxStatus } from './api/tx'
-import { GraphQLSchema } from './graphql'
 import { Chain, configureChains, createClient } from 'wagmi'
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc'
 import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
@@ -18,20 +16,6 @@ export const isEthAddress = (hash: string) => {
 }
 
 export const provider = new providers.JsonRpcProvider(NODE_URL)
-
-export const getBlockStatus = (status: GraphQLSchema.BlockStatus | null): TxStatus => {
-  switch (status) {
-    case GraphQLSchema.BlockStatus.Committed: {
-      return 'committed'
-    }
-    case GraphQLSchema.BlockStatus.Finalized: {
-      return 'finalized'
-    }
-    default: {
-      return 'pending'
-    }
-  }
-}
 
 export const parseTokenName = (name: string) => {
   const parsed = name?.split(/\(via|from/) ?? []

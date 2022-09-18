@@ -1,17 +1,20 @@
+import { useTranslation } from 'next-i18next'
 import Tooltip from 'components/Tooltip'
 import PendingIcon from 'assets/icons/pending.svg'
 import CommittedIcon from 'assets/icons/committed.svg'
 import FailedIcon from 'assets/icons/failed.svg'
 import FinalizedIcon from 'assets/icons/finalized.svg'
-import { useTranslation } from 'next-i18next'
-import type { TxStatus } from 'utils'
+import { GraphQLSchema } from 'utils'
 
-const TxStatusIcon: React.FC<{ status: TxStatus; isSuccess?: boolean }> = ({ status, isSuccess = false }) => {
+const TxStatusIcon: React.FC<{ status: GraphQLSchema.BlockStatus | null; isSuccess?: boolean }> = ({
+  status,
+  isSuccess = false,
+}) => {
   const [t] = useTranslation('common')
 
-  if (status === 'pending') {
+  if (status === GraphQLSchema.BlockStatus.Pending || !status) {
     return (
-      <Tooltip title={t(status)} placement="top">
+      <Tooltip title={t(status.toLowerCase())} placement="top">
         <PendingIcon />
       </Tooltip>
     )
@@ -21,18 +24,18 @@ const TxStatusIcon: React.FC<{ status: TxStatus; isSuccess?: boolean }> = ({ sta
     return <FailedIcon style={{ flexShrink: 0 }} />
   }
 
-  if (status === 'committed') {
+  if (status === GraphQLSchema.BlockStatus.Committed) {
     return (
-      <Tooltip title={t(status)} placement="top">
+      <Tooltip title={t(status.toLowerCase())} placement="top">
         <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
           <CommittedIcon />
         </div>
       </Tooltip>
     )
   }
-  if (status === 'finalized') {
+  if (status === GraphQLSchema.BlockStatus.Finalized) {
     return (
-      <Tooltip title={t(status)} placement="top">
+      <Tooltip title={t(status.toLowerCase())} placement="top">
         <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
           <FinalizedIcon />
         </div>
