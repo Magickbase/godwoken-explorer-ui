@@ -243,7 +243,7 @@ const Tx = () => {
     toLabel = tx.to_account.type.replace(/_/g, ' ').toLowerCase()
   }
 
-  const method = tx?.method_id ?? tx?.method_name
+  const method = tx?.method_name ?? tx?.method_id
 
   const overview = [
     {
@@ -251,7 +251,7 @@ const Tx = () => {
       content: (
         <div className={styles.hash}>
           <span className="mono-font">{hash as string}</span>
-          <CopyBtn content={hash as string} field={t('transaction')} />
+          <CopyBtn content={hash as string} field={t('hash')} />
         </div>
       ),
     },
@@ -313,7 +313,7 @@ const Tx = () => {
       ? {
           field: t('method'),
           content: (
-            <Tooltip title={method} placement="top">
+            <Tooltip title={tx.method_id} placement="top">
               <span className="mono-font">{method}</span>
             </Tooltip>
           ),
