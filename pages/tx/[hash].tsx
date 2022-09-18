@@ -4,9 +4,11 @@ import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useQuery } from 'react-query'
+import { gql } from 'graphql-request'
 import { Skeleton } from '@mui/material'
 import { ethers } from 'ethers'
 import BigNumber from 'bignumber.js'
+import Tooltip from 'components/Tooltip'
 import Tabs from 'components/Tabs'
 import SubpageHead from 'components/SubpageHead'
 import PageTitle from 'components/PageTitle'
@@ -22,11 +24,102 @@ import Amount from 'components/Amount'
 import { SIZES } from 'components/PageSize'
 import PolyjuiceStatus from 'components/PolyjuiceStatus'
 import ExpandIcon from 'assets/icons/expand.svg'
-import { formatDatetime, fetchTx, fetchEventLogsListByType, CKB_EXPLORER_URL, PCKB_UDT_INFO, ZERO_ADDRESS } from 'utils'
+import {
+  formatDatetime,
+  fetchEventLogsListByType,
+  GraphQLSchema,
+  client,
+  CKB_EXPLORER_URL,
+  PCKB_UDT_INFO,
+  ZERO_ADDRESS,
+} from 'utils'
 import styles from './styles.module.scss'
 
 const tabs = ['erc20', 'logs', 'raw-data']
-const ADDR_LENGTH = 42
+
+interface Transaction {
+  hash: string
+  type: GraphQLSchema.TransactionType
+  nonce: number
+  index: number
+  method_id: string | null
+  method_name: string | null
+  from_account: Pick<GraphQLSchema.Account, 'eth_address' | 'type'> | null
+  to_account: Pick<GraphQLSchema.Account, 'eth_address' | 'type' | 'smart_contract'> | null
+  polyjuice: Pick<
+    GraphQLSchema.Polyjuice,
+    | 'tx_hash'
+    | 'status'
+    | 'input'
+    | 'created_contract_address_hash'
+    | 'native_transfer_address_hash'
+    | 'value'
+    | 'gas_used'
+    | 'gas_limit'
+    | 'gas_price'
+  > | null
+  polyjuice_creator: Pick<GraphQLSchema.PolyjuiceCreator, 'created_account'> | null
+  block: Pick<GraphQLSchema.Block, 'number' | 'hash' | 'timestamp' | 'status' | 'layer1_block_number'>
+}
+
+const txQuery = gql`
+  fragment Tx on Transaction {
+    hash
+    type
+    nonce
+    index
+    method_id
+    method_name
+    from_account {
+      eth_address
+      type
+    }
+    to_account {
+      eth_address
+      type
+    }
+    to_account {
+      eth_address
+      type
+      smart_contract {
+        name
+        abi
+      }
+    }
+    polyjuice {
+      tx_hash
+      status
+      input
+      created_contract_address_hash
+      value
+      gas_used
+      gas_limit
+      gas_price
+    }
+    polyjuice_creator {
+      created_account {
+        eth_address
+        type
+      }
+    }
+    block {
+      number
+      hash
+      timestamp
+      status
+      layer1_block_number
+    }
+  }
+  query ($hash: HashFull) {
+    eth_transaction: transaction(input: { transaction_hash: $hash }) {
+      ...Tx
+    }
+
+    gw_transaction: transaction(input: { eth_hash: $hash }) {
+      ...Tx
+    }
+  }
+`
 
 const Tx = () => {
   const {
@@ -45,10 +138,16 @@ const Tx = () => {
   const [t, { language }] = useTranslation('tx')
   const [isFinalized, setIsFinalized] = useState(false)
 
-  const { isLoading: isTxLoading, data: tx } = useQuery(['tx', hash], () => fetchTx(hash as string), {
-    enabled: !!hash,
-    refetchInterval: isFinalized ? undefined : 10000,
-  })
+  const { isLoading: isTxLoading, data: txs } = useQuery(
+    ['tx', hash],
+    () => client.request<Record<'eth_transaction' | 'gw_transaction', Transaction>>(txQuery, { hash }),
+    {
+      enabled: !!hash,
+      refetchInterval: isFinalized ? undefined : 10000,
+    },
+  )
+
+  const tx = txs?.eth_transaction ?? txs?.gw_transaction
 
   const { isLoading: isTransferListLoading, data: transferList } = useQuery(
     ['tx-transfer-list', hash, before, after, address_from, address_to, log_index_sort, page_size],
@@ -77,43 +176,43 @@ const Tx = () => {
   )
 
   useEffect(() => {
-    if (tx?.status === 'finalized') {
+    if (tx?.block?.status === GraphQLSchema.BlockStatus.Finalized) {
       setIsFinalized(true)
     }
   }, [tx, setIsFinalized])
 
-  if (!isTxLoading && !tx?.hash) {
+  if (!isTxLoading && !tx) {
     replace(`${language}/404?query=${hash}`)
   }
 
   const downloadItems = [{ label: t('ERC20Records'), href: DOWNLOAD_HREF_LIST.txTransferList(hash as string) }]
 
   const decodedInput = useMemo(() => {
-    if (tx && tx.contractAbi && tx.contractAbi.length && tx.input) {
+    if (tx && tx.to_account?.smart_contract?.abi?.length && tx.polyjuice?.input) {
       try {
-        const i = new ethers.utils.Interface(tx.contractAbi)
-        return i.parseTransaction({ data: tx.input })
+        const i = new ethers.utils.Interface(tx.to_account.smart_contract.abi)
+        return i.parseTransaction({ data: tx.polyjuice.input })
       } catch (err) {
         console.error(err)
         return null
       }
     }
     return null
-  }, [tx?.contractAbi, tx?.input])
+  }, [tx?.to_account?.smart_contract?.abi, tx?.polyjuice?.input])
 
   const utf8Input = useMemo(() => {
-    if (tx?.input) {
+    if (tx?.polyjuice?.input) {
       try {
-        return ethers.utils.toUtf8String(tx.input)
+        return ethers.utils.toUtf8String(tx.polyjuice.input)
       } catch {
         return null
       }
     }
     return null
-  }, [tx?.input])
+  }, [tx?.polyjuice?.input])
 
   const inputContents = [
-    { type: 'raw', text: tx?.input },
+    { type: 'raw', text: tx?.polyjuice?.input },
     decodedInput
       ? {
           type: 'decoded',
@@ -124,6 +223,27 @@ const Tx = () => {
       : null,
     utf8Input ? { type: 'utf8', text: utf8Input } : null,
   ].filter(v => v)
+
+  const from = tx?.from_account?.eth_address
+  let toLabel = tx?.to_account?.eth_address || 'zero address'
+  let toAddr = tx?.to_account?.eth_address ?? ZERO_ADDRESS
+
+  if (tx?.polyjuice?.native_transfer_address_hash) {
+    toLabel = tx.polyjuice.native_transfer_address_hash
+    toAddr = tx.polyjuice.native_transfer_address_hash
+  } else if (tx?.to_account?.smart_contract?.name) {
+    toLabel = `${tx.to_account.smart_contract.name} (${tx.to_account?.eth_address})`
+  } else if (
+    [
+      GraphQLSchema.AccountType.EthAddrReg,
+      GraphQLSchema.AccountType.MetaContract,
+      GraphQLSchema.AccountType.PolyjuiceCreator,
+    ].includes(tx?.to_account?.type)
+  ) {
+    toLabel = tx.to_account.type.replace(/_/g, ' ').toLowerCase()
+  }
+
+  const method = tx?.method_id ?? tx?.method_name
 
   const overview = [
     {
@@ -140,39 +260,66 @@ const Tx = () => {
       content: isTxLoading ? (
         <Skeleton animation="wave" />
       ) : tx ? (
-        <HashLink label={tx.from} href={`/address/${tx.from}`} style={{ wordBreak: 'break-all' }} />
+        <HashLink label={from} href={`/address/${from}`} style={{ wordBreak: 'break-all' }} />
       ) : (
         t('pending')
       ),
     },
     {
-      field: t(tx?.toAlias ? 'interactedContract' : 'to'),
+      field: t(tx?.to_account?.smart_contract ? 'interactedContract' : 'to'),
       content: isTxLoading ? (
         <Skeleton animation="wave" />
       ) : tx ? (
-        <HashLink label={tx.toAlias || (tx.to === ZERO_ADDRESS ? 'zero address' : tx.to)} href={`/address/${tx.to}`} />
+        <HashLink label={toLabel} href={`/address/${toAddr}`} />
       ) : (
         t('pending')
       ),
     },
-    tx?.contractAddress?.length === ADDR_LENGTH
+    tx?.polyjuice?.created_contract_address_hash
       ? {
           field: t('deployed_contract'),
-          content: <HashLink label={tx.contractAddress} href={`/address/${tx.contractAddress}`} />,
+          content: (
+            <HashLink
+              label={tx.polyjuice.created_contract_address_hash}
+              href={`/address/${tx.polyjuice.created_contract_address_hash}`}
+            />
+          ),
         }
       : null,
-    {
-      field: t('value'),
-      // FIXME: tx.value is formatted incorrectly
-      content: tx?.value ? (
-        <div className={styles.value}>
-          <Amount amount={tx?.value || '0'} udt={{ decimal: 10, symbol: PCKB_UDT_INFO.symbol }} showSymbol />
-        </div>
-      ) : (
-        t('pending')
-      ),
-    },
-    tx?.input
+    tx?.polyjuice_creator?.created_account?.eth_address
+      ? {
+          field: t('created_account'),
+          content: (
+            <HashLink
+              label={tx.polyjuice_creator.created_account.eth_address}
+              href={`/address/${tx.polyjuice_creator.created_account.eth_address}`}
+            />
+          ),
+        }
+      : null,
+    tx?.type === GraphQLSchema.TransactionType.Polyjuice
+      ? {
+          field: t('value'),
+          content: tx?.polyjuice?.value ? (
+            <div className={styles.value}>
+              <Amount amount={tx?.polyjuice?.value || '0'} udt={PCKB_UDT_INFO} showSymbol />
+            </div>
+          ) : (
+            t('pending')
+          ),
+        }
+      : null,
+    method
+      ? {
+          field: t('method'),
+          content: (
+            <Tooltip title={method} placement="top">
+              <span className="mono-font">{method}</span>
+            </Tooltip>
+          ),
+        }
+      : null,
+    tx?.polyjuice?.input
       ? {
           field: t('input'),
           content: (
@@ -196,20 +343,23 @@ const Tx = () => {
       : null,
   ]
 
-  const isPolyjuiceTx = tx?.type === 'polyjuice'
+  const isPolyjuiceTx = tx?.type === GraphQLSchema.TransactionType.Polyjuice
 
   const basicInfo = [
-    { field: t('finalizeState'), content: tx ? t(tx.status) : <Skeleton animation="wave" /> },
+    {
+      field: t('finalizeState'),
+      content: tx ? t(tx?.block?.status.toLowerCase() ?? 'pending') : <Skeleton animation="wave" />,
+    },
     {
       field: t('type'),
-      content: tx ? <TxType type={tx.type} /> : <Skeleton animation="wave" />,
+      content: tx ? <TxType type={tx?.type} /> : <Skeleton animation="wave" />,
     },
     {
       field: t('l1Block'),
-      content: tx?.l1BlockNumber ? (
+      content: tx?.block?.layer1_block_number ? (
         <HashLink
-          label={tx.l1BlockNumber.toLocaleString('en')}
-          href={`${CKB_EXPLORER_URL}/block/${tx.l1BlockNumber}`}
+          label={tx.block.layer1_block_number.toLocaleString('en')}
+          href={`${CKB_EXPLORER_URL}/block/${tx.block.layer1_block_number}`}
           external
         />
       ) : (
@@ -218,8 +368,8 @@ const Tx = () => {
     },
     {
       field: t('l2Block'),
-      content: tx?.blockNumber ? (
-        <HashLink label={tx.blockNumber.toLocaleString('en')} href={`/block/${tx.blockNumber}`} />
+      content: tx?.block?.number ? (
+        <HashLink label={tx.block.number.toLocaleString('en')} href={`/block/${tx.block.number}`} />
       ) : (
         t('pending')
       ),
@@ -228,12 +378,20 @@ const Tx = () => {
     { field: t('nonce'), content: tx ? (tx.nonce || 0).toLocaleString('en') : <Skeleton animation="wave" /> },
     {
       field: t('status'),
-      content: tx ? <PolyjuiceStatus status={tx.polyjuiceStatus ?? null} /> : <Skeleton animation="wave" />,
+      content: tx?.polyjuice ? (
+        <PolyjuiceStatus status={tx.polyjuice.status ?? GraphQLSchema.PolyjuiceStatus.Pending} />
+      ) : tx?.type === GraphQLSchema.TransactionType.Polyjuice ? (
+        <Skeleton animation="wave" />
+      ) : (
+        '-'
+      ),
     },
     {
       field: t('gasPrice'),
-      content: tx?.gasPrice ? (
-        <span className={styles.gasPrice}>{`${new BigNumber(tx.gasPrice).toFormat()} ${PCKB_UDT_INFO.symbol}`}</span>
+      content: tx?.polyjuice?.gas_price ? (
+        <span className={styles.gasPrice}>{`${new BigNumber(tx.polyjuice.gas_price)
+          .dividedBy(10 ** PCKB_UDT_INFO.decimal)
+          .toFormat()} ${PCKB_UDT_INFO.symbol}`}</span>
       ) : isTxLoading ? (
         <Skeleton animation="wave" />
       ) : isPolyjuiceTx ? (
@@ -245,8 +403,8 @@ const Tx = () => {
     {
       field: t('gasUsed'),
       content:
-        tx && tx.gasUsed ? (
-          new BigNumber(tx.gasUsed).toFormat()
+        tx && tx.polyjuice?.gas_used ? (
+          new BigNumber(tx.polyjuice.gas_used).toFormat()
         ) : isTxLoading ? (
           <Skeleton animation="wave" />
         ) : isPolyjuiceTx ? (
@@ -257,8 +415,8 @@ const Tx = () => {
     },
     {
       field: t('gasLimit'),
-      content: tx?.gasLimit ? (
-        new BigNumber(tx.gasLimit).toFormat()
+      content: tx?.polyjuice?.gas_limit ? (
+        new BigNumber(tx.polyjuice.gas_limit).toFormat()
       ) : isTxLoading ? (
         <Skeleton animation="wave" />
       ) : isPolyjuiceTx ? (
@@ -270,11 +428,11 @@ const Tx = () => {
     {
       field: t('fee'),
       content:
-        tx && tx.gasPrice && tx.gasUsed ? (
+        tx && tx.polyjuice?.gas_price && tx.polyjuice.gas_used ? (
           <span className={styles.gasFee}>
             <Amount
-              amount={`${new BigNumber(tx.gasUsed).times(new BigNumber(tx.gasPrice))}`}
-              udt={{ decimal: 0, symbol: PCKB_UDT_INFO.symbol }}
+              amount={`${new BigNumber(tx.polyjuice.gas_used).times(new BigNumber(tx.polyjuice.gas_price))}`}
+              udt={PCKB_UDT_INFO}
               showSymbol
             />
           </span>
@@ -288,12 +446,11 @@ const Tx = () => {
     },
     {
       field: t('timestamp'),
-      content:
-        tx?.timestamp >= 0 ? (
-          <time dateTime={new Date(tx.timestamp).toISOString()}>{formatDatetime(tx.timestamp)}</time>
-        ) : (
-          t('pending')
-        ),
+      content: tx?.block?.timestamp ? (
+        <time dateTime={new Date(tx.block.timestamp).toISOString()}>{formatDatetime(tx.block.timestamp)}</time>
+      ) : (
+        t('pending')
+      ),
     },
   ]
 

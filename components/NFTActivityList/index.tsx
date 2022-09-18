@@ -8,7 +8,7 @@ import Pagination from 'components/SimplePagination'
 import TxStatusIcon from 'components/TxStatusIcon'
 import TransferDirection from 'components/TransferDirection'
 import NoDataIcon from 'assets/icons/no-data.svg'
-import { client, timeDistance, getBlockStatus, GraphQLSchema } from 'utils'
+import { client, timeDistance, GraphQLSchema } from 'utils'
 import styles from './styles.module.scss'
 
 type ActivityListProps = {
@@ -132,7 +132,7 @@ const ActivityList: React.FC<
                         </span>
                       </Tooltip>
                       <TxStatusIcon
-                        status={getBlockStatus(item.block.status)}
+                        status={item.block.status}
                         isSuccess={item.polyjuice.status === GraphQLSchema.PolyjuiceStatus.Succeed}
                       />
                     </div>

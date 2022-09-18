@@ -34,6 +34,7 @@ export namespace GraphQLSchema {
   export enum PolyjuiceStatus {
     Failed = 'FAILED',
     Succeed = 'SUCCEED',
+    Pending = 'PENDING',
   }
 
   export enum TransactionType {
@@ -114,6 +115,8 @@ export namespace GraphQLSchema {
     status: PolyjuiceStatus
     tx_hash: string
     value: string
+    created_contract_address_hash: string | null
+    native_transfer_address_hash: string | null
   }
 
   export interface PolyjuiceCreator {
@@ -124,6 +127,7 @@ export namespace GraphQLSchema {
     id: number
     script_args: string
     tx_hash: string
+    created_account: Account | null
   }
 
   export interface Transaction {
