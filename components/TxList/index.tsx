@@ -13,7 +13,7 @@ import FilterMenu from 'components/FilterMenu'
 import RoundedAmount from 'components/RoundedAmount'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import EmptyFilteredListIcon from 'assets/icons/empty-filtered-list.svg'
-import { getBlockStatus, timeDistance, GraphQLSchema, client, PCKB_UDT_INFO } from 'utils'
+import { timeDistance, GraphQLSchema, client, PCKB_UDT_INFO } from 'utils'
 import styles from './styles.module.scss'
 
 export type TxListProps = {
@@ -170,7 +170,7 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
                         </div>
                       </Tooltip>
                       <TxStatusIcon
-                        status={getBlockStatus(item.block?.status ?? GraphQLSchema.BlockStatus.Pending)}
+                        status={item.block?.status}
                         isSuccess={
                           item.polyjuice ? item.polyjuice.status === GraphQLSchema.PolyjuiceStatus.Succeed : true
                         }

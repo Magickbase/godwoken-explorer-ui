@@ -30,7 +30,7 @@ import Search from 'components/Search'
 import Tooltip from 'components/Tooltip'
 import BlockStateIcon from 'components/BlockStateIcon'
 import TxStatusIcon from 'components/TxStatusIcon'
-import { fetchHome, timeDistance, formatInt, client, GraphQLSchema, IS_MAINNET, getBlockStatus } from 'utils'
+import { fetchHome, timeDistance, formatInt, client, GraphQLSchema, IS_MAINNET } from 'utils'
 type State = API.Home.Parsed
 
 // TODO: add polyjuice status
@@ -493,7 +493,7 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
                           </Box>
                         </Tooltip>
                         <TxStatusIcon
-                          status={getBlockStatus(tx.block?.status)}
+                          status={tx.block?.status}
                           isSuccess={
                             tx.polyjuice ? tx.polyjuice.status === GraphQLSchema.PolyjuiceStatus.Succeed : true
                           }
