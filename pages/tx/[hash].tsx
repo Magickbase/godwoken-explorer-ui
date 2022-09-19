@@ -91,6 +91,7 @@ const txQuery = gql`
       status
       input
       created_contract_address_hash
+      native_transfer_address_hash
       value
       gas_used
       gas_limit
