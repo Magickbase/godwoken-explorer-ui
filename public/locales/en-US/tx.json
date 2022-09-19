@@ -54,5 +54,6 @@
   "txReceiptRawData": "Transaction Receipt",
   "noData": "No Data",
   "check": "Check",
-  "ERC20Records": "ERC20 Transfers"
+  "ERC20Records": "ERC20 Transfers",
+  "method": "method"
 }
