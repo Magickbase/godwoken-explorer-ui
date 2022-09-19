@@ -1,11 +1,13 @@
 {
-  "baseUrl": "http://localhost:3000",
+  "baseUrl": "http://localhost:3333",
   "env": {
     "EXPLORER_TITLE": "GwScan",
     "codeCoverage": {
       "url": "/api/__coverage__"
     }
   },
+  "defaultCommandTimeout": 8000,
+  "requestTimeout": 6000,
   "pluginsFile": "node_modules/@cypress/code-coverage/plugins",
   "supportFile": "node_modules/@cypress/code-coverage/support",
   "projectId": "2sb35d"
