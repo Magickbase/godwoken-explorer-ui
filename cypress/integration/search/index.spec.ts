@@ -86,7 +86,13 @@ context('Search', () => {
 
   describe('redirection', () => {
     const REDIRECT_TIMEOUT = 14000
-    before(() => cy.visit('/en-US'))
+    before(() =>
+      cy.visit('/en-US', {
+        headers: {
+          'Accept-Encoding': 'gzip, deflate',
+        },
+      }),
+    )
 
     it('should redirect to block page when keyword is a block hash', () => {
       cy.get(`a[title='block number']:first`)
