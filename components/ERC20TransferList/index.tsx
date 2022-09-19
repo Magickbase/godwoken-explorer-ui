@@ -12,7 +12,7 @@ import RoundedAmount from 'components/RoundedAmount'
 import TokenLogo from 'components/TokenLogo'
 import ChangeIcon from 'assets/icons/change.svg'
 import NoDataIcon from 'assets/icons/no-data.svg'
-import { client, timeDistance, getBlockStatus, GraphQLSchema } from 'utils'
+import { client, timeDistance, GraphQLSchema } from 'utils'
 import styles from './styles.module.scss'
 
 export type TransferListProps = {
@@ -190,7 +190,7 @@ const TransferList: React.FC<
                         </span>
                       </Tooltip>
                       <TxStatusIcon
-                        status={getBlockStatus(item.block.status)}
+                        status={item.block.status}
                         isSuccess={item.polyjuice.status === GraphQLSchema.PolyjuiceStatus.Succeed}
                       />
                     </div>
