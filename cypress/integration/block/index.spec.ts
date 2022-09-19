@@ -3,7 +3,13 @@
 context('Block Page', () => {
   const hash = '0x0a9fbb868d381f65328a811ffe441f80c328400b583887731ae7195579e0ca5d'
 
-  before(() => cy.visit(`/en-US/block/${hash}`))
+  before(() =>
+    cy.visit(`/en-US/block/${hash}`, {
+      headers: {
+        'Accept-Encoding': 'gzip, deflate',
+      },
+    }),
+  )
 
   describe('block info', () => {
     it('should have title with block number', () => {

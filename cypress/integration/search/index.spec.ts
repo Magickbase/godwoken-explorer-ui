@@ -84,8 +84,8 @@ context('Search', () => {
     })
   })
 
-  describe.only('redirection', () => {
-    const REDIRECT_TIMEOUT = 12000
+  describe('redirection', () => {
+    const REDIRECT_TIMEOUT = 14000
     beforeEach(() => cy.visit('/en-US'))
 
     it('should redirect to block page when keyword is a block hash', () => {

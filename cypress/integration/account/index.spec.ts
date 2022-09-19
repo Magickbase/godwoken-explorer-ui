@@ -3,15 +3,15 @@
 context.skip('Account Page', () => {
   let id: number
 
-  // before(() => {
-  // cy.fixture('accountIds')
-  //   .then(ids => {
-  //     id = ids.user
-  //   })
-  //   .then(() => {
-  //     cy.visit(`/en-US/account/${id}`)
-  //   })
-  // })
+  before(() => {
+    cy.fixture('accountIds')
+      .then(ids => {
+        id = ids.user
+      })
+      .then(() => {
+        cy.visit(`/en-US/account/${id}`)
+      })
+  })
 
   describe.skip('general sets', () => {
     it.skip('cy.title() - get the title', () => {
