@@ -1,0 +1,60 @@
+@mixin relative-inline-block {
+  position: relative;
+  display: inline-block;
+}
+@mixin tooltip-content-title {
+  content: attr(data-tooltip);
+}
+
+$tooltip-border-color: #333;
+$tooltip-background-color: #333;
+$tooltip-font-color: #fff;
+
+.tooltip {
+  display: inline-block;
+  @include relative-inline-block;
+
+  &::before {
+    min-width: 100px;
+    max-width: 300px;
+    padding: 8px;
+    top: -8px;
+    border-radius: 5px;
+    overflow-wrap: break-word;
+    background-color: $tooltip-background-color;
+    color: $tooltip-font-color;
+    user-select: text;
+    white-space: normal;
+    display: none;
+
+    @include tooltip-content-title;
+
+    @media screen and (max-width: 600px) {
+      max-width: 220px;
+    }
+  }
+  &::after {
+    content: '';
+    user-select: text;
+    top: 8px;
+    width: 0;
+    height: 0;
+    border-width: 10px;
+    border-style: solid;
+    border-color: transparent;
+    display: none;
+    border-top-color: $tooltip-border-color;
+  }
+
+  &:hover::after,
+  &:hover::before {
+    position: absolute;
+    display: inline-block;
+    left: 50%;
+    transform: translate(-50%, -100%);
+  }
+}
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

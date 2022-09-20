@@ -1,11 +1,7 @@
 import type { MetaContract as MetaContractProps } from '../AccountOverview'
 import { useTranslation } from 'next-i18next'
-import Tooltip from 'components/Tooltip'
 import BigNumber from 'bignumber.js'
-import InfoList from '../InfoList'
-// import BaseTooltip from './BaseTooltip'
-
-import styles from './styles.module.scss'
+import InfoList, { InfoItermProps } from '../InfoList'
 
 const MetaContract = ({
   status,
@@ -15,7 +11,7 @@ const MetaContract = ({
   last_finalized_block_number,
 }: MetaContractProps['script']) => {
   const [t] = useTranslation('account')
-  const list: Array<{ field: string; content: React.ReactNode }> = [
+  const list: Array<InfoItermProps> = [
     {
       field: t(`type`),
       content: `Meta Contract`,
@@ -38,34 +34,18 @@ const MetaContract = ({
     },
     {
       field: t('accountMerkleRoot'),
-      content: (
-        // <BaseTooltip title={account_merkle_state.account_merkle_root} placement="top" zIndex={1000}>
-        //   <span className="mono-font">{t(account_merkle_state.account_merkle_root)}</span>
-        // </BaseTooltip>
-        // <Tooltip title={account_merkle_state.account_merkle_root} placement="top">
-        // <div>
-        <span className={`mono-font ${styles['tooltip']}`} data-title="tooltip-test-title">
-          {t(account_merkle_state.account_merkle_root)}
-        </span>
-        // </div>
-        // </Tooltip>
-      ),
+      content: <span className="mono-font text-ellipsis">{t(account_merkle_state.account_merkle_root)}</span>,
+      tooltipTitle: account_merkle_state.account_merkle_root,
     },
     {
       field: t('blockMerkleRoot'),
-      content: (
-        <Tooltip title={block_merkle_state.block_merkle_root} placement="top">
-          <span className="mono-font">{t(block_merkle_state.block_merkle_root)}</span>
-        </Tooltip>
-      ),
+      content: <span className="mono-font text-ellipsis">{t(block_merkle_state.block_merkle_root)}</span>,
+      tooltipTitle: block_merkle_state.block_merkle_root,
     },
     {
       field: t('revertedBlockRoot'),
-      content: (
-        <Tooltip title={reverted_block_root} placement="top">
-          <span className="mono-font">{reverted_block_root}</span>
-        </Tooltip>
-      ),
+      content: <span className="mono-font text-ellipsis">{reverted_block_root}</span>,
+      tooltipTitle: reverted_block_root,
     },
   ]
   return <InfoList title={t('basicInfo')} list={list} />
