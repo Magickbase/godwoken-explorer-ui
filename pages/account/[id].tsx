@@ -35,8 +35,6 @@ import { fetchBridgedRecordList, fetchEventLogsListByType, isEthAddress, GraphQL
 import { WagmiConfig } from 'wagmi'
 import styles from './styles.module.scss'
 
-// import BaseTooltip from 'components/BaseTooltip'
-
 const isSmartContractAccount = (account: AccountOverviewProps['account']): account is PolyjuiceContract => {
   return !!(account as PolyjuiceContract)?.smart_contract
 }

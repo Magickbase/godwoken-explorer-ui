@@ -31,7 +31,8 @@ const SUDT = ({ udt, script, script_hash }: SudtProps) => {
     script_hash
       ? {
           field: t(`l2ScriptHash`),
-          content: <span className="mono-font">{script_hash}</span>,
+          content: <span className="mono-font  text-ellipsis">{script_hash}</span>,
+          tooltipTitle: script_hash,
         }
       : null,
     script
