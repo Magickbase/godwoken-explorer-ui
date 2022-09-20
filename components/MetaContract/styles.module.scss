@@ -1,0 +1,50 @@
+@mixin relative-inline-block {
+  position: relative;
+  display: inline-block;
+}
+@mixin content-title {
+  content: attr(data-title);
+}
+$border-color: #333;
+$background-color: #333;
+
+.tooltip {
+  display: inline-block;
+  @include relative-inline-block;
+
+  &::before {
+    min-width: 100px;
+    max-width: 300px;
+    padding: 10px;
+    border-radius: 5px;
+    overflow-wrap: break-word;
+    background-color: $background-color;
+    color: #fff;
+    user-select: text;
+    display: inline-block;
+
+    @include content-title;
+    top: -10px;
+  }
+  &::after {
+    content: '';
+    user-select: text;
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-width: 10px;
+    border-style: solid;
+    border-color: transparent;
+
+    top: 10px;
+    border-top-color: $border-color;
+  }
+
+  &::after,
+  &::before {
+    position: absolute;
+    display: inline-block;
+    left: 50%;
+    transform: translate(-50%, -100%);
+  }
+}

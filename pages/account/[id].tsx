@@ -35,6 +35,8 @@ import { fetchBridgedRecordList, fetchEventLogsListByType, isEthAddress, GraphQL
 import { WagmiConfig } from 'wagmi'
 import styles from './styles.module.scss'
 
+// import BaseTooltip from 'components/BaseTooltip'
+
 const isSmartContractAccount = (account: AccountOverviewProps['account']): account is PolyjuiceContract => {
   return !!(account as PolyjuiceContract)?.smart_contract
 }
@@ -226,6 +228,21 @@ const Account = () => {
   return (
     <>
       <SubpageHead subtitle={account ? `${title} ${id}` : (id as string)} />
+      {/* <BaseTooltip
+        placement="top-right"
+        fontColor="#666"
+        overlayClassName={styles.test}
+        zIndex={1000}
+        title="test titlet itletitleti tletitl etitl etit letitle titletitl etitletitletitletitletitletitle"
+      > */}
+      <div
+        className={styles['tooltip']}
+        data-title="tooltip-test-title"
+        style={{ width: '500px', background: 'lightgreen' }}
+      >
+        xxxx
+      </div>
+      {/* </BaseTooltip> */}
       <div className={styles.container}>
         <div className={styles.title}>
           <PageTitle>{title}</PageTitle>

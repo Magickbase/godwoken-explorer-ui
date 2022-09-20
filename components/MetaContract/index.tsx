@@ -1,8 +1,11 @@
-import type { MetaContract as MetaContractProps } from './AccountOverview'
+import type { MetaContract as MetaContractProps } from '../AccountOverview'
 import { useTranslation } from 'next-i18next'
 import Tooltip from 'components/Tooltip'
 import BigNumber from 'bignumber.js'
-import InfoList from './InfoList'
+import InfoList from '../InfoList'
+// import BaseTooltip from './BaseTooltip'
+
+import styles from './styles.module.scss'
 
 const MetaContract = ({
   status,
@@ -36,9 +39,16 @@ const MetaContract = ({
     {
       field: t('accountMerkleRoot'),
       content: (
-        <Tooltip title={account_merkle_state.account_merkle_root} placement="top">
-          <span className="mono-font">{t(account_merkle_state.account_merkle_root)}</span>
-        </Tooltip>
+        // <BaseTooltip title={account_merkle_state.account_merkle_root} placement="top" zIndex={1000}>
+        //   <span className="mono-font">{t(account_merkle_state.account_merkle_root)}</span>
+        // </BaseTooltip>
+        // <Tooltip title={account_merkle_state.account_merkle_root} placement="top">
+        // <div>
+        <span className={`mono-font ${styles['tooltip']}`} data-title="tooltip-test-title">
+          {t(account_merkle_state.account_merkle_root)}
+        </span>
+        // </div>
+        // </Tooltip>
       ),
     },
     {
