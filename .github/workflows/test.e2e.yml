@@ -53,11 +53,7 @@ jobs:
 
       - name: Test
         run: |
-          npm run dev &
-          echo 'Waiting 2min for nextjs server ready...'
-          sleep 2
-          echo 'Start running cypress tests'
-          npm run cypress:run
+          npm run test:e2e
         env:
           NEXT_PUBLIC_SERVER_ENDPOINT: ${{ secrets.NEXT_PUBLIC_SERVER_ENDPOINT }}
           NEXT_PUBLIC_SERVER_URL: ${{ secrets.NEXT_PUBLIC_SERVER_URL }}
