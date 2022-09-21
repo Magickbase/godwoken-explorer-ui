@@ -8,7 +8,6 @@ context('Block Page', () => {
       headers: {
         'Accept-Encoding': 'gzip, deflate',
       },
-      timeout: 80000,
     }),
   )
 

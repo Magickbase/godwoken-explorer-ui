@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-context.skip('Account Page', () => {
+context('Account Page', () => {
   let id: number
 
   before(() => {
@@ -13,9 +13,9 @@ context.skip('Account Page', () => {
       })
   })
 
-  describe.skip('general sets', () => {
-    it.skip('cy.title() - get the title', () => {
-      cy.title().should('include', 'Godwoken Explorer')
+  describe('general sets', () => {
+    it('cy.title() - get the title', () => {
+      cy.title().should('include', 'GwScan')
     })
   })
 
