@@ -86,7 +86,7 @@ context('Search', () => {
 
   describe('redirection', () => {
     const REDIRECT_TIMEOUT = 14000
-    before(() =>
+    beforeEach(() =>
       cy.visit('/en-US', {
         headers: {
           'Accept-Encoding': 'gzip, deflate',
