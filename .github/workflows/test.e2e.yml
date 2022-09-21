@@ -54,8 +54,8 @@ jobs:
       - name: Test
         run: |
           npm run dev &
-          echo 'Waiting 2min for nextjs server ready...'
-          sleep 2
+          echo 'Waiting 2min for nextjs server to be ready...'
+          sleep 120
           echo 'Start running cypress tests'
           npm run cypress:run
         env:
