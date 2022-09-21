@@ -29,9 +29,9 @@ import {
   fetchEventLogsListByType,
   GraphQLSchema,
   client,
+  getAddressDisplay,
   CKB_EXPLORER_URL,
   PCKB_UDT_INFO,
-  ZERO_ADDRESS,
 } from 'utils'
 import styles from './styles.module.scss'
 
@@ -44,8 +44,8 @@ interface Transaction {
   index: number
   method_id: string | null
   method_name: string | null
-  from_account: Pick<GraphQLSchema.Account, 'eth_address' | 'type'> | null
-  to_account: Pick<GraphQLSchema.Account, 'eth_address' | 'type' | 'smart_contract'> | null
+  from_account: Pick<GraphQLSchema.Account, 'eth_address' | 'type' | 'smart_contract' | 'script_hash'> | null
+  to_account: Pick<GraphQLSchema.Account, 'eth_address' | 'type' | 'smart_contract' | 'script_hash'> | null
   polyjuice: Pick<
     GraphQLSchema.Polyjuice,
     | 'tx_hash'
@@ -77,10 +77,16 @@ const txQuery = gql`
     to_account {
       eth_address
       type
+      script_hash
+      smart_contract {
+        name
+        abi
+      }
     }
     to_account {
       eth_address
       type
+      script_hash
       smart_contract {
         name
         abi
@@ -225,24 +231,8 @@ const Tx = () => {
     utf8Input ? { type: 'utf8', text: utf8Input } : null,
   ].filter(v => v)
 
-  const from = tx?.from_account?.eth_address
-  let toLabel = tx?.to_account?.eth_address || 'zero address'
-  let toAddr = tx?.to_account?.eth_address ?? ZERO_ADDRESS
-
-  if (tx?.polyjuice?.native_transfer_address_hash) {
-    toLabel = tx.polyjuice.native_transfer_address_hash
-    toAddr = tx.polyjuice.native_transfer_address_hash
-  } else if (tx?.to_account?.smart_contract?.name) {
-    toLabel = `${tx.to_account.smart_contract.name} (${tx.to_account?.eth_address})`
-  } else if (
-    [
-      GraphQLSchema.AccountType.EthAddrReg,
-      GraphQLSchema.AccountType.MetaContract,
-      GraphQLSchema.AccountType.PolyjuiceCreator,
-    ].includes(tx?.to_account?.type)
-  ) {
-    toLabel = tx.to_account.type.replace(/_/g, ' ').toLowerCase()
-  }
+  const fromAddrDisplay = getAddressDisplay(tx?.from_account)
+  const toAddrDisplay = getAddressDisplay(tx?.to_account, tx?.polyjuice?.native_transfer_address_hash)
 
   const method = tx?.method_name ?? tx?.method_id
 
@@ -261,7 +251,11 @@ const Tx = () => {
       content: isTxLoading ? (
         <Skeleton animation="wave" />
       ) : tx ? (
-        <HashLink label={from} href={`/address/${from}`} style={{ wordBreak: 'break-all' }} />
+        <HashLink
+          label={fromAddrDisplay.label}
+          href={`/address/${fromAddrDisplay.address}`}
+          style={{ wordBreak: 'break-all' }}
+        />
       ) : (
         t('pending')
       ),
@@ -271,7 +265,7 @@ const Tx = () => {
       content: isTxLoading ? (
         <Skeleton animation="wave" />
       ) : tx ? (
-        <HashLink label={toLabel} href={`/address/${toAddr}`} />
+        <HashLink label={toAddrDisplay.label} href={`/address/${toAddrDisplay.address}`} />
       ) : (
         t('pending')
       ),
