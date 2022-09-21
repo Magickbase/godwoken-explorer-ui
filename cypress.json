@@ -7,8 +7,8 @@
     }
   },
   "defaultCommandTimeout": 8000,
-  "responseTimeout": 90000,
-  "pageLoadTimeout": 90000,
+  "responseTimeout": 15000,
+  "pageLoadTimeout": 20000,
   "pluginsFile": "node_modules/@cypress/code-coverage/plugins",
   "supportFile": "node_modules/@cypress/code-coverage/support",
   "projectId": "2sb35d"

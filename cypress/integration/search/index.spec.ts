@@ -85,7 +85,7 @@ context('Search', () => {
   })
 
   describe('redirection', () => {
-    const REDIRECT_TIMEOUT = 80000
+    const REDIRECT_TIMEOUT = 10000
     beforeEach(() =>
       cy.visit('/en-US', {
         headers: {
