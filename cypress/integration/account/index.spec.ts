@@ -9,8 +9,7 @@ context('Account Page', () => {
         id = ids.user
       })
       .then(() => {
-        // need more time for the first test (extra time for the server to ready)
-        cy.visit(`/en-US/account/${id}`, { timeout: 150000 })
+        cy.visit(`/en-US/account/${id}`)
       })
   })
 

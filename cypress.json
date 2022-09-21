@@ -7,7 +7,7 @@
     }
   },
   "defaultCommandTimeout": 8000,
-  "responseTimeout": 60000,
+  "responseTimeout": 90000,
   "pageLoadTimeout": 90000,
   "pluginsFile": "node_modules/@cypress/code-coverage/plugins",
   "supportFile": "node_modules/@cypress/code-coverage/support",
