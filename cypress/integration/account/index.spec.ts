@@ -9,7 +9,7 @@ context('Account Page', () => {
         id = ids.user
       })
       .then(() => {
-        cy.visit(`/en-US/account/${id}`, { timeout: 80000 })
+        cy.visit(`/en-US/account/${id}`)
       })
   })
 
