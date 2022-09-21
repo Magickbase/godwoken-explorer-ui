@@ -9,8 +9,7 @@ context('Account Page', () => {
         id = ids.user
       })
       .then(() => {
-        // since this is the first test, in CI, we need to wait longer for nextjs compile first
-        cy.visit(`/en-US/account/${id}`, { timeout: 120000 })
+        cy.visit(`/en-US/account/${id}`)
       })
   })
 

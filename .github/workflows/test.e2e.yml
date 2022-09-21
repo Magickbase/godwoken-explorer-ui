@@ -4,7 +4,6 @@ on:
   schedule:
     - cron: '0 0 * * *'
   push:
-  pull_request:
 
 jobs:
   e2e_tests:
@@ -48,7 +47,10 @@ jobs:
           npx cypress version --component node
 
       - name: Test
-        run: npm run test:e2e
+        run: |
+          npm run dev
+          sleep 100
+          npm run cypress:run
         env:
           NEXT_PUBLIC_SERVER_ENDPOINT: ${{ secrets.NEXT_PUBLIC_SERVER_ENDPOINT }}
           NEXT_PUBLIC_SERVER_URL: ${{ secrets.NEXT_PUBLIC_SERVER_URL }}
