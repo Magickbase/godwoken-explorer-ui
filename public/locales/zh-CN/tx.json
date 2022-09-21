@@ -54,5 +54,6 @@
   "txReceiptRawData": "交易回执",
   "noData": "没有数据",
   "check": "查看",
-  "ERC20Records": "ERC20 交易记录"
+  "ERC20Records": "ERC20 交易记录",
+  "method": "方法"
 }
