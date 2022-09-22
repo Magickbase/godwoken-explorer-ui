@@ -259,7 +259,7 @@ const TokenApprovalList: React.FC<TokenApprovalListProps & { maxCount?: string; 
     )
   }
 
-  const isOwner = connectedAddr ? id === connectedAddr : true
+  const isOwner = connectedAddr ? (id as string).toLowerCase() === connectedAddr.toLowerCase() : true
   const disabled =
     !isOwner ||
     isSwitchingNetwork ||
