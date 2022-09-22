@@ -26,8 +26,8 @@ const InfoList: React.FC<{
         {list
           .filter(v => v)
           .map(({ field, content, expandable, tooltipTitle }, idx) => {
-            const overflow = tooltipTitle ? 'visible' : 'hidden'
-            const tooltipStyle = tooltipTitle ? { overflow: 'visible', display: 'grid' } : {}
+            // const overflow = tooltipTitle ? 'visible' : 'hidden'
+            // const tooltipStyle = tooltipTitle ? { overflow: 'visible', display: 'grid' } : {}
 
             return (
               <dl
@@ -35,18 +35,19 @@ const InfoList: React.FC<{
                 role="listitem"
                 title={field}
                 className={styles.item}
+                data-show-tooltip={!!tooltipTitle}
                 style={{
-                  overflow,
                   order: type === 'one-column' ? 1 : idx >= midIndex ? (idx - midIndex) * 2 + 1 : idx * 2,
                 }}
               >
                 <dt className={styles.term}>{field}</dt>
                 <dd
-                  style={{
-                    ...tooltipStyle,
-                  }}
+                  // style={{
+                  //   ...tooltipStyle,
+                  // }}
                   className={`${styles.desc} ${tooltipTitle ? 'tooltip' : ''}`}
                   data-tooltip={tooltipTitle}
+                  data-show-tooltip={!!tooltipTitle}
                   data-expandable={expandable}
                 >
                   {content}

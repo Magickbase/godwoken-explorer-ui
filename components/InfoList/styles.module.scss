@@ -57,6 +57,10 @@
     border-top: 1px solid transparent;
     border-bottom: 1px solid var(--border-color);
 
+    &[data-show-tooltip='true'] {
+      overflow: visible;
+    }
+
     dt.term {
       flex-shrink: 0;
       flex-basis: 7.25rem;
@@ -68,8 +72,13 @@
     dd.desc {
       margin: 0;
       flex: 1;
-      overflow: hidden;
       text-overflow: ellipsis;
+      overflow: hidden;
+
+      &[data-show-tooltip='true'] {
+        overflow: visible;
+        display: grid;
+      }
     }
 
     dd.desc[data-expandable='true'] {

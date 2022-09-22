@@ -6,11 +6,11 @@
   content: attr(data-tooltip);
 }
 
-$tooltip-border-color: #333;
-$tooltip-background-color: #333;
-$tooltip-font-color: #fff;
-
 .tooltip {
+  --tooltip-border-color: #333;
+  --tooltip-background-color: #333;
+  --tooltip-font-color: #fff;
+
   display: inline-block;
   @include relative-inline-block;
 
@@ -21,8 +21,8 @@ $tooltip-font-color: #fff;
     top: -8px;
     border-radius: 5px;
     overflow-wrap: break-word;
-    background-color: $tooltip-background-color;
-    color: $tooltip-font-color;
+    background-color: var(--tooltip-background-color);
+    color: var(--tooltip-font-color);
     user-select: text;
     white-space: normal;
     display: none;
@@ -43,7 +43,7 @@ $tooltip-font-color: #fff;
     border-style: solid;
     border-color: transparent;
     display: none;
-    border-top-color: $tooltip-border-color;
+    border-top-color: var(--tooltip-border-color);
   }
 
   &:hover::after,

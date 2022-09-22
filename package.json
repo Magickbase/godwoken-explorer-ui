@@ -12,7 +12,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "cypress:open": "cypress open",
+    "cypress:open": "npm run dev & cypress open",
     "cypress:run": "cypress run",
     "coverage": "nyc npm run test",
     "format": "prettier -w --ignore-unknown pages/* pages/**/* components/* components/**/* styles/* utils/* cypress/**/*{.ts,.json}",
@@ -46,6 +46,7 @@
   },
   "devDependencies": {
     "@cypress/code-coverage": "3.10.0",
+    "@cypress/react": "6.2.0",
     "@svgr/webpack": "6.4.0",
     "@types/node": "16.11.65",
     "@types/phoenix": "1.5.4",
