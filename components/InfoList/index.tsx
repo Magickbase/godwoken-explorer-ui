@@ -11,12 +11,13 @@ const InfoList: React.FC<{
   title?: string | React.ReactNode
   list: Array<InfoItermProps>
   style?: React.CSSProperties
+  className?: string
   type?: 'one-column' | 'two-columns'
-}> = ({ title, list, style, type = 'one-column' }) => {
+}> = ({ title, list, style, type = 'one-column', className = '' }) => {
   const midIndex = Math.floor(list.length / 2)
 
   return (
-    <div className={styles.container} style={style}>
+    <div className={`${styles.container} ${className}`} style={style}>
       <div role="list" className={styles.list} data-type={type}>
         {title ? (
           <dl role="listitem" className={styles.title}>
@@ -26,9 +27,6 @@ const InfoList: React.FC<{
         {list
           .filter(v => v)
           .map(({ field, content, expandable, tooltipTitle }, idx) => {
-            // const overflow = tooltipTitle ? 'visible' : 'hidden'
-            // const tooltipStyle = tooltipTitle ? { overflow: 'visible', display: 'grid' } : {}
-
             return (
               <dl
                 key={field}
@@ -42,9 +40,6 @@ const InfoList: React.FC<{
               >
                 <dt className={styles.term}>{field}</dt>
                 <dd
-                  // style={{
-                  //   ...tooltipStyle,
-                  // }}
                   className={`${styles.desc} ${tooltipTitle ? 'tooltip' : ''}`}
                   data-tooltip={tooltipTitle}
                   data-show-tooltip={!!tooltipTitle}

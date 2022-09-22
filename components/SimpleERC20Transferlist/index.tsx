@@ -4,7 +4,6 @@ import NextLink from 'next/link'
 import { useRouter } from 'next/router'
 import { gql } from 'graphql-request'
 import { SIZES } from 'components/PageSize'
-import Tooltip from 'components/Tooltip'
 import HashLink from 'components/HashLink'
 import Table from 'components/Table'
 import Pagination from 'components/SimplePagination'
@@ -172,32 +171,28 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
               <tr key={`${item.transaction_hash}-${item.log_index}`}>
                 <td>{item.log_index}</td>
                 <td className={styles.address}>
-                  <Tooltip title={item.from_address} placement="top">
-                    <span className="mono-font">
-                      {item.from_address === ZERO_ADDRESS ? (
-                        'zero address'
-                      ) : (
-                        <HashLink
-                          label={`${item.from_address.slice(0, 8)}...${item.from_address.slice(-8)}`}
-                          href={`/account/${item.from_address}`}
-                        />
-                      )}
-                    </span>
-                  </Tooltip>
+                  <span className="mono-font tooltip" data-tooltip={item.from_address}>
+                    {item.from_address === ZERO_ADDRESS ? (
+                      'zero address'
+                    ) : (
+                      <HashLink
+                        label={`${item.from_address.slice(0, 8)}...${item.from_address.slice(-8)}`}
+                        href={`/account/${item.from_address}`}
+                      />
+                    )}
+                  </span>
                 </td>
                 <td className={styles.address}>
-                  <Tooltip title={item.to_address} placement="top">
-                    <span className="mono-font">
-                      {item.to_address === ZERO_ADDRESS ? (
-                        'zero address'
-                      ) : (
-                        <HashLink
-                          label={`${item.to_address.slice(0, 8)}...${item.to_address.slice(-8)}`}
-                          href={`/account/${item.to_address}`}
-                        />
-                      )}
-                    </span>
-                  </Tooltip>
+                  <span className="mono-font tooltip" data-tooltip={item.to_address}>
+                    {item.to_address === ZERO_ADDRESS ? (
+                      'zero address'
+                    ) : (
+                      <HashLink
+                        label={`${item.to_address.slice(0, 8)}...${item.to_address.slice(-8)}`}
+                        href={`/account/${item.to_address}`}
+                      />
+                    )}
+                  </span>
                 </td>
                 <td className={styles.tokenLogo}>
                   <NextLink href={`/token/${item.udt.id}`}>

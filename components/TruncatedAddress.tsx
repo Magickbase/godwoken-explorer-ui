@@ -1,5 +1,4 @@
 import { Box, SxProps } from '@mui/material'
-import Tooltip from 'components/Tooltip'
 import HashLink from './HashLink'
 import { getAddressDisplay, GraphQLSchema, ZERO_ADDRESS } from 'utils'
 
@@ -20,13 +19,11 @@ const TruncatedAddress = ({
 }) => {
   if (address === ZERO_ADDRESS) {
     return (
-      <Tooltip title={address} placement="top" sx={sx}>
-        <Box sx={sx}>
-          <span className="mono-font" style={{ color: 'var(--primary-text-color)', userSelect: 'none' }}>
-            zero address
-          </span>
-        </Box>
-      </Tooltip>
+      <Box sx={sx} className="tooltip" data-tooltip={address}>
+        <span className="mono-font" style={{ color: 'var(--primary-text-color)', userSelect: 'none' }}>
+          zero address
+        </span>
+      </Box>
     )
   }
 
@@ -48,11 +45,9 @@ const TruncatedAddress = ({
   }
 
   return (
-    <Tooltip title={address} placement="top" sx={sx}>
-      <Box sx={sx}>
-        <HashLink label={label} href={`/account/${address}`} monoFont={monoFont} />
-      </Box>
-    </Tooltip>
+    <Box className="tooltip" data-tooltip={address} sx={sx}>
+      <HashLink label={label} href={`/account/${address}`} monoFont={monoFont} />
+    </Box>
   )
 }
 

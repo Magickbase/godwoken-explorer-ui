@@ -107,7 +107,7 @@ const NftCollectionList = () => {
             </span>
             {list?.metadata.total_count ? <Pagination {...list.metadata} /> : null}
           </div>
-          <Table>
+          <Table style={{ overflow: 'unset' }}>
             <thead>
               <tr>
                 <th>

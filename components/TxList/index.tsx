@@ -8,7 +8,6 @@ import HashLink from 'components/HashLink'
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/SimplePagination'
 import TransferDirection from 'components/TransferDirection'
-import Tooltip from 'components/Tooltip'
 import FilterMenu from 'components/FilterMenu'
 import RoundedAmount from 'components/RoundedAmount'
 import NoDataIcon from 'assets/icons/no-data.svg'
@@ -172,11 +171,9 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
                 <tr key={hash}>
                   <td>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <Tooltip title={hash} placement="top">
-                        <div style={{ paddingRight: 4 }}>
-                          <HashLink label={`${hash.slice(0, 8)}...${hash.slice(-8)}`} href={`/tx/${hash}`} />
-                        </div>
-                      </Tooltip>
+                      <div className="tooltip" data-tooltip={hash} style={{ paddingRight: 4 }}>
+                        <HashLink label={`${hash.slice(0, 8)}...${hash.slice(-8)}`} href={`/tx/${hash}`} />
+                      </div>
                       <TxStatusIcon
                         status={item.block?.status}
                         isSuccess={
@@ -187,11 +184,9 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
                   </td>
                   <td>
                     {method ? (
-                      <Tooltip title={item.method_id} placement="top">
-                        <div className={styles.method} title={method}>
-                          {method}
-                        </div>
-                      </Tooltip>
+                      <div title={method} className={`${styles.method} tooltip`} data-tooltip={item.method_id}>
+                        {method}
+                      </div>
                     ) : (
                       <div className={styles.method} data-is-native-transfer="true" />
                     )}

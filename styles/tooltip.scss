@@ -25,6 +25,7 @@
     color: var(--tooltip-font-color);
     user-select: text;
     white-space: normal;
+    text-align: center;
     display: none;
 
     @include tooltip-content-title;
@@ -52,6 +53,7 @@
     display: inline-block;
     left: 50%;
     transform: translate(-50%, -100%);
+    z-index: 999;
   }
 }
 .text-ellipsis {

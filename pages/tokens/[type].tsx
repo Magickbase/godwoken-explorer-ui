@@ -163,6 +163,7 @@ const TokenList = () => {
   }
 
   const title = t(`${type}-udt-list`)
+  console.log(title, 'title')
   return (
     <>
       <SubpageHead subtitle={title} />
@@ -228,7 +229,7 @@ const TokenList = () => {
             </Stack>
           )}
 
-          <Table>
+          <Table style={{ overflow: 'unset' }}>
             <thead style={{ textTransform: 'capitalize', fontSize: isMobile ? 12 : 14 }}>
               <tr style={{ borderTop: '1px solid #f0f0f0', borderBottom: '1px solid #f0f0f0' }}>
                 {headers.map(h => (
@@ -277,7 +278,7 @@ const TokenList = () => {
                             <TokenLogo logo={token.icon} name={token.name} />
                           </div>
                           {type === 'bridge' ? (
-                            <Tooltip title={t(`view-mapped-native-token`)} placement="top">
+                            <div className="tooltip" data-tooltip={t(`view-mapped-native-token`)}>
                               <span>
                                 <NextLink href={`/token/${id}`} passHref>
                                   <Link
@@ -303,7 +304,7 @@ const TokenList = () => {
                                   </Link>
                                 </NextLink>
                               </span>
-                            </Tooltip>
+                            </div>
                           ) : (
                             <NextLink href={`/token/${id}`} passHref>
                               <Link
@@ -333,11 +334,9 @@ const TokenList = () => {
                       </td>
                       <td title={addr}>
                         {addr.length > 42 ? (
-                          <Tooltip title={addr} placement="top">
-                            <span>
-                              <HashLink label={`${addr.slice(0, 12)}...${addr.slice(-12)}`} href={`/account/${addr}`} />
-                            </span>
-                          </Tooltip>
+                          <span className="tooltip" data-tooltip={addr}>
+                            <HashLink label={`${addr.slice(0, 12)}...${addr.slice(-12)}`} href={`/account/${addr}`} />
+                          </span>
                         ) : (
                           <HashLink
                             label={isMobile ? `${addr.slice(0, 8)}...${addr.slice(-8)}` : addr}
@@ -346,16 +345,7 @@ const TokenList = () => {
                         )}
                       </td>
                       <td>
-                        <div
-                          style={{
-                            whiteSpace: 'nowrap',
-                            textOverflow: 'ellipsis',
-                            overflow: 'hidden',
-                            width: 180,
-                          }}
-                        >
-                          <Amount amount={token.supply ?? '0'} udt={token} showSymbol />
-                        </div>
+                        <Amount amount={token.supply ?? '0'} udt={token} showSymbol />
                       </td>
                       <td style={{ minWidth: isMobile ? 100 : 125 }} title={`${token.holders_count || '0'}`}>
                         {token.holders_count || '0'}

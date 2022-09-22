@@ -1,6 +1,5 @@
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
-import Tooltip from 'components/Tooltip'
 import Table from 'components/Table'
 import HashLink from 'components/HashLink'
 import Address from 'components/TruncatedAddress'
@@ -58,15 +57,13 @@ const BridgedRecordList: React.FC<{ list: ParsedList; showUser?: boolean }> = ({
                 <td>
                   {r.layer1.output.hash ? (
                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <Tooltip title={r.layer1.output.hash} placement="top">
-                        <div>
-                          <HashLink
-                            label={`${r.layer1.output.hash.slice(0, 8)}...${r.layer1.output.hash.slice(-8)}`}
-                            href={`${CKB_EXPLORER_URL}/transaction/${r.layer1.output.hash}#${r.layer1.output.index}`}
-                            external
-                          />
-                        </div>
-                      </Tooltip>
+                      <div className="tooltip" data-tooltip={r.layer1.output.hash}>
+                        <HashLink
+                          label={`${r.layer1.output.hash.slice(0, 8)}...${r.layer1.output.hash.slice(-8)}`}
+                          href={`${CKB_EXPLORER_URL}/transaction/${r.layer1.output.hash}#${r.layer1.output.index}`}
+                          external
+                        />
+                      </div>
                     </div>
                   ) : (
                     t(`pending`)

@@ -8,6 +8,9 @@
   &:hover {
     filter: brightness(0.5);
   }
+  &::before {
+    min-width: 200px;
+  }
 }
 
 .qrCodeModal {

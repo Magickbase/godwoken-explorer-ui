@@ -462,7 +462,12 @@ const Tx = () => {
           </div>
         </PageTitle>
 
-        <InfoList title={t(`overview`)} list={overview} style={{ marginBottom: '2rem' }} />
+        <InfoList
+          title={t(`overview`)}
+          list={overview}
+          style={{ marginBottom: '2rem' }}
+          className={styles['overview-class']}
+        />
 
         <InfoList title={t(`basicInfo`)} list={basicInfo} style={{ marginBottom: '2rem' }} type="two-columns" />
 

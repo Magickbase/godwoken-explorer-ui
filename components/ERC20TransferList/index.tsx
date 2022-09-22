@@ -3,7 +3,6 @@ import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import { gql } from 'graphql-request'
 import Table from 'components/Table'
-import Tooltip from 'components/Tooltip'
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/SimplePagination'
 import TxStatusIcon from 'components/TxStatusIcon'
@@ -179,16 +178,14 @@ const TransferList: React.FC<
                 <tr key={item.transaction_hash + item.log_index}>
                   <td>
                     <div className={styles.hash}>
-                      <Tooltip title={item.transaction_hash} placement="top">
-                        <span>
-                          <NextLink href={`/tx/${item.transaction_hash}`}>
-                            <a className="mono-font">{`${item.transaction_hash.slice(
-                              0,
-                              8,
-                            )}...${item.transaction_hash.slice(-8)}`}</a>
-                          </NextLink>
-                        </span>
-                      </Tooltip>
+                      <span className="tooltip" data-tooltip={item.transaction_hash}>
+                        <NextLink href={`/tx/${item.transaction_hash}`}>
+                          <a className="mono-font">{`${item.transaction_hash.slice(
+                            0,
+                            8,
+                          )}...${item.transaction_hash.slice(-8)}`}</a>
+                        </NextLink>
+                      </span>
                       <TxStatusIcon
                         status={item.block.status}
                         isSuccess={item.polyjuice.status === GraphQLSchema.PolyjuiceStatus.Succeed}

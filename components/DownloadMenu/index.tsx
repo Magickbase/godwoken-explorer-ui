@@ -1,6 +1,5 @@
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
-import Tooltip from 'components/Tooltip'
 import { API_ENDPOINT } from 'utils'
 import DownloadIcon from 'assets/icons/download.svg'
 import styles from './styles.module.scss'
@@ -30,15 +29,13 @@ const DownloadMenu: React.FC<DownloadMenuProps> = ({ items }) => {
 
   return (
     <div className={styles.container}>
-      <Tooltip title={t(`up_to_5k_records_will_be_exported`)} placement="top">
-        <>
-          <label htmlFor="download-button">
-            {t(`download`)}
-            <DownloadIcon />
-          </label>
-          <input id="download-button" readOnly inputMode="none" />
-        </>
-      </Tooltip>
+      <div className="tooltip" data-tooltip={t(`up_to_5k_records_will_be_exported`)}>
+        <label htmlFor="download-button">
+          {t(`download`)}
+          <DownloadIcon />
+        </label>
+        <input id="download-button" readOnly inputMode="none" />
+      </div>
       <ul className={styles.list}>
         {items.map(item => (
           <li key={item.label}>
