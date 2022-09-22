@@ -71,13 +71,16 @@ const Alert: React.FC<SnackbarProps & { content: string; type: 'error' | 'succes
   type,
   ...rest
 }) => {
-  const [severity, setSeverity] = useState<AlertColor>()
+  const [internalState, setInternalState] = useState<{ content: string; type: AlertColor }>()
 
   useEffect(() => {
     if (type) {
-      setSeverity(type)
+      setInternalState(prev => ({ ...prev, type }))
     }
-  }, [type])
+    if (content) {
+      setInternalState(prev => ({ ...prev, content }))
+    }
+  }, [type, content])
 
   return (
     <StyledSnackbar
@@ -91,11 +94,11 @@ const Alert: React.FC<SnackbarProps & { content: string; type: 'error' | 'succes
     >
       <div>
         <StyledAlert
-          severity={severity}
+          severity={internalState?.type}
           variant="filled"
           iconMapping={{ error: <CancelIcon />, success: <CheckCircleIcon />, warning: <ErrorIcon /> }}
         >
-          {content}
+          {internalState?.content}
         </StyledAlert>
       </div>
     </StyledSnackbar>
