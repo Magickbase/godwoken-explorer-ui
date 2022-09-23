@@ -46,7 +46,7 @@ export const fetchUdtList = (variables: Variables) =>
 const AssetList = ({ list = [] }: { list: UdtList }) => {
   const [t] = useTranslation('account')
   return (
-    <Table>
+    <Table style={{ overflow: 'unset' }}>
       <thead className={styles.tableHeader}>
         <tr style={{ textTransform: 'capitalize' }}>
           <th>{t(`asset`)}</th>

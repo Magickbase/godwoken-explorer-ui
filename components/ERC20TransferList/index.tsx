@@ -151,7 +151,7 @@ const TransferList: React.FC<
 
   return (
     <div className={styles.container}>
-      <Table>
+      <Table style={{ overflow: 'unset' }}>
         <thead>
           <tr>
             <th>{t('txHash')}</th>

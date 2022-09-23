@@ -8,7 +8,6 @@ import { gql } from 'graphql-request'
 import { Skeleton } from '@mui/material'
 import { ethers } from 'ethers'
 import BigNumber from 'bignumber.js'
-import Tooltip from 'components/Tooltip'
 import Tabs from 'components/Tabs'
 import SubpageHead from 'components/SubpageHead'
 import PageTitle from 'components/PageTitle'
@@ -308,9 +307,10 @@ const Tx = () => {
       ? {
           field: t('method'),
           content: (
-            <Tooltip title={tx.method_id} placement="top">
-              <span className="mono-font">{method}</span>
-            </Tooltip>
+            // TODO: fix the problem of too right when it is in 50% left, if we replace the Tooltip in tooltip class
+            // <Tooltip title={tx.method_id} placement="top">
+            <span className="mono-font">{method}</span>
+            // </Tooltip>
           ),
         }
       : null,

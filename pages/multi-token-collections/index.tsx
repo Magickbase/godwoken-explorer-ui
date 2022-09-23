@@ -12,7 +12,6 @@ import Table from 'components/Table'
 import Pagination from 'components/SimplePagination'
 import TokenLogo from 'components/TokenLogo'
 import HashLink from 'components/HashLink'
-import Tooltip from 'components/Tooltip'
 import { SIZES } from 'components/PageSize'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import { client, GraphQLSchema } from 'utils'
@@ -139,14 +138,12 @@ const MultiTokenCollectionList = () => {
                       </td>
                       <td className={styles.addr} title={item.account.eth_address}>
                         <HashLink label={item.account.eth_address} href={`/account/${item.account.eth_address}`} />
-                        <Tooltip title={item.account.eth_address} placement="top">
-                          <span>
-                            <HashLink
-                              label={`${item.account.eth_address.slice(0, 8)}...${item.account.eth_address.slice(-8)}`}
-                              href={`/account/${item.account.eth_address}`}
-                            />
-                          </span>
-                        </Tooltip>
+                        <span className="tooltip" data-tooltip={item.account.eth_address}>
+                          <HashLink
+                            label={`${item.account.eth_address.slice(0, 8)}...${item.account.eth_address.slice(-8)}`}
+                            href={`/account/${item.account.eth_address}`}
+                          />
+                        </span>
                       </td>
                       <td title={item.holders_count.toLocaleString('en')}>{item.holders_count.toLocaleString('en')}</td>
                       <td title={item.minted_count.toLocaleString('en')}>{item.minted_count.toLocaleString('en')}</td>

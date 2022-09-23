@@ -1,5 +1,4 @@
 import BigNumber from 'bignumber.js'
-import Tooltip from './Tooltip'
 
 const Amount: React.FC<{ amount: string; udt: { decimal: number; symbol: string }; showSymbol?: boolean }> = ({
   amount,
@@ -10,17 +9,19 @@ const Amount: React.FC<{ amount: string; udt: { decimal: number; symbol: string 
   const [rInt, rFrac] = a.split('.')
   const unit = symbol?.split('.')[0] ?? ''
   return (
-    <div className="tooltip" data-tooltip={`${a} ${unit}`}>
-      <b
-        style={{
-          width: '180px',
-          display: 'inline-block',
-          whiteSpace: 'nowrap',
-          textOverflow: 'ellipsis',
-          overflow: 'hidden',
-          fontWeight: 500,
-        }}
-      >
+    <div
+      className="tooltip"
+      data-tooltip={`${a} ${unit}`}
+      style={{
+        width: '100%',
+        display: 'inline-block',
+        whiteSpace: 'nowrap',
+        textOverflow: 'ellipsis',
+        overflow: 'hidden',
+        fontWeight: 500,
+      }}
+    >
+      <b>
         <span>{rInt}</span>
         {rFrac ? <span style={{ color: 'var(--amount-frac-color)' }}>{`.${rFrac}`}</span> : null}
         {showSymbol ? ` ${unit}` : null}

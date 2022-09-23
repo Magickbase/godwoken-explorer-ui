@@ -12,7 +12,6 @@ import Table from 'components/Table'
 import PageTitle from 'components/PageTitle'
 import SubpageHead from 'components/SubpageHead'
 import TxListComp, { fetchTxList } from 'components/TxList'
-import Tooltip from 'components/Tooltip'
 import FilterIcon from 'assets/icons/filter.svg'
 import PendingIcon from 'assets/icons/pending.svg'
 import IsPendingListIcon from 'assets/icons/is-pending-tx-list.svg'
@@ -94,7 +93,7 @@ const TxList = () => {
               <Skeleton animation="wave" width={50} height={24} />
             </Stack>
             <TableContainer>
-              <Table>
+              <Table style={{ overflow: 'unset' }}>
                 <thead style={{ textTransform: 'capitalize', fontSize: isMobile ? 12 : 14 }}>
                   <tr>
                     <th>{t('txHash')}</th>
@@ -181,12 +180,12 @@ const TxList = () => {
                     })}
               </Typography>
               <div className={styles.filter}>
-                <Tooltip title={t('view-filter')} placement="top">
+                <div className="tooltip" data-tooltip={t('view-filter')}>
                   <label htmlFor="filter">
                     <FilterIcon />
                     <input id="filter" readOnly />
                   </label>
-                </Tooltip>
+                </div>
                 <ul>
                   <li data-active={isPendingList}>
                     <NextLink href={isPendingList ? '/txs' : 'txs?status=pending'}>

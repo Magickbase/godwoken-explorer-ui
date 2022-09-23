@@ -27,11 +27,9 @@ import { useTheme } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded'
 import Search from 'components/Search'
-import Tooltip from 'components/Tooltip'
 import BlockStateIcon from 'components/BlockStateIcon'
 import TxStatusIcon from 'components/TxStatusIcon'
 import { fetchHome, timeDistance, formatInt, client, GraphQLSchema, IS_MAINNET } from 'utils'
-import { initial } from 'cypress/types/lodash'
 type State = API.Home.Parsed
 
 // TODO: add polyjuice status
@@ -228,14 +226,12 @@ const ListContainer = ({ link, title, tooltip, children }) => {
         </Typography>
         <NextLink href={link} passHref>
           <div className="tooltip " data-tooltip={tooltip}>
-            {/* <Tooltip placement="top" title={tooltip}> */}
             <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
               <Typography variant="body2" fontSize={{ xs: 13, md: 14 }} fontWeight={500} color="primary">
                 {t('all')}
               </Typography>
               <ArrowForwardIosRoundedIcon color="primary" sx={{ fontSize: 12, m: '0 2px 1px 2px' }} />
             </Box>
-            {/* </Tooltip> */}
           </div>
         </NextLink>
       </Box>
@@ -364,20 +360,20 @@ const BlockList: React.FC<{ list: HomeLists['blocks']; isLoading: boolean; lengt
                       </NextLink>
                       <BlockStateIcon state={block.status} />
                     </Box>
-                    <Tooltip title={block.hash} className="mono-font" hidden>
-                      <Box
-                        component="span"
-                        sx={{
-                          'overflow': 'hidden',
-                          'textOverflow': 'ellipsis',
-                          '&:hover': { backgroundColor: 'unset' },
-                        }}
-                        className="mono-font"
-                        px={1}
-                      >
-                        {block.hash}
-                      </Box>
-                    </Tooltip>
+                    <Box
+                      className="mono-font tooltip"
+                      data-tooltip={block.hash}
+                      component="span"
+                      style={{ display: 'none' }}
+                      sx={{
+                        'overflow': 'hidden',
+                        'textOverflow': 'ellipsis',
+                        '&:hover': { backgroundColor: 'unset' },
+                      }}
+                      px={1}
+                    >
+                      {block.hash}
+                    </Box>
                     <Box alignItems="bottom" fontWeight={400} fontSize={{ xs: 12, md: 14 }} color="secondary.light">
                       <time
                         dateTime={new Date(block.timestamp).toISOString()}

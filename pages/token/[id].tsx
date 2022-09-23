@@ -23,7 +23,6 @@ import styles from './styles.module.scss'
 import type { API } from 'utils/api/utils'
 import { SIZES } from 'components/PageSize'
 import TokenLogo from 'components/TokenLogo'
-import Tooltip from 'components/Tooltip'
 
 const tabs = ['transfers', 'bridged', 'holders']
 
@@ -186,6 +185,7 @@ const Token: React.FC<Props> = () => {
       ) : (
         '-'
       ),
+      tooltipTitle: token?.supply || '0',
     },
     {
       field: t('holderCount'),
@@ -256,7 +256,7 @@ const Token: React.FC<Props> = () => {
               <div className={styles.infoTitle}>
                 {t(`tokenInfo`)}
                 {token?.eth_type === 'ERC20' ? (
-                  <Tooltip title={t('import-token-into-metamask')} placement="top">
+                  <div className="tooltip" data-tooltip={t('import-token-into-metamask')}>
                     <img
                       src="/logos/metamask.png"
                       alt="MetaMask"
@@ -264,7 +264,7 @@ const Token: React.FC<Props> = () => {
                       title={t('import-into-metamask')}
                       onClick={handleImportIntoMetamask}
                     />
-                  </Tooltip>
+                  </div>
                 ) : null}
               </div>
             }

@@ -134,7 +134,7 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
 
   return (
     <div className={styles.container} data-is-filter-unnecessary={isFilterUnnecessary}>
-      <Table>
+      <Table style={{ overflow: 'unset' }}>
         <thead>
           <tr>
             <th>{t('txHash')}</th>
@@ -167,6 +167,8 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
 
               const method = item.method_name || item.method_id
 
+              console.log(method, 'method')
+
               return (
                 <tr key={hash}>
                   <td>
@@ -184,7 +186,12 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
                   </td>
                   <td>
                     {method ? (
-                      <div title={method} className={`${styles.method} tooltip`} data-tooltip={item.method_id}>
+                      <div
+                        title={method}
+                        className={`${styles.method} tooltip`}
+                        data-tooltip={item.method_id}
+                        style={{ overflow: 'unset' }}
+                      >
                         {method}
                       </div>
                     ) : (
