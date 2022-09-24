@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
 import NextLink from 'next/link'
@@ -208,11 +208,19 @@ const TokenApprovalList: React.FC<TokenApprovalListProps & { maxCount?: string; 
     function: '',
     args: [],
   })
+  const [callWrite, setCallWrite] = useState(false)
 
   /* wagmi hooks */
   const { chain } = useNetwork()
   const targetChainId = IS_MAINNET ? mainnet.id : testnet.id
-  const { switchNetwork, isLoading: isSwitchingNetwork } = useSwitchNetwork()
+  const { switchNetwork, isLoading: isSwitchingNetwork } = useSwitchNetwork({
+    onSuccess: () => {
+      setAlert({ open: true, type: 'success', msg: t('switch_network_success') })
+    },
+    onError: () => {
+      setAlert({ open: true, type: 'error', msg: t('user-rejected') })
+    },
+  })
   const { config, isLoading: isPreparingContract } = usePrepareContractWrite({
     chainId: targetChainId,
     addressOrName: currentContract.address,
@@ -232,11 +240,11 @@ const TokenApprovalList: React.FC<TokenApprovalListProps & { maxCount?: string; 
   const { isLoading: isRevokeTxnLoading } = useWaitForTransaction({
     hash: revokeTxn?.hash,
   })
-  const { connect, connectors } = useConnect({
+  const { connect, connectors, isSuccess } = useConnect({
     chainId: targetChainId,
     onError(error) {
       if (error instanceof ConnectorAlreadyConnectedError) {
-        write()
+        return
       } else if (error instanceof ConnectorNotFoundError) {
         setAlert({ open: true, type: 'error', msg: t('ethereum-is-not-injected', { ns: 'tokens' }) })
       } else {
@@ -245,7 +253,7 @@ const TokenApprovalList: React.FC<TokenApprovalListProps & { maxCount?: string; 
     },
   })
   const connector = connectors[0] // only have metamask for now
-  const { address: connectedAddr, isConnecting: isConnectingAccount } = useAccount()
+  const { address: connectedAddr, isConnecting: isConnectingAccount, isConnected } = useAccount()
 
   const handleSortClick = (type: string) => (e: React.MouseEvent<HTMLOrSVGImageElement>) => {
     const {
@@ -267,6 +275,18 @@ const TokenApprovalList: React.FC<TokenApprovalListProps & { maxCount?: string; 
     isConnectingAccount ||
     !connector.ready ||
     isRevokeTxnLoading
+
+  useEffect(() => {
+    if (callWrite) {
+      if (chain && chain.id !== targetChainId) {
+        switchNetwork?.(targetChainId)
+      }
+      if (chain && chain?.id === targetChainId) {
+        write?.()
+      }
+    }
+    setCallWrite(false)
+  }, [callWrite, chain, switchNetwork, targetChainId, write])
 
   return (
     <div className={styles.container} data-is-filter-unnecessary={isFilterUnnecessary}>
@@ -350,7 +370,7 @@ const TokenApprovalList: React.FC<TokenApprovalListProps & { maxCount?: string; 
                         <button
                           className={styles.revoke}
                           disabled={disabled}
-                          onClick={async () => {
+                          onClick={() => {
                             const mapEthTypeToABI = {
                               [GraphQLSchema.TokenType.ERC20]: {
                                 address: item.token_contract_address_hash,
@@ -371,15 +391,14 @@ const TokenApprovalList: React.FC<TokenApprovalListProps & { maxCount?: string; 
                                 args: [item.spender_address_hash, false],
                               },
                             }
-                            setCurrentContract(mapEthTypeToABI[item.udt.eth_type])
 
-                            // open metamask and connect to wallet
-                            if (!chain || chain.id !== targetChainId) {
+                            if (!isConnected) {
                               setAlert({ open: true, type: 'warning', msg: t('please-connect-mm') })
-                              // switch chain if connect to another chain
-                              switchNetwork?.(targetChainId)
+                              connect({ connector, chainId: targetChainId })
                             }
-                            connect({ connector, chainId: targetChainId })
+
+                            setCurrentContract(mapEthTypeToABI[item.udt.eth_type])
+                            setCallWrite(true)
                           }}
                         >
                           {t('revoke')} <DisconnectIcon />

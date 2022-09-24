@@ -75,5 +75,6 @@
   "connect-mm-fail": "Connect MetaMask failed",
   "revoke-success": "Revoke success",
   "user-rejected": "User rejected request",
-  "please-connect-mm": "Please connect to MetaMask first"
+  "please-connect-mm": "Please connect to MetaMask first",
+  "switch_network_success": "Switch network success"
 }
