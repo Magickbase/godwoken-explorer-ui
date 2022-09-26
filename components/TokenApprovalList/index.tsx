@@ -213,7 +213,7 @@ const TokenApprovalList: React.FC<TokenApprovalListProps & { maxCount?: string; 
   /* wagmi hooks */
   const { chain } = useNetwork()
   const targetChainId = IS_MAINNET ? mainnet.id : testnet.id
-  const { switchNetwork, isLoading: isSwitchingNetwork } = useSwitchNetwork({
+  const { switchNetwork } = useSwitchNetwork({
     onSuccess: () => {
       setAlert({ open: true, type: 'success', msg: t('switch_network_success') })
     },
@@ -253,7 +253,7 @@ const TokenApprovalList: React.FC<TokenApprovalListProps & { maxCount?: string; 
     },
   })
   const connector = connectors[0] // only have metamask for now
-  const { address: connectedAddr, isConnecting: isConnectingAccount, isConnected } = useAccount()
+  const { address: connectedAddr, isConnected } = useAccount()
 
   const handleSortClick = (type: string) => (e: React.MouseEvent<HTMLOrSVGImageElement>) => {
     const {
@@ -268,13 +268,7 @@ const TokenApprovalList: React.FC<TokenApprovalListProps & { maxCount?: string; 
   }
 
   const isOwner = connectedAddr ? (id as string).toLowerCase() === connectedAddr.toLowerCase() : true
-  const disabled =
-    !isOwner ||
-    isSwitchingNetwork ||
-    isPreparingContract ||
-    isConnectingAccount ||
-    !connector.ready ||
-    isRevokeTxnLoading
+  const disabled = !isOwner || isPreparingContract || !connector.ready || isRevokeTxnLoading
 
   useEffect(() => {
     if (callWrite) {
