@@ -1,8 +1,9 @@
-import { AlertProps, SnackbarProps, Snackbar, Alert as MuiAlert } from '@mui/material'
+import { AlertProps, SnackbarProps, Snackbar, Alert as MuiAlert, AlertColor } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import CancelIcon from '@mui/icons-material/Cancel'
 import ErrorIcon from '@mui/icons-material/Error'
+import { useEffect, useState } from 'react'
 
 const StyledSnackbar = styled((props: SnackbarProps) => <Snackbar {...props} />)(({ theme }) => ({
   '&.MuiSnackbar-root': {
@@ -70,6 +71,17 @@ const Alert: React.FC<SnackbarProps & { content: string; type: 'error' | 'succes
   type,
   ...rest
 }) => {
+  const [internalState, setInternalState] = useState<{ content: string; type: AlertColor }>()
+
+  useEffect(() => {
+    if (type) {
+      setInternalState(prev => ({ ...prev, type }))
+    }
+    if (content) {
+      setInternalState(prev => ({ ...prev, content }))
+    }
+  }, [type, content])
+
   return (
     <StyledSnackbar
       anchorOrigin={{
@@ -82,11 +94,11 @@ const Alert: React.FC<SnackbarProps & { content: string; type: 'error' | 'succes
     >
       <div>
         <StyledAlert
-          severity={type}
+          severity={internalState?.type}
           variant="filled"
           iconMapping={{ error: <CancelIcon />, success: <CheckCircleIcon />, warning: <ErrorIcon /> }}
         >
-          {content}
+          {internalState?.content}
         </StyledAlert>
       </div>
     </StyledSnackbar>
