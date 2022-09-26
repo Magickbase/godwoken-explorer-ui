@@ -267,8 +267,8 @@ const TokenApprovalList: React.FC<TokenApprovalListProps & { maxCount?: string; 
     )
   }
 
-  const isOwner = connectedAddr ? (id as string).toLowerCase() === connectedAddr.toLowerCase() : true
-  const disabled = !isOwner || isPreparingContract || !connector.ready || isRevokeTxnLoading
+  const isOwner = connectedAddr ? (id as string).toLowerCase() === connectedAddr.toLowerCase() : false
+  const disabled = (isConnected && !isOwner) || isPreparingContract || !connector.ready || isRevokeTxnLoading
 
   useEffect(() => {
     if (callWrite) {
@@ -359,7 +359,7 @@ const TokenApprovalList: React.FC<TokenApprovalListProps & { maxCount?: string; 
                     <Address address={item.spender_address_hash} />
                   </td>
                   <td>
-                    <Tooltip title={!isOwner ? t('not_owner') : t('click_to_revoke')} placement="top">
+                    <Tooltip title={isConnected && !isOwner ? t('not_owner') : t('click_to_revoke')} placement="top">
                       <span>
                         <button
                           className={styles.revoke}
@@ -387,7 +387,7 @@ const TokenApprovalList: React.FC<TokenApprovalListProps & { maxCount?: string; 
                             }
 
                             if (!isConnected) {
-                              setAlert({ open: true, type: 'warning', msg: t('please-connect-mm') })
+                              // setAlert({ open: true, type: 'warning', msg: t('please-connect-mm') })
                               connect({ connector, chainId: targetChainId })
                             }
 
