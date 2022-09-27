@@ -53,7 +53,9 @@
     "block_from": "Block Number",
     "block_to": "Block Number",
     "address_from": "Search by address",
-    "address_to": "Search by address"
+    "address_to": "Search by address",
+    "asset": "Asset",
+    "token_type": "Token Type"
   },
   "n_kinds_in_total": "{{number}} Kinds in Total",
   "no_related_content": "No related content",
@@ -61,5 +63,18 @@
   "tx_in_mem_pool": "Txns in pool",
   "view-filter": "View Filter",
   "view-pending-txs": "View pending transactions",
-  "token_amount": "Token Amount"
+  "token_amount": "Token Amount",
+  "last_update_time": "Last Update Time",
+  "asset": "Asset",
+  "token_type": "Token Type",
+  "approved_type": "Approved Type",
+  "approved_spender": "Approved spender",
+  "revoke": "Revoke",
+  "click_to_revoke": "Click to revoke",
+  "not_owner": "Only account owner can revoke",
+  "connect-mm-fail": "Connect MetaMask failed",
+  "revoke-success": "Revoke success",
+  "user-rejected": "User rejected request",
+  "please-connect-mm": "Please connect to MetaMask first",
+  "switch_network_success": "Switch network success"
 }

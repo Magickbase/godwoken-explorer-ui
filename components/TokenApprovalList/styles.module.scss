@@ -1,0 +1,55 @@
+@import '../../styles/mixin.scss';
+
+.container {
+  th,
+  td {
+    &:last-child {
+      text-align: right;
+    }
+  }
+  &[data-is-filter-unnecessary='true'] {
+    th {
+      svg {
+        display: none;
+      }
+    }
+  }
+  svg {
+    cursor: pointer;
+    margin-left: 8px;
+    &[data-order='DESC'] {
+      transform: rotate(0.5turn);
+    }
+  }
+}
+
+.asset {
+  display: flex;
+  align-items: center;
+  column-gap: 0.5rem;
+}
+
+.revoke {
+  width: 80px;
+  height: 40px;
+  background: var(--primary-color);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  svg {
+    margin-left: 0.25rem;
+  }
+  &[disabled] {
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 0.6;
+  }
+}
+
+.noRecords {
+  @include empty-list;
+}

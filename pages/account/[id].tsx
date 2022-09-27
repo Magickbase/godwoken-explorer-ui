@@ -29,8 +29,10 @@ import CopyBtn from 'components/CopyBtn'
 import QRCodeBtn from 'components/QRCodeBtn'
 import PageTitle from 'components/PageTitle'
 import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
+import TokenApprovalList, { fetchTokenApprovalList } from 'components/TokenApprovalList'
 import { SIZES } from 'components/PageSize'
-import { fetchBridgedRecordList, fetchEventLogsListByType, isEthAddress, GraphQLSchema } from 'utils'
+import { fetchBridgedRecordList, fetchEventLogsListByType, isEthAddress, GraphQLSchema, wagmiClient } from 'utils'
+import { WagmiConfig } from 'wagmi'
 import styles from './styles.module.scss'
 
 const isSmartContractAccount = (account: AccountOverviewProps['account']): account is PolyjuiceContract => {
@@ -48,6 +50,10 @@ const Account = () => {
       block_to = null,
       page = '1',
       page_size = SIZES[1],
+      sort_time = 'ASC',
+      sort_asset = 'ASC',
+      sort_token_type = 'ASC',
+      token_type = null,
     },
   } = useRouter()
   const [t] = useTranslation(['account', 'common'])
@@ -155,6 +161,26 @@ const Account = () => {
     { enabled: tab === 'erc-1155-assets' && !!q.address },
   )
 
+  const { isLoading: isTokenApprovalsLoading, data: tokenApprovalsList } = useQuery(
+    // TODO: add sorter after api ready
+    ['account-token-approvals-list', id, token_type],
+    () =>
+      fetchTokenApprovalList({
+        address: id as string,
+        before: before as string,
+        after: after as string,
+        limit: +page_size,
+        token_type: token_type as GraphQLSchema.TokenType,
+        // TODO: add sorter after api ready
+        // sorter: [
+        //   { sort_type: sort_time as GraphQLSchema.SortType, sort_value: GraphQLSchema.TokenApprovalsSorter.Id },
+        //   { sort_type: sort_asset as GraphQLSchema.SortType, sort_value: GraphQLSchema.TokenApprovalsSorter.Id },
+        //   { sort_type: sort_token_type as GraphQLSchema.SortType, sort_value: GraphQLSchema.TokenApprovalsSorter.Id },
+        // ],
+      }),
+    { enabled: tab === 'token-approvals' && !!id },
+  )
+
   /* is script hash supported? */
   const downloadItems = account?.eth_address
     ? [
@@ -187,6 +213,9 @@ const Account = () => {
     // [GraphQLSchema.AccountType.EthUser, GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType)
     //   ? { label: t('erc1155Assets'), key: 'erc-1155-assets' }
     //   : null,
+    [GraphQLSchema.AccountType.EthUser].includes(accountType)
+      ? { label: t('tokenApproval'), key: 'token-approvals' }
+      : null,
     [GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType) &&
     isSmartContractAccount(account) &&
     account.smart_contract?.abi
@@ -265,6 +294,15 @@ const Account = () => {
           {tab === 'erc-1155-assets' ? (
             !isERC1155InventoryListLoading && erc1155InventoryList ? (
               <ERC1155InventoryList inventory={erc1155InventoryList} viewer={q.address} />
+            ) : (
+              <Skeleton animation="wave" />
+            )
+          ) : null}
+          {tab === 'token-approvals' ? (
+            !isTokenApprovalsLoading && tokenApprovalsList ? (
+              <WagmiConfig client={wagmiClient}>
+                <TokenApprovalList list={tokenApprovalsList} />
+              </WagmiConfig>
             ) : (
               <Skeleton animation="wave" />
             )
