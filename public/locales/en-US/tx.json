@@ -31,7 +31,6 @@
   "committed": "committed",
   "finalized": "finalized",
   "emptyTxList": "No transactions found",
-  "txHashCopied": "Transaction hash copied to clipboard",
   "interactedContract": "Interact with Contract",
   "erc20Receiver": "ERC20 Transfer Receiver",
   "erc20Sender": "ERC20 Transfer Sender",
@@ -41,6 +40,7 @@
   "utf8Input": "UTF8",
   "erc20_records": "ERC20 Transfers",
   "deployed_contract": "Deployed Contract",
+  "created_account": "Created Account",
   "logs": "Logs",
   "txReceiptEventLogs": "Transaction Receipt Event Logs",
   "noLogs": "No logs from this transaction",
@@ -54,5 +54,6 @@
   "txReceiptRawData": "Transaction Receipt",
   "noData": "No Data",
   "check": "Check",
-  "ERC20Records": "ERC20 Transfers"
+  "ERC20Records": "ERC20 Transfers",
+  "method": "method"
 }

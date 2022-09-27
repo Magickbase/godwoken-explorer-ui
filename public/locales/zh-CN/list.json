@@ -27,6 +27,7 @@
   "gas_used": "gas 消耗",
   "gas_limit": "gas 上限",
   "rank": "排序",
+  "quantity": "数量",
   "address": "地址",
   "balance": "余额",
   "percentage": "百分比",
@@ -57,9 +58,11 @@
   },
   "n_kinds_in_total": "共计 {{number}} 种",
   "no_related_content": "没有相关数据",
+  "token_id": "Token ID",
   "tx_in_mem_pool": "交易池中的交易",
   "view-filter": "查看筛选条件",
   "view-pending-txs": "查看交易池中的交易",
+  "token_amount": "数量",
   "last_update_time": "最近更新时间",
   "asset": "资产",
   "token_type": "代币类型",
@@ -68,5 +71,9 @@
   "revoke": "撤销",
   "click_to_revoke": "点击撤销许可",
   "not_owner": "只有账户持有人可以撤销",
-  "revoke-success": "撤销成功"
+  "connect-mm-fail": "连接 MetaMask 失败",
+  "revoke-success": "撤销成功",
+  "user-rejected": "请求被拒绝",
+  "please-connect-mm": "请先连接到 MetaMask",
+  "switch_network_success": "切换网络成功"
 }

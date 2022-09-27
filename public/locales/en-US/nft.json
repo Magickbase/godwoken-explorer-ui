@@ -1,0 +1,19 @@
+{
+  "nft-collections": "NFT Collections",
+  "nft-collection": "NFT Collection",
+  "info": "info",
+  "stats": "stats",
+  "type": "type",
+  "contract": "contract",
+  "holder_count": "Holder Count",
+  "minted_count": "Minted Count",
+  "activity": "activity",
+  "holders": "holders",
+  "inventory": "inventory",
+  "token": "Token",
+  "address": "Address",
+  "erc-721": "ERC 721",
+  "token-id": "Token ID",
+  "owner": "Owner",
+  "name": "Name"
+}

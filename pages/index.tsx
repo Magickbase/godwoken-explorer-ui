@@ -30,7 +30,7 @@ import Search from 'components/Search'
 import Tooltip from 'components/Tooltip'
 import BlockStateIcon from 'components/BlockStateIcon'
 import TxStatusIcon from 'components/TxStatusIcon'
-import { fetchHome, timeDistance, formatInt, client, GraphQLSchema, IS_MAINNET, getBlockStatus } from 'utils'
+import { fetchHome, timeDistance, formatInt, client, GraphQLSchema, IS_MAINNET } from 'utils'
 type State = API.Home.Parsed
 
 // TODO: add polyjuice status
@@ -149,7 +149,7 @@ const Statistic: React.FC<State['statistic'] & { isLoading: boolean }> = ({
       setStats(start => ({
         blockHeight: calclateCurValue(progress, +blockCount - 1, +start.blockHeight),
         txCount: calclateCurValue(progress, +txCount, +start.txCount),
-        tps: calclateCurValue(progress, +tps, +start.tps),
+        tps: calclateCurValue(progress, +tps * 10, +start.tps * 10) / 10,
         accountCount: calclateCurValue(progress, +accountCount, +start.accountCount),
         averageBlockTime: calclateCurValue(progress, +averageBlockTime, start.averageBlockTime),
       }))
@@ -493,7 +493,7 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
                           </Box>
                         </Tooltip>
                         <TxStatusIcon
-                          status={getBlockStatus(tx.block?.status)}
+                          status={tx.block?.status}
                           isSuccess={
                             tx.polyjuice ? tx.polyjuice.status === GraphQLSchema.PolyjuiceStatus.Succeed : true
                           }
@@ -640,7 +640,7 @@ const Home = () => {
   return (
     <Box sx={{ pb: { xs: 5, md: 11 } }}>
       <Box sx={{ bgcolor: 'primary.light' }}>
-        <Container sx={{ px: { md: 3, lg: 0 } }}>
+        <Container sx={{ px: { xs: 2, md: 2, lg: 0 } }}>
           <Search />
         </Container>
         <Container sx={{ px: { md: 3, lg: 0 }, pr: { xs: 0 } }}>

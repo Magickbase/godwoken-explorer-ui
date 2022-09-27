@@ -1,0 +1,57 @@
+@import '../../styles/mixin.scss';
+
+.container {
+  @include main-center;
+  h5 {
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    @media screen and (max-width: 1024px) {
+      margin: 0.5rem;
+    }
+  }
+}
+.title {
+  display: flex;
+  align-items: center;
+  span {
+    margin-left: 0.5rem;
+  }
+}
+
+.overview {
+  display: flex;
+  dd {
+    white-space: breaks-spaces;
+    word-break: break-all;
+  }
+
+  @media screen and (min-width: 1024px) {
+    padding-bottom: 2rem;
+    & > div {
+      flex: 1;
+      &:first-child {
+        margin-right: 1rem;
+      }
+      &:last-child {
+        margin-left: 1rem;
+      }
+    }
+  }
+
+  @media screen and (max-width: 1024px) {
+    flex-direction: column;
+    & > div {
+      margin-bottom: 1rem;
+    }
+  }
+}
+
+.list {
+  background-color: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
+  @media screen and (max-width: 1024px) {
+    border-radius: 0.5rem;
+  }
+}

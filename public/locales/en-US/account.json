@@ -86,8 +86,10 @@
   "anonymous_response": "anonymous response",
   "connected_addr": "Connected Address:",
   "checking": "Checking...",
-  "connect-mm-fail": "Connect MetaMask failed",
-  "user-rejected": "User rejected request",
-  "please-connect-mm": "Please connect to MetaMask first",
-  "switch-to-network": "Please connect to {{network}}"
+  "ERC1155": "ERC-1155",
+  "ERC20": "ERC-20",
+  "ERC721": "ERC-721",
+  "erc721Assets": "ERC 721 Assets",
+  "erc1155Assets": "ERC 1155 Assets",
+  "erc20Assets": "ERC 20 Assets"
 }

@@ -86,8 +86,10 @@
   "anonymous_response": " 匿名返回值",
   "connected_addr": " 已连接地址:",
   "checking": "检查中...",
-  "connect-mm-fail": "连接 MetaMask 失败",
-  "user-rejected": "请求被拒绝",
-  "please-connect-mm": "请先连接到 MetaMask",
-  "switch-to-network": "请连接到 {{network}}"
+  "ERC1155": "ERC-1155",
+  "ERC20": "ERC-20",
+  "ERC721": "ERC-721",
+  "erc721Assets": "ERC 721 资产",
+  "erc1155Assets": "ERC 1155 资产",
+  "erc20Assets": "ERC 20 资产"
 }

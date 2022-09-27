@@ -60,7 +60,7 @@ const TxList = () => {
     return (
       <>
         <SubpageHead subtitle={title} />
-        <Container sx={{ px: { xs: 2, sm: 3, md: 2, lg: 0 }, pb: { xs: 5.5, md: 11 } }}>
+        <Container sx={{ px: { xs: 2, lg: 0 }, pb: { xs: 5.5, md: 11 } }}>
           <PageTitle>
             <Typography variant="inherit" display="inline" pr={1}>
               {title}
@@ -147,12 +147,8 @@ const TxList = () => {
   return (
     <>
       <SubpageHead subtitle={title} />
-      <Container sx={{ px: { xs: 2, sm: 3, md: 2, lg: 0 }, pb: { xs: 5.5, md: 11 } }}>
-        <PageTitle>
-          <Typography variant="inherit" display="inline" pr={1}>
-            {title}
-          </Typography>
-        </PageTitle>
+      <Container sx={{ px: { xs: 2, lg: 0 }, pb: { xs: 5.5, md: 11 } }}>
+        <PageTitle>{title}</PageTitle>
         <Box
           sx={{
             borderRadius: {
@@ -163,13 +159,19 @@ const TxList = () => {
               xs: '0.5px solid #F0F0F0',
               md: '1px solid #F0F0F0',
             },
-            pt: { xs: 1.5, md: 2 },
             mt: { xs: 2, md: 3 },
             bgcolor: '#fff',
           }}
         >
           {txList.entries.length >= 2 ? (
-            <Stack direction="row" flexWrap="wrap" alignItems="center" mb={{ xs: 1.5, md: 2 }} px={{ xs: 1.5, md: 3 }}>
+            <Stack
+              direction="row"
+              flexWrap="wrap"
+              alignItems="center"
+              mb={{ xs: 1.5, md: 2 }}
+              px={{ xs: 1.5, md: 3 }}
+              pt={{ xs: 1.5, md: 2 }}
+            >
               <Typography variant="inherit" color="secondary" fontWeight={500} fontSize={{ xs: 14, md: 16 }}>
                 {isPendingList
                   ? t('tx_in_mem_pool')

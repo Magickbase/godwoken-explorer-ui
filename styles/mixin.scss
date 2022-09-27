@@ -1,10 +1,10 @@
 @mixin main-center {
   width: 100%;
   max-width: var(--main-center-width);
-  margin: 0rem auto 1rem;
+  margin: 0rem auto 5.5rem;
   @media screen and (max-width: 1232px) {
     box-sizing: border-box;
-    margin: 0 0 1rem;
+    margin: 0 0 2.75rem;
     padding: 0 1rem;
     max-width: unset;
   }
@@ -31,4 +31,19 @@
   @media screen and (max-width: 1024px) {
     padding: 5.625rem 0;
   }
+}
+
+@mixin tx-method {
+  width: min-content;
+  max-width: 95px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.875rem;
+  color: var(--primary-text-color);
+  padding: 6px 8px;
+  background: #fafafa;
+  line-height: 1;
+  border-radius: 8px;
+  user-select: all;
+  cursor: default;
 }

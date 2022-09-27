@@ -47,7 +47,7 @@ export interface PolyjuiceContract extends AccountBase {
     | 'abi'
     | 'constructor_arguments'
   > | null
-  udt: Pick<GraphQLSchema.Udt, 'id' | 'name' | 'official_site' | 'description' | 'icon'> | null
+  udt: Pick<GraphQLSchema.Udt, 'id' | 'name' | 'official_site' | 'description' | 'icon' | 'eth_type'> | null
 }
 export interface PolyjuiceCreator extends AccountBase {
   type: GraphQLSchema.AccountType.PolyjuiceCreator
@@ -112,6 +112,9 @@ const accountOverviewQuery = gql`
         contract_source_code
         constructor_arguments
         abi
+      }
+      udt {
+        eth_type
       }
     }
   }

@@ -31,7 +31,6 @@
   "committed": "已提交",
   "finalized": "已确认",
   "emptyTxList": "没有交易",
-  "txHashCopied": "交易哈希已复制",
   "interactedContract": "与合约交互",
   "erc20Receiver": "ERC20 接收账户",
   "erc20Sender": "ERC20 发送账户",
@@ -41,6 +40,7 @@
   "utf8Input": "UTF8",
   "erc20_records": "ERC20 交易记录",
   "deployed_contract": "已部署合约",
+  "created_account": "已创建账户",
   "logs": "日志",
   "txReceiptEventLogs": "交易收据事件日志",
   "noLogs": "此交易没有日志",
@@ -54,5 +54,6 @@
   "txReceiptRawData": "交易回执",
   "noData": "没有数据",
   "check": "查看",
-  "ERC20Records": "ERC20 交易记录"
+  "ERC20Records": "ERC20 交易记录",
+  "method": "方法"
 }

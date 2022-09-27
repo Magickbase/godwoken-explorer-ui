@@ -45,7 +45,7 @@ const BlockList = () => {
     return (
       <>
         <SubpageHead subtitle={title} />
-        <Container sx={{ px: { xs: 2, sm: 3, md: 2, lg: 0 }, pb: { xs: 5.5, md: 11 } }}>
+        <Container sx={{ px: { xs: 2, lg: 0 }, pb: { xs: 5.5, md: 11 } }}>
           <PageTitle>
             <Typography variant="inherit" display="inline" pr={1}>
               {title}
@@ -124,7 +124,7 @@ const BlockList = () => {
   return (
     <>
       <SubpageHead subtitle={title} />
-      <Container sx={{ px: { xs: 2, sm: 3, md: 2, lg: 0 }, pb: { xs: 5.5, md: 11 } }}>
+      <Container sx={{ px: { xs: 2, lg: 0 }, pb: { xs: 5.5, md: 11 } }}>
         <PageTitle>
           <Typography variant="inherit" display="inline" pr={1}>
             {title}
