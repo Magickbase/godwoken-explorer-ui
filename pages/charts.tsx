@@ -85,7 +85,7 @@ const Charts = (initState: State) => {
   return (
     <>
       <SubpageHead subtitle={title} />
-      <Container sx={{ pt: 2, pb: { xs: 5.5, md: 11 }, px: { xs: 2, sm: 3, md: 2, lg: 0 } }}>
+      <Container sx={{ pt: 2, pb: { xs: 5.5, md: 11 }, px: { xs: 2, lg: 0 } }}>
         <Alert
           severity="info"
           sx={{
