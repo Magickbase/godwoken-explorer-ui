@@ -43,6 +43,21 @@ export namespace GraphQLSchema {
     PolyjuiceCreator = 'POLYJUICE_CREATOR',
   }
 
+  export enum ApprovalType {
+    Approval = 'APPROVAL',
+    ApprovalAll = 'APPROVAL_ALL',
+  }
+
+  export enum SortType {
+    Asc = 'ASC',
+    Desc = 'DESC',
+  }
+
+  export enum TokenApprovalsSorter {
+    BlockNumber = 'BLOCK_NUMBER',
+    Id = 'ID',
+  }
+
   export interface Udt {
     account: Account
     bridge_account_id: number
@@ -219,6 +234,11 @@ export namespace GraphQLSchema {
     account: Pick<Account, 'eth_address'>
     holders_count: number
     minted_count: number
+  }
+
+  export interface TokenApprovalsSorterInput {
+    sort_type: SortType
+    sort_value: TokenApprovalsSorter
   }
 
   export interface PageMetadata {

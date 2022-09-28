@@ -57,6 +57,7 @@
   "transactionRecords": "交易记录",
   "ERC20Records": "ERC20 交易记录",
   "bridgedRecords": "桥接交易记录",
+  "tokenApproval": "代币许可",
   "contract_name": "合约名称",
   "compiler_version": "编译器版本",
   "compiler_file_format": "合约文件格式",
@@ -85,6 +86,9 @@
   "anonymous_response": " 匿名返回值",
   "connected_addr": " 已连接地址:",
   "checking": "检查中...",
+  "ERC1155": "ERC-1155",
+  "ERC20": "ERC-20",
+  "ERC721": "ERC-721",
   "erc721Assets": "ERC 721 资产",
   "erc1155Assets": "ERC 1155 资产",
   "erc20Assets": "ERC 20 资产"
