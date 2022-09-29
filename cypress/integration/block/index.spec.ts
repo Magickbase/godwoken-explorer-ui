@@ -3,11 +3,17 @@
 context('Block Page', () => {
   const hash = '0x0a9fbb868d381f65328a811ffe441f80c328400b583887731ae7195579e0ca5d'
 
-  before(() => cy.visit(`/en-US/block/${hash}`))
+  before(() =>
+    cy.visit(`/en-US/block/${hash}`, {
+      headers: {
+        'Accept-Encoding': 'gzip, deflate',
+      },
+    }),
+  )
 
   describe('block info', () => {
     it('should have title with block number', () => {
-      cy.get('h5').should('have.text', 'Block #131229')
+      cy.get('h5').should('contain.text', 'Block # 131,229')
     })
 
     it('should have block hash', () => {
@@ -169,7 +175,9 @@ context('Block Page', () => {
         .first()
         .should('have.text', 'Txn Hash')
         .next()
-        .should('have.text', 'Block')
+        .should('have.text', 'Method')
+        .next()
+        .should('contain.text', 'Block')
         .next()
         .should('have.text', 'Age')
         .next()
@@ -177,9 +185,8 @@ context('Block Page', () => {
         .next()
         .should('have.text', 'To')
         .next()
-        .should('have.text', 'Value (CKB)')
         .next()
-        .should('have.text', 'Type')
+        .should('contain.text', 'Value (pCKB)')
     })
 
     it('should have 20 record', () => {
@@ -199,6 +206,10 @@ context('Block Page', () => {
         })
         .next()
         .should(field => {
+          expect(field.text()).to.eq('-')
+        })
+        .next()
+        .should(field => {
           expect(field.text()).to.eq('131,229')
           expect(field.find('a').attr('href')).to.eq(
             '/block/0x0a9fbb868d381f65328a811ffe441f80c328400b583887731ae7195579e0ca5d',
@@ -211,11 +222,10 @@ context('Block Page', () => {
         .next()
         .should('have.text', '0x60a227...c90b8984')
         .next()
-        .should('have.text', 'POLYJUICE CREATOR')
+        .should('have.text', 'polyjuice creator')
         .next()
-        .should('have.text', '0')
         .next()
-        .should('have.text', 'polyjuice')
+        .should('have.text', '0.00000000')
     })
   })
 })
