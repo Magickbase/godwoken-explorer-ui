@@ -4,7 +4,7 @@ import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import OpenInNewIcon from 'assets/icons/open-in-new.svg'
 import ExpandIcon from 'assets/icons/expand.svg'
-import { IS_MAINNET, provider, mainnet, testnet } from 'utils'
+import { currentChain as targetChain, provider } from 'utils'
 import styles from './styles.module.scss'
 import {
   ConnectorAlreadyConnectedError,
@@ -38,7 +38,6 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
   const [writeMethods, setWriteMethods] = useState({})
 
   // wagmi hooks
-  const targetChain = IS_MAINNET ? mainnet : testnet
   const { connect, connectors } = useConnect({
     chainId: targetChain.id,
     onError(error) {

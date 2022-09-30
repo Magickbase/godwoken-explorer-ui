@@ -1,5 +1,5 @@
 import { utils, providers } from 'ethers'
-import { NODE_URL, PCKB_UDT_INFO, ZERO_ADDRESS } from './constants'
+import { NODE_URL, PCKB_UDT_INFO, ZERO_ADDRESS, IS_MAINNET } from './constants'
 import { Chain, configureChains, createClient } from 'wagmi'
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc'
 import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
@@ -63,6 +63,8 @@ export const testnet: Chain = {
   testnet: true,
 }
 
+export const currentChain = IS_MAINNET ? mainnet : testnet
+
 // wagmi config chains
 const { chains, provider: wagmiProvider } = configureChains(
   [mainnet, testnet],
@@ -81,7 +83,6 @@ export const wagmiClient = createClient({
   connectors: [new MetaMaskConnector({ chains })],
   provider: wagmiProvider,
 })
-
 // TODO: add tests after cypress is enabled
 export const getAddressDisplay = (
   account?: Pick<GraphQLSchema.Account, 'smart_contract' | 'eth_address' | 'script_hash' | 'type'>,
