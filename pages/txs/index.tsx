@@ -5,7 +5,7 @@ import NextLink from 'next/link'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useQuery } from 'react-query'
-import { Container, Typography, Box, Stack, TableContainer, Skeleton } from '@mui/material'
+import { Container, Typography, Box, Stack, TableContainer, Skeleton, Tooltip } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import Table from 'components/Table'
@@ -93,7 +93,7 @@ const TxList = () => {
               <Skeleton animation="wave" width={50} height={24} />
             </Stack>
             <TableContainer>
-              <Table style={{ overflow: 'unset' }}>
+              <Table>
                 <thead style={{ textTransform: 'capitalize', fontSize: isMobile ? 12 : 14 }}>
                   <tr>
                     <th>{t('txHash')}</th>
@@ -180,12 +180,12 @@ const TxList = () => {
                     })}
               </Typography>
               <div className={styles.filter}>
-                <div className="tooltip" data-tooltip={t('view-filter')}>
+                <Tooltip title={t('view-filter')} placement="top">
                   <label htmlFor="filter">
                     <FilterIcon />
                     <input id="filter" readOnly />
                   </label>
-                </div>
+                </Tooltip>
                 <ul>
                   <li data-active={isPendingList}>
                     <NextLink href={isPendingList ? '/txs' : 'txs?status=pending'}>

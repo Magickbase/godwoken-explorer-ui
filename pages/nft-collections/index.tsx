@@ -5,7 +5,7 @@ import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useQuery } from 'react-query'
 import { gql } from 'graphql-request'
-import { Skeleton } from '@mui/material'
+import { Skeleton, Tooltip } from '@mui/material'
 import SubpageHead from 'components/SubpageHead'
 import PageTitle from 'components/PageTitle'
 import Table from 'components/Table'
@@ -106,7 +106,7 @@ const NftCollectionList = () => {
             </span>
             {list?.metadata.total_count ? <Pagination {...list.metadata} /> : null}
           </div>
-          <Table style={{ overflow: 'unset' }}>
+          <Table>
             <thead>
               <tr>
                 <th>
@@ -138,12 +138,14 @@ const NftCollectionList = () => {
                       </td>
                       <td className={styles.addr} title={item.account.eth_address}>
                         <HashLink label={item.account.eth_address} href={`/account/${item.account.eth_address}`} />
-                        <span className="tooltip" data-tooltip={item.account.eth_address}>
-                          <HashLink
-                            label={`${item.account.eth_address.slice(0, 8)}...${item.account.eth_address.slice(-8)}`}
-                            href={`/account/${item.account.eth_address}`}
-                          />
-                        </span>
+                        <Tooltip title={item.account.eth_address} placement="top">
+                          <span>
+                            <HashLink
+                              label={`${item.account.eth_address.slice(0, 8)}...${item.account.eth_address.slice(-8)}`}
+                              href={`/account/${item.account.eth_address}`}
+                            />
+                          </span>
+                        </Tooltip>
                       </td>
                       <td title={item.holders_count.toLocaleString('en')}>{item.holders_count.toLocaleString('en')}</td>
                       <td title={item.minted_count.toLocaleString('en')}>{item.minted_count.toLocaleString('en')}</td>

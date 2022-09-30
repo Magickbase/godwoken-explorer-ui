@@ -17,11 +17,11 @@ const InfoList: React.FC<{
   const midIndex = Math.floor(list.length / 2)
 
   return (
-    <div className={`${styles.container} ${className}`} style={style}>
+    <div className={`${styles.container} ${className}`} style={style} data-testid="infoList">
       <div role="list" className={styles.list} data-type={type}>
         {title ? (
           <dl role="listitem" className={styles.title}>
-            <dt>{title}</dt>
+            <dt data-testid="title">{title}</dt>
           </dl>
         ) : null}
         {list
@@ -44,6 +44,7 @@ const InfoList: React.FC<{
                   data-tooltip={tooltipTitle}
                   data-show-tooltip={!!tooltipTitle}
                   data-expandable={expandable}
+                  data-testid="item-content"
                 >
                   {content}
                 </dd>

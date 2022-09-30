@@ -14,6 +14,7 @@ import NoDataIcon from 'assets/icons/no-data.svg'
 import EmptyFilteredListIcon from 'assets/icons/empty-filtered-list.svg'
 import { timeDistance, GraphQLSchema, client, PCKB_UDT_INFO } from 'utils'
 import styles from './styles.module.scss'
+import { Tooltip } from '@mui/material'
 
 export type TxListProps = {
   transactions: {
@@ -134,7 +135,7 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
 
   return (
     <div className={styles.container} data-is-filter-unnecessary={isFilterUnnecessary}>
-      <Table style={{ overflow: 'unset' }}>
+      <Table>
         <thead>
           <tr>
             <th>{t('txHash')}</th>
@@ -166,16 +167,15 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
               }
 
               const method = item.method_name || item.method_id
-
-              console.log(method, 'method')
-
               return (
                 <tr key={hash}>
                   <td>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <div className="tooltip" data-tooltip={hash} style={{ paddingRight: 4 }}>
-                        <HashLink label={`${hash.slice(0, 8)}...${hash.slice(-8)}`} href={`/tx/${hash}`} />
-                      </div>
+                      <Tooltip title={hash} placement="top">
+                        <div style={{ paddingRight: 4 }}>
+                          <HashLink label={`${hash.slice(0, 8)}...${hash.slice(-8)}`} href={`/tx/${hash}`} />
+                        </div>
+                      </Tooltip>
                       <TxStatusIcon
                         status={item.block?.status}
                         isSuccess={
@@ -186,14 +186,11 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
                   </td>
                   <td>
                     {method ? (
-                      <div
-                        title={method}
-                        className={`${styles.method} tooltip`}
-                        data-tooltip={item.method_id}
-                        style={{ overflow: 'unset' }}
-                      >
-                        {method}
-                      </div>
+                      <Tooltip title={item.method_id} placement="top">
+                        <div className={styles.method} title={method}>
+                          {method}
+                        </div>
+                      </Tooltip>
                     ) : (
                       <div className={styles.method} data-is-native-transfer="true" />
                     )}

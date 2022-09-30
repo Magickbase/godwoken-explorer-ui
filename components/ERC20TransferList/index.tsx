@@ -13,6 +13,7 @@ import ChangeIcon from 'assets/icons/change.svg'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import { client, timeDistance, GraphQLSchema } from 'utils'
 import styles from './styles.module.scss'
+import { Tooltip } from '@mui/material'
 
 export type TransferListProps = {
   token_transfers: {
@@ -151,7 +152,7 @@ const TransferList: React.FC<
 
   return (
     <div className={styles.container}>
-      <Table style={{ overflow: 'unset' }}>
+      <Table>
         <thead>
           <tr>
             <th>{t('txHash')}</th>
@@ -178,14 +179,16 @@ const TransferList: React.FC<
                 <tr key={item.transaction_hash + item.log_index}>
                   <td>
                     <div className={styles.hash}>
-                      <span className="tooltip" data-tooltip={item.transaction_hash}>
-                        <NextLink href={`/tx/${item.transaction_hash}`}>
-                          <a className="mono-font">{`${item.transaction_hash.slice(
-                            0,
-                            8,
-                          )}...${item.transaction_hash.slice(-8)}`}</a>
-                        </NextLink>
-                      </span>
+                      <Tooltip title={item.transaction_hash} placement="top">
+                        <span>
+                          <NextLink href={`/tx/${item.transaction_hash}`}>
+                            <a className="mono-font">{`${item.transaction_hash.slice(
+                              0,
+                              8,
+                            )}...${item.transaction_hash.slice(-8)}`}</a>
+                          </NextLink>
+                        </span>
+                      </Tooltip>
                       <TxStatusIcon
                         status={item.block.status}
                         isSuccess={item.polyjuice.status === GraphQLSchema.PolyjuiceStatus.Succeed}
