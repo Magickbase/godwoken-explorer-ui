@@ -1,21 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
 import NextLink from 'next/link'
 import { gql } from 'graphql-request'
-import {
-  ConnectorAlreadyConnectedError,
-  useConnect,
-  erc20ABI,
-  erc721ABI,
-  useContractWrite,
-  usePrepareContractWrite,
-  useWaitForTransaction,
-  ConnectorNotFoundError,
-  useNetwork,
-  useSwitchNetwork,
-  useAccount,
-} from 'wagmi'
 import Table from 'components/Table'
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/SimplePagination'
@@ -23,16 +10,15 @@ import Tooltip from 'components/Tooltip'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import EmptyFilteredListIcon from 'assets/icons/empty-filtered-list.svg'
 import FilterMenu from 'components/FilterMenu'
-import { GraphQLSchema, client, formatDatetime, parseTokenName, erc1155ABI, IS_MAINNET, mainnet, testnet } from 'utils'
+import { GraphQLSchema, client, formatDatetime, parseTokenName } from 'utils'
 import { SIZES } from 'components/PageSize'
 import TokenLogo from 'components/TokenLogo'
 import Alert from 'components/Alert'
-import DisconnectIcon from 'assets/icons/disconnect.svg'
 import SortIcon from 'assets/icons/sort.svg'
 import styles from './styles.module.scss'
-import { ContractInterface } from 'ethers'
+import RevokeButton from './RevokeButton'
 
-type TokenApprovalEntryType = {
+export type TokenApprovalEntryType = {
   approved: boolean
   block: Pick<GraphQLSchema.Block, 'hash' | 'number' | 'status' | 'timestamp'>
   block_hash: string
@@ -197,63 +183,7 @@ const TokenApprovalList: React.FC<TokenApprovalListProps & { maxCount?: string; 
     type: 'success',
     msg: '',
   })
-  const [currentContract, setCurrentContract] = useState<{
-    address: string
-    abi: ContractInterface
-    function: string
-    args: any
-  }>({
-    address: '',
-    abi: [],
-    function: '',
-    args: [],
-  })
-  const [callWrite, setCallWrite] = useState(false)
-
-  /* wagmi hooks */
-  const { chain } = useNetwork()
-  const targetChainId = IS_MAINNET ? mainnet.id : testnet.id
-  const { switchNetwork } = useSwitchNetwork({
-    onSuccess: () => {
-      setAlert({ open: true, type: 'success', msg: t('switch_network_success') })
-    },
-    onError: () => {
-      setAlert({ open: true, type: 'error', msg: t('user-rejected') })
-    },
-  })
-  const { config, isLoading: isPreparingContract } = usePrepareContractWrite({
-    chainId: targetChainId,
-    addressOrName: currentContract.address,
-    contractInterface: currentContract.abi,
-    functionName: currentContract.function,
-    args: currentContract.args,
-  })
-  const { data: revokeTxn, write } = useContractWrite({
-    ...config,
-    onSuccess: () => {
-      setAlert({ open: true, type: 'success', msg: t('revoke-success') })
-    },
-    onError: () => {
-      setAlert({ open: true, type: 'error', msg: t('user-rejected') })
-    },
-  })
-  const { isLoading: isRevokeTxnLoading } = useWaitForTransaction({
-    hash: revokeTxn?.hash,
-  })
-  const { connect, connectors, isSuccess } = useConnect({
-    chainId: targetChainId,
-    onError(error) {
-      if (error instanceof ConnectorAlreadyConnectedError) {
-        return
-      } else if (error instanceof ConnectorNotFoundError) {
-        setAlert({ open: true, type: 'error', msg: t('ethereum-is-not-injected', { ns: 'tokens' }) })
-      } else {
-        setAlert({ open: true, type: 'error', msg: t('connect-mm-fail') })
-      }
-    },
-  })
-  const connector = connectors[0] // only have metamask for now
-  const { address: connectedAddr, isConnected } = useAccount()
+  const [internalEntries, setInternalEntries] = useState(entries)
 
   const handleSortClick = (type: string) => (e: React.MouseEvent<HTMLOrSVGImageElement>) => {
     const {
@@ -267,20 +197,10 @@ const TokenApprovalList: React.FC<TokenApprovalListProps & { maxCount?: string; 
     )
   }
 
-  const isOwner = connectedAddr ? (id as string).toLowerCase() === connectedAddr.toLowerCase() : true
-  const disabled = !isOwner || isPreparingContract || !connector.ready || isRevokeTxnLoading
-
-  useEffect(() => {
-    if (callWrite) {
-      if (chain && chain.id !== targetChainId) {
-        switchNetwork?.(targetChainId)
-      }
-      if (chain && chain?.id === targetChainId) {
-        write?.()
-      }
-    }
-    setCallWrite(false)
-  }, [callWrite, chain, switchNetwork, targetChainId, write])
+  // hide list item after it's revoke txn success but backend not synced yet
+  const hideItem = (txnHash: string) => {
+    setInternalEntries(internalEntries.filter(entry => entry.transaction_hash !== txnHash))
+  }
 
   return (
     <div className={styles.container} data-is-filter-unnecessary={isFilterUnnecessary}>
@@ -314,8 +234,8 @@ const TokenApprovalList: React.FC<TokenApprovalListProps & { maxCount?: string; 
           </tr>
         </thead>
         <tbody>
-          {metadata.total_count ? (
-            entries.map(item => {
+          {internalEntries.length ? (
+            internalEntries.map(item => {
               const txnHash = item.transaction_hash
               const lastUpdateTime = formatDatetime(Date.parse(item.block?.timestamp), 'YYYY-MM-DD HH:mm:ss')
 
@@ -359,49 +279,7 @@ const TokenApprovalList: React.FC<TokenApprovalListProps & { maxCount?: string; 
                     <Address address={item.spender_address_hash} />
                   </td>
                   <td>
-                    <Tooltip
-                      title={!isOwner || !connector.ready ? t('not_owner') : t('click_to_revoke')}
-                      placement="top"
-                    >
-                      <span>
-                        <button
-                          className={styles.revoke}
-                          disabled={disabled}
-                          onClick={() => {
-                            const mapEthTypeToABI = {
-                              [GraphQLSchema.TokenType.ERC20]: {
-                                address: item.token_contract_address_hash,
-                                abi: erc20ABI,
-                                function: 'approve',
-                                args: [item.spender_address_hash, 0],
-                              },
-                              [GraphQLSchema.TokenType.ERC721]: {
-                                address: item.token_contract_address_hash,
-                                abi: erc721ABI,
-                                function: 'setApprovalForAll',
-                                args: [item.spender_address_hash, false],
-                              },
-                              [GraphQLSchema.TokenType.ERC1155]: {
-                                address: item.token_contract_address_hash,
-                                abi: erc1155ABI,
-                                function: 'setApprovalForAll',
-                                args: [item.spender_address_hash, false],
-                              },
-                            }
-
-                            if (!isConnected) {
-                              // setAlert({ open: true, type: 'warning', msg: t('please-connect-mm') })
-                              connect({ connector, chainId: targetChainId })
-                            }
-
-                            setCurrentContract(mapEthTypeToABI[item.udt.eth_type])
-                            setCallWrite(true)
-                          }}
-                        >
-                          {t('revoke')} <DisconnectIcon />
-                        </button>
-                      </span>
-                    </Tooltip>
+                    <RevokeButton setAlert={setAlert} listItem={item} account={id as string} hideItem={hideItem} />
                   </td>
                 </tr>
               )

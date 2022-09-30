@@ -70,10 +70,12 @@
   "approved_type": "Approved Type",
   "approved_spender": "Approved spender",
   "revoke": "Revoke",
+  "revoking": "Revoking",
   "click_to_revoke": "Click to revoke",
   "not_owner": "Only account owner can revoke",
   "connect-mm-fail": "Connect MetaMask failed",
   "revoke-success": "Revoke success",
+  "revokeTxn-sent-success": "Transaction sent success",
   "user-rejected": "User rejected request",
   "please-connect-mm": "Please connect to MetaMask first",
   "switch_network_success": "Switch network success"
