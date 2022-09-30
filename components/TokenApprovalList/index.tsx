@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
 import NextLink from 'next/link'
@@ -183,7 +183,7 @@ const TokenApprovalList: React.FC<TokenApprovalListProps & { maxCount?: string; 
     type: 'success',
     msg: '',
   })
-  const [internalEntries, setInternalEntries] = useState(entries)
+  const [internalEntries, setInternalEntries] = useState([])
 
   const handleSortClick = (type: string) => (e: React.MouseEvent<HTMLOrSVGImageElement>) => {
     const {
@@ -197,10 +197,31 @@ const TokenApprovalList: React.FC<TokenApprovalListProps & { maxCount?: string; 
     )
   }
 
-  // hide list item after it's revoke txn success but backend not synced yet
+  // hide and cache:
+  // - the listitem has revoke txn packaged successfully in a block but backend not synced yet
   const hideItem = (txnHash: string) => {
+    localStorage.setItem(
+      'revokingItems',
+      JSON.stringify([...JSON.parse(localStorage.getItem('revokingItems') ?? '[]'), txnHash]),
+    )
     setInternalEntries(internalEntries.filter(entry => entry.transaction_hash !== txnHash))
   }
+
+  useEffect(() => {
+    // only show entries that are not in the cached revoking items list
+    let oldRevokingItems = JSON.parse(localStorage.getItem('revokingItems') ?? '[]')
+    let newInternalEntries = []
+    let newRevokingItems = []
+    entries.forEach((item: TokenApprovalEntryType) => {
+      if (oldRevokingItems.includes(item.transaction_hash)) {
+        newRevokingItems.push(item.transaction_hash)
+      } else {
+        newInternalEntries.push(item)
+      }
+    })
+    localStorage.setItem('revokingItems', JSON.stringify(newRevokingItems))
+    setInternalEntries(newInternalEntries)
+  }, [entries])
 
   return (
     <div className={styles.container} data-is-filter-unnecessary={isFilterUnnecessary}>
