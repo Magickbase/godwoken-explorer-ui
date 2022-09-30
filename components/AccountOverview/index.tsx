@@ -140,7 +140,7 @@ const checkSourcify = gql`
   }
 `
 
-type Variables = { address: string } | { script_hash: string }
+type Variables = { address: string } & { script_hash: string }
 
 export const fetchAccountOverview = (variables: Variables) =>
   client.request<Omit<AccountOverviewProps, 'balance'>>(accountOverviewQuery, variables).then(
@@ -164,11 +164,11 @@ export const fetchDeployAddress = (variables: { eth_hash: string }) =>
 
 export const fetchSourcifyStatus = (address: string) =>
   client.request<{ sourcify_check_by_addresses: { status: string | null } }>(checkSourcify, { address }).then(data => {
-    return data.sourcify_check_by_addresses[0].status
+    return data.sourcify_check_by_addresses.status
   })
 
 const overviewPlaceHolderCount = (account: AccountOverviewProps['account']) => {
-  switch (account.type) {
+  switch (account?.type) {
     case GraphQLSchema.AccountType.EthUser:
       return 0
     case GraphQLSchema.AccountType.PolyjuiceCreator:
@@ -199,7 +199,7 @@ const overviewPlaceHolderCount = (account: AccountOverviewProps['account']) => {
 const AccountOverview: React.FC<AccountOverviewProps & { refetch: () => Promise<any> }> = ({
   account,
   balance,
-  deployerAddr,
+  deployerAddr = '',
   isBalanceLoading,
   isOverviewLoading,
   refetch,
@@ -231,24 +231,56 @@ const AccountOverview: React.FC<AccountOverviewProps & { refetch: () => Promise<
     )
   }
 
+  const infoList = [
+    {
+      field: t(`ckbBalance`),
+      content: isBalanceLoading ? (
+        <Skeleton animation="wave" />
+      ) : (
+        <span className={styles.balance}>
+          <Amount amount={balance || '0'} udt={PCKB_UDT_INFO} showSymbol />
+        </span>
+      ),
+    },
+    {
+      field: t(`txCount`),
+      content: isOverviewLoading ? (
+        <Skeleton animation="wave" />
+      ) : (
+        new BigNumber(Math.max(account.nonce ?? 0, account.transaction_count ?? 0)).toFormat()
+      ),
+    },
+  ]
+
+  overviewPlaceHolderCount(account) &&
+    infoList.push({
+      field: '',
+      content: (
+        <div
+          data-role="placeholder"
+          style={{ height: `calc(${3.5 * overviewPlaceHolderCount(account)!}rem - 2rem)` }}
+        ></div>
+      ),
+    })
+
   return (
     <div className={styles.container} data-account-type={account.type}>
       {account.type === GraphQLSchema.AccountType.MetaContract ? (
         <MetaContract {...(account.script as MetaContract['script'])} />
       ) : null}
       {account.type === GraphQLSchema.AccountType.EthUser ? (
-        <User nonce={account.nonce} isLoading={isOverviewLoading} />
+        <User nonce={account.nonce} isLoading={!!isOverviewLoading} />
       ) : null}
       {account.type === GraphQLSchema.AccountType.EthAddrReg ? <EthAddrReg /> : null}
       {account.type === GraphQLSchema.AccountType.PolyjuiceContract ? (
         <SmartContract
           deployer={deployerAddr}
-          deployTxHash={account.smart_contract?.deployment_tx_hash}
+          deployTxHash={account.smart_contract?.deployment_tx_hash!}
           udt={account.udt}
-          address={account.eth_address}
+          address={account.eth_address || ''}
           isVerified={!!account.smart_contract?.contract_source_code}
           refetch={refetch}
-          isLoading={isOverviewLoading}
+          isLoading={!!isOverviewLoading}
         />
       ) : null}
       {account.type === GraphQLSchema.AccountType.PolyjuiceCreator ? (
@@ -259,41 +291,7 @@ const AccountOverview: React.FC<AccountOverviewProps & { refetch: () => Promise<
       ) : null}
       {account.type === GraphQLSchema.AccountType.Unknown ? <UnknownAccount nonce={account.nonce} /> : null}
 
-      <InfoList
-        title={t('overview')}
-        list={[
-          {
-            field: t(`ckbBalance`),
-            content: isBalanceLoading ? (
-              <Skeleton animation="wave" />
-            ) : (
-              <span className={styles.balance}>
-                <Amount amount={balance || '0'} udt={PCKB_UDT_INFO} showSymbol />
-              </span>
-            ),
-          },
-          {
-            field: t(`txCount`),
-            content: isOverviewLoading ? (
-              <Skeleton animation="wave" />
-            ) : (
-              new BigNumber(Math.max(account.nonce ?? 0, account.transaction_count ?? 0)).toFormat()
-            ),
-          },
-          overviewPlaceHolderCount(account)
-            ? {
-                field: '',
-                content: (
-                  <div
-                    data-role="placeholder"
-                    style={{ height: `calc(${3.5 * overviewPlaceHolderCount(account)}rem - 2rem)` }}
-                  ></div>
-                ),
-              }
-            : null,
-          // ...overviewPlaceHolderFields,
-        ]}
-      />
+      <InfoList title={t('overview')} list={infoList} />
     </div>
   )
 }
