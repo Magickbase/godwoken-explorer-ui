@@ -6,6 +6,7 @@ import HashLink from 'components/HashLink'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import { client, GraphQLSchema, handleNftImageLoadError } from 'utils'
 import styles from './styles.module.scss'
+import Tooltip from 'components/Tooltip'
 
 type InventoryListProps = {
   inventory: {
@@ -126,10 +127,12 @@ const NFTInventoryList: React.FC<InventoryListProps> = ({ inventory, viewer }) =
               />
             </div>
             {!viewer ? (
-              <div data-tooltip={item.address_hash} className={`${styles.info} tooltip`}>
-                <span>{t('owner')}</span>
-                <HashLink href={`/account/${item.address_hash}`} label={item.address_hash} />
-              </div>
+              <Tooltip title={item.address_hash} placement="bottom">
+                <div className={styles.info}>
+                  <span>{t('owner')}</span>
+                  <HashLink href={`/account/${item.address_hash}`} label={item.address_hash} />
+                </div>
+              </Tooltip>
             ) : null}
           </div>
         ))}

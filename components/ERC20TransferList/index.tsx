@@ -13,7 +13,7 @@ import ChangeIcon from 'assets/icons/change.svg'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import { client, timeDistance, GraphQLSchema } from 'utils'
 import styles from './styles.module.scss'
-import { Tooltip } from '@mui/material'
+import Tooltip from 'components/Tooltip'
 
 export type TransferListProps = {
   token_transfers: {

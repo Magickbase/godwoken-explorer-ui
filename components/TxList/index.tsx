@@ -14,7 +14,7 @@ import NoDataIcon from 'assets/icons/no-data.svg'
 import EmptyFilteredListIcon from 'assets/icons/empty-filtered-list.svg'
 import { timeDistance, GraphQLSchema, client, PCKB_UDT_INFO } from 'utils'
 import styles from './styles.module.scss'
-import { Tooltip } from '@mui/material'
+import Tooltip from 'components/Tooltip'
 
 export type TxListProps = {
   transactions: {
@@ -187,9 +187,7 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
                   <td>
                     {method ? (
                       <Tooltip title={item.method_id} placement="top">
-                        <div className={styles.method} title={method}>
-                          {method}
-                        </div>
+                        <div className={styles.method}>{method}</div>
                       </Tooltip>
                     ) : (
                       <div className={styles.method} data-is-native-transfer="true" />

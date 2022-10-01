@@ -8,6 +8,7 @@ import NoDataIcon from 'assets/icons/no-data.svg'
 import Amount from 'components/Amount'
 import { timeDistance, getBridgedRecordListRes, CKB_EXPLORER_URL, PCKB_UAN, PCKB_UDT_INFO } from 'utils'
 import styles from './styles.module.scss'
+import Tooltip from 'components/Tooltip'
 
 type ParsedList = ReturnType<typeof getBridgedRecordListRes>
 
@@ -57,13 +58,15 @@ const BridgedRecordList: React.FC<{ list: ParsedList; showUser?: boolean }> = ({
                 <td>
                   {r.layer1.output.hash ? (
                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <div className="tooltip" data-tooltip={r.layer1.output.hash}>
-                        <HashLink
-                          label={`${r.layer1.output.hash.slice(0, 8)}...${r.layer1.output.hash.slice(-8)}`}
-                          href={`${CKB_EXPLORER_URL}/transaction/${r.layer1.output.hash}#${r.layer1.output.index}`}
-                          external
-                        />
-                      </div>
+                      <Tooltip title={r.layer1.output.hash} placement="top">
+                        <div>
+                          <HashLink
+                            label={`${r.layer1.output.hash.slice(0, 8)}...${r.layer1.output.hash.slice(-8)}`}
+                            href={`${CKB_EXPLORER_URL}/transaction/${r.layer1.output.hash}#${r.layer1.output.index}`}
+                            external
+                          />
+                        </div>
+                      </Tooltip>
                     </div>
                   ) : (
                     t(`pending`)

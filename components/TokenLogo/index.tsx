@@ -1,3 +1,4 @@
+import Tooltip from 'components/Tooltip'
 import { TokenOrigins, TokenLogoWhitelist } from 'utils'
 import styles from './styles.module.scss'
 
@@ -20,24 +21,26 @@ const TokenLogo: React.FC<{ logo: string; name: string }> = ({ name, logo }) => 
 
   if (!origin) {
     return (
-      <span className="tooltip" data-tooltip={name}>
-        {Token}
-      </span>
+      <Tooltip title={name} placement="top">
+        <div>{Token}</div>
+      </Tooltip>
     )
   }
 
   if (origin) {
     return (
-      <div className={`${styles.overlap} tooltip`} data-tooltip={name}>
-        <img
-          className={styles.origin}
-          src={origin.logo || DEFAULT_LOGO_URL}
-          loading="lazy"
-          crossOrigin="anonymous"
-          referrerPolicy="no-referrer"
-        />
-        {Token}
-      </div>
+      <Tooltip title={name} placement="top">
+        <div className={styles.overlap}>
+          <img
+            className={styles.origin}
+            src={origin.logo || DEFAULT_LOGO_URL}
+            loading="lazy"
+            crossOrigin="anonymous"
+            referrerPolicy="no-referrer"
+          />
+          {Token}
+        </div>
+      </Tooltip>
     )
   }
 }

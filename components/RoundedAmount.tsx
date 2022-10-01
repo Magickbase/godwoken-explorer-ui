@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js'
+import Tooltip from 'components/Tooltip'
 
 const RoundedAmount: React.FC<{ amount: string; udt: { decimal: number; symbol: string } }> = ({
   amount,
@@ -9,15 +10,13 @@ const RoundedAmount: React.FC<{ amount: string; udt: { decimal: number; symbol: 
   const [rInt, rFrac] = roundedAmount.toString().split('.')
   const isExact = new BigNumber(roundedAmount).isEqualTo(a)
   return (
-    <b
-      className="tooltip"
-      data-tooltip={`${a.toFormat()} ${symbol?.split('.')[0] ?? ''}`}
-      style={{ whiteSpace: 'nowrap', fontWeight: 500 }}
-    >
-      {`${isExact ? '' : '≈ '}`}
-      <span>{new BigNumber(rInt).toFormat()}</span>
-      {rFrac ? <span style={{ color: 'var(--amount-frac-color)' }}>{`.${rFrac}`}</span> : null}
-    </b>
+    <Tooltip title={`${a.toFormat()} ${symbol?.split('.')[0] ?? ''}`} placement="top">
+      <b style={{ whiteSpace: 'nowrap', fontWeight: 500 }}>
+        {`${isExact ? '' : '≈ '}`}
+        <span>{new BigNumber(rInt).toFormat()}</span>
+        {rFrac ? <span style={{ color: 'var(--amount-frac-color)' }}>{`.${rFrac}`}</span> : null}
+      </b>
+    </Tooltip>
   )
 }
 
