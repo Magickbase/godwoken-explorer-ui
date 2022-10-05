@@ -32,15 +32,11 @@ context('Transaction Page', () => {
           .find('dt')
           .should('have.text', 'Interact with Contract')
           .next()
-          .should('have.text', 'ERC20')
+          .should('contain.text', 'ERC20')
       })
 
       it('should have value', () => {
-        cy.get('dl[title="value"]')
-          .find('dt')
-          .should('have.text', 'value')
-          .next()
-          .should('have.text', '0 pCKB.gw|gb.ckb')
+        cy.get('dl[title="value"]').find('dt').should('have.text', 'value').next().should('have.text', '0 pCKB')
       })
 
       it('should have input', () => {
@@ -87,7 +83,7 @@ context('Transaction Page', () => {
       })
 
       it('should have status', () => {
-        cy.get('dl[title="status"').find('dt').should('have.text', 'status').next().should('have.text', 'success')
+        cy.get('dl[title="status"').find('dt').should('have.text', 'status').next().should('have.text', 'succeed')
       })
 
       it('should have gas price', () => {
@@ -95,7 +91,7 @@ context('Transaction Page', () => {
           .find('dt')
           .should('have.text', 'gas price')
           .next()
-          .should('have.text', '0.00009 pCKB.gw|gb.ckb')
+          .should('have.text', '0.00009 pCKB')
       })
 
       it('should have gas used', () => {
@@ -107,24 +103,16 @@ context('Transaction Page', () => {
       })
 
       it('should have fee', () => {
-        cy.get('dl[title="fee"')
-          .find('dt')
-          .should('have.text', 'fee')
-          .next()
-          .should('have.text', '2.43441 pCKB.gw|gb.ckb')
+        cy.get('dl[title="fee"').find('dt').should('have.text', 'fee').next().should('have.text', '2.43441 pCKB')
       })
 
       it('should have timestamp', () => {
-        cy.get('dl[title="fee"')
-          .find('dt')
-          .should('have.text', 'fee')
-          .next()
-          .should('have.text', '2.43441 pCKB.gw|gb.ckb')
+        cy.get('dl[title="fee"').find('dt').should('have.text', 'fee').next().should('have.text', '2.43441 pCKB')
       })
     })
   })
 
-  describe.only('should have erc20 transfer, logs, raw data tabs', () => {
+  describe('should have erc20 transfer, logs, raw data tabs', () => {
     it('should have 3 tabs', () => {
       cy.get('div[data-role="tabs"]')
         .find('a')

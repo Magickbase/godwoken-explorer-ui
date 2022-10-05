@@ -15,7 +15,6 @@
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
     "coverage": "nyc npm run test",
-    "test:e2e": "npm run dev & npm run cypress:run",
     "format": "prettier -w --ignore-unknown pages/* pages/**/* components/* components/**/* styles/* utils/* cypress/**/*{.ts,.json}",
     "prepare": "husky install"
   },
