@@ -14,7 +14,7 @@ type InventoryListProps = {
       token_id: string
       address_hash: string
       token_contract_address_hash: string
-      udt: {
+      udt?: {
         id: number
         name: string | null
         icon: string | null
@@ -27,18 +27,11 @@ type InventoryListProps = {
 
 const inventoryListOfCollectionQuery = gql`
   query ($address: HashAddress!, $before: String, $after: String, $limit: Int) {
-    inventory: erc721_erc1155_inventory(
-      input: { contract_address: $address, before: $before, after: $after, limit: $limit }
-    ) {
+    inventory: erc721_inventory(input: { contract_address: $address, before: $before, after: $after, limit: $limit }) {
       entries {
         token_id
         address_hash
         token_contract_address_hash
-        udt {
-          id
-          name
-          icon
-        }
       }
       metadata {
         before
@@ -55,10 +48,6 @@ const inventoryListOfAccountQuery = gql`
       entries {
         token_id
         token_contract_address_hash
-        udt {
-          name
-          icon
-        }
       }
       metadata {
         total_count
@@ -116,10 +105,16 @@ const NFTInventoryList: React.FC<InventoryListProps> = ({ inventory, viewer }) =
               </a>
             </NextLink>
 
+            {/* {viewer ? ( */}
+            {/*   <div className={styles.info}> */}
+            {/*     <span>{t('name')}</span> */}
+            {/*     <span>{item.udt?.name?.length > 15 ? item.udt?.name.slice(0, 15) + '...' : item.udt?.name || '-'}</span> */}
+            {/*   </div> */}
+            {/* ) : null} */}
             {viewer ? (
               <div className={styles.info}>
-                <span>{t('name')}</span>
-                <span>{item.udt.name?.length > 15 ? item.udt.name.slice(0, 15) + '...' : item.udt.name || '-'}</span>
+                <span>{t('Token')}</span>
+                <span>{item.token_contract_address_hash.slice(0, 12) + '...'}</span>
               </div>
             ) : null}
 
