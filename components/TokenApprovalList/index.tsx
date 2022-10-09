@@ -198,15 +198,20 @@ const TokenApprovalList: React.FC<TokenApprovalListProps & { maxCount?: string; 
   }
 
   // hide and cache:
-  // - the listitem has revoke txn packaged successfully in a block but backend not synced yet
+  // - the item has revoke txn packaged successfully in a block but backend not synced yet
   const hideItem = (item: TokenApprovalEntryType) => {
-    const newItemHash = item.transaction_hash + item.spender_address_hash
+    const { transaction_hash, spender_address_hash, token_contract_address_hash, data } = item
+    const newItemKey = transaction_hash + spender_address_hash + token_contract_address_hash + data
     localStorage.setItem(
       'revokingItems',
-      JSON.stringify([...JSON.parse(localStorage.getItem('revokingItems') ?? '[]'), newItemHash]),
+      JSON.stringify([...JSON.parse(localStorage.getItem('revokingItems') ?? '[]'), newItemKey]),
     )
     setInternalEntries(
-      internalEntries.filter(entry => entry.transaction_hash + entry.spender_address_hash !== newItemHash),
+      internalEntries.filter(entry => {
+        const { transaction_hash, spender_address_hash, token_contract_address_hash, data } = entry
+        const entryKey = transaction_hash + spender_address_hash + token_contract_address_hash + data
+        return entryKey !== newItemKey
+      }),
     )
   }
 
@@ -216,7 +221,8 @@ const TokenApprovalList: React.FC<TokenApprovalListProps & { maxCount?: string; 
     let newInternalEntries = []
     let newRevokingItems = []
     entries.forEach((item: TokenApprovalEntryType) => {
-      const key = item.transaction_hash + item.spender_address_hash
+      const { transaction_hash, spender_address_hash, token_contract_address_hash, data } = item
+      const key = transaction_hash + spender_address_hash + token_contract_address_hash + data
       if (oldRevokingItems.includes(key)) {
         newRevokingItems.push(key)
       } else {
