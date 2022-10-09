@@ -21,9 +21,9 @@
   "dependencies": {
     "@emotion/react": "11.9.0",
     "@emotion/styled": "11.8.1",
-    "@fontsource/jetbrains-mono": "4.5.9",
+    "@fontsource/jetbrains-mono": "4.5.11",
     "@fontsource/material-icons": "4.5.4",
-    "@fontsource/roboto": "4.5.7",
+    "@fontsource/roboto": "4.5.8",
     "@mui/icons-material": "5.2.5",
     "@mui/material": "5.2.5",
     "@nervosnetwork/ckb-sdk-utils": "0.102.3",
