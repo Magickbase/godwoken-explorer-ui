@@ -30,7 +30,7 @@ type Props = {
   >
   listItem: TokenApprovalEntryType
   account: string
-  hideItem: (txnHash: string) => void
+  hideItem: (item: TokenApprovalEntryType) => void
 }
 
 const mapEthTypeToABI = (item: TokenApprovalEntryType) => {
@@ -113,7 +113,7 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
         setAlert({ open: true, type: 'success', msg: t('revoke-success') })
         // seems after the block is created, backend still need a few minutes to update tokenApprovalList,
         // so hide this record right after revoke txn is package in a block
-        hideItem(listItem.transaction_hash)
+        hideItem(listItem)
       }
     },
   })
