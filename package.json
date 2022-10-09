@@ -51,7 +51,7 @@
     "@types/phoenix": "1.5.4",
     "@types/qrcode": "1.4.2",
     "@types/react": "17.0.37",
-    "autoprefixer": "10.4.4",
+    "autoprefixer": "10.4.12",
     "babel-plugin-istanbul": "6.1.1",
     "cypress": "9.1.1",
     "eslint": "8.13.0",
