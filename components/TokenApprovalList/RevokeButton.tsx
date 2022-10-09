@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'next-i18next'
-import { currentChain, erc1155ABI, GraphQLSchema } from 'utils'
+import { currentChain, erc1155ABI, GraphQLSchema, ZERO_ADDRESS } from 'utils'
 import { TokenApprovalEntryType } from '.'
 import {
   ConnectorAlreadyConnectedError,
@@ -41,12 +41,20 @@ const mapEthTypeToABI = (item: TokenApprovalEntryType) => {
       function: 'approve',
       args: [item.spender_address_hash, 0],
     },
-    [GraphQLSchema.TokenType.ERC721]: {
-      address: item.token_contract_address_hash,
-      abi: erc721ABI,
-      function: 'setApprovalForAll',
-      args: [item.spender_address_hash, false],
-    },
+    [GraphQLSchema.TokenType.ERC721]:
+      item.type === GraphQLSchema.ApprovalType.ApprovalAll
+        ? {
+            address: item.token_contract_address_hash,
+            abi: erc721ABI,
+            function: 'setApprovalForAll',
+            args: [item.spender_address_hash, false],
+          }
+        : {
+            address: item.token_contract_address_hash,
+            abi: erc721ABI,
+            function: 'approve',
+            args: [ZERO_ADDRESS, item.udt.id],
+          },
     [GraphQLSchema.TokenType.ERC1155]: {
       address: item.token_contract_address_hash,
       abi: erc1155ABI,
