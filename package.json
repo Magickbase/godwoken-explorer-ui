@@ -46,7 +46,7 @@
   },
   "devDependencies": {
     "@cypress/code-coverage": "3.9.12",
-    "@svgr/webpack": "6.2.1",
+    "@svgr/webpack": "6.4.0",
     "@types/node": "16.11.64",
     "@types/phoenix": "1.5.4",
     "@types/qrcode": "1.5.0",
