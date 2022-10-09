@@ -53,7 +53,7 @@ const mapEthTypeToABI = (item: TokenApprovalEntryType) => {
             address: item.token_contract_address_hash,
             abi: erc721ABI,
             function: 'approve',
-            args: [ZERO_ADDRESS, item.udt.id],
+            args: [ZERO_ADDRESS, item.data],
           },
     [GraphQLSchema.TokenType.ERC1155]: {
       address: item.token_contract_address_hash,
