@@ -48,6 +48,11 @@ const inventoryListOfAccountQuery = gql`
       entries {
         token_id
         token_contract_address_hash
+        udt {
+          id
+          name
+          icon
+        }
       }
       metadata {
         total_count
@@ -105,16 +110,10 @@ const NFTInventoryList: React.FC<InventoryListProps> = ({ inventory, viewer }) =
               </a>
             </NextLink>
 
-            {/* {viewer ? ( */}
-            {/*   <div className={styles.info}> */}
-            {/*     <span>{t('name')}</span> */}
-            {/*     <span>{item.udt?.name?.length > 15 ? item.udt?.name.slice(0, 15) + '...' : item.udt?.name || '-'}</span> */}
-            {/*   </div> */}
-            {/* ) : null} */}
             {viewer ? (
               <div className={styles.info}>
-                <span>{t('Token')}</span>
-                <span>{item.token_contract_address_hash.slice(0, 12) + '...'}</span>
+                <span>{t('name')}</span>
+                <span>{item.udt?.name?.length > 15 ? item.udt?.name.slice(0, 15) + '...' : item.udt?.name || '-'}</span>
               </div>
             ) : null}
 

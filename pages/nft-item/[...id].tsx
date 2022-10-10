@@ -30,7 +30,7 @@ const collectionInfoQuery = gql`
       }
     }
 
-    holders: erc721_erc1155_inventory(input: { contract_address: $address, token_id: $token_id }) {
+    holders: erc721_inventory(input: { contract_address: $address, token_id: $token_id }) {
       entries {
         address_hash
       }

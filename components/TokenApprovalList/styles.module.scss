@@ -30,7 +30,7 @@
 }
 
 .revoke {
-  width: 80px;
+  width: 88px;
   height: 40px;
   background: var(--primary-color);
   border: none;
@@ -47,6 +47,13 @@
     cursor: not-allowed;
     pointer-events: none;
     opacity: 0.6;
+  }
+  .loading {
+    margin-left: 4px;
+    height: 12px;
+    svg {
+      margin-left: 0;
+    }
   }
 }
 
