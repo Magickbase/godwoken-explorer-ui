@@ -70,6 +70,9 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
   const currentContract = mapEthTypeToABI(listItem)
   const [callWrite, setCallWrite] = useState(false)
   const [isPackaging, setIsPackaging] = useState(false)
+  const { transaction_hash, spender_address_hash, token_contract_address_hash, data } = listItem
+  const itemKey = transaction_hash + spender_address_hash + token_contract_address_hash + data + '-revokeTxn'
+  const [revokeTxnHash, setRevokeTxnHash] = useState(localStorage.getItem(itemKey) || '')
 
   /* wagmi hooks */
   const { chain } = useNetwork()
@@ -103,23 +106,25 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
     functionName: currentContract.function,
     args: currentContract.args,
   })
-  const { data: revokeTxn, write } = useContractWrite({
+  const { write } = useContractWrite({
     ...config,
-    onSuccess: () => {
+    onSuccess: data => {
       setAlert({ open: true, type: 'success', msg: t('revokeTxn-sent-success') })
-      setIsPackaging(true)
+      localStorage.setItem(itemKey, data.hash)
+      setRevokeTxnHash(data.hash)
     },
     onError: () => {
       setAlert({ open: true, type: 'error', msg: t('user-rejected') })
     },
   })
   const { isLoading: isRevokeTxnLoading } = useWaitForTransaction({
-    hash: revokeTxn?.hash,
+    hash: revokeTxnHash,
     onSuccess: data => {
       if (data?.blockHash) {
+        localStorage.removeItem(itemKey)
         setIsPackaging(false)
         setAlert({ open: true, type: 'success', msg: t('revoke-success') })
-        // seems after the block is created, backend still need a few minutes to update tokenApprovalList,
+        // after the block is created, backend still need a few minutes to update tokenApprovalList,
         // so hide this record right after revoke txn is package in a block
         hideItem(listItem)
       }
@@ -135,6 +140,13 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    if (revokeTxnHash) {
+      // if revokeTxnHash exists, means it is packaging
+      setIsPackaging(true)
+    }
+  }, [revokeTxnHash])
 
   useEffect(() => {
     if (callWrite) {
