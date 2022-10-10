@@ -140,7 +140,7 @@ const checkSourcify = gql`
   }
 `
 
-type Variables = { address: string } & { script_hash: string }
+type Variables = { address: string } | { script_hash: string }
 
 export const fetchAccountOverview = (variables: Variables) =>
   client.request<Omit<AccountOverviewProps, 'balance'>>(accountOverviewQuery, variables).then(
