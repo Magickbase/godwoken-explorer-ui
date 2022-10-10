@@ -13,6 +13,7 @@ import {
   useAccount,
   useSigner,
   useNetwork,
+  useSwitchNetwork,
   useContract,
 } from 'wagmi'
 import Alert from 'components/Alert'
@@ -54,9 +55,11 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
   const { address: addr } = useAccount()
   const { data: signer } = useSigner()
   const { chain } = useNetwork()
+  const { switchNetworkAsync } = useSwitchNetwork()
   const contract = useContract({
     addressOrName: address,
     contractInterface: abi,
+    // FIXME: remove the provider, or it will break the workflow of `switch to the correct network -> send a request` by one click due to inconsistent chain id
     signerOrProvider: tabIdx === 2 ? signer : provider,
   })
 
@@ -122,6 +125,14 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
 
     form.setAttribute(LOADING_ATTRIBUTE, 'true')
     try {
+      if (tabIdx === 2 && chain?.id !== targetChain.id) {
+        if (switchNetworkAsync) {
+          await switchNetworkAsync(targetChain.id)
+        } else {
+          connect({ connector, chainId: targetChain.id })
+        }
+        return
+      }
       const result = await method(...params)
       if (tabIdx === 2) {
         const elm = resInputList[0]
