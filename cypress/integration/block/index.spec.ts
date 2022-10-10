@@ -206,7 +206,9 @@ context('Block Page', () => {
         })
         .next()
         .should(field => {
-          expect(field.text()).to.eq('-')
+          const badge = field.find('div')
+          expect(badge).to.have.attr('data-is-native-transfer', 'true')
+          expect(window.getComputedStyle(badge[0], 'after').content).to.eq('"Send"')
         })
         .next()
         .should(field => {
