@@ -19,8 +19,8 @@
     "prepare": "husky install"
   },
   "dependencies": {
-    "@emotion/react": "11.9.0",
-    "@emotion/styled": "11.8.1",
+    "@emotion/react": "11.10.4",
+    "@emotion/styled": "11.10.4",
     "@fontsource/jetbrains-mono": "4.5.11",
     "@fontsource/material-icons": "4.5.4",
     "@fontsource/roboto": "4.5.8",
