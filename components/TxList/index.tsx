@@ -193,7 +193,7 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
                         </div>
                       </Tooltip>
                     ) : (
-                      '-'
+                      <div className={styles.method} data-is-native-transfer="true" />
                     )}
                   </td>
                   <td>
