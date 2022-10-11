@@ -151,7 +151,7 @@ const Statistic: React.FC<State['statistic'] & { isLoading: boolean }> = ({
         txCount: calclateCurValue(progress, +txCount, +start.txCount),
         tps: calclateCurValue(progress, +tps * 10, +start.tps * 10) / 10,
         accountCount: calclateCurValue(progress, +accountCount, +start.accountCount),
-        averageBlockTime: calclateCurValue(progress, +averageBlockTime, start.averageBlockTime),
+        averageBlockTime: calclateCurValue(progress, +averageBlockTime * 100, start.averageBlockTime * 100) / 100,
       }))
 
       if (progress < 1) {
