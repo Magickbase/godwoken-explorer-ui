@@ -170,7 +170,7 @@ const ActivityList: React.FC<
                       </NextLink>
                     </td>
                   )}
-                  <td>{+(item.amount ?? 0).toLocaleString('en')}</td>
+                  <td>{(+item.amount ?? 0).toLocaleString('en')}</td>
                 </tr>
               )
             })

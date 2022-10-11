@@ -148,8 +148,12 @@ const MultiTokenCollectionList = () => {
                           </span>
                         </Tooltip>
                       </td>
-                      <td title={item.holders_count.toLocaleString('en')}>{item.holders_count.toLocaleString('en')}</td>
-                      <td title={item.minted_count.toLocaleString('en')}>{item.minted_count.toLocaleString('en')}</td>
+                      <td title={(+item.holders_count).toLocaleString('en')}>
+                        {(+item.holders_count).toLocaleString('en')}
+                      </td>
+                      <td title={(+item.minted_count).toLocaleString('en')}>
+                        {(+item.minted_count).toLocaleString('en')}
+                      </td>
                     </tr>
                   )
                 })
