@@ -51,6 +51,9 @@ context('Home Page', () => {
       it('should have time', () => {
         cy.get(`${ROOT_SELECTOR} .list-container`).children().first().find('time').should('not.be.undefined')
       })
+      it('should have a status', () => {
+        cy.get(`${ROOT_SELECTOR} .list-container`).children().first().find('svg').should('not.be.undefined')
+      })
     })
   })
 
@@ -94,6 +97,9 @@ context('Home Page', () => {
       })
       it('should have time', () => {
         cy.get(`${ROOT_SELECTOR} .list-container`).children().first().find('time').should('not.be.undefined')
+      })
+      it('should have a status', () => {
+        cy.get(`${ROOT_SELECTOR} .list-container`).children().first().find('svg').should('not.be.undefined')
       })
     })
   })
