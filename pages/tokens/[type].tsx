@@ -18,12 +18,12 @@ import FilterMenu from 'components/FilterMenu'
 import SortIcon from 'assets/icons/sort.svg'
 import { SIZES } from 'components/PageSize'
 import Amount from 'components/Amount'
+import Tooltip from 'components/Tooltip'
 import AddIcon from 'assets/icons/add.svg'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import EmptyFilteredListIcon from 'assets/icons/empty-filtered-list.svg'
 import { GraphQLSchema, client, parseTokenName } from 'utils'
 import styles from './styles.module.scss'
-import Tooltip from 'components/Tooltip'
 
 const BRIDGED_TOKEN_TEMPLATE_URL =
   'https://github.com/magickbase/godwoken_explorer/issues/new?assignees=Keith-CY&labels=Token+Registration&template=register-a-new-bridged-token.yml&title=%5BBridged+Token%5D+%2A%2AToken+Name%2A%2A'

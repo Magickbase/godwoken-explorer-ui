@@ -10,11 +10,11 @@ import Pagination from 'components/SimplePagination'
 import TransferDirection from 'components/TransferDirection'
 import FilterMenu from 'components/FilterMenu'
 import RoundedAmount from 'components/RoundedAmount'
+import Tooltip from 'components/Tooltip'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import EmptyFilteredListIcon from 'assets/icons/empty-filtered-list.svg'
 import { timeDistance, GraphQLSchema, client, PCKB_UDT_INFO } from 'utils'
 import styles from './styles.module.scss'
-import Tooltip from 'components/Tooltip'
 
 export type TxListProps = {
   transactions: {

@@ -5,7 +5,7 @@ import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useQuery } from 'react-query'
 import { gql } from 'graphql-request'
-import { Skeleton, Tooltip } from '@mui/material'
+import { Skeleton } from '@mui/material'
 import { ethers } from 'ethers'
 import BigNumber from 'bignumber.js'
 import Tabs from 'components/Tabs'
@@ -21,6 +21,7 @@ import TxType from 'components/TxType'
 import HashLink from 'components/HashLink'
 import Amount from 'components/Amount'
 import { SIZES } from 'components/PageSize'
+import Tooltip from 'components/Tooltip'
 import PolyjuiceStatus from 'components/PolyjuiceStatus'
 import ExpandIcon from 'assets/icons/expand.svg'
 import {
@@ -307,7 +308,6 @@ const Tx = () => {
       ? {
           field: t('method'),
           content: (
-            // TODO: fix the problem of too right when it is in 50% left, if we replace the Tooltip in tooltip class
             <Tooltip title={tx?.method_id || false} placement="top">
               <span className="mono-font">{method}</span>
             </Tooltip>
@@ -462,12 +462,7 @@ const Tx = () => {
           </div>
         </PageTitle>
 
-        <InfoList
-          title={t(`overview`)}
-          list={overview}
-          style={{ marginBottom: '2rem' }}
-          className={styles['overview-class']}
-        />
+        <InfoList title={t(`overview`)} list={overview} style={{ marginBottom: '2rem' }} />
 
         <InfoList title={t(`basicInfo`)} list={basicInfo} style={{ marginBottom: '2rem' }} type="two-columns" />
 

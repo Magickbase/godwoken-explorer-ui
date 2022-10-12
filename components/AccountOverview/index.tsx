@@ -162,9 +162,13 @@ export const fetchDeployAddress = (variables: { eth_hash: string }) =>
     .request<{ transaction: { from_account: Pick<GraphQLSchema.Account, 'eth_address'> } }>(deployAddrQuery, variables)
     .then(data => data.transaction.from_account.eth_address)
 
+type SourcifyStatusResponse = {
+  sourcify_check_by_addresses: [{ address: string; chain_ids: string[]; status: string }]
+}
+
 export const fetchSourcifyStatus = (address: string) =>
-  client.request<{ sourcify_check_by_addresses: { status: string | null } }>(checkSourcify, { address }).then(data => {
-    return data.sourcify_check_by_addresses.status
+  client.request<SourcifyStatusResponse>(checkSourcify, { address }).then(data => {
+    return data.sourcify_check_by_addresses[0].status
   })
 
 const overviewPlaceHolderCount = (account: AccountOverviewProps['account']) => {
@@ -269,7 +273,7 @@ const AccountOverview: React.FC<AccountOverviewProps & { refetch: () => Promise<
         <MetaContract {...(account.script as MetaContract['script'])} />
       ) : null}
       {account.type === GraphQLSchema.AccountType.EthUser ? (
-        <User nonce={account.nonce} isLoading={!!isOverviewLoading} />
+        <User nonce={account.nonce} isLoading={isOverviewLoading} />
       ) : null}
       {account.type === GraphQLSchema.AccountType.EthAddrReg ? <EthAddrReg /> : null}
       {account.type === GraphQLSchema.AccountType.PolyjuiceContract ? (
@@ -280,7 +284,7 @@ const AccountOverview: React.FC<AccountOverviewProps & { refetch: () => Promise<
           address={account.eth_address || ''}
           isVerified={!!account.smart_contract?.contract_source_code}
           refetch={refetch}
-          isLoading={!!isOverviewLoading}
+          isLoading={isOverviewLoading}
         />
       ) : null}
       {account.type === GraphQLSchema.AccountType.PolyjuiceCreator ? (
