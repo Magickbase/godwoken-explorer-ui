@@ -14,11 +14,13 @@ import {
   useNetwork,
   useSwitchNetwork,
   useAccount,
+  useTransaction,
 } from 'wagmi'
 import { CircularProgress } from '@mui/material'
 import DisconnectIcon from 'assets/icons/disconnect.svg'
 import Tooltip from 'components/Tooltip'
 import styles from './styles.module.scss'
+import { ethers } from 'ethers'
 
 type Props = {
   setAlert: Dispatch<
@@ -33,7 +35,7 @@ type Props = {
   hideItem: (item: TokenApprovalEntryType) => void
 }
 
-const mapEthTypeToABI = (item: TokenApprovalEntryType) => {
+const mapEthTypeToABI = (item: TokenApprovalEntryType, tokenId: string) => {
   const map = {
     [GraphQLSchema.TokenType.ERC20]: {
       address: item.token_contract_address_hash,
@@ -53,7 +55,7 @@ const mapEthTypeToABI = (item: TokenApprovalEntryType) => {
             address: item.token_contract_address_hash,
             abi: erc721ABI,
             function: 'approve',
-            args: [ZERO_ADDRESS, item.data],
+            args: [ZERO_ADDRESS, tokenId],
           },
     [GraphQLSchema.TokenType.ERC1155]: {
       address: item.token_contract_address_hash,
@@ -67,7 +69,7 @@ const mapEthTypeToABI = (item: TokenApprovalEntryType) => {
 
 const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }) => {
   const [t] = useTranslation(['list', 'tokens', 'account'])
-  const currentContract = mapEthTypeToABI(listItem)
+  const [currentContract, setCurrentContract] = useState(mapEthTypeToABI(listItem, ''))
   const [callWrite, setCallWrite] = useState(false)
   const [isPackaging, setIsPackaging] = useState(false)
   const { transaction_hash, spender_address_hash, token_contract_address_hash, data } = listItem
@@ -130,9 +132,22 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
       }
     },
   })
+  const { isLoading: isFetchApproveTxLoading } = useTransaction({
+    hash: listItem.transaction_hash as `0x${string}`,
+    onSuccess: data => {
+      // get tokenId from approve txn
+      if (listItem.udt.eth_type === GraphQLSchema.TokenType.ERC721) {
+        const i = new ethers.utils.Interface(erc721ABI)
+        const decodedData = i.decodeFunctionData('approve', data.data)
+        const tokenId = decodedData[1].toString()
+        setCurrentContract(mapEthTypeToABI(listItem, tokenId))
+      }
+    },
+  })
 
   const isOwner = connectedAddr ? account.toLowerCase() === connectedAddr.toLowerCase() : true
-  const disabled = !isOwner || isPreparingContract || !connector.ready || isRevokeTxnLoading || isPackaging
+  const disabled =
+    !isOwner || isPreparingContract || !connector.ready || isRevokeTxnLoading || isFetchApproveTxLoading || isPackaging
 
   useEffect(() => {
     if (!isConnected) {
