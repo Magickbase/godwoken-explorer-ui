@@ -134,14 +134,14 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
   })
   const { isLoading: isFetchApproveTxLoading } = useTransaction({
     hash: listItem.transaction_hash as `0x${string}`,
+    enabled: listItem.udt.eth_type === GraphQLSchema.TokenType.ERC721,
     onSuccess: data => {
-      // get tokenId from approve txn
-      if (listItem.udt.eth_type === GraphQLSchema.TokenType.ERC721) {
-        const i = new ethers.utils.Interface(erc721ABI)
-        const decodedData = i.decodeFunctionData('approve', data.data)
-        const tokenId = decodedData[1].toString()
-        setCurrentContract(mapEthTypeToABI(listItem, tokenId))
-      }
+      if (!data) return
+      // get tokenId from approve erc721 txn
+      const i = new ethers.utils.Interface(erc721ABI)
+      const decodedData = i.decodeFunctionData('approve', data.data)
+      const tokenId = decodedData[1].toString()
+      setCurrentContract(mapEthTypeToABI(listItem, tokenId))
     },
   })
 
@@ -149,12 +149,12 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
   const disabled =
     !isOwner || isPreparingContract || !connector.ready || isRevokeTxnLoading || isFetchApproveTxLoading || isPackaging
 
-  useEffect(() => {
-    if (!isConnected) {
-      connect({ connector, chainId: targetChainId })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  // useEffect(() => {
+  //   if (!isConnected) {
+  //     connect({ connector, chainId: targetChainId })
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [])
 
   useEffect(() => {
     if (revokeTxnHash) {
