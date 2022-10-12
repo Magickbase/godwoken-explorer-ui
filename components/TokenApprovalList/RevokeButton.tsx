@@ -70,7 +70,6 @@ const mapEthTypeToABI = (item: TokenApprovalEntryType, tokenId: string) => {
 const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }) => {
   const [t] = useTranslation(['list', 'tokens', 'account'])
   const [currentContract, setCurrentContract] = useState(mapEthTypeToABI(listItem, ''))
-  const [callWrite, setCallWrite] = useState(false)
   const [isPackaging, setIsPackaging] = useState(false)
   const { transaction_hash, spender_address_hash, token_contract_address_hash, data } = listItem
   const itemKey = transaction_hash + spender_address_hash + token_contract_address_hash + data + '-revokeTxn'
@@ -89,7 +88,7 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
   })
   const { connect, connectors, isSuccess } = useConnect({
     chainId: targetChainId,
-    onError(error) {
+    onError: error => {
       if (error instanceof ConnectorAlreadyConnectedError) {
         return
       } else if (error instanceof ConnectorNotFoundError) {
@@ -149,31 +148,12 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
   const disabled =
     !isOwner || isPreparingContract || !connector.ready || isRevokeTxnLoading || isFetchApproveTxLoading || isPackaging
 
-  // useEffect(() => {
-  //   if (!isConnected) {
-  //     connect({ connector, chainId: targetChainId })
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [])
-
   useEffect(() => {
     if (revokeTxnHash) {
       // if revokeTxnHash exists, means it is packaging
       setIsPackaging(true)
     }
   }, [revokeTxnHash])
-
-  useEffect(() => {
-    if (callWrite) {
-      if (chain && chain.id !== targetChainId) {
-        switchNetwork?.(targetChainId)
-      }
-      if (chain && chain?.id === targetChainId) {
-        write?.()
-      }
-    }
-    setCallWrite(false)
-  }, [callWrite, chain, switchNetwork, targetChainId, write])
 
   const tooltipTitle = useCallback(() => {
     if (!isOwner || !connector.ready) {
@@ -192,10 +172,15 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
           className={styles.revoke}
           disabled={disabled}
           onClick={() => {
-            if (!isConnected) {
+            if (!isConnected || !chain) {
               connect({ connector, chainId: targetChainId })
             }
-            setCallWrite(true)
+            if (chain && chain.id !== targetChainId) {
+              switchNetwork?.(targetChainId)
+            }
+            if (chain && chain?.id === targetChainId) {
+              write?.()
+            }
           }}
         >
           {isPackaging ? (
