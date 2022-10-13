@@ -8,7 +8,7 @@ interface TabsProps {
 
 const Tabs: React.FC<TabsProps> = ({ tabs, value }) => {
   return (
-    <div className={styles.container} data-role="tabs">
+    <div className={styles.container} data-role="tabs" data-testid="tabs">
       <div className={styles.tabs}>
         {tabs.map(({ label, href }, idx) =>
           href ? (

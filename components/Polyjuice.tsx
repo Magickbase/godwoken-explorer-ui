@@ -1,6 +1,5 @@
 import type { PolyjuiceCreator as PolyjuiceCreatorProps } from './AccountOverview'
 import { useTranslation } from 'next-i18next'
-import Tooltip from 'components/Tooltip'
 import ScriptCode from 'components/ScriptCode'
 import InfoList from './InfoList'
 
@@ -14,9 +13,9 @@ const Polyjuice = ({ script, scriptHash }: { script: PolyjuiceCreatorProps['scri
     {
       field: t(`l2ScriptHash`),
       content: scriptHash ? (
-        <Tooltip title={scriptHash} placement="top">
-          <span className="mono-font">{scriptHash}</span>
-        </Tooltip>
+        <span className="mono-font tooltip" data-tooltip={scriptHash}>
+          {scriptHash}
+        </span>
       ) : (
         '-'
       ),
