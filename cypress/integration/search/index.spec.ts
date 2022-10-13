@@ -111,9 +111,11 @@ context('Search', () => {
 
     it('should redirect to transaction page when keyword is a tx hash', () => {
       cy.get(`a[title='tx hash']:first`)
-        .then(tx => tx.parent())
-        .invoke('attr', 'aria-label')
-        .then(hash => {
+        .then(tx => {
+          const hash = tx.attr('href').slice('/tx/'.length)
+          return { hash }
+        })
+        .should(({ hash }) => {
           cy.get(`${ROOT_SELECTOR} input`).type(hash)
           cy.get(ROOT_SELECTOR).type('{enter}')
           cy.url({ timeout: REDIRECT_TIMEOUT }).should('contain', `/tx/${hash}`)
