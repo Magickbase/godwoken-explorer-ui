@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js'
-import Tooltip from './Tooltip'
+import Tooltip from 'components/Tooltip'
 
 const RoundedAmount: React.FC<{ amount: string; udt: { decimal: number; symbol: string } }> = ({
   amount,

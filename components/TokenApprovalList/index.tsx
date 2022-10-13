@@ -22,7 +22,7 @@ export type TokenApprovalEntryType = {
   approved: boolean
   block: Pick<GraphQLSchema.Block, 'hash' | 'number' | 'status' | 'timestamp'>
   block_hash: string
-  data: number
+  data: string
   spender_address_hash: string
   token_contract_address_hash: string
   token_owner_address_hash: string

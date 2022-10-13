@@ -56,4 +56,7 @@ $offset-y: 6px;
       border: none;
     }
   }
+  .tooltip::before {
+    font-size: 0.875rem;
+  }
 }

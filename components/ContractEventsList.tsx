@@ -13,7 +13,6 @@ import {
   TableRow,
   TableCell,
   Link,
-  Tooltip,
   InputAdornment,
   TextField,
   tableCellClasses,
@@ -30,22 +29,20 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }))
 
 export const EventFilterIcon = ({ setSearchText, tooltip, value }) => (
-  <Tooltip title={tooltip} placement="top">
-    <Box>
-      <Image
-        src={`${IMG_URL}filter.svg`}
-        loading="lazy"
-        width="12"
-        height="12"
-        layout="fixed"
-        alt="filter-icon"
-        color="#333333"
-        onClick={() => {
-          setSearchText(value)
-        }}
-      />
-    </Box>
-  </Tooltip>
+  <Box className="tooltip" data-tooltip={tooltip}>
+    <Image
+      src={`${IMG_URL}filter.svg`}
+      loading="lazy"
+      width="12"
+      height="12"
+      layout="fixed"
+      alt="filter-icon"
+      color="#333333"
+      onClick={() => {
+        setSearchText(value)
+      }}
+    />
+  </Box>
 )
 
 const ContractEventsList = ({ list }: { list: ParsedEventLog[] }) => {

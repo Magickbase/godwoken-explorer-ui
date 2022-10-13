@@ -1,8 +1,12 @@
 {
+  "extends": "../tsconfig.json",
   "compilerOptions": {
+    "baseUrl": "../",
     "target": "es5",
     "lib": ["es5", "dom"],
-    "types": ["cypress", "node"]
+    "jsx": "preserve",
+    "types": ["cypress", "node"],
+    "moduleResolution": "node"
   },
-  "include": ["**/*.ts"]
+  "include": ["../tsconfig.json", "../package.json", "./**/*.ts", "**/*.tsx"]
 }

@@ -1,7 +1,7 @@
 import { Box, SxProps } from '@mui/material'
-import Tooltip from 'components/Tooltip'
 import HashLink from './HashLink'
 import { getAddressDisplay, GraphQLSchema, ZERO_ADDRESS } from 'utils'
+import Tooltip from 'components/Tooltip'
 
 const TruncatedAddress = ({
   address,

@@ -3,10 +3,10 @@ import NextLink from 'next/link'
 import { gql } from 'graphql-request'
 import Pagination from 'components/SimplePagination'
 import HashLink from 'components/HashLink'
-import Tooltip from 'components/Tooltip'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import { client, GraphQLSchema, handleNftImageLoadError } from 'utils'
 import styles from './styles.module.scss'
+import Tooltip from 'components/Tooltip'
 
 type InventoryListProps = {
   inventory: {

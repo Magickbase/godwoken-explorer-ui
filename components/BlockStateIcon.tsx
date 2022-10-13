@@ -1,7 +1,6 @@
 import { HelpOutlineOutlined as HelpIcon } from '@mui/icons-material'
 import { useTranslation } from 'next-i18next'
 import type { BlockState, GraphQLSchema } from 'utils'
-import Tooltip from 'components/Tooltip'
 import CommittedIcon from 'assets/icons/committed.svg'
 import FinalizedIcon from 'assets/icons/finalized.svg'
 import PendingIcon from 'assets/icons/pending.svg'
@@ -14,29 +13,23 @@ const BlockStateIcon: React.FC<{ state: BlockState | GraphQLSchema.BlockStatus }
 
   if (stateLowercase === 'committed') {
     return (
-      <Tooltip title={t(stateLowercase)} placement="top">
-        <div style={{ ...properties }}>
-          <CommittedIcon />
-        </div>
-      </Tooltip>
+      <div className="tooltip" data-tooltip={t(stateLowercase)} style={{ ...properties }}>
+        <CommittedIcon />
+      </div>
     )
   }
   if (stateLowercase === 'finalized') {
     return (
-      <Tooltip title={t(stateLowercase)} placement="top">
-        <div style={{ ...properties }}>
-          <FinalizedIcon {...properties} />
-        </div>
-      </Tooltip>
+      <div className="tooltip" data-tooltip={t(stateLowercase)} style={{ ...properties }}>
+        <FinalizedIcon {...properties} />
+      </div>
     )
   }
   if (stateLowercase === 'pending') {
     return (
-      <Tooltip title={t(stateLowercase)} placement="top">
-        <div style={{ ...properties }}>
-          <PendingIcon {...properties} />
-        </div>
-      </Tooltip>
+      <div className="tooltip" data-tooltip={t(stateLowercase)} style={{ ...properties }}>
+        <PendingIcon {...properties} />
+      </div>
     )
   }
 
