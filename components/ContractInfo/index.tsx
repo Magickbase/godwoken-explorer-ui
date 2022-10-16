@@ -22,7 +22,7 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
   address,
   contract: { abi, compiler_file_format, compiler_version, name, contract_source_code, constructor_arguments },
 }) => {
-  const [t] = useTranslation(['account', 'tokens'])
+  const [t] = useTranslation(['account', 'tokens', 'list'])
   const [tabIdx, setTabIdx] = useState(0)
   const vm = compiler_file_format?.split(' ')[0]
   const chips = [
@@ -55,7 +55,7 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
   const { address: addr } = useAccount()
   const { data: signer } = useSigner()
   const { chain } = useNetwork()
-  const { switchNetworkAsync } = useSwitchNetwork()
+  const { switchNetwork, switchNetworkAsync } = useSwitchNetwork()
   const contract = useContract({
     addressOrName: address,
     contractInterface: abi,
@@ -64,13 +64,13 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
   })
 
   useEffect(() => {
-    if (chain?.id !== targetChain.id) {
-      setAlert({ open: true, type: 'warning', msg: t('switch-to-network', { network: targetChain.name }) })
-    }
-  }, [chain?.id, t, targetChain])
-
-  useEffect(() => {
     if (tabIdx === 2) {
+      if (chain?.id !== targetChain.id && switchNetwork) {
+        switchNetwork(targetChain.id)
+      }
+      //  else {
+      //   connect({ connector, chainId: targetChain.id })
+      // }
       connect({ connector, chainId: targetChain.id })
     }
   }, [connect, connector, tabIdx, targetChain.id])
