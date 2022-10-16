@@ -4,7 +4,7 @@ import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import OpenInNewIcon from 'assets/icons/open-in-new.svg'
 import ExpandIcon from 'assets/icons/expand.svg'
-import { currentChain as targetChain, provider } from 'utils'
+import { currentChain as targetChain } from 'utils'
 import styles from './styles.module.scss'
 import {
   ConnectorAlreadyConnectedError,
@@ -41,13 +41,13 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
   // wagmi hooks
   const { connect, connectors } = useConnect({
     chainId: targetChain.id,
-    onError(error) {
+    onError: error => {
       if (error instanceof ConnectorAlreadyConnectedError) {
         return
       } else if (error instanceof ConnectorNotFoundError) {
         setAlert({ open: true, type: 'error', msg: t('ethereum-is-not-injected', { ns: 'tokens' }) })
       } else {
-        setAlert({ open: true, type: 'error', msg: t('connect-mm-fail') })
+        setAlert({ open: true, type: 'error', msg: t('connect-mm-fail', { ns: 'list' }) })
       }
     },
   })
@@ -55,12 +55,18 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
   const { address: addr } = useAccount()
   const { data: signer } = useSigner()
   const { chain } = useNetwork()
-  const { switchNetwork, switchNetworkAsync } = useSwitchNetwork()
+  const { switchNetwork, switchNetworkAsync } = useSwitchNetwork({
+    onSuccess: () => {
+      setAlert({ open: true, type: 'success', msg: t('switch_network_success', { ns: 'list' }) })
+    },
+    onError: () => {
+      setAlert({ open: true, type: 'error', msg: t('user-rejected', { ns: 'list' }) })
+    },
+  })
   const contract = useContract({
     addressOrName: address,
     contractInterface: abi,
-    // FIXME: remove the provider, or it will break the workflow of `switch to the correct network -> send a request` by one click due to inconsistent chain id
-    signerOrProvider: tabIdx === 2 ? signer : provider,
+    signerOrProvider: signer,
   })
 
   useEffect(() => {
@@ -68,9 +74,6 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
       if (chain?.id !== targetChain.id && switchNetwork) {
         switchNetwork(targetChain.id)
       }
-      //  else {
-      //   connect({ connector, chainId: targetChain.id })
-      // }
       connect({ connector, chainId: targetChain.id })
     }
   }, [connect, connector, tabIdx, targetChain.id])
