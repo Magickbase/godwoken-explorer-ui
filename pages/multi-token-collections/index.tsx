@@ -39,6 +39,7 @@ const erc1155ListQuery = gql`
         }
         holders_count
         minted_count
+        token_type_count
       }
       metadata {
         total_count
@@ -117,8 +118,8 @@ const MultiTokenCollectionList = () => {
                   </span>
                 </th>
                 <th>{t('address')} </th>
+                <th>{t('type_count')}</th>
                 <th>{t('holder_count')} </th>
-                <th>{t('minted_count')}</th>
               </tr>
             </thead>
             <tbody>
@@ -148,11 +149,11 @@ const MultiTokenCollectionList = () => {
                           </span>
                         </Tooltip>
                       </td>
+                      <td title={item.token_type_count.toLocaleString('en')}>
+                        {item.token_type_count.toLocaleString('en')}
+                      </td>
                       <td title={(+item.holders_count).toLocaleString('en')}>
                         {(+item.holders_count).toLocaleString('en')}
-                      </td>
-                      <td title={(+item.minted_count).toLocaleString('en')}>
-                        {(+item.minted_count).toLocaleString('en')}
                       </td>
                     </tr>
                   )

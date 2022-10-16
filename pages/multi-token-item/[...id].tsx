@@ -17,7 +17,7 @@ import InventoryList, { fetchInventoryListOfTokenItem as fetchInventoryList } fr
 import HolderList, { fetchItemHoldersList as fetchHolderList } from 'components/MultiTokenHolderList'
 import Metadata from 'components/Metadata'
 import CopyBtn from 'components/CopyBtn'
-import { client, handleNftImageLoadError, erc1155ABI, provider, getIpfsUrl } from 'utils'
+import { client, handleNftImageLoadError, erc1155ABI, provider, getIpfsUrl, GraphQLSchema } from 'utils'
 import styles from './styles.module.scss'
 
 const infoQuery = gql`
@@ -39,14 +39,15 @@ const infoQuery = gql`
   }
 `
 
-interface CollectionInfo {
+interface CollectionInfo
+  extends Pick<
+    GraphQLSchema.MultiTokenCollectionListItem,
+    'icon' | 'holders_count' | 'minted_count' | 'token_type_count'
+  > {
   collection?: {
     name: string | null
     symbol: string | null
   }
-  icon: string | null
-  holder_count: number
-  minted_count: number
 }
 
 interface InfoProps {
