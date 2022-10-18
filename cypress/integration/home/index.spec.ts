@@ -40,7 +40,7 @@ context('Home Page', () => {
         cy.get(`${ROOT_SELECTOR} .list-container`)
           .children()
           .first()
-          .find(`a[title='block number']`)
+          .find(`a[title='block number']`, { timeout: 20000 })
           .should(link => {
             expect(link).to.has.attr('href').contains('/block/')
           })
