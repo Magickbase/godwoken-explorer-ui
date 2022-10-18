@@ -6,7 +6,7 @@
       "url": "/api/__coverage__"
     }
   },
-  "defaultCommandTimeout": 20000,
+  "defaultCommandTimeout": 12000,
   "responseTimeout": 15000,
   "pageLoadTimeout": 20000,
   "pluginsFile": "node_modules/@cypress/code-coverage/plugins",
