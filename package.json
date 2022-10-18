@@ -43,7 +43,7 @@
     "react-dom": "18.2.0",
     "react-query": "3.39.2",
     "recharts": "2.1.15",
-    "wagmi": "0.6.8"
+    "wagmi": "0.7.3"
   },
   "devDependencies": {
     "@cypress/code-coverage": "3.10.0",

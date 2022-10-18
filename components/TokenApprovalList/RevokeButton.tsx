@@ -102,8 +102,8 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
   const { address: connectedAddr, isConnected } = useAccount()
   const { config, isLoading: isPreparingContract } = usePrepareContractWrite({
     chainId: targetChainId,
-    addressOrName: currentContract.address,
-    contractInterface: currentContract.abi,
+    address: currentContract.address,
+    abi: currentContract.abi as typeof erc1155ABI,
     functionName: currentContract.function,
     args: currentContract.args,
   })
@@ -119,7 +119,7 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
     },
   })
   const { isLoading: isRevokeTxnLoading } = useWaitForTransaction({
-    hash: revokeTxnHash,
+    hash: revokeTxnHash as `0x${string}`,
     onSuccess: data => {
       if (data?.blockHash) {
         localStorage.removeItem(itemKey)
