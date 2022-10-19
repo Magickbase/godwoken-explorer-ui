@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
 
-if (!(process.env.NEXT_PUBLIC_SERVER_ENDPOINT || !process.env.NEXT_PUBLIC_SERVER_ENDPOINT_FOR_E2E)) {
+if (!(process.env.NEXT_PUBLIC_SERVER_ENDPOINT || process.env.NEXT_PUBLIC_SERVER_ENDPOINT_FOR_E2E)) {
   throw new Error(`Server endpoint required`)
 }
 
