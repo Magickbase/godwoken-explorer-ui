@@ -46,28 +46,7 @@ const Layout = ({ children }) => {
               GwScan
             </Link>
           </Alert>
-        ) : (
-          <Alert
-            severity="warning"
-            sx={{
-              'display': 'flex',
-              'justifyContent': 'center',
-              'borderRadius': 0,
-              'bgcolor': 'warning.main',
-              'color': '#333333',
-              'fontSize': { xs: 12, md: 14 },
-              'padding': '6px 10px',
-              '& .MuiAlert-icon': {
-                color: '#000000',
-                mr: { xs: 0.5, md: 1 },
-                fontSize: { xs: 12, md: 20 },
-                py: { xs: 1.25, md: 1 },
-              },
-            }}
-          >
-            {t(`mainnetAnnotation`)}
-          </Alert>
-        )}
+        ) : null}
         {!isHome && (
           <Container
             sx={{
