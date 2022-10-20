@@ -1,9 +1,9 @@
 import { utils, providers } from 'ethers'
 import { NODE_URL, PCKB_UDT_INFO, ZERO_ADDRESS, IS_MAINNET } from './constants'
-import { Chain, configureChains, createClient, defaultChains } from 'wagmi'
+import { Chain, configureChains, createClient, defaultChains, WagmiConfig } from 'wagmi'
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc'
 import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
-import { GraphQLSchema } from './graphql'
+import { client, GraphQLSchema } from './graphql'
 
 export const isEthAddress = (hash: string) => {
   try {
@@ -83,6 +83,19 @@ export const wagmiClient = createClient({
   connectors: [new MetaMaskConnector({ chains })],
   provider: wagmiProvider,
 })
+
+// wagmi hoc
+export function withWagmi<P>(Component: React.ComponentType<P>) {
+  const ComponentWithWagmi = (props: P) => {
+    return (
+      <WagmiConfig client={wagmiClient}>
+        <Component {...props} />
+      </WagmiConfig>
+    )
+  }
+  return ComponentWithWagmi
+}
+
 // TODO: add tests after cypress is enabled
 export const getAddressDisplay = (
   account?: Pick<GraphQLSchema.Account, 'smart_contract' | 'eth_address' | 'script_hash' | 'type'>,

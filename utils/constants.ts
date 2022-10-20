@@ -1,16 +1,12 @@
 import BigNumber from 'bignumber.js'
 
-if (!(process.env.NEXT_PUBLIC_SERVER_ENDPOINT || process.env.NEXT_PUBLIC_SERVER_ENDPOINT_FOR_E2E)) {
+if (!process.env.NEXT_PUBLIC_SERVER_ENDPOINT) {
   throw new Error(`Server endpoint required`)
 }
 
-const SERVER_ENDPOINT = process.env.NEXT_PUBLIC_SERVER_ENDPOINT_FOR_E2E
-  ? process.env.NEXT_PUBLIC_SERVER_ENDPOINT_FOR_E2E
-  : process.env.NEXT_PUBLIC_SERVER_ENDPOINT
-
-export const API_ENDPOINT = `https://${SERVER_ENDPOINT}/api`
-export const WS_ENDPOINT = `wss://${SERVER_ENDPOINT}/socket`
-export const GRAPHQL_ENDPOINT = `https://${SERVER_ENDPOINT}/graphql`
+export const API_ENDPOINT = `https://${process.env.NEXT_PUBLIC_SERVER_ENDPOINT}/api`
+export const WS_ENDPOINT = `wss://${process.env.NEXT_PUBLIC_SERVER_ENDPOINT}/socket`
+export const GRAPHQL_ENDPOINT = `https://${process.env.NEXT_PUBLIC_SERVER_ENDPOINT}/graphql`
 export const NODE_URL = process.env.NEXT_PUBLIC_NODE_URL
 
 export const EXPLORER_TITLE = process.env.NEXT_PUBLIC_EXPLORER_TITLE

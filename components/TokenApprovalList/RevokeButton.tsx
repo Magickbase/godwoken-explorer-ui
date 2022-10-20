@@ -37,12 +37,6 @@ type Props = {
 
 const mapEthTypeToABI = (item: TokenApprovalEntryType, tokenId: string) => {
   const map = {
-    [GraphQLSchema.TokenType.ERC20]: {
-      address: item.token_contract_address_hash,
-      abi: erc20ABI,
-      function: 'approve',
-      args: [item.spender_address_hash, 0],
-    },
     [GraphQLSchema.TokenType.ERC721]:
       item.type === GraphQLSchema.ApprovalType.ApprovalAll
         ? {
@@ -100,13 +94,23 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
   })
   const connector = connectors[0] // only have metamask for now
   const { address: connectedAddr, isConnected } = useAccount()
-  const { config, isLoading: isPreparingContract } = usePrepareContractWrite({
-    chainId: targetChainId,
-    address: currentContract.address,
-    abi: currentContract.abi as typeof erc1155ABI,
-    functionName: currentContract.function,
-    args: currentContract.args,
-  })
+  const { config, isLoading: isPreparingContract } = usePrepareContractWrite(
+    listItem.udt.eth_type === GraphQLSchema.TokenType.ERC20
+      ? {
+          chainId: targetChainId,
+          address: listItem.token_contract_address_hash,
+          abi: erc20ABI,
+          functionName: 'approve',
+          args: [listItem.spender_address_hash, 0],
+        }
+      : {
+          chainId: targetChainId,
+          address: currentContract.address,
+          abi: currentContract.abi,
+          functionName: currentContract.function,
+          args: currentContract.args,
+        },
+  )
   const { write } = useContractWrite({
     ...config,
     onSuccess: data => {
