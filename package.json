@@ -30,7 +30,7 @@
     "@nervosnetwork/ckb-sdk-utils": "0.103.1",
     "bignumber.js": "9.1.0",
     "dayjs": "1.11.5",
-    "ethers": "5.7.1",
+    "ethers": "5.7.2",
     "graphql": "16.6.0",
     "graphql-request": "5.0.0",
     "material-ui-popup-state": "4.1.0",
