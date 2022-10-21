@@ -6,7 +6,7 @@ import { useRouter } from 'next/router'
 import { useQuery } from 'react-query'
 import { gql } from 'graphql-request'
 import { Skeleton } from '@mui/material'
-import { ConnectorAlreadyConnectedError, useConnect } from 'wagmi'
+import { ConnectorAlreadyConnectedError, useConnect, UserRejectedRequestError } from 'wagmi'
 import SubpageHead from 'components/SubpageHead'
 import PageTitle from 'components/PageTitle'
 import Tabs from 'components/Tabs'
@@ -86,7 +86,7 @@ const fetchTokenInfo = (variables: Variables): Promise<TokenInfoProps['token'] |
     .catch(() => undefined)
 
 const Token: React.FC<Props> = () => {
-  const [t, { language }] = useTranslation('tokens')
+  const [t, { language }] = useTranslation(['tokens', 'list'])
   const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string }>(null)
   const {
     replace,
@@ -217,9 +217,12 @@ const Token: React.FC<Props> = () => {
       try {
         await connectAsync({ connector, chainId: currentChain.id })
       } catch (err) {
-        if (!(err instanceof ConnectorAlreadyConnectedError)) {
+        if (err instanceof UserRejectedRequestError) {
+          setMsg({ type: 'error', text: t('user-rejected', { ns: 'list' }) })
+        } else if (!(err instanceof ConnectorAlreadyConnectedError)) {
           setMsg({ type: 'error', text: err.message })
         }
+        return
       }
       const symbol = token.symbol?.split('.')[0] || ''
       try {
