@@ -8,9 +8,9 @@ import HashLink from 'components/HashLink'
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/SimplePagination'
 import TransferDirection from 'components/TransferDirection'
-import Tooltip from 'components/Tooltip'
 import FilterMenu from 'components/FilterMenu'
 import RoundedAmount from 'components/RoundedAmount'
+import Tooltip from 'components/Tooltip'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import EmptyFilteredListIcon from 'assets/icons/empty-filtered-list.svg'
 import { timeDistance, GraphQLSchema, client, PCKB_UDT_INFO } from 'utils'
@@ -167,7 +167,6 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
               }
 
               const method = item.method_name || item.method_id
-
               return (
                 <tr key={hash}>
                   <td>
@@ -188,12 +187,10 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
                   <td>
                     {method ? (
                       <Tooltip title={item.method_id} placement="top">
-                        <div className={styles.method} title={method}>
-                          {method}
-                        </div>
+                        <div className={styles.method}>{method}</div>
                       </Tooltip>
                     ) : (
-                      '-'
+                      <div className={styles.method} data-is-native-transfer="true" />
                     )}
                   </td>
                   <td>

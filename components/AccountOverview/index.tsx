@@ -162,13 +162,17 @@ export const fetchDeployAddress = (variables: { eth_hash: string }) =>
     .request<{ transaction: { from_account: Pick<GraphQLSchema.Account, 'eth_address'> } }>(deployAddrQuery, variables)
     .then(data => data.transaction.from_account.eth_address)
 
+type SourcifyStatusResponse = {
+  sourcify_check_by_addresses: [{ address: string; chain_ids: string[]; status: string }]
+}
+
 export const fetchSourcifyStatus = (address: string) =>
-  client.request<{ sourcify_check_by_addresses: { status: string | null } }>(checkSourcify, { address }).then(data => {
+  client.request<SourcifyStatusResponse>(checkSourcify, { address }).then(data => {
     return data.sourcify_check_by_addresses[0].status
   })
 
 const overviewPlaceHolderCount = (account: AccountOverviewProps['account']) => {
-  switch (account.type) {
+  switch (account?.type) {
     case GraphQLSchema.AccountType.EthUser:
       return 0
     case GraphQLSchema.AccountType.PolyjuiceCreator:
@@ -199,7 +203,7 @@ const overviewPlaceHolderCount = (account: AccountOverviewProps['account']) => {
 const AccountOverview: React.FC<AccountOverviewProps & { refetch: () => Promise<any> }> = ({
   account,
   balance,
-  deployerAddr,
+  deployerAddr = '',
   isBalanceLoading,
   isOverviewLoading,
   refetch,
@@ -231,6 +235,38 @@ const AccountOverview: React.FC<AccountOverviewProps & { refetch: () => Promise<
     )
   }
 
+  const infoList = [
+    {
+      field: t(`ckbBalance`),
+      content: isBalanceLoading ? (
+        <Skeleton animation="wave" />
+      ) : (
+        <span className={styles.balance}>
+          <Amount amount={balance || '0'} udt={PCKB_UDT_INFO} showSymbol />
+        </span>
+      ),
+    },
+    {
+      field: t(`txCount`),
+      content: isOverviewLoading ? (
+        <Skeleton animation="wave" />
+      ) : (
+        new BigNumber(Math.max(account.nonce ?? 0, account.transaction_count ?? 0)).toFormat()
+      ),
+    },
+  ]
+
+  overviewPlaceHolderCount(account) &&
+    infoList.push({
+      field: '',
+      content: (
+        <div
+          data-role="placeholder"
+          style={{ height: `calc(${3.5 * overviewPlaceHolderCount(account)!}rem - 2rem)` }}
+        ></div>
+      ),
+    })
+
   return (
     <div className={styles.container} data-account-type={account.type}>
       {account.type === GraphQLSchema.AccountType.MetaContract ? (
@@ -243,9 +279,9 @@ const AccountOverview: React.FC<AccountOverviewProps & { refetch: () => Promise<
       {account.type === GraphQLSchema.AccountType.PolyjuiceContract ? (
         <SmartContract
           deployer={deployerAddr}
-          deployTxHash={account.smart_contract?.deployment_tx_hash}
+          deployTxHash={account.smart_contract?.deployment_tx_hash!}
           udt={account.udt}
-          address={account.eth_address}
+          address={account.eth_address || ''}
           isVerified={!!account.smart_contract?.contract_source_code}
           refetch={refetch}
           isLoading={isOverviewLoading}
@@ -259,41 +295,7 @@ const AccountOverview: React.FC<AccountOverviewProps & { refetch: () => Promise<
       ) : null}
       {account.type === GraphQLSchema.AccountType.Unknown ? <UnknownAccount nonce={account.nonce} /> : null}
 
-      <InfoList
-        title={t('overview')}
-        list={[
-          {
-            field: t(`ckbBalance`),
-            content: isBalanceLoading ? (
-              <Skeleton animation="wave" />
-            ) : (
-              <span className={styles.balance}>
-                <Amount amount={balance || '0'} udt={PCKB_UDT_INFO} showSymbol />
-              </span>
-            ),
-          },
-          {
-            field: t(`txCount`),
-            content: isOverviewLoading ? (
-              <Skeleton animation="wave" />
-            ) : (
-              new BigNumber(Math.max(account.nonce ?? 0, account.transaction_count ?? 0)).toFormat()
-            ),
-          },
-          overviewPlaceHolderCount(account)
-            ? {
-                field: '',
-                content: (
-                  <div
-                    data-role="placeholder"
-                    style={{ height: `calc(${3.5 * overviewPlaceHolderCount(account)}rem - 2rem)` }}
-                  ></div>
-                ),
-              }
-            : null,
-          // ...overviewPlaceHolderFields,
-        ]}
-      />
+      <InfoList title={t('overview')} list={infoList} />
     </div>
   )
 }
