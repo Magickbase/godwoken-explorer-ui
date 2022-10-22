@@ -13,7 +13,7 @@ import HashLink from 'components/HashLink'
 import Tabs from 'components/Tabs'
 import { SIZES } from 'components/PageSize'
 import ActivityList, { fetchActivityList } from 'components/MultiTokenActivityList'
-import InventoryList, { fetchInventoryListOfTokenItem as fetchInventoryList } from 'components/MultiTokenInventoryList'
+import InventoryList from 'components/MultiTokenInventoryList'
 import HolderList, { fetchItemHoldersList as fetchHolderList } from 'components/MultiTokenHolderList'
 import Metadata from 'components/Metadata'
 import CopyBtn from 'components/CopyBtn'
@@ -129,15 +129,7 @@ const MultiTokenItem = () => {
     ['multi-token-item-holders', address, token_id, before, after, page_size],
     () => fetchHolderList(listParams),
     {
-      enabled: address && token_id && tab === tabs[1],
-    },
-  )
-
-  const { isLoading: isInventoryListLoading, data: inventoryList } = useQuery(
-    ['multi-token-item-inventory', address, token_id, before, after, page_size],
-    () => fetchInventoryList(listParams),
-    {
-      enabled: address && token_id && tab === tabs[2],
+      enabled: address && token_id && (tab === tabs[1] || tab === tabs[2]),
     },
   )
 
@@ -232,8 +224,19 @@ const MultiTokenItem = () => {
           ) : null}
 
           {tab === tabs[2] ? (
-            !isInventoryListLoading && inventoryList ? (
-              <InventoryList inventory={inventoryList} />
+            !isHolderListLoading && holderList ? (
+              <InventoryList
+                token_id={token_id}
+                inventory={{
+                  entries: holderList.entries.map(item => ({
+                    token_id,
+                    contract_address_hash: address,
+                    counts: item.quantity.toString(),
+                    owner: item.address_hash,
+                  })),
+                  metadata: holderList.metadata,
+                }}
+              />
             ) : (
               <Skeleton animation="wave" />
             )

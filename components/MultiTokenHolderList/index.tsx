@@ -43,8 +43,10 @@ const collectionHolderListQuery = gql`
 `
 
 const itemHolderListQuery = gql`
-  query ($address: HashAddress!, $before: String, $after: String, $limit: Int) {
-    holders: erc1155_holders(input: { contract_address: $address, before: $before, after: $after, limit: $limit }) {
+  query ($address: HashAddress!, $token_id: Decimal, $before: String, $after: String, $limit: Int) {
+    holders: erc1155_holders(
+      input: { contract_address: $address, token_id: $token_id, before: $before, after: $after, limit: $limit }
+    ) {
       entries {
         rank
         address_hash
@@ -76,7 +78,7 @@ export const fetchHoldersList = (variables: Variables) =>
     .then(data => data.holders)
     .catch(() => ({ entries: [], metadata: { before: null, after: null, total_count: 0 } }))
 
-export const fetchItemHoldersList = (variables: ItemHoldersVariables) =>
+export const fetchItemHoldersList = (variables: ItemHoldersVariables): Promise<HolderListProps['holders']> =>
   client
     .request<HolderListProps>(itemHolderListQuery, variables)
     .then(data => data.holders)

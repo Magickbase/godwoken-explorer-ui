@@ -1,8 +1,10 @@
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
+import Image from 'next/image'
 import { gql } from 'graphql-request'
 import Pagination from 'components/SimplePagination'
 import HashLink from 'components/HashLink'
+import Tooltip from 'components/Tooltip'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import { client, GraphQLSchema, handleNftImageLoadError } from 'utils'
 import styles from './styles.module.scss'
@@ -13,6 +15,7 @@ type InventoryListProps = {
       token_id: string
       contract_address_hash: string
       counts: string
+      owner?: string
       udt?: {
         id: number
         name: string | null
@@ -22,6 +25,7 @@ type InventoryListProps = {
     metadata: GraphQLSchema.PageMetadata
   }
   viewer?: string
+  token_id?: string
 }
 
 const CollectionFragment = gql`
@@ -43,17 +47,6 @@ const inventoryListOfCollectionQuery = gql`
   ${CollectionFragment}
   query ($address: HashAddress!, $before: String, $after: String, $limit: Int) {
     inventory: erc1155_inventory(input: { contract_address: $address, before: $before, after: $after, limit: $limit }) {
-      ...collectionOrItemList
-    }
-  }
-`
-
-const inventoryListOfTokenItemQuery = gql`
-  ${CollectionFragment}
-  query ($address: HashAddress!, $token_id: Decimal, $before: String, $after: String, $limit: Int) {
-    inventory: erc1155_inventory(
-      input: { contract_address: $address, token_id: $token_id, before: $before, after: $after, limit: $limit }
-    ) {
       ...collectionOrItemList
     }
   }
@@ -86,21 +79,16 @@ interface Variables {
   limit: number
 }
 
-interface InventoryOfTokenItemVariables extends Variables {
-  token_id: string
-}
-
 export const fetchInventoryListOfCollection = (variables: Variables) =>
   client
     .request<InventoryListProps>(inventoryListOfCollectionQuery, variables)
     .then(data => data.inventory)
     .catch(() => ({ entries: [], metadata: { before: null, after: null, total_count: 0 } }))
 
-export const fetchInventoryListOfTokenItem = (variables: InventoryOfTokenItemVariables) =>
-  client
-    .request<InventoryListProps>(inventoryListOfTokenItemQuery, variables)
-    .then(data => data.inventory)
-    .catch(() => ({ entries: [], metadata: { before: null, after: null, total_count: 0 } }))
+/*
+ * For erc 1155, a token type's inventory is same as its holder list because token items belong to a token type are fungible tokens
+ * So query of holder list will be used instead
+ */
 
 export const fetchInventoryListOfAccount = (variables: Variables) =>
   client
@@ -108,7 +96,7 @@ export const fetchInventoryListOfAccount = (variables: Variables) =>
     .then(data => data.inventory)
     .catch(() => ({ entries: [], metadata: { before: null, after: null, total_count: 0 } }))
 
-const MultiTokenInventoryList: React.FC<InventoryListProps> = ({ inventory, viewer }) => {
+const MultiTokenInventoryList: React.FC<InventoryListProps> = ({ inventory, viewer, token_id }) => {
   const [t] = useTranslation(['multi-token', 'list'])
   if (!inventory?.metadata.total_count) {
     return (
@@ -128,10 +116,11 @@ const MultiTokenInventoryList: React.FC<InventoryListProps> = ({ inventory, view
           <div key={item.token_id} className={styles.card}>
             <NextLink href={`/multi-token-item/${item.contract_address_hash}/${item.token_id}`}>
               <a className={styles.cover}>
-                <img
+                <Image
                   src={item.udt?.icon ?? '/images/nft-placeholder.svg'}
                   onError={handleNftImageLoadError}
                   alt="nft-cover"
+                  loading="lazy"
                 />
               </a>
             </NextLink>
@@ -148,15 +137,24 @@ const MultiTokenInventoryList: React.FC<InventoryListProps> = ({ inventory, view
               </div>
             )}
 
-            <div className={styles.info}>
-              <span>{t('token-id')}</span>
-              <HashLink
-                label={item.token_id}
-                href={`/multi-token-item/${item.contract_address_hash}/${item.token_id}`}
-                monoFont={false}
-                style={{ fontSize: 14 }}
-              />
-            </div>
+            {token_id ? (
+              <Tooltip title={item.owner} placement="bottom">
+                <div className={styles.info}>
+                  <span>{t('owner')}</span>
+                  <HashLink href={`/account/${item.owner}`} label={item.owner} />
+                </div>
+              </Tooltip>
+            ) : (
+              <div className={styles.info}>
+                <span>{t('token-id')}</span>
+                <HashLink
+                  label={item.token_id}
+                  href={`/multi-token-item/${item.contract_address_hash}/${item.token_id}`}
+                  monoFont={false}
+                  style={{ fontSize: 14 }}
+                />
+              </div>
+            )}
           </div>
         ))}
       </div>
