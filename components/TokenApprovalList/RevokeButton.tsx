@@ -68,32 +68,15 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
   const { transaction_hash, spender_address_hash, token_contract_address_hash, data } = listItem
   const itemKey = transaction_hash + spender_address_hash + token_contract_address_hash + data + '-revokeTxn'
   const [revokeTxnHash, setRevokeTxnHash] = useState(localStorage.getItem(itemKey) || '')
+  const [callWrite, setCallWrite] = useState(false)
 
   /* wagmi hooks */
   const { chain } = useNetwork()
   const targetChainId = currentChain.id
-  const { switchNetwork } = useSwitchNetwork({
-    onSuccess: () => {
-      setAlert({ open: true, type: 'success', msg: t('switch_network_success') })
-    },
-    onError: () => {
-      setAlert({ open: true, type: 'error', msg: t('user-rejected') })
-    },
-  })
-  const { connect, connectors, isSuccess } = useConnect({
-    chainId: targetChainId,
-    onError: error => {
-      if (error instanceof ConnectorAlreadyConnectedError) {
-        return
-      } else if (error instanceof ConnectorNotFoundError) {
-        setAlert({ open: true, type: 'error', msg: t('ethereum-is-not-injected', { ns: 'tokens' }) })
-      } else {
-        setAlert({ open: true, type: 'error', msg: t('connect-mm-fail') })
-      }
-    },
-  })
+  const { switchNetworkAsync } = useSwitchNetwork({ chainId: targetChainId })
+  const { connectAsync, connectors } = useConnect({ chainId: targetChainId })
   const connector = connectors[0] // only have metamask for now
-  const { address: connectedAddr, isConnected } = useAccount()
+  const { address: connectedAddr } = useAccount()
   const { config, isLoading: isPreparingContract } = usePrepareContractWrite(
     listItem.udt.eth_type === GraphQLSchema.TokenType.ERC20
       ? {
@@ -159,6 +142,15 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
     }
   }, [revokeTxnHash])
 
+  useEffect(() => {
+    if (chain?.id === targetChainId && callWrite) {
+      if (write) {
+        write()
+        setCallWrite(false)
+      }
+    }
+  }, [chain, callWrite, write, targetChainId])
+
   const tooltipTitle = useCallback(() => {
     if (!isOwner || !connector.ready) {
       return t('not_owner')
@@ -175,16 +167,33 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
         <button
           className={styles.revoke}
           disabled={disabled}
-          onClick={() => {
-            if (!isConnected || !chain) {
-              connect({ connector, chainId: targetChainId })
+          onClick={async () => {
+            if (!chain) {
+              try {
+                await connectAsync({ connector, chainId: targetChainId })
+              } catch (error) {
+                if (error instanceof ConnectorAlreadyConnectedError) {
+                  return
+                } else if (error instanceof ConnectorNotFoundError) {
+                  setAlert({ open: true, type: 'error', msg: t('ethereum-is-not-injected', { ns: 'tokens' }) })
+                } else {
+                  setAlert({ open: true, type: 'error', msg: t('user-rejected') })
+                }
+                return
+              }
             }
             if (chain && chain.id !== targetChainId) {
-              switchNetwork?.(targetChainId)
+              try {
+                if (switchNetworkAsync) {
+                  await switchNetworkAsync(targetChainId)
+                  setAlert({ open: true, type: 'success', msg: t('switch_network_success') })
+                }
+              } catch {
+                setAlert({ open: true, type: 'error', msg: t('user-rejected') })
+                return
+              }
             }
-            if (chain && chain?.id === targetChainId) {
-              write?.()
-            }
+            setCallWrite(true)
           }}
         >
           {isPackaging ? (
