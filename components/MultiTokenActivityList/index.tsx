@@ -169,15 +169,17 @@ const ActivityList: React.FC<
                       <TransferDirection from={item.from_address} to={item.to_address} viewer={viewer ?? ''} />
                     </td>
                   ) : null}
-                  <td>
-                    <div className={styles.ids}>
-                      {token_ids.map(id => (
-                        <NextLink href={`/multi-token-item/${item.token_contract_address_hash}/${id}`} key={id}>
-                          <a>{(+id).toLocaleString('en')}</a>
-                        </NextLink>
-                      ))}
-                    </div>
-                  </td>
+                  {token_id ? null : (
+                    <td>
+                      <div className={styles.ids}>
+                        {token_ids.map(id => (
+                          <NextLink href={`/multi-token-item/${item.token_contract_address_hash}/${id}`} key={id}>
+                            <a>{(+id).toLocaleString('en')}</a>
+                          </NextLink>
+                        ))}
+                      </div>
+                    </td>
+                  )}
                   <td>
                     <div className={styles.amounts}>
                       {amounts.map((amount, idx) => (
