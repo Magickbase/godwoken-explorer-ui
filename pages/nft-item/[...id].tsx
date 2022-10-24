@@ -185,7 +185,7 @@ const NftItem = () => {
         <div className={styles.list}>
           <Tabs
             value={tabs.indexOf(tab as string)}
-            tabs={tabs.slice(0, metadata ? 2 : -1).map((tabItem, idx) => ({
+            tabs={tabs.slice(0, metadata ? undefined : -1).map((tabItem, idx) => ({
               label: t(tabItem),
               href: `/nft-item/${address}/${token_id}?tab=${tabs[idx]}`,
             }))}

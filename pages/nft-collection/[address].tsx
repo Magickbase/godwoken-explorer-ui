@@ -115,11 +115,11 @@ const NftCollection = () => {
   const stats: Array<{ field: string; content: React.ReactNode }> = [
     {
       field: t('holder_count'),
-      content: isInfoLoading ? <Skeleton animation="wave" /> : info?.holders_count.toLocaleString('en') ?? '-',
+      content: isInfoLoading ? <Skeleton animation="wave" /> : (+info?.holders_count ?? 0).toLocaleString('en'),
     },
     {
       field: t('minted_count'),
-      content: isInfoLoading ? <Skeleton animation="wave" /> : info?.minted_count.toLocaleString('en') ?? '-',
+      content: isInfoLoading ? <Skeleton animation="wave" /> : (+info?.minted_count ?? 0).toLocaleString('en'),
     },
   ]
 
