@@ -21,9 +21,11 @@ type ActivityListProps = {
       to_account?: Pick<GraphQLSchema.Account, 'type'>
       log_index: number
       polyjuice: Pick<GraphQLSchema.Polyjuice, 'status'>
-      token_id: number
       token_contract_address_hash: string
+      token_id: string | null
       amount: string | null
+      token_ids: Array<string> | null
+      amounts: Array<string> | null
     }>
     metadata: GraphQLSchema.PageMetadata
   }
@@ -74,9 +76,11 @@ const activityListQuery = gql`
         polyjuice {
           status
         }
-        token_id
         token_contract_address_hash
+        token_id
         amount
+        token_ids
+        amounts
       }
 
       metadata {
@@ -118,6 +122,9 @@ const ActivityList: React.FC<
           {transfers?.metadata.total_count ? (
             transfers.entries.map(item => {
               const method = item.transaction.method_name || item.transaction.method_id
+
+              const token_ids = Array.isArray(item.token_ids) ? item.token_ids : [item.token_id]
+              const amounts = Array.isArray(item.amounts) ? item.amounts : [item.amount]
 
               return (
                 <tr key={item.transaction.eth_hash + item.log_index}>
@@ -162,14 +169,22 @@ const ActivityList: React.FC<
                       <TransferDirection from={item.from_address} to={item.to_address} viewer={viewer ?? ''} />
                     </td>
                   ) : null}
-                  {token_id ? null : (
-                    <td>
-                      <NextLink href={`/multi-token-item/${item.token_contract_address_hash}/${item.token_id}`}>
-                        <a>{(+item.token_id).toLocaleString('en')}</a>
-                      </NextLink>
-                    </td>
-                  )}
-                  <td>{(+item.amount ?? 0).toLocaleString('en')}</td>
+                  <td>
+                    <div className={styles.ids}>
+                      {token_ids.map(id => (
+                        <NextLink href={`/multi-token-item/${item.token_contract_address_hash}/${id}`} key={id}>
+                          <a>{(+id).toLocaleString('en')}</a>
+                        </NextLink>
+                      ))}
+                    </div>
+                  </td>
+                  <td>
+                    <div className={styles.amounts}>
+                      {amounts.map((amount, idx) => (
+                        <span key={token_ids[idx]}>{(+amount).toLocaleString('en')}</span>
+                      ))}
+                    </div>
+                  </td>
                 </tr>
               )
             })
