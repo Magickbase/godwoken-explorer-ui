@@ -222,8 +222,8 @@ export namespace GraphQLSchema {
     symbol: string
     icon: string
     account: Pick<Account, 'eth_address'>
-    holders_count: number
-    minted_count: number
+    holders_count: string
+    minted_count: string
   }
 
   export interface MultiTokenCollectionListItem {
@@ -232,8 +232,9 @@ export namespace GraphQLSchema {
     symbol: string
     icon: string
     account: Pick<Account, 'eth_address'>
-    holders_count: number
-    minted_count: number
+    holders_count: string
+    minted_count: string
+    token_type_count: number
   }
 
   export interface TokenApprovalsSorterInput {
