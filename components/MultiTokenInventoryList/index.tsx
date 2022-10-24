@@ -1,6 +1,5 @@
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
-import Image from 'next/image'
 import { gql } from 'graphql-request'
 import Pagination from 'components/SimplePagination'
 import HashLink from 'components/HashLink'
@@ -116,7 +115,7 @@ const MultiTokenInventoryList: React.FC<InventoryListProps> = ({ inventory, view
           <div key={item.token_id} className={styles.card}>
             <NextLink href={`/multi-token-item/${item.contract_address_hash}/${item.token_id}`}>
               <a className={styles.cover}>
-                <Image
+                <img
                   src={item.udt?.icon ?? '/images/nft-placeholder.svg'}
                   onError={handleNftImageLoadError}
                   alt="nft-cover"
