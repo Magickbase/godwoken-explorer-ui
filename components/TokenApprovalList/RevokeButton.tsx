@@ -97,12 +97,14 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
   const { write } = useContractWrite({
     ...config,
     onSuccess: data => {
+      setCallWrite(false)
       setAlert({ open: true, type: 'success', msg: t('revokeTxn-sent-success') })
       localStorage.setItem(itemKey, data.hash)
       setRevokeTxnHash(data.hash)
     },
     onError: () => {
       setAlert({ open: true, type: 'error', msg: t('user-rejected') })
+      setCallWrite(false)
     },
   })
   const { isLoading: isRevokeTxnLoading } = useWaitForTransaction({
@@ -146,7 +148,6 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
     if (chain?.id === targetChainId && callWrite) {
       if (write) {
         write()
-        setCallWrite(false)
       }
     }
   }, [chain, callWrite, write, targetChainId])
