@@ -94,19 +94,7 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
           args: currentContract.args,
         },
   )
-  const { write } = useContractWrite({
-    ...config,
-    onSuccess: data => {
-      setCallWrite(false)
-      setAlert({ open: true, type: 'success', msg: t('revokeTxn-sent-success') })
-      localStorage.setItem(itemKey, data.hash)
-      setRevokeTxnHash(data.hash)
-    },
-    onError: () => {
-      setAlert({ open: true, type: 'error', msg: t('user-rejected') })
-      setCallWrite(false)
-    },
-  })
+  const { writeAsync } = useContractWrite({ ...config })
   const { isLoading: isRevokeTxnLoading } = useWaitForTransaction({
     hash: revokeTxnHash as `0x${string}`,
     onSuccess: data => {
@@ -144,13 +132,27 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
     }
   }, [revokeTxnHash])
 
+  const sentWrite = async () => {
+    try {
+      const data = await writeAsync()
+      setAlert({ open: true, type: 'success', msg: t('revokeTxn-sent-success') })
+      localStorage.setItem(itemKey, data.hash)
+      setRevokeTxnHash(data.hash)
+      setCallWrite(false)
+    } catch {
+      setAlert({ open: true, type: 'error', msg: t('user-rejected') })
+      setCallWrite(false)
+    }
+  }
+
   useEffect(() => {
     if (chain?.id === targetChainId && callWrite) {
-      if (write) {
-        write()
+      if (writeAsync) {
+        sentWrite()
       }
     }
-  }, [chain, callWrite, write, targetChainId])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chain, callWrite, targetChainId])
 
   const tooltipTitle = useCallback(() => {
     if (!isOwner || !connector.ready) {
