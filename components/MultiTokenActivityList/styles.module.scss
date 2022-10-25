@@ -15,6 +15,12 @@
   @include tx-method;
 }
 
+.ids,
+.amounts {
+  display: flex;
+  flex-direction: column;
+}
+
 .noRecords {
   @include empty-list;
 }

@@ -191,7 +191,6 @@ const Token: React.FC<Props> = () => {
       ) : (
         '-'
       ),
-      tooltipTitle: token?.supply || '0',
     },
     {
       field: t('holderCount'),
