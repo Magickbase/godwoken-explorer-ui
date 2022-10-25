@@ -210,9 +210,9 @@ const Account = () => {
     [GraphQLSchema.AccountType.EthUser, GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType)
       ? { label: t('erc721Assets'), key: 'erc-721-assets' }
       : null,
-    // [GraphQLSchema.AccountType.EthUser, GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType)
-    //   ? { label: t('erc1155Assets'), key: 'erc-1155-assets' }
-    //   : null,
+    [GraphQLSchema.AccountType.EthUser, GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType)
+      ? { label: t('erc1155Assets'), key: 'erc-1155-assets' }
+      : null,
     [GraphQLSchema.AccountType.EthUser].includes(accountType)
       ? { label: t('tokenApproval'), key: 'token-approvals' }
       : null,

@@ -18,9 +18,35 @@ export type HolderListProps = {
   }
 }
 
-const holdersListQuery = gql`
+const holderFragment = gql`
+  fragment holders on PaginateErc721Erc1155Holders {
+    entries {
+      rank
+      address_hash
+      quantity
+    }
+    metadata {
+      before
+      after
+      total_count
+    }
+  }
+`
+
+const collectionHolderListQuery = gql`
+  ${holderFragment}
   query ($address: HashAddress!, $before: String, $after: String, $limit: Int) {
     holders: erc1155_holders(input: { contract_address: $address, before: $before, after: $after, limit: $limit }) {
+      ...holders
+    }
+  }
+`
+
+const itemHolderListQuery = gql`
+  query ($address: HashAddress!, $token_id: Decimal, $before: String, $after: String, $limit: Int) {
+    holders: erc1155_holders(
+      input: { contract_address: $address, token_id: $token_id, before: $before, after: $after, limit: $limit }
+    ) {
       entries {
         rank
         address_hash
@@ -35,18 +61,30 @@ const holdersListQuery = gql`
   }
 `
 
-export const fetchHoldersList = (variables: {
+interface Variables {
   address: string // nft collection contract address
   before: string | null
   after: string | null
   limit: number
-}) =>
+}
+
+interface ItemHoldersVariables extends Variables {
+  token_id: string
+}
+
+export const fetchHoldersList = (variables: Variables) =>
   client
-    .request<HolderListProps>(holdersListQuery, variables)
+    .request<HolderListProps>(collectionHolderListQuery, variables)
     .then(data => data.holders)
     .catch(() => ({ entries: [], metadata: { before: null, after: null, total_count: 0 } }))
 
-const NFTHolderList: React.FC<HolderListProps> = ({ holders }) => {
+export const fetchItemHoldersList = (variables: ItemHoldersVariables): Promise<HolderListProps['holders']> =>
+  client
+    .request<HolderListProps>(itemHolderListQuery, variables)
+    .then(data => data.holders)
+    .catch(() => ({ entries: [], metadata: { before: null, after: null, total_count: 0 } }))
+
+const MultiTokenHolderList: React.FC<HolderListProps> = ({ holders }) => {
   const [t] = useTranslation('list')
 
   return (
@@ -90,4 +128,4 @@ const NFTHolderList: React.FC<HolderListProps> = ({ holders }) => {
   )
 }
 
-export default NFTHolderList
+export default MultiTokenHolderList
