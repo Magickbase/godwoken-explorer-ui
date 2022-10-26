@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
 import { OutlinedInput, InputAdornment, styled, InputBaseProps } from '@mui/material'
@@ -33,17 +33,22 @@ const StyledInputBase = styled((props: InputBaseProps) => <OutlinedInput {...pro
 }))
 
 const Search = () => {
-  const { push, asPath } = useRouter()
+  const { push, asPath, query, isReady } = useRouter()
   const searchRef = useRef<HTMLInputElement | null>(null)
   const [showClearBtn, setShowClearBtn] = useState(false)
   const isHome = asPath === '/' || asPath === '/zh-CN'
   const theme = useTheme()
 
+  useEffect(() => {
+    if (isReady && searchRef.current) {
+      searchRef.current.value = (query.search as string) || ''
+    }
+  }, [query, isReady])
+
   const handleSearch = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     await handleSearchKeyPress(e, push)
     if (e.key === 'Enter') {
       searchRef.current?.blur()
-      searchRef.current.value = ''
       setShowClearBtn(false)
     }
   }

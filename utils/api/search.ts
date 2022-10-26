@@ -39,5 +39,12 @@ export const fetchSearch = (search: string) => {
         }
       }
     })
-    .then(url => `${url}?search=${search}`)
+    .then(url => {
+      if (url.startsWith('/404') && Number.isNaN(+query)) {
+        // could be a native token name, go to tokens list
+        return `/tokens/native?name=${encodeURIComponent(query)}&search=${query}`
+      } else {
+        return `${url}?search=${search}`
+      }
+    })
 }
