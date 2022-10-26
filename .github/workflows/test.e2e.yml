@@ -41,8 +41,7 @@ jobs:
           config-file: cypress.json
           command: npm run cypress:run
         env:
-          NEXT_PUBLIC_SERVER_ENDPOINT: ${{ secrets.NEXT_PUBLIC_SERVER_ENDPOINT }}
-          NEXT_PUBLIC_SERVER_URL: ${{ secrets.NEXT_PUBLIC_SERVER_URL }}
+          NEXT_PUBLIC_SERVER_ENDPOINT: ${{ secrets.NEXT_PUBLIC_SERVER_ENDPOINT_FOR_E2E }}
           NEXT_PUBLIC_WS_URL: ${{ secrets.NEXT_PUBLIC_WS_URL }}
           NEXT_PUBLIC_CHAIN_TYPE: ${{ secrets.NEXT_PUBLIC_CHAIN_TYPE }}
 

@@ -6,6 +6,7 @@ import { useRouter } from 'next/router'
 import { useQuery } from 'react-query'
 import { gql } from 'graphql-request'
 import { Skeleton } from '@mui/material'
+import { ConnectorAlreadyConnectedError, useConnect, UserRejectedRequestError } from 'wagmi'
 import SubpageHead from 'components/SubpageHead'
 import PageTitle from 'components/PageTitle'
 import Tabs from 'components/Tabs'
@@ -17,7 +18,7 @@ import HashLink from 'components/HashLink'
 import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
 import Amount from 'components/Amount'
 import Alert from 'components/Alert'
-import { fetchToken, fetchBridgedRecordList, fetchTokenHolderList, client } from 'utils'
+import { fetchToken, fetchBridgedRecordList, fetchTokenHolderList, client, currentChain, withWagmi } from 'utils'
 import styles from './styles.module.scss'
 
 import type { API } from 'utils/api/utils'
@@ -26,7 +27,7 @@ import TokenLogo from 'components/TokenLogo'
 
 const tabs = ['transfers', 'bridged', 'holders']
 
-const isEtheremInjected = (ethereum: any): ethereum is { request: Function } => {
+const isEtheremInjected = (ethereum: any): ethereum is { networkVersion: string; request: Function } => {
   return ethereum && 'request' in ethereum && typeof ethereum.request === 'function'
 }
 
@@ -85,7 +86,7 @@ const fetchTokenInfo = (variables: Variables): Promise<TokenInfoProps['token'] |
     .catch(() => undefined)
 
 const Token: React.FC<Props> = () => {
-  const [t, { language }] = useTranslation('tokens')
+  const [t, { language }] = useTranslation(['tokens', 'list'])
   const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string }>(null)
   const {
     replace,
@@ -135,6 +136,11 @@ const Token: React.FC<Props> = () => {
     () => fetchTokenHolderList({ udt_id: id.toString(), page: page as string }),
     { enabled: tab === tabs[2] },
   )
+
+  const { connectAsync, connectors } = useConnect({
+    chainId: currentChain.id,
+  })
+  const connector = connectors[0]
 
   const tokenInfo = [
     {
@@ -207,6 +213,16 @@ const Token: React.FC<Props> = () => {
 
     const ethereum: unknown | undefined = window['ethereum']
     if (isEtheremInjected(ethereum)) {
+      try {
+        await connectAsync({ connector, chainId: currentChain.id })
+      } catch (err) {
+        if (err instanceof UserRejectedRequestError) {
+          setMsg({ type: 'error', text: t('user-rejected', { ns: 'list' }) })
+        } else if (!(err instanceof ConnectorAlreadyConnectedError)) {
+          setMsg({ type: 'error', text: err.message })
+        }
+        return
+      }
       const symbol = token.symbol?.split('.')[0] || ''
       try {
         await ethereum.request({
@@ -318,4 +334,4 @@ export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return { props: lng }
 }
 
-export default Token
+export default withWagmi<Props>(Token)
