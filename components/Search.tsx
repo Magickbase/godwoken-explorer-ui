@@ -40,10 +40,15 @@ const Search = () => {
   const theme = useTheme()
 
   useEffect(() => {
-    if (searchRef.current) {
+    if (!searchRef.current) return
+    if (query.search) {
+      searchRef.current.value = (query.search as string) || ''
+    } else {
       const queryKey = 'search'
       const queryValue = query[queryKey] || asPath.match(new RegExp(`[&?]${queryKey}=(.*)(&|$)`))
-      searchRef.current.value = queryValue[1] || ''
+      if (queryValue) {
+        searchRef.current.value = queryValue[1] || ''
+      }
     }
   }, [query, asPath])
 
