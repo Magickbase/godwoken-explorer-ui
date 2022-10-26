@@ -33,22 +33,19 @@ const StyledInputBase = styled((props: InputBaseProps) => <OutlinedInput {...pro
 }))
 
 const Search = () => {
-  const { push, asPath, query, isReady } = useRouter()
+  const { push, asPath, query } = useRouter()
   const searchRef = useRef<HTMLInputElement | null>(null)
   const [showClearBtn, setShowClearBtn] = useState(false)
   const isHome = asPath === '/' || asPath === '/zh-CN'
   const theme = useTheme()
 
   useEffect(() => {
-    let s = query.search
-    if (!s) {
-      const q = new URLSearchParams(window.location.search)
-      s = q.get('search')
+    if (searchRef.current) {
+      const queryKey = 'search'
+      const queryValue = query[queryKey] || asPath.match(new RegExp(`[&?]${queryKey}=(.*)(&|$)`))
+      searchRef.current.value = queryValue[1] || ''
     }
-    if (isReady && searchRef.current) {
-      searchRef.current.value = (s as string) || ''
-    }
-  }, [query, isReady])
+  }, [query, asPath])
 
   const handleSearch = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     await handleSearchKeyPress(e, push)
