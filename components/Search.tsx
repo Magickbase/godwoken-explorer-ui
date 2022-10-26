@@ -40,8 +40,13 @@ const Search = () => {
   const theme = useTheme()
 
   useEffect(() => {
+    let s = query.search
+    if (!s) {
+      const q = new URLSearchParams(window.location.search)
+      s = q.get('search')
+    }
     if (isReady && searchRef.current) {
-      searchRef.current.value = (query.search as string) || ''
+      searchRef.current.value = (s as string) || ''
     }
   }, [query, isReady])
 
