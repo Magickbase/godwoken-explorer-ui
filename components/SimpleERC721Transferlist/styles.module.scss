@@ -1,0 +1,55 @@
+@import '../../styles/mixin.scss';
+
+.container {
+  th {
+    text-transform: capitalize;
+  }
+  th,
+  td {
+    &:last-child {
+      text-align: right;
+    }
+  }
+  &[data-is-filter-unnecessary='true'] {
+    th {
+      svg {
+        display: none;
+      }
+    }
+  }
+}
+
+.tokenLogo {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+.token {
+  display: flex;
+  align-items: center;
+  svg {
+    margin-left: 0.25rem;
+    cursor: pointer;
+  }
+}
+
+.index {
+  display: flex;
+  align-items: center;
+  svg {
+    cursor: pointer;
+    margin-left: 8px;
+    &[data-order='DESC'] {
+      transform: rotate(0.5turn);
+    }
+  }
+}
+
+.from,
+.to {
+  display: flex;
+  align-items: center;
+}
+
+.noRecords {
+  @include empty-list;
+}

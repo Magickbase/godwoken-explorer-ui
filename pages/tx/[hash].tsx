@@ -13,6 +13,7 @@ import SubpageHead from 'components/SubpageHead'
 import PageTitle from 'components/PageTitle'
 import InfoList from 'components/InfoList'
 import TransferList, { fetchTransferList } from 'components/SimpleERC20Transferlist'
+import SimpleERC721Transferlist from 'components/SimpleERC721Transferlist'
 import TxLogsList from 'components/TxLogsList'
 import RawTxData from 'components/RawTxData'
 import CopyBtn from 'components/CopyBtn'
@@ -510,6 +511,13 @@ const Tx = () => {
             )
           ) : null}
           {tab === 'raw-data' && tx ? <RawTxData hash={hash as string} /> : null}
+          {tab === 'erc721' ? (
+            transferList || !isTransferListLoading ? (
+              <SimpleERC721Transferlist token_transfers={transferList} />
+            ) : (
+              <Skeleton animation="wave" />
+            )
+          ) : null}
         </div>
       </div>
     </>
