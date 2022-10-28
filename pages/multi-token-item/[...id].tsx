@@ -179,7 +179,7 @@ const MultiTokenItem = () => {
               <Skeleton animation="wave" />
             ) : (
               <h2>
-                <span>{info?.collection?.name || '-'}</span>
+                <span>{metadata?.name || '-'}</span>
                 {info?.collection?.name ? (
                   <NextLink href={`/multi-token-collection/${address}`}>
                     <a className={styles.collection}>
