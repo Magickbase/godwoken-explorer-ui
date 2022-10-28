@@ -4,7 +4,7 @@ import { gql } from 'graphql-request'
 import Pagination from 'components/SimplePagination'
 import HashLink from 'components/HashLink'
 import NoDataIcon from 'assets/icons/no-data.svg'
-import { client, GraphQLSchema, handleNftImageLoadError } from 'utils'
+import { client, getIpfsUrl, GraphQLSchema, handleNftImageLoadError } from 'utils'
 import styles from './styles.module.scss'
 import Tooltip from 'components/Tooltip'
 
@@ -19,6 +19,9 @@ type InventoryListProps = {
         name: string | null
         icon: string | null
       }
+      token_instance?: {
+        metadata?: Record<'image', string>
+      }
     }>
     metadata: GraphQLSchema.PageMetadata
   }
@@ -32,6 +35,9 @@ const inventoryListOfCollectionQuery = gql`
         token_id
         address_hash
         token_contract_address_hash
+        token_instance {
+          metadata
+        }
       }
       metadata {
         before
@@ -52,6 +58,9 @@ const inventoryListOfAccountQuery = gql`
           id
           name
           icon
+        }
+        token_instance {
+          metadata
         }
       }
       metadata {
@@ -103,7 +112,7 @@ const NFTInventoryList: React.FC<InventoryListProps> = ({ inventory, viewer }) =
             <NextLink href={`/nft-item/${item.token_contract_address_hash}/${item.token_id}`}>
               <a className={styles.cover}>
                 <img
-                  src={item.udt?.icon ?? '/images/nft-placeholder.svg'}
+                  src={getIpfsUrl(item.token_instance?.metadata?.image) ?? '/images/nft-placeholder.svg'}
                   onError={handleNftImageLoadError}
                   alt="nft-cover"
                 />
