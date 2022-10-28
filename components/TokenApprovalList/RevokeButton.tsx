@@ -37,12 +37,6 @@ type Props = {
 
 const mapEthTypeToABI = (item: TokenApprovalEntryType, tokenId: string) => {
   const map = {
-    [GraphQLSchema.TokenType.ERC20]: {
-      address: item.token_contract_address_hash,
-      abi: erc20ABI,
-      function: 'approve',
-      args: [item.spender_address_hash, 0],
-    },
     [GraphQLSchema.TokenType.ERC721]:
       item.type === GraphQLSchema.ApprovalType.ApprovalAll
         ? {
@@ -74,52 +68,35 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
   const { transaction_hash, spender_address_hash, token_contract_address_hash, data } = listItem
   const itemKey = transaction_hash + spender_address_hash + token_contract_address_hash + data + '-revokeTxn'
   const [revokeTxnHash, setRevokeTxnHash] = useState(localStorage.getItem(itemKey) || '')
+  const [callWrite, setCallWrite] = useState(false)
 
   /* wagmi hooks */
   const { chain } = useNetwork()
   const targetChainId = currentChain.id
-  const { switchNetwork } = useSwitchNetwork({
-    onSuccess: () => {
-      setAlert({ open: true, type: 'success', msg: t('switch_network_success') })
-    },
-    onError: () => {
-      setAlert({ open: true, type: 'error', msg: t('user-rejected') })
-    },
-  })
-  const { connect, connectors, isSuccess } = useConnect({
-    chainId: targetChainId,
-    onError: error => {
-      if (error instanceof ConnectorAlreadyConnectedError) {
-        return
-      } else if (error instanceof ConnectorNotFoundError) {
-        setAlert({ open: true, type: 'error', msg: t('ethereum-is-not-injected', { ns: 'tokens' }) })
-      } else {
-        setAlert({ open: true, type: 'error', msg: t('connect-mm-fail') })
-      }
-    },
-  })
+  const { switchNetworkAsync } = useSwitchNetwork({ chainId: targetChainId })
+  const { connectAsync, connectors } = useConnect({ chainId: targetChainId })
   const connector = connectors[0] // only have metamask for now
-  const { address: connectedAddr, isConnected } = useAccount()
-  const { config, isLoading: isPreparingContract } = usePrepareContractWrite({
-    chainId: targetChainId,
-    addressOrName: currentContract.address,
-    contractInterface: currentContract.abi,
-    functionName: currentContract.function,
-    args: currentContract.args,
-  })
-  const { write } = useContractWrite({
-    ...config,
-    onSuccess: data => {
-      setAlert({ open: true, type: 'success', msg: t('revokeTxn-sent-success') })
-      localStorage.setItem(itemKey, data.hash)
-      setRevokeTxnHash(data.hash)
-    },
-    onError: () => {
-      setAlert({ open: true, type: 'error', msg: t('user-rejected') })
-    },
-  })
+  const { address: connectedAddr } = useAccount()
+  const { config, isLoading: isPreparingContract } = usePrepareContractWrite(
+    listItem.udt.eth_type === GraphQLSchema.TokenType.ERC20
+      ? {
+          chainId: targetChainId,
+          address: listItem.token_contract_address_hash,
+          abi: erc20ABI,
+          functionName: 'approve',
+          args: [listItem.spender_address_hash, 0],
+        }
+      : {
+          chainId: targetChainId,
+          address: currentContract.address,
+          abi: currentContract.abi,
+          functionName: currentContract.function,
+          args: currentContract.args,
+        },
+  )
+  const { writeAsync } = useContractWrite({ ...config })
   const { isLoading: isRevokeTxnLoading } = useWaitForTransaction({
-    hash: revokeTxnHash,
+    hash: revokeTxnHash as `0x${string}`,
     onSuccess: data => {
       if (data?.blockHash) {
         localStorage.removeItem(itemKey)
@@ -155,6 +132,28 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
     }
   }, [revokeTxnHash])
 
+  const sentWrite = async () => {
+    if (writeAsync) {
+      try {
+        const data = await writeAsync()
+        setAlert({ open: true, type: 'success', msg: t('revokeTxn-sent-success') })
+        localStorage.setItem(itemKey, data.hash)
+        setRevokeTxnHash(data.hash)
+        setCallWrite(false)
+      } catch {
+        setAlert({ open: true, type: 'error', msg: t('user-rejected') })
+        setCallWrite(false)
+      }
+    }
+  }
+
+  useEffect(() => {
+    if (chain?.id === targetChainId && callWrite) {
+      sentWrite()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chain, callWrite, targetChainId])
+
   const tooltipTitle = useCallback(() => {
     if (!isOwner || !connector.ready) {
       return t('not_owner')
@@ -171,16 +170,33 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
         <button
           className={styles.revoke}
           disabled={disabled}
-          onClick={() => {
-            if (!isConnected || !chain) {
-              connect({ connector, chainId: targetChainId })
+          onClick={async () => {
+            if (!chain) {
+              try {
+                await connectAsync({ connector, chainId: targetChainId })
+              } catch (error) {
+                if (error instanceof ConnectorAlreadyConnectedError) {
+                  return
+                } else if (error instanceof ConnectorNotFoundError) {
+                  setAlert({ open: true, type: 'error', msg: t('ethereum-is-not-injected', { ns: 'tokens' }) })
+                } else {
+                  setAlert({ open: true, type: 'error', msg: t('user-rejected') })
+                }
+                return
+              }
             }
             if (chain && chain.id !== targetChainId) {
-              switchNetwork?.(targetChainId)
+              try {
+                if (switchNetworkAsync) {
+                  await switchNetworkAsync(targetChainId)
+                  setAlert({ open: true, type: 'success', msg: t('switch_network_success') })
+                }
+              } catch {
+                setAlert({ open: true, type: 'error', msg: t('user-rejected') })
+                return
+              }
             }
-            if (chain && chain?.id === targetChainId) {
-              write?.()
-            }
+            setCallWrite(true)
           }}
         >
           {isPackaging ? (

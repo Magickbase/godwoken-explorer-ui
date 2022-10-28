@@ -5,7 +5,7 @@ import Pagination from 'components/SimplePagination'
 import HashLink from 'components/HashLink'
 import Tooltip from 'components/Tooltip'
 import NoDataIcon from 'assets/icons/no-data.svg'
-import { client, GraphQLSchema, handleNftImageLoadError } from 'utils'
+import { client, getIpfsUrl, GraphQLSchema, handleNftImageLoadError } from 'utils'
 import styles from './styles.module.scss'
 
 type InventoryListProps = {
@@ -20,6 +20,9 @@ type InventoryListProps = {
         name: string | null
         icon: string | null
       }
+      token_instance?: {
+        metadata?: Record<'image', string>
+      }
     }>
     metadata: GraphQLSchema.PageMetadata
   }
@@ -33,6 +36,9 @@ const CollectionFragment = gql`
       token_id
       contract_address_hash
       counts
+      token_instance {
+        metadata
+      }
     }
     metadata {
       before
@@ -60,6 +66,9 @@ const inventoryListOfAccountQuery = gql`
         udt {
           name
           icon
+        }
+        token_instance {
+          metadata
         }
       }
       metadata {
@@ -116,7 +125,7 @@ const MultiTokenInventoryList: React.FC<InventoryListProps> = ({ inventory, view
             <NextLink href={`/multi-token-item/${item.contract_address_hash}/${item.token_id}`}>
               <a className={styles.cover}>
                 <img
-                  src={item.udt?.icon ?? '/images/nft-placeholder.svg'}
+                  src={getIpfsUrl(item.token_instance?.metadata?.image) ?? '/images/nft-placeholder.svg'}
                   onError={handleNftImageLoadError}
                   alt="nft-cover"
                   loading="lazy"

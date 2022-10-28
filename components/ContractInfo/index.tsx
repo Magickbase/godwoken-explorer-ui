@@ -4,7 +4,7 @@ import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import OpenInNewIcon from 'assets/icons/open-in-new.svg'
 import ExpandIcon from 'assets/icons/expand.svg'
-import { currentChain as targetChain, provider } from 'utils'
+import { currentChain as targetChain } from 'utils'
 import styles from './styles.module.scss'
 import {
   ConnectorAlreadyConnectedError,
@@ -15,6 +15,7 @@ import {
   useNetwork,
   useSwitchNetwork,
   useContract,
+  UserRejectedRequestError,
 } from 'wagmi'
 import Alert from 'components/Alert'
 
@@ -22,7 +23,7 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
   address,
   contract: { abi, compiler_file_format, compiler_version, name, contract_source_code, constructor_arguments },
 }) => {
-  const [t] = useTranslation(['account', 'tokens'])
+  const [t] = useTranslation(['account', 'tokens', 'list'])
   const [tabIdx, setTabIdx] = useState(0)
   const vm = compiler_file_format?.split(' ')[0]
   const chips = [
@@ -39,38 +40,43 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
   const [writeMethods, setWriteMethods] = useState({})
 
   // wagmi hooks
-  const { connect, connectors } = useConnect({
+  const { connect, connectAsync, connectors } = useConnect({
     chainId: targetChain.id,
-    onError(error) {
+    onError: error => {
       if (error instanceof ConnectorAlreadyConnectedError) {
         return
       } else if (error instanceof ConnectorNotFoundError) {
         setAlert({ open: true, type: 'error', msg: t('ethereum-is-not-injected', { ns: 'tokens' }) })
       } else {
-        setAlert({ open: true, type: 'error', msg: t('connect-mm-fail') })
+        setAlert({ open: true, type: 'error', msg: t('connect-mm-fail', { ns: 'list' }) })
       }
     },
   })
   const connector = connectors[0] // only have metamask
   const { address: addr } = useAccount()
-  const { data: signer } = useSigner()
+  const { data: signer } = useSigner({
+    chainId: targetChain.id,
+  })
   const { chain } = useNetwork()
-  const { switchNetworkAsync } = useSwitchNetwork()
+  const { switchNetwork, switchNetworkAsync } = useSwitchNetwork({
+    onSuccess: () => {
+      setAlert({ open: true, type: 'success', msg: t('switch_network_success', { ns: 'list' }) })
+    },
+    onError: () => {
+      setAlert({ open: true, type: 'error', msg: t('user-rejected', { ns: 'list' }) })
+    },
+  })
   const contract = useContract({
-    addressOrName: address,
-    contractInterface: abi,
-    // FIXME: remove the provider, or it will break the workflow of `switch to the correct network -> send a request` by one click due to inconsistent chain id
-    signerOrProvider: tabIdx === 2 ? signer : provider,
+    address: address,
+    abi: abi,
+    signerOrProvider: signer,
   })
 
   useEffect(() => {
-    if (chain?.id !== targetChain.id) {
-      setAlert({ open: true, type: 'warning', msg: t('switch-to-network', { network: targetChain.name }) })
-    }
-  }, [chain?.id, t, targetChain])
-
-  useEffect(() => {
     if (tabIdx === 2) {
+      if (chain?.id !== targetChain.id && switchNetwork) {
+        switchNetwork(targetChain.id)
+      }
       connect({ connector, chainId: targetChain.id })
     }
   }, [connect, connector, tabIdx, targetChain.id])
@@ -123,16 +129,26 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
       return
     }
 
-    form.setAttribute(LOADING_ATTRIBUTE, 'true')
     try {
       if (tabIdx === 2 && chain?.id !== targetChain.id) {
         if (switchNetworkAsync) {
           await switchNetworkAsync(targetChain.id)
         } else {
-          connect({ connector, chainId: targetChain.id })
+          await connectAsync({ connector, chainId: targetChain.id })
         }
-        return
       }
+    } catch (err) {
+      if (err instanceof UserRejectedRequestError) {
+        setAlert({ open: true, type: 'error', msg: t('user-rejected', { ns: 'list' }) })
+      } else if (!(err instanceof ConnectorAlreadyConnectedError)) {
+        setAlert({ open: true, type: 'error', msg: err.message })
+      }
+      return
+    }
+
+    form.setAttribute(LOADING_ATTRIBUTE, 'true')
+
+    try {
       const result = await method(...params)
       if (tabIdx === 2) {
         const elm = resInputList[0]
@@ -149,11 +165,15 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
         resList.map((res, i) => (resInputList[i] ? (resInputList[i].value = res.toString()) : null))
       }
     } catch (err: any) {
-      const message = err.data?.message ?? err.message
-      if (message.length > 60) {
-        window.alert(message)
+      if (err.code === 4001 || err.code === 'ACTION_REJECTED') {
+        setAlert({ open: true, type: 'error', msg: t('user-rejected', { ns: 'list' }) })
       } else {
-        setAlert({ open: true, type: 'error', msg: message })
+        const message = err.data?.message ?? err.message
+        if (message.length > 60) {
+          window.alert(message)
+        } else {
+          setAlert({ open: true, type: 'error', msg: message })
+        }
       }
     } finally {
       btn.disabled = false
