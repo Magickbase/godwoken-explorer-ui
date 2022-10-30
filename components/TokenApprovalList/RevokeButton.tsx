@@ -69,6 +69,7 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
   const itemKey = transaction_hash + spender_address_hash + token_contract_address_hash + data + '-revokeTxn'
   const [revokeTxnHash, setRevokeTxnHash] = useState(localStorage.getItem(itemKey) || '')
   const [callWrite, setCallWrite] = useState(false)
+  const [calling, setCalling] = useState(false)
 
   /* wagmi hooks */
   const { chain } = useNetwork()
@@ -132,27 +133,28 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
     }
   }, [revokeTxnHash])
 
-  const sentWrite = async () => {
-    if (writeAsync) {
-      try {
-        const data = await writeAsync()
-        setAlert({ open: true, type: 'success', msg: t('revokeTxn-sent-success') })
-        localStorage.setItem(itemKey, data.hash)
-        setRevokeTxnHash(data.hash)
-        setCallWrite(false)
-      } catch {
-        setAlert({ open: true, type: 'error', msg: t('user-rejected') })
-        setCallWrite(false)
-      }
+  const sendWriteCall = async () => {
+    setCalling(true)
+    try {
+      const data = await writeAsync?.()
+      setAlert({ open: true, type: 'success', msg: t('revokeTxn-sent-success') })
+      localStorage.setItem(itemKey, data?.hash)
+      setRevokeTxnHash(data.hash)
+      setCallWrite(false)
+    } catch {
+      setAlert({ open: true, type: 'error', msg: t('user-rejected') })
+      setCallWrite(false)
     }
+    setCalling(false)
   }
 
   useEffect(() => {
+    if (!writeAsync || calling) return
     if (chain?.id === targetChainId && callWrite) {
-      sentWrite()
+      sendWriteCall()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chain, callWrite, targetChainId])
+  }, [chain, callWrite, targetChainId, writeAsync, calling])
 
   const tooltipTitle = useCallback(() => {
     if (!isOwner || !connector.ready) {
