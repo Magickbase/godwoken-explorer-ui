@@ -39,7 +39,7 @@ context('Home Page', () => {
       it('should have number which is a link', () => {
         cy.get(`${ROOT_SELECTOR} .list-container`)
           .children()
-          .first()
+          .last()
           .find(`a[title='block number']`)
           .should(link => {
             expect(link).to.has.attr('href').contains('/block/')
