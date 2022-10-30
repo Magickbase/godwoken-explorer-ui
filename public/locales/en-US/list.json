@@ -78,5 +78,7 @@
   "revokeTxn-sent-success": "Transaction sent success",
   "user-rejected": "User rejected request",
   "please-connect-mm": "Please connect to MetaMask first",
-  "switch_network_success": "Switch network success"
+  "switch_network_success": "Switch network success",
+  "waiting_for_tx": "Waiting for transaction",
+  "waiting_for_block": "Waiting for block"
 }

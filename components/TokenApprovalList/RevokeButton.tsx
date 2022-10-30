@@ -69,7 +69,7 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
   const itemKey = transaction_hash + spender_address_hash + token_contract_address_hash + data + '-revokeTxn'
   const [revokeTxnHash, setRevokeTxnHash] = useState(localStorage.getItem(itemKey) || '')
   const [callWrite, setCallWrite] = useState(false)
-  const [calling, setCalling] = useState(false)
+  const [callingWrite, setCallingWrite] = useState(false)
 
   /* wagmi hooks */
   const { chain } = useNetwork()
@@ -124,7 +124,13 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
 
   const isOwner = connectedAddr ? account.toLowerCase() === connectedAddr.toLowerCase() : true
   const disabled =
-    !isOwner || isPreparingContract || !connector.ready || isRevokeTxnLoading || isFetchApproveTxLoading || isPackaging
+    !isOwner ||
+    isPreparingContract ||
+    !connector.ready ||
+    isRevokeTxnLoading ||
+    isFetchApproveTxLoading ||
+    isPackaging ||
+    callingWrite
 
   useEffect(() => {
     if (revokeTxnHash) {
@@ -134,7 +140,7 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
   }, [revokeTxnHash])
 
   const sendWriteCall = async () => {
-    setCalling(true)
+    setCallingWrite(true)
     try {
       const data = await writeAsync?.()
       setAlert({ open: true, type: 'success', msg: t('revokeTxn-sent-success') })
@@ -145,26 +151,28 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
       setAlert({ open: true, type: 'error', msg: t('user-rejected') })
       setCallWrite(false)
     }
-    setCalling(false)
+    setCallingWrite(false)
   }
 
   useEffect(() => {
-    if (!writeAsync || calling) return
+    if (!writeAsync || callingWrite) return
     if (chain?.id === targetChainId && callWrite) {
       sendWriteCall()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chain, callWrite, targetChainId, writeAsync, calling])
+  }, [chain, callWrite, targetChainId, writeAsync, callingWrite])
 
   const tooltipTitle = useCallback(() => {
     if (!isOwner || !connector.ready) {
       return t('not_owner')
+    } else if (callingWrite) {
+      return t('waiting_for_tx')
     } else if (isPackaging) {
-      return ''
+      return t('waiting_for_block')
     } else {
       return t('click_to_revoke')
     }
-  }, [connector.ready, isOwner, isPackaging, t])
+  }, [connector.ready, isOwner, isPackaging, callingWrite, t])
 
   return (
     <Tooltip title={tooltipTitle()} placement="top">
