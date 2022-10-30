@@ -21,6 +21,14 @@
 
 .overview {
   display: flex;
+
+  dt {
+    flex-basis: 10.5rem !important;
+    @media screen and (max-width: 1280px) {
+      flex-basis: 7.25rem !important;
+    }
+  }
+
   dd {
     white-space: breaks-spaces;
     word-break: break-all;

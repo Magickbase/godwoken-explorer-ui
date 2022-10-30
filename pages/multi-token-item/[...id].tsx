@@ -1,22 +1,27 @@
 import type { GetStaticPaths, GetStaticProps } from 'next'
+import { useState, useEffect } from 'react'
 import { useQuery } from 'react-query'
-import { gql } from 'graphql-request'
+import NextLink from 'next/link'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { Skeleton } from '@mui/material'
+import { gql } from 'graphql-request'
+import { ethers } from 'ethers'
 import SubpageHead from 'components/SubpageHead'
 import HashLink from 'components/HashLink'
 import Tabs from 'components/Tabs'
 import { SIZES } from 'components/PageSize'
 import ActivityList, { fetchActivityList } from 'components/MultiTokenActivityList'
+import InventoryList from 'components/MultiTokenInventoryList'
+import HolderList, { fetchItemHoldersList as fetchHolderList } from 'components/MultiTokenHolderList'
+import Metadata from 'components/Metadata'
 import CopyBtn from 'components/CopyBtn'
-import { client, handleNftImageLoadError } from 'utils'
+import { client, handleNftImageLoadError, erc1155ABI, provider, getIpfsUrl, GraphQLSchema } from 'utils'
 import styles from './styles.module.scss'
-// TODO: add metadata display after PR https://github.com/Magickbase/godwoken-explorer-ui/pull/542 is merged, that PR introduces ABI of ERC 1155
 
 const infoQuery = gql`
-  query ($address: HashAddress, $token_id: String) {
+  query ($address: HashAddress) {
     erc1155_udts(input: { contract_address: $address, limit: 1 }) {
       entries {
         name
@@ -27,35 +32,38 @@ const infoQuery = gql`
       }
     }
 
-    holders: erc721_erc1155_inventory(input: { contract_address: $address, token_id: $token_id }) {
-      entries {
-        address_hash
-      }
+    udt(input: { contract_address: $address }) {
+      symbol
+      name
     }
   }
 `
 
-interface CollectionInfo {
-  name: string | null
-  symbol: string | null
-  icon: string | null
-  holder_count: number
-  minted_count: number
-  owner: string | null
+interface CollectionInfo
+  extends Pick<
+    GraphQLSchema.MultiTokenCollectionListItem,
+    'icon' | 'holders_count' | 'minted_count' | 'token_type_count'
+  > {
+  collection?: {
+    name: string | null
+    symbol: string | null
+  }
 }
 
 interface InfoProps {
   erc1155_udts: {
     entries: Array<CollectionInfo>
   }
-  holders: {
-    entries: Array<{ address_hash: string }>
+  udt?: {
+    name: string | null
+    symbol: string | null
   }
 }
 
+type MetadataProps = Record<'name' | 'description' | 'image', string>
+
 interface Variables {
   address: string
-  token_id: string
 }
 
 const fetchInfo = (variables: Variables): Promise<CollectionInfo | undefined> =>
@@ -63,19 +71,34 @@ const fetchInfo = (variables: Variables): Promise<CollectionInfo | undefined> =>
     .request<InfoProps>(infoQuery, variables)
     .then(data => ({
       ...data.erc1155_udts.entries[0],
-      owner: data.holders.entries[0]?.address_hash ?? null,
+      collection: data.udt,
     }))
     .catch(() => undefined)
 
-const tabs = ['activity']
+const tabs = ['activity', 'holders', 'inventory', 'metadata']
 
 const MultiTokenItem = () => {
   const [t] = useTranslation('multi-token')
+  const [metadata, setMetadata] = useState<Metadata | null>(null)
   const {
     query: { id, before = null, after = null, page_size = SIZES[1], tab = tabs[0] },
   } = useRouter()
 
   const [address, token_id] = Array.isArray(id) ? id : [null, null]
+
+  useEffect(() => {
+    if (!address || !token_id) return
+    const contract = new ethers.Contract(address, erc1155ABI, provider)
+    contract
+      .uri(token_id)
+      .then((url: string) => {
+        return getIpfsUrl(url).replace(/{id}/, token_id)
+      })
+      .then((url: string) => fetch(url))
+      .then(res => res.json())
+      .then((metadata: MetadataProps) => setMetadata(metadata))
+      .catch(console.warn)
+  }, [address, token_id, setMetadata])
 
   const listParams = {
     address: address as string,
@@ -86,8 +109,8 @@ const MultiTokenItem = () => {
   }
 
   const { isLoading: isInfoLoading, data: info } = useQuery(
-    ['multi-token-item-info', address, id],
-    () => fetchInfo({ address, token_id: token_id as string }),
+    ['multi-token-item-info', address],
+    () => fetchInfo({ address }),
     {
       enabled: !!address && !!token_id,
       refetchInterval: 10000,
@@ -102,23 +125,18 @@ const MultiTokenItem = () => {
     },
   )
 
+  const { isLoading: isHolderListLoading, data: holderList } = useQuery(
+    ['multi-token-item-holders', address, token_id, before, after, page_size],
+    () => fetchHolderList(listParams),
+    {
+      enabled: address && token_id && (tab === tabs[1] || tab === tabs[2]),
+    },
+  )
+
   const infoList: Array<{
     field: string
     content: React.ReactNode | string
   }> = [
-    {
-      field: t('owner'),
-      content: info?.owner ? (
-        <div className={styles.owner}>
-          <HashLink label={info.owner as string} href={`/account/${info.owner}`} />
-          <CopyBtn content={info.owner as string} field={t('address', { ns: 'common' })} />
-        </div>
-      ) : isInfoLoading ? (
-        <Skeleton animation="wave" />
-      ) : (
-        '-'
-      ),
-    },
     {
       field: t('contract'),
       content: (
@@ -143,16 +161,34 @@ const MultiTokenItem = () => {
     },
   ]
 
-  const title = `${t('multi-token-collection')} ${info?.name ?? '-'}`
+  // TODO: use name from metadata
+  const title = `${t('multi-token-collection')} ${metadata?.name ?? info?.collection?.name ?? '-'}`
 
   return (
     <>
       <SubpageHead subtitle={title} />
       <div className={styles.container}>
         <div className={styles.overview}>
-          <img src={'/images/nft-placeholder.svg'} onError={handleNftImageLoadError} alt="nft-cover" />
+          <img
+            src={getIpfsUrl(metadata?.image ?? '/images/nft-placeholder.svg')}
+            onError={handleNftImageLoadError}
+            alt="nft-cover"
+          />
           <div className={styles.info}>
-            {isInfoLoading ? <Skeleton animation="wave" /> : <h2>{info?.name || '-'}</h2>}
+            {isInfoLoading ? (
+              <Skeleton animation="wave" />
+            ) : (
+              <h2>
+                <span>{metadata?.name || '-'}</span>
+                {info?.collection?.name ? (
+                  <NextLink href={`/multi-token-collection/${address}`}>
+                    <a className={styles.collection}>
+                      {`${info.collection.name}` + (info.collection.symbol ? `(${info.collection.symbol})` : '')}
+                    </a>
+                  </NextLink>
+                ) : null}
+              </h2>
+            )}
             {infoList.map(({ field, content }, i) => (
               <div key={i} className={styles.item}>
                 <div>{field}</div>
@@ -165,11 +201,12 @@ const MultiTokenItem = () => {
         <div className={styles.list}>
           <Tabs
             value={tabs.indexOf(tab as string)}
-            tabs={tabs.map((tabItem, idx) => ({
+            tabs={tabs.slice(0, metadata ? undefined : -1).map((tabItem, idx) => ({
               label: t(tabItem),
-              href: `/multi-token-item/${id}?tab=${tabs[idx]}`,
+              href: `/multi-token-item/${address}/${token_id}?tab=${tabs[idx]}`,
             }))}
           />
+
           {tab === tabs[0] ? (
             !isActivityListLoading && activityList ? (
               <ActivityList transfers={activityList} token_id={token_id} />
@@ -177,6 +214,34 @@ const MultiTokenItem = () => {
               <Skeleton animation="wave" />
             )
           ) : null}
+
+          {tab === tabs[1] ? (
+            !isHolderListLoading && holderList ? (
+              <HolderList holders={holderList} />
+            ) : (
+              <Skeleton animation="wave" />
+            )
+          ) : null}
+
+          {tab === tabs[2] ? (
+            !isHolderListLoading && holderList ? (
+              <InventoryList
+                token_id={token_id}
+                inventory={{
+                  entries: holderList.entries.map(item => ({
+                    token_id,
+                    contract_address_hash: address,
+                    counts: item.quantity.toString(),
+                    owner: item.address_hash,
+                  })),
+                  metadata: holderList.metadata,
+                }}
+              />
+            ) : (
+              <Skeleton animation="wave" />
+            )
+          ) : null}
+          {tab === tabs[3] && metadata ? <Metadata {...metadata} /> : null}
         </div>
       </div>
     </>

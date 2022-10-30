@@ -5,7 +5,6 @@ import { Button, Modal } from '@mui/material'
 import CopyIcon from 'assets/icons/qr-code.svg'
 import CloseIcon from 'assets/icons/close.svg'
 import styles from './styles.module.scss'
-import Tooltip from 'components/Tooltip'
 import QRCode from 'qrcode'
 import { useTheme } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
@@ -47,11 +46,14 @@ const QRCodeBtn: React.FC<{ content: string }> = ({ content }) => {
 
   return (
     <>
-      <Tooltip title={t(`clickViewQRCode`)} placement="bottom">
-        <button className={styles.qrCodeBtn} aria-label="qr-code" onClick={handleOpen}>
-          <CopyIcon fontSize="inherit" />
-        </button>
-      </Tooltip>
+      <button
+        data-tooltip={t(`clickViewQRCode`)}
+        className={`${styles.qrCodeBtn} tooltip`}
+        aria-label="qr-code"
+        onClick={handleOpen}
+      >
+        <CopyIcon fontSize="inherit" />
+      </button>
       <Modal open={open} onClose={() => setOpen(false)}>
         <div className={styles.qrCodeModal}>
           <div className={styles.close} onClick={() => setOpen(false)}>

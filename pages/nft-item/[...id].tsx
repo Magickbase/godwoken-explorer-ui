@@ -1,12 +1,10 @@
 import type { GetStaticPaths, GetStaticProps } from 'next'
-import { useState, useEffect } from 'react'
-import { erc721ABI } from 'wagmi'
 import { useQuery } from 'react-query'
 import { gql } from 'graphql-request'
 import { useRouter } from 'next/router'
+import NextLink from 'next/link'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { ethers } from 'ethers'
 import { Skeleton } from '@mui/material'
 import SubpageHead from 'components/SubpageHead'
 import HashLink from 'components/HashLink'
@@ -15,7 +13,7 @@ import { SIZES } from 'components/PageSize'
 import ActivityList, { fetchActivityList } from 'components/NFTActivityList'
 import CopyBtn from 'components/CopyBtn'
 import Metadata from 'components/Metadata'
-import { client, handleNftImageLoadError, provider, getIpfsUrl } from 'utils'
+import { client, handleNftImageLoadError, getIpfsUrl } from 'utils'
 import styles from './styles.module.scss'
 
 const collectionInfoQuery = gql`
@@ -33,10 +31,15 @@ const collectionInfoQuery = gql`
     holders: erc721_inventory(input: { contract_address: $address, token_id: $token_id }) {
       entries {
         address_hash
+        token_instance {
+          metadata
+        }
       }
     }
   }
 `
+
+type TokenMetadata = Record<'name' | 'description' | 'image', string>
 
 interface CollectionInfo {
   name: string | null
@@ -45,6 +48,7 @@ interface CollectionInfo {
   holder_count: number
   minted_count: number
   owner: string | null
+  metadata?: TokenMetadata
 }
 
 interface NftCollectionProps {
@@ -52,7 +56,10 @@ interface NftCollectionProps {
     entries: Array<CollectionInfo>
   }
   holders: {
-    entries: Array<{ address_hash: string }>
+    entries: Array<{
+      address_hash: string
+      token_instance?: { metadata: TokenMetadata }
+    }>
   }
 }
 
@@ -61,14 +68,13 @@ interface Variables {
   token_id: string
 }
 
-type MetadataProps = Record<'name' | 'description' | 'image', string>
-
 const fetchNftCollection = (variables: Variables): Promise<CollectionInfo | undefined> =>
   client
     .request<NftCollectionProps>(collectionInfoQuery, variables)
     .then(data => ({
       ...data.erc721_udts.entries[0],
       owner: data.holders.entries[0]?.address_hash ?? null,
+      metadata: data.holders.entries[0]?.token_instance?.metadata,
     }))
     .catch(() => undefined)
 
@@ -76,22 +82,11 @@ const tabs = ['activity', 'metadata']
 
 const NftItem = () => {
   const [t] = useTranslation('nft')
-  const [metadata, setMetadata] = useState<Metadata | null>(null)
   const {
     query: { id, before = null, after = null, page_size = SIZES[1], tab = tabs[0] },
   } = useRouter()
 
   const [address, token_id] = Array.isArray(id) ? id : [null, null]
-  useEffect(() => {
-    if (!address || !token_id) return
-    const contract = new ethers.Contract(address, erc721ABI, provider)
-    contract
-      .tokenURI(token_id)
-      .then((url: string) => fetch(getIpfsUrl(url)))
-      .then(res => res.json())
-      .then((metadata: MetadataProps) => setMetadata(metadata))
-      .catch(console.warn)
-  }, [address, token_id, setMetadata])
 
   const listParams = {
     address: address as string,
@@ -159,6 +154,7 @@ const NftItem = () => {
     },
   ]
 
+  const metadata = info?.metadata
   const title = `${t('nft-collection')} ${info?.name ?? '-'}`
 
   return (
@@ -172,7 +168,18 @@ const NftItem = () => {
             alt="nft-cover"
           />
           <div className={styles.info}>
-            {isInfoLoading ? <Skeleton animation="wave" /> : <h2>{info?.name || '-'}</h2>}
+            {isInfoLoading ? (
+              <Skeleton animation="wave" />
+            ) : (
+              <h2>
+                {info?.metadata?.name || '-'}
+                {info?.name ? (
+                  <NextLink href={`/multi-token-collection/${address}`}>
+                    <a className={styles.collection}>{`${info.name}` + (info.symbol ? `(${info.symbol})` : '')}</a>
+                  </NextLink>
+                ) : null}
+              </h2>
+            )}
             {infoList.map(({ field, content }, i) => (
               <div key={i} className={styles.item}>
                 <div>{field}</div>

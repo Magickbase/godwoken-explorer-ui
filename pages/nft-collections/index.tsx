@@ -5,14 +5,13 @@ import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useQuery } from 'react-query'
 import { gql } from 'graphql-request'
-import { Skeleton } from '@mui/material'
+import { Skeleton, Tooltip } from '@mui/material'
 import SubpageHead from 'components/SubpageHead'
 import PageTitle from 'components/PageTitle'
 import Table from 'components/Table'
 import Pagination from 'components/SimplePagination'
 import TokenLogo from 'components/TokenLogo'
 import HashLink from 'components/HashLink'
-import Tooltip from 'components/Tooltip'
 import { SIZES } from 'components/PageSize'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import { client, GraphQLSchema } from 'utils'
@@ -148,8 +147,12 @@ const NftCollectionList = () => {
                           </span>
                         </Tooltip>
                       </td>
-                      <td title={item.holders_count.toLocaleString('en')}>{item.holders_count.toLocaleString('en')}</td>
-                      <td title={item.minted_count.toLocaleString('en')}>{item.minted_count.toLocaleString('en')}</td>
+                      <td title={(+item.holders_count).toLocaleString('en')}>
+                        {(+item.holders_count).toLocaleString('en')}
+                      </td>
+                      <td title={(+item.minted_count).toLocaleString('en')}>
+                        {(+item.minted_count).toLocaleString('en')}
+                      </td>
                     </tr>
                   )
                 })

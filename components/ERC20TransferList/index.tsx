@@ -3,7 +3,6 @@ import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import { gql } from 'graphql-request'
 import Table from 'components/Table'
-import Tooltip from 'components/Tooltip'
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/SimplePagination'
 import TxStatusIcon from 'components/TxStatusIcon'
@@ -14,6 +13,7 @@ import ChangeIcon from 'assets/icons/change.svg'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import { client, timeDistance, GraphQLSchema } from 'utils'
 import styles from './styles.module.scss'
+import Tooltip from 'components/Tooltip'
 
 export type TransferListProps = {
   token_transfers: {

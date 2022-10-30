@@ -2,7 +2,6 @@ import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import { gql } from 'graphql-request'
 import Table from 'components/Table'
-import Tooltip from 'components/Tooltip'
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/SimplePagination'
 import TxStatusIcon from 'components/TxStatusIcon'
@@ -22,9 +21,11 @@ type ActivityListProps = {
       to_account?: Pick<GraphQLSchema.Account, 'type'>
       log_index: number
       polyjuice: Pick<GraphQLSchema.Polyjuice, 'status'>
-      token_id: number
       token_contract_address_hash: string
+      token_id: string | null
       amount: string | null
+      token_ids: Array<string> | null
+      amounts: Array<string> | null
     }>
     metadata: GraphQLSchema.PageMetadata
   }
@@ -75,9 +76,11 @@ const activityListQuery = gql`
         polyjuice {
           status
         }
-        token_id
         token_contract_address_hash
+        token_id
         amount
+        token_ids
+        amounts
       }
 
       metadata {
@@ -120,20 +123,21 @@ const ActivityList: React.FC<
             transfers.entries.map(item => {
               const method = item.transaction.method_name || item.transaction.method_id
 
+              const token_ids = Array.isArray(item.token_ids) ? item.token_ids : [item.token_id]
+              const amounts = Array.isArray(item.amounts) ? item.amounts : [item.amount]
+
               return (
                 <tr key={item.transaction.eth_hash + item.log_index}>
                   <td>
                     <div className={styles.hash}>
-                      <Tooltip title={item.transaction.eth_hash} placement="top">
-                        <span>
-                          <NextLink href={`/tx/${item.transaction.eth_hash}`}>
-                            <a className="mono-font">{`${item.transaction.eth_hash.slice(
-                              0,
-                              8,
-                            )}...${item.transaction.eth_hash.slice(-8)}`}</a>
-                          </NextLink>
-                        </span>
-                      </Tooltip>
+                      <span className="tooltip" data-tooltip={item.transaction.eth_hash}>
+                        <NextLink href={`/tx/${item.transaction.eth_hash}`}>
+                          <a className="mono-font">{`${item.transaction.eth_hash.slice(
+                            0,
+                            8,
+                          )}...${item.transaction.eth_hash.slice(-8)}`}</a>
+                        </NextLink>
+                      </span>
                       <TxStatusIcon
                         status={item.block.status}
                         isSuccess={item.polyjuice.status === GraphQLSchema.PolyjuiceStatus.Succeed}
@@ -142,11 +146,13 @@ const ActivityList: React.FC<
                   </td>
                   <td>
                     {method ? (
-                      <Tooltip title={item.transaction.method_id} placement="top">
-                        <div className={styles.method} title={method}>
-                          {method}
-                        </div>
-                      </Tooltip>
+                      <div
+                        data-tooltip={item.transaction.method_id}
+                        className={`${styles.method} tooltip`}
+                        title={method}
+                      >
+                        {method}
+                      </div>
                     ) : (
                       '-'
                     )}
@@ -165,12 +171,22 @@ const ActivityList: React.FC<
                   ) : null}
                   {token_id ? null : (
                     <td>
-                      <NextLink href={`/multi-token-item/${item.token_contract_address_hash}/${item.token_id}`}>
-                        <a>{(+item.token_id).toLocaleString('en')}</a>
-                      </NextLink>
+                      <div className={styles.ids}>
+                        {token_ids.map(id => (
+                          <NextLink href={`/multi-token-item/${item.token_contract_address_hash}/${id}`} key={id}>
+                            <a>{(+id).toLocaleString('en')}</a>
+                          </NextLink>
+                        ))}
+                      </div>
                     </td>
                   )}
-                  <td>{+(item.amount ?? 0).toLocaleString('en')}</td>
+                  <td>
+                    <div className={styles.amounts}>
+                      {amounts.map((amount, idx) => (
+                        <span key={token_ids[idx]}>{(+amount).toLocaleString('en')}</span>
+                      ))}
+                    </div>
+                  </td>
                 </tr>
               )
             })

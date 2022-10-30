@@ -5,48 +5,54 @@ import Pagination from 'components/SimplePagination'
 import HashLink from 'components/HashLink'
 import Tooltip from 'components/Tooltip'
 import NoDataIcon from 'assets/icons/no-data.svg'
-import { client, GraphQLSchema, handleNftImageLoadError } from 'utils'
+import { client, getIpfsUrl, GraphQLSchema, handleNftImageLoadError } from 'utils'
 import styles from './styles.module.scss'
 
 type InventoryListProps = {
   inventory: {
     entries: Array<{
       token_id: string
-      address_hash: string
-      token_contract_address_hash: string
-      udt: {
+      contract_address_hash: string
+      counts: string
+      owner?: string
+      udt?: {
         id: number
         name: string | null
         icon: string | null
       }
-      value: string
+      token_instance?: {
+        metadata?: Record<'image', string>
+      }
     }>
     metadata: GraphQLSchema.PageMetadata
   }
   viewer?: string
+  token_id?: string
 }
 
+const CollectionFragment = gql`
+  fragment collectionOrItemList on PaginateErc1155Inventory {
+    entries {
+      token_id
+      contract_address_hash
+      counts
+      token_instance {
+        metadata
+      }
+    }
+    metadata {
+      before
+      after
+      total_count
+    }
+  }
+`
+
 const inventoryListOfCollectionQuery = gql`
+  ${CollectionFragment}
   query ($address: HashAddress!, $before: String, $after: String, $limit: Int) {
-    inventory: erc721_erc1155_inventory(
-      input: { contract_address: $address, before: $before, after: $after, limit: $limit }
-    ) {
-      entries {
-        token_id
-        address_hash
-        token_contract_address_hash
-        udt {
-          id
-          name
-          icon
-        }
-        value
-      }
-      metadata {
-        before
-        after
-        total_count
-      }
+    inventory: erc1155_inventory(input: { contract_address: $address, before: $before, after: $after, limit: $limit }) {
+      ...collectionOrItemList
     }
   }
 `
@@ -56,10 +62,13 @@ const inventoryListOfAccountQuery = gql`
     inventory: user_erc1155_assets(input: { user_address: $address, before: $before, after: $after, limit: $limit }) {
       entries {
         token_id
-        token_contract_address_hash
+        contract_address_hash: token_contract_address_hash
         udt {
           name
           icon
+        }
+        token_instance {
+          metadata
         }
       }
       metadata {
@@ -84,13 +93,18 @@ export const fetchInventoryListOfCollection = (variables: Variables) =>
     .then(data => data.inventory)
     .catch(() => ({ entries: [], metadata: { before: null, after: null, total_count: 0 } }))
 
+/*
+ * For erc 1155, a token type's inventory is same as its holder list because token items belong to a token type are fungible tokens
+ * So query of holder list will be used instead
+ */
+
 export const fetchInventoryListOfAccount = (variables: Variables) =>
   client
     .request<InventoryListProps>(inventoryListOfAccountQuery, variables)
     .then(data => data.inventory)
     .catch(() => ({ entries: [], metadata: { before: null, after: null, total_count: 0 } }))
 
-const NFTInventoryList: React.FC<InventoryListProps> = ({ inventory, viewer }) => {
+const MultiTokenInventoryList: React.FC<InventoryListProps> = ({ inventory, viewer, token_id }) => {
   const [t] = useTranslation(['multi-token', 'list'])
   if (!inventory?.metadata.total_count) {
     return (
@@ -108,12 +122,13 @@ const NFTInventoryList: React.FC<InventoryListProps> = ({ inventory, viewer }) =
       <div className={styles.container}>
         {inventory.entries.map(item => (
           <div key={item.token_id} className={styles.card}>
-            <NextLink href={`/multi-token-item/${item.token_contract_address_hash}/${item.token_id}`}>
+            <NextLink href={`/multi-token-item/${item.contract_address_hash}/${item.token_id}`}>
               <a className={styles.cover}>
                 <img
-                  src={item.udt?.icon ?? '/images/nft-placeholder.svg'}
+                  src={getIpfsUrl(item.token_instance?.metadata?.image) ?? '/images/nft-placeholder.svg'}
                   onError={handleNftImageLoadError}
                   alt="nft-cover"
+                  loading="lazy"
                 />
               </a>
             </NextLink>
@@ -126,19 +141,28 @@ const NFTInventoryList: React.FC<InventoryListProps> = ({ inventory, viewer }) =
             ) : (
               <div className={styles.info}>
                 <span>{t('quantity')}</span>
-                <span>{(+item.value || 0).toLocaleString('en')}</span>
+                <span>{(+item.counts || 0).toLocaleString('en')}</span>
               </div>
             )}
 
-            <div className={styles.info}>
-              <span>{t('token-id')}</span>
-              <HashLink
-                label={item.token_id}
-                href={`/multi-token-item/${item.token_contract_address_hash}/${item.token_id}`}
-                monoFont={false}
-                style={{ fontSize: 14 }}
-              />
-            </div>
+            {token_id ? (
+              <Tooltip title={item.owner} placement="bottom">
+                <div className={styles.info}>
+                  <span>{t('owner')}</span>
+                  <HashLink href={`/account/${item.owner}`} label={item.owner} />
+                </div>
+              </Tooltip>
+            ) : (
+              <div className={styles.info}>
+                <span>{t('token-id')}</span>
+                <HashLink
+                  label={item.token_id}
+                  href={`/multi-token-item/${item.contract_address_hash}/${item.token_id}`}
+                  monoFont={false}
+                  style={{ fontSize: 14 }}
+                />
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -148,4 +172,4 @@ const NFTInventoryList: React.FC<InventoryListProps> = ({ inventory, viewer }) =
   )
 }
 
-export default NFTInventoryList
+export default MultiTokenInventoryList

@@ -8,7 +8,6 @@ import { gql } from 'graphql-request'
 import { Skeleton } from '@mui/material'
 import { ethers } from 'ethers'
 import BigNumber from 'bignumber.js'
-import Tooltip from 'components/Tooltip'
 import Tabs from 'components/Tabs'
 import SubpageHead from 'components/SubpageHead'
 import PageTitle from 'components/PageTitle'
@@ -22,6 +21,7 @@ import TxType from 'components/TxType'
 import HashLink from 'components/HashLink'
 import Amount from 'components/Amount'
 import { SIZES } from 'components/PageSize'
+import Tooltip from 'components/Tooltip'
 import PolyjuiceStatus from 'components/PolyjuiceStatus'
 import ExpandIcon from 'assets/icons/expand.svg'
 import {
@@ -308,7 +308,7 @@ const Tx = () => {
       ? {
           field: t('method'),
           content: (
-            <Tooltip title={tx.method_id} placement="top">
+            <Tooltip title={tx?.method_id || false} placement="top">
               <span className="mono-font">{method}</span>
             </Tooltip>
           ),
