@@ -25,6 +25,8 @@ export type TransferListProps = {
     log_index: number
     transaction_hash: string
     udt: Nullable<Pick<GraphQLSchema.Udt, 'decimal' | 'name' | 'symbol' | 'id' | 'icon'>>
+    token_contract_address_hash: string
+    token_id: number
   }>
   metadata: GraphQLSchema.PageMetadata
   isShowValue?: boolean
@@ -124,7 +126,7 @@ const TransferList: React.FC<TransferListProps> = ({ entries, metadata, isShowVa
                   </Tooltip>
                 </td>
                 <td className={styles.tokenLogo}>
-                  <NextLink href={`/token/${item.udt.id}`}>
+                  <NextLink href={`/nft-item/${item.token_contract_address_hash}/${item.token_id}`}>
                     <a>
                       {isShowLogo ? (
                         <TokenLogo name={item.udt.name} logo={item.udt.icon} />

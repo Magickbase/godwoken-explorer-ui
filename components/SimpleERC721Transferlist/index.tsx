@@ -31,6 +31,7 @@ const transferListQueryForErc721 = gql`
         }
         token_id
         token_ids
+        token_contract_address_hash
       }
       metadata {
         total_count

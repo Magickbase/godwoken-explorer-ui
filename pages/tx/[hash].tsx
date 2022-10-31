@@ -84,15 +84,6 @@ const txQuery = gql`
         abi
       }
     }
-    to_account {
-      eth_address
-      type
-      script_hash
-      smart_contract {
-        name
-        abi
-      }
-    }
     polyjuice {
       tx_hash
       status
@@ -155,6 +146,7 @@ const Tx = () => {
     },
     replace,
   } = useRouter()
+
   const [t, { language }] = useTranslation('tx')
   const [isFinalized, setIsFinalized] = useState(false)
 
