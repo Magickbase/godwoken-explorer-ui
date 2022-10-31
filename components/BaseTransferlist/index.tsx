@@ -18,23 +18,21 @@ import { GraphQLSchema, client, ZERO_ADDRESS } from 'utils'
 import styles from './styles.module.scss'
 
 export type TransferListProps = {
-  token_transfers: {
-    entries: Array<{
-      amount: string
-      block: Nullable<Pick<GraphQLSchema.Block, 'number' | 'timestamp'>>
-      from_address: string
-      to_address: string
-      log_index: number
-      transaction_hash: string
-      udt: Nullable<Pick<GraphQLSchema.Udt, 'decimal' | 'name' | 'symbol' | 'id' | 'icon'>>
-    }>
-    metadata: GraphQLSchema.PageMetadata
-  }
+  entries: Array<{
+    amount: string
+    from_address: string
+    to_address: string
+    log_index: number
+    transaction_hash: string
+    udt: Nullable<Pick<GraphQLSchema.Udt, 'decimal' | 'name' | 'symbol' | 'id' | 'icon'>>
+  }>
+  metadata: GraphQLSchema.PageMetadata
+  isShowValue?: boolean
 }
 
 const FILTER_KEYS = ['address_from', 'address_to']
 
-const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries, metadata } }) => {
+const TransferList: React.FC<TransferListProps> = ({ entries, metadata, isShowValue = false }) => {
   const [isShowLogo, setIsShowLogo] = useState(true)
   const [t] = useTranslation('list')
   const {
@@ -44,7 +42,7 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
   } = useRouter()
 
   const isFiltered = Object.keys(query).some(key => FILTER_KEYS.includes(key))
-  const isFilterUnnecessary = !metadata.total_count && !isFiltered
+  const isFilterUnnecessary = !metadata?.total_count && !isFiltered
 
   const handleLogIndexSortClick = (e: React.MouseEvent<HTMLOrSVGImageElement>) => {
     const {
@@ -89,12 +87,12 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
                 <ChangeIcon onClick={handleTokenDisplayChange} />
               </div>
             </th>
-            <th>{`${t('value')}`}</th>
+            {isShowValue && <th>{`${t('value')}`}</th>}
           </tr>
         </thead>
         <tbody>
-          {metadata.total_count ? (
-            entries.map(item => (
+          {metadata?.total_count ? (
+            entries?.map(item => (
               <tr key={`${item.transaction_hash}-${item.log_index}`}>
                 <td>{item.log_index}</td>
                 <td className={styles.address}>
@@ -104,8 +102,8 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
                         'zero address'
                       ) : (
                         <HashLink
-                          label={`${item.from_address.slice(0, 8)}...${item.from_address.slice(-8)}`}
-                          href={`/account/${item.from_address}`}
+                          label={`${item?.from_address?.slice(0, 8)}...${item?.from_address?.slice(-8)}`}
+                          href={`/account/${item?.from_address}`}
                         />
                       )}
                     </span>
@@ -136,9 +134,11 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
                     </a>
                   </NextLink>
                 </td>
-                <td title={item.udt.name}>
-                  <RoundedAmount amount={item.amount} udt={item.udt} />
-                </td>
+                {isShowValue && (
+                  <td title={item.udt.name}>
+                    <RoundedAmount amount={item.amount} udt={item.udt} />
+                  </td>
+                )}
               </tr>
             ))
           ) : (
@@ -160,7 +160,7 @@ const TransferList: React.FC<TransferListProps> = ({ token_transfers: { entries,
           )}
         </tbody>
       </Table>
-      {metadata.total_count ? <Pagination {...metadata} note={t(`last-n-records`, { n: `100k` })} /> : null}
+      {metadata?.total_count ? <Pagination {...metadata} note={t(`last-n-records`, { n: `100k` })} /> : null}
     </div>
   )
 }

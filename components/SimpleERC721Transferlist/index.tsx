@@ -1,79 +1,61 @@
 import { gql } from 'graphql-request'
 import BaseTransferlist, { TransferListProps } from 'components/BaseTransferlist'
-import { GraphQLSchema, client, ZERO_ADDRESS } from 'utils'
+import { client } from 'utils'
 
-const transferListQuery = gql`
-  query (
-    $transaction_hash: String!
-    $before: String
-    $after: String
-    $from_address: String
-    $to_address: String
-    $combine_from_to: Boolean
-    $limit: Int
-    $log_index_sort: SortType
-  ) {
-    token_transfers(
+type ResponseProps = {
+  erc721_token_transfers: TransferListProps
+}
+
+const transferListQueryForErc721 = gql`
+  query ($to_address: String!, $limit: Int, $log_index_sort: SortType, $before: String, $after: String) {
+    erc721_token_transfers(
       input: {
-        transaction_hash: $transaction_hash
+        to_address: $to_address
+        limit: $limit
         before: $before
         after: $after
-        from_address: $from_address
-        to_address: $to_address
-        combine_from_to: $combine_from_to
-        limit: $limit
         sorter: [{ sort_type: $log_index_sort, sort_value: LOG_INDEX }]
       }
     ) {
       entries {
-        amount
+        transaction_hash
+        log_index
         from_address
         to_address
-        from_account {
-          eth_address
-          script_hash
-        }
-        to_account {
-          eth_address
-          script_hash
-        }
-        block {
-          number
-          timestamp
-        }
-        log_index
-        transaction_hash
         udt {
           decimal
           name
+          icon
           symbol
           id
-          icon
         }
+        token_id
+        token_ids
       }
       metadata {
+        total_count
         before
         after
-        total_count
       }
     }
   }
 `
 
-export const fetchTransferList = (variables: {
-  transaction_hash: string
-  before: string | null
-  after: string | null
-  from_address?: string | null
+export const fetchTransferListForErc721 = (variables: {
   to_address?: string | null
-  combine_from_to?: boolean | null
   limit: number
+  before: string
+  after: string
   log_index_sort: 'ASC' | 'DESC'
 }) =>
   client
-    .request<TransferListProps>(transferListQuery, variables)
-    .then(data => data.token_transfers)
+    .request(transferListQueryForErc721, variables)
+    .then(data => data.erc721_token_transfers)
     .catch(() => ({ entries: [], metadata: { before: null, after: null, total_count: 0 } }))
 
-const SimpleERC721Transferlist: React.FC<TransferListProps> = props => <BaseTransferlist {...props} />
+const SimpleERC721Transferlist: React.FC<ResponseProps> = props => {
+  const { erc721_token_transfers: dataSource } = props
+
+  return <BaseTransferlist {...dataSource} />
+}
 export default SimpleERC721Transferlist

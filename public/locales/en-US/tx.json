@@ -39,6 +39,7 @@
   "decodedInput": "Decoded",
   "utf8Input": "UTF8",
   "erc20_records": "ERC20 Transfers",
+  "erc721_records": "ERC721 Transfers",
   "deployed_contract": "Deployed Contract",
   "created_account": "Created Account",
   "logs": "Logs",

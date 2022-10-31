@@ -4,12 +4,6 @@
   th {
     text-transform: capitalize;
   }
-  th,
-  td {
-    &:last-child {
-      text-align: right;
-    }
-  }
   &[data-is-filter-unnecessary='true'] {
     th {
       svg {

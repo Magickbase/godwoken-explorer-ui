@@ -13,7 +13,7 @@ import SubpageHead from 'components/SubpageHead'
 import PageTitle from 'components/PageTitle'
 import InfoList from 'components/InfoList'
 import TransferList, { fetchTransferList } from 'components/SimpleERC20Transferlist'
-import SimpleERC721Transferlist from 'components/SimpleERC721Transferlist'
+import SimpleERC721Transferlist, { fetchTransferListForErc721 } from 'components/SimpleERC721Transferlist'
 import TxLogsList from 'components/TxLogsList'
 import RawTxData from 'components/RawTxData'
 import CopyBtn from 'components/CopyBtn'
@@ -36,7 +36,7 @@ import {
 } from 'utils'
 import styles from './styles.module.scss'
 
-const tabs = ['erc20', 'logs', 'raw-data']
+const tabs = ['erc20', 'logs', 'raw-data', 'erc721']
 
 interface Transaction {
   hash: string
@@ -169,6 +169,8 @@ const Tx = () => {
 
   const tx = txs?.eth_transaction ?? txs?.gw_transaction
 
+  const to_address = '0x0000000000ce6d8c1fba76f26d6cc5db71432710'
+
   const { isLoading: isTransferListLoading, data: transferList } = useQuery(
     ['tx-transfer-list', hash, before, after, address_from, address_to, log_index_sort, page_size],
     () =>
@@ -184,6 +186,22 @@ const Tx = () => {
       }),
     {
       enabled: tab === 'erc20',
+    },
+  )
+
+  const { isLoading: isErc721TransferListLoading, data: erc721TransferList } = useQuery(
+    ['tx-erc721-transfer-list', to_address, before, after, log_index_sort, page_size],
+    () =>
+      fetchTransferListForErc721({
+        to_address: to_address as string | null,
+        // limit: Number.isNaN(+page_size) ? +SIZES[1] : +page_size,
+        before: before as string | null,
+        after: after as string | null,
+        limit: 2,
+        log_index_sort: log_index_sort as 'ASC' | 'DESC',
+      }),
+    {
+      enabled: tab === 'erc721',
     },
   )
 
@@ -491,7 +509,7 @@ const Tx = () => {
         <div className={styles.list}>
           <Tabs
             value={tabs.indexOf(tab as string)}
-            tabs={['erc20_records', 'logs', 'rawData'].map((label, idx) => ({
+            tabs={['erc20_records', 'logs', 'rawData', 'erc721_records'].map((label, idx) => ({
               label: t(label),
               href: `/tx/${hash}?tab=${tabs[idx]}`,
             }))}
@@ -512,8 +530,8 @@ const Tx = () => {
           ) : null}
           {tab === 'raw-data' && tx ? <RawTxData hash={hash as string} /> : null}
           {tab === 'erc721' ? (
-            transferList || !isTransferListLoading ? (
-              <SimpleERC721Transferlist token_transfers={transferList} />
+            erc721TransferList || !isErc721TransferListLoading ? (
+              <SimpleERC721Transferlist erc721_token_transfers={erc721TransferList} />
             ) : (
               <Skeleton animation="wave" />
             )
