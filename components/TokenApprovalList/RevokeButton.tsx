@@ -16,11 +16,11 @@ import {
   useAccount,
   useTransaction,
 } from 'wagmi'
+import { ethers } from 'ethers'
 import { CircularProgress } from '@mui/material'
 import DisconnectIcon from 'assets/icons/disconnect.svg'
 import Tooltip from 'components/Tooltip'
 import styles from './styles.module.scss'
-import { ethers } from 'ethers'
 
 type Props = {
   setAlert: Dispatch<
@@ -139,20 +139,19 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
     }
   }, [revokeTxnHash])
 
-  const sendWriteCall = async () => {
+  const sendWriteCall = useCallback(async () => {
     setCallingWrite(true)
     try {
-      const data = await writeAsync?.()
+      const data = await writeAsync()
       setAlert({ open: true, type: 'success', msg: t('revokeTxn-sent-success') })
       localStorage.setItem(itemKey, data?.hash)
       setRevokeTxnHash(data.hash)
-      setCallWrite(false)
     } catch {
       setAlert({ open: true, type: 'error', msg: t('user-rejected') })
-      setCallWrite(false)
     }
+    setCallWrite(false)
     setCallingWrite(false)
-  }
+  }, [itemKey, setAlert, t, writeAsync])
 
   useEffect(() => {
     if (!writeAsync || callingWrite) return
@@ -160,7 +159,7 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
       sendWriteCall()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chain, callWrite, targetChainId, writeAsync, callingWrite])
+  }, [chain, callWrite, callingWrite])
 
   const tooltipTitle = useCallback(() => {
     if (!isOwner || !connector.ready) {
