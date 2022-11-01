@@ -11,10 +11,10 @@ import FilterMenu from 'components/FilterMenu'
 import RoundedAmount from 'components/RoundedAmount'
 import Tooltip from 'components/Tooltip'
 import SortIcon from 'assets/icons/sort.svg'
+import { GraphQLSchema, ZERO_ADDRESS } from 'utils'
 import ChangeIcon from 'assets/icons/change.svg'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import EmptyFilteredListIcon from 'assets/icons/empty-filtered-list.svg'
-import { GraphQLSchema, client, ZERO_ADDRESS } from 'utils'
 import styles from './styles.module.scss'
 
 export type TransferListProps = {
@@ -25,8 +25,9 @@ export type TransferListProps = {
     log_index: number
     transaction_hash: string
     udt: Nullable<Pick<GraphQLSchema.Udt, 'decimal' | 'name' | 'symbol' | 'id' | 'icon'>>
-    token_contract_address_hash: string
-    token_id: number
+    block?: Nullable<Pick<GraphQLSchema.Block, 'number' | 'timestamp'>>
+    token_contract_address_hash?: string
+    token_id?: number
   }>
   metadata: GraphQLSchema.PageMetadata
   isShowValue?: boolean
@@ -89,7 +90,7 @@ const TransferList: React.FC<TransferListProps> = ({ entries, metadata, isShowVa
                 <ChangeIcon onClick={handleTokenDisplayChange} />
               </div>
             </th>
-            {isShowValue && <th>{`${t('value')}`}</th>}
+            {isShowValue && <th className={styles['ta-r']}>{`${t('value')}`}</th>}
           </tr>
         </thead>
         <tbody>
@@ -126,7 +127,13 @@ const TransferList: React.FC<TransferListProps> = ({ entries, metadata, isShowVa
                   </Tooltip>
                 </td>
                 <td className={styles.tokenLogo}>
-                  <NextLink href={`/nft-item/${item.token_contract_address_hash}/${item.token_id}`}>
+                  <NextLink
+                    href={
+                      isShowValue
+                        ? `/token/${item.udt.id}`
+                        : `/nft-item/${item.token_contract_address_hash}/${item.token_id}`
+                    }
+                  >
                     <a>
                       {isShowLogo ? (
                         <TokenLogo name={item.udt.name} logo={item.udt.icon} />
@@ -137,7 +144,7 @@ const TransferList: React.FC<TransferListProps> = ({ entries, metadata, isShowVa
                   </NextLink>
                 </td>
                 {isShowValue && (
-                  <td title={item.udt.name}>
+                  <td title={item.udt.name} className={styles['ta-r']}>
                     <RoundedAmount amount={item.amount} udt={item.udt} />
                   </td>
                 )}

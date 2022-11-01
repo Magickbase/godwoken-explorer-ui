@@ -1,9 +1,12 @@
+import CommonTransferlist, { TransferListProps } from 'components/CommonTransferlist'
 import { gql } from 'graphql-request'
-import BaseTransferlist, { TransferListProps } from 'components/BaseTransferlist'
 import { client } from 'utils'
 
 type ResponseProps = {
-  erc721_token_transfers: TransferListProps
+  erc721_token_transfers: TransferListProps & {
+    token_contract_address_hash: string
+    token_id: number
+  }
 }
 
 const transferListQueryForErc721 = gql`
@@ -57,6 +60,6 @@ export const fetchTransferListForErc721 = (variables: {
 const SimpleERC721Transferlist: React.FC<ResponseProps> = props => {
   const { erc721_token_transfers: dataSource } = props
 
-  return <BaseTransferlist {...dataSource} />
+  return <CommonTransferlist {...dataSource} />
 }
 export default SimpleERC721Transferlist

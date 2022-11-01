@@ -160,8 +160,7 @@ const Tx = () => {
   )
 
   const tx = txs?.eth_transaction ?? txs?.gw_transaction
-
-  const to_address = '0x0000000000ce6d8c1fba76f26d6cc5db71432710'
+  const to_address = txs?.gw_transaction.to_account.eth_address
 
   const { isLoading: isTransferListLoading, data: transferList } = useQuery(
     ['tx-transfer-list', hash, before, after, address_from, address_to, log_index_sort, page_size],
@@ -186,10 +185,9 @@ const Tx = () => {
     () =>
       fetchTransferListForErc721({
         to_address: to_address as string | null,
-        // limit: Number.isNaN(+page_size) ? +SIZES[1] : +page_size,
+        limit: Number.isNaN(+page_size) ? +SIZES[1] : +page_size,
         before: before as string | null,
         after: after as string | null,
-        limit: 2,
         log_index_sort: log_index_sort as 'ASC' | 'DESC',
       }),
     {
