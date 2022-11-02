@@ -78,7 +78,11 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
   const { connectAsync, connectors } = useConnect({ chainId: targetChainId })
   const connector = connectors[0] // only have metamask for now
   const { address: connectedAddr } = useAccount()
-  const { config, isLoading: isPreparingContract } = usePrepareContractWrite(
+  const {
+    config,
+    isLoading: isPreparingContract,
+    isFetching: isFetchingContract,
+  } = usePrepareContractWrite(
     listItem.udt.eth_type === GraphQLSchema.TokenType.ERC20
       ? {
           chainId: targetChainId,
@@ -126,6 +130,7 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
   const disabled =
     !isOwner ||
     isPreparingContract ||
+    isFetchingContract ||
     !connector.ready ||
     isRevokeTxnLoading ||
     isFetchApproveTxLoading ||
@@ -154,12 +159,12 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
   }, [itemKey, setAlert, t, writeAsync])
 
   useEffect(() => {
-    if (!writeAsync || callingWrite) return
-    if (chain?.id === targetChainId && callWrite) {
+    if (!writeAsync || callingWrite || chain?.id !== targetChainId) return
+    if (callWrite) {
       sendWriteCall()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chain, callWrite, callingWrite])
+  }, [chain, callWrite, callingWrite, isPreparingContract, isFetchingContract])
 
   const tooltipTitle = useCallback(() => {
     if (!isOwner || !connector.ready) {
