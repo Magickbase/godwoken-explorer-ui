@@ -174,7 +174,7 @@ const NftItem = () => {
               <h2>
                 {info?.metadata?.name || '-'}
                 {info?.name ? (
-                  <NextLink href={`/multi-token-collection/${address}`}>
+                  <NextLink href={`/nft-collection/${address}`}>
                     <a className={styles.collection}>{`${info.name}` + (info.symbol ? `(${info.symbol})` : '')}</a>
                   </NextLink>
                 ) : null}
