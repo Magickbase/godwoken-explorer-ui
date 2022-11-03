@@ -103,7 +103,7 @@ context.skip('Transaction List Page', () => {
     before(() => {
       cy.visit(`/en-US/txs?account_id=${id}`)
       cy.get('.pager').then(el => {
-        TOTAL_PAGE = +el.attr('attr-total-page')
+        TOTAL_PAGE = +(el?.attr('attr-total-page') || 0)
       })
     })
 
