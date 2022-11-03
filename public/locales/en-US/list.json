@@ -79,6 +79,6 @@
   "user-rejected": "User rejected request",
   "please-connect-mm": "Please connect to MetaMask first",
   "switch_network_success": "Switch network success",
-  "waiting_for_tx": "Waiting for transaction",
+  "waiting_for_confirm": "Waiting for confirm",
   "waiting_for_block": "Waiting for block"
 }

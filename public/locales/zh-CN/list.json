@@ -78,6 +78,6 @@
   "user-rejected": "请求被拒绝",
   "please-connect-mm": "请先连接到 MetaMask",
   "switch_network_success": "切换网络成功",
-  "waiting_for_tx": "等待交易中",
+  "waiting_for_confirm": "等待确认中",
   "waiting_for_block": "等待出块中"
 }

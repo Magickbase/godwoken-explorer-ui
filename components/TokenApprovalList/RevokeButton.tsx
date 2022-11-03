@@ -69,7 +69,7 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
   const itemKey = transaction_hash + spender_address_hash + token_contract_address_hash + data + '-revokeTxn'
   const [revokeTxnHash, setRevokeTxnHash] = useState(localStorage.getItem(itemKey) || '')
   const [callWrite, setCallWrite] = useState(false)
-  const [callingWrite, setCallingWrite] = useState(false)
+  const [isCallingWrite, setIsCallingWrite] = useState(false)
 
   /* wagmi hooks */
   const { chain } = useNetwork()
@@ -135,7 +135,7 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
     isRevokeTxnLoading ||
     isFetchApproveTxLoading ||
     isPackaging ||
-    callingWrite
+    isCallingWrite
 
   useEffect(() => {
     if (revokeTxnHash) {
@@ -145,7 +145,7 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
   }, [revokeTxnHash])
 
   const sendWriteCall = useCallback(async () => {
-    setCallingWrite(true)
+    setIsCallingWrite(true)
     try {
       const data = await writeAsync()
       setAlert({ open: true, type: 'success', msg: t('revokeTxn-sent-success') })
@@ -155,28 +155,28 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
       setAlert({ open: true, type: 'error', msg: t('user-rejected') })
     }
     setCallWrite(false)
-    setCallingWrite(false)
+    setIsCallingWrite(false)
   }, [itemKey, setAlert, t, writeAsync])
 
   useEffect(() => {
-    if (!writeAsync || callingWrite || chain?.id !== targetChainId) return
+    if (!writeAsync || isCallingWrite || chain?.id !== targetChainId) return
     if (callWrite) {
       sendWriteCall()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chain, callWrite, callingWrite, isPreparingContract, isFetchingContract])
+  }, [chain, callWrite, isCallingWrite, isPreparingContract, isFetchingContract])
 
   const tooltipTitle = useCallback(() => {
     if (!isOwner || !connector.ready) {
       return t('not_owner')
-    } else if (callingWrite) {
-      return t('waiting_for_tx')
+    } else if (isCallingWrite) {
+      return t('waiting_for_confirm')
     } else if (isPackaging) {
       return t('waiting_for_block')
     } else {
       return t('click_to_revoke')
     }
-  }, [connector.ready, isOwner, isPackaging, callingWrite, t])
+  }, [connector.ready, isOwner, isPackaging, isCallingWrite, t])
 
   return (
     <Tooltip title={tooltipTitle()} placement="top">
