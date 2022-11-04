@@ -38,6 +38,7 @@ context('Home Page', () => {
     describe('each block', () => {
       it('should have number which is a link', () => {
         cy.get(`${ROOT_SELECTOR} .list-container`)
+          .should('be.visible')
           .children()
           .last()
           .find(`a[title='block number']`)
