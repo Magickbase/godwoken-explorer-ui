@@ -52,7 +52,7 @@
     "@types/phoenix": "1.5.4",
     "@types/qrcode": "1.5.0",
     "@types/react": "17.0.50",
-    "autoprefixer": "10.4.12",
+    "autoprefixer": "10.4.13",
     "@testing-library/jest-dom": "5.16.5",
     "@testing-library/react": "13.4.0",
     "@types/cypress": "1.1.3",
