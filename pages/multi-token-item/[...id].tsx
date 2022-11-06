@@ -240,7 +240,7 @@ const MultiTokenItem = () => {
               <Skeleton animation="wave" />
             )
           ) : null}
-          {tab === tabs[3] && metadata ? <Metadata {...metadata} /> : null}
+          {tab === tabs[3] && metadata ? <Metadata {...(metadata as MetadataProps)} /> : null}
         </div>
       </div>
     </>
