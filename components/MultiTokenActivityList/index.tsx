@@ -6,10 +6,10 @@ import Address from 'components/TruncatedAddress'
 import Pagination from 'components/SimplePagination'
 import TxStatusIcon from 'components/TxStatusIcon'
 import TransferDirection from 'components/TransferDirection'
+import Tooltip from 'components/Tooltip'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import { client, timeDistance, GraphQLSchema } from 'utils'
 import styles from './styles.module.scss'
-import Tooltip from 'components/Tooltip'
 
 type ActivityListProps = {
   transfers: {
