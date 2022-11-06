@@ -16,11 +16,11 @@ import {
   useAccount,
   useTransaction,
 } from 'wagmi'
+import { ethers } from 'ethers'
 import { CircularProgress } from '@mui/material'
 import DisconnectIcon from 'assets/icons/disconnect.svg'
 import Tooltip from 'components/Tooltip'
 import styles from './styles.module.scss'
-import { ethers } from 'ethers'
 
 type Props = {
   setAlert: Dispatch<
@@ -69,6 +69,7 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
   const itemKey = transaction_hash + spender_address_hash + token_contract_address_hash + data + '-revokeTxn'
   const [revokeTxnHash, setRevokeTxnHash] = useState(localStorage.getItem(itemKey) || '')
   const [callWrite, setCallWrite] = useState(false)
+  const [isCallingWrite, setIsCallingWrite] = useState(false)
 
   /* wagmi hooks */
   const { chain } = useNetwork()
@@ -77,7 +78,11 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
   const { connectAsync, connectors } = useConnect({ chainId: targetChainId })
   const connector = connectors[0] // only have metamask for now
   const { address: connectedAddr } = useAccount()
-  const { config, isLoading: isPreparingContract } = usePrepareContractWrite(
+  const {
+    config,
+    isLoading: isPreparingContract,
+    isFetching: isFetchingContract,
+  } = usePrepareContractWrite(
     listItem.udt.eth_type === GraphQLSchema.TokenType.ERC20
       ? {
           chainId: targetChainId,
@@ -123,7 +128,14 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
 
   const isOwner = connectedAddr ? account.toLowerCase() === connectedAddr.toLowerCase() : true
   const disabled =
-    !isOwner || isPreparingContract || !connector.ready || isRevokeTxnLoading || isFetchApproveTxLoading || isPackaging
+    !isOwner ||
+    isPreparingContract ||
+    isFetchingContract ||
+    !connector.ready ||
+    isRevokeTxnLoading ||
+    isFetchApproveTxLoading ||
+    isPackaging ||
+    isCallingWrite
 
   useEffect(() => {
     if (revokeTxnHash) {
@@ -132,37 +144,39 @@ const RevokeButton: React.FC<Props> = ({ setAlert, listItem, account, hideItem }
     }
   }, [revokeTxnHash])
 
-  const sentWrite = async () => {
-    if (writeAsync) {
-      try {
-        const data = await writeAsync()
-        setAlert({ open: true, type: 'success', msg: t('revokeTxn-sent-success') })
-        localStorage.setItem(itemKey, data.hash)
-        setRevokeTxnHash(data.hash)
-        setCallWrite(false)
-      } catch {
-        setAlert({ open: true, type: 'error', msg: t('user-rejected') })
-        setCallWrite(false)
-      }
+  const sendWriteCall = useCallback(async () => {
+    setIsCallingWrite(true)
+    try {
+      const data = await writeAsync()
+      setAlert({ open: true, type: 'success', msg: t('revokeTxn-sent-success') })
+      localStorage.setItem(itemKey, data?.hash)
+      setRevokeTxnHash(data.hash)
+    } catch {
+      setAlert({ open: true, type: 'error', msg: t('user-rejected') })
     }
-  }
+    setCallWrite(false)
+    setIsCallingWrite(false)
+  }, [itemKey, setAlert, t, writeAsync])
 
   useEffect(() => {
-    if (chain?.id === targetChainId && callWrite) {
-      sentWrite()
+    if (!writeAsync || isCallingWrite || chain?.id !== targetChainId) return
+    if (callWrite) {
+      sendWriteCall()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chain, callWrite, targetChainId])
+  }, [chain, callWrite, isCallingWrite, isPreparingContract, isFetchingContract])
 
   const tooltipTitle = useCallback(() => {
     if (!isOwner || !connector.ready) {
       return t('not_owner')
+    } else if (isCallingWrite) {
+      return t('waiting_for_confirm')
     } else if (isPackaging) {
-      return ''
+      return t('waiting_for_block')
     } else {
       return t('click_to_revoke')
     }
-  }, [connector.ready, isOwner, isPackaging, t])
+  }, [connector.ready, isOwner, isPackaging, isCallingWrite, t])
 
   return (
     <Tooltip title={tooltipTitle()} placement="top">
