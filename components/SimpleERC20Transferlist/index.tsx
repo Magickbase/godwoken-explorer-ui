@@ -83,7 +83,8 @@ export const fetchTransferList = (variables: {
 
 const TransferList: React.FC<ResponseProps> = props => {
   const { token_transfers: dataSource } = props
+  const handleTokenName = udt => udt.symbol.split('.')[0] || ''
 
-  return <CommonTransferlist {...dataSource} isShowValue />
+  return <CommonTransferlist {...dataSource} isShowValue handleTokenName={handleTokenName} />
 }
 export default TransferList

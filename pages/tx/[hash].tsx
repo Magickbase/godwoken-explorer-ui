@@ -36,7 +36,7 @@ import {
 } from 'utils'
 import styles from './styles.module.scss'
 
-const tabs = ['erc20', 'logs', 'raw-data', 'erc721']
+const tabs = ['erc20Records', 'erc721Records', 'logs', 'rawData']
 
 interface Transaction {
   hash: string
@@ -136,7 +136,7 @@ const Tx = () => {
   const {
     query: {
       hash,
-      tab = 'erc20',
+      tab = 'erc20Records',
       before = null,
       after = null,
       address_from = null,
@@ -176,14 +176,15 @@ const Tx = () => {
         log_index_sort: log_index_sort as 'ASC' | 'DESC',
       }),
     {
-      enabled: tab === 'erc20',
+      enabled: tab === 'erc20Records',
     },
   )
 
   const { isLoading: isErc721TransferListLoading, data: erc721TransferList } = useQuery(
-    ['tx-erc721-transfer-list', to_address, before, after, log_index_sort, page_size],
+    ['tx-erc721-transfer-list', address_from, to_address, before, after, log_index_sort, page_size],
     () =>
       fetchTransferListForErc721({
+        from_address: address_from as string | null,
         to_address: to_address as string | null,
         limit: Number.isNaN(+page_size) ? +SIZES[1] : +page_size,
         before: before as string | null,
@@ -191,7 +192,7 @@ const Tx = () => {
         log_index_sort: log_index_sort as 'ASC' | 'DESC',
       }),
     {
-      enabled: tab === 'erc721',
+      enabled: tab === 'erc721Records',
     },
   )
 
@@ -499,14 +500,21 @@ const Tx = () => {
         <div className={styles.list}>
           <Tabs
             value={tabs.indexOf(tab as string)}
-            tabs={['erc20_records', 'logs', 'rawData', 'erc721_records'].map((label, idx) => ({
+            tabs={tabs.map(label => ({
               label: t(label),
-              href: `/tx/${hash}?tab=${tabs[idx]}`,
+              href: `/tx/${hash}?tab=${label}`,
             }))}
           />
-          {tab === 'erc20' ? (
+          {tab === 'erc20Records' ? (
             transferList || !isTransferListLoading ? (
               <TransferList token_transfers={transferList} />
+            ) : (
+              <Skeleton animation="wave" />
+            )
+          ) : null}
+          {tab === 'erc721Records' ? (
+            erc721TransferList || !isErc721TransferListLoading ? (
+              <SimpleERC721Transferlist erc721_token_transfers={erc721TransferList} />
             ) : (
               <Skeleton animation="wave" />
             )
@@ -518,14 +526,7 @@ const Tx = () => {
               <Skeleton animation="wave" />
             )
           ) : null}
-          {tab === 'raw-data' && tx ? <RawTxData hash={hash as string} /> : null}
-          {tab === 'erc721' ? (
-            erc721TransferList || !isErc721TransferListLoading ? (
-              <SimpleERC721Transferlist erc721_token_transfers={erc721TransferList} />
-            ) : (
-              <Skeleton animation="wave" />
-            )
-          ) : null}
+          {tab === 'rawData' && tx ? <RawTxData hash={hash as string} /> : null}
         </div>
       </div>
     </>

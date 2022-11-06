@@ -10,9 +10,17 @@ type ResponseProps = {
 }
 
 const transferListQueryForErc721 = gql`
-  query ($to_address: String!, $limit: Int, $log_index_sort: SortType, $before: String, $after: String) {
+  query (
+    $from_address: String
+    $to_address: String!
+    $limit: Int
+    $before: String
+    $after: String
+    $log_index_sort: SortType
+  ) {
     erc721_token_transfers(
       input: {
+        from_address: $from_address
         to_address: $to_address
         limit: $limit
         before: $before
@@ -46,10 +54,11 @@ const transferListQueryForErc721 = gql`
 `
 
 export const fetchTransferListForErc721 = (variables: {
-  to_address?: string | null
   limit: number
   before: string
   after: string
+  from_address?: string | null
+  to_address: string | null
   log_index_sort: 'ASC' | 'DESC'
 }) =>
   client
@@ -59,7 +68,8 @@ export const fetchTransferListForErc721 = (variables: {
 
 const SimpleERC721Transferlist: React.FC<ResponseProps> = props => {
   const { erc721_token_transfers: dataSource } = props
+  const handleTokenName = udt => `${udt.name}#${udt.id}`
 
-  return <CommonTransferlist {...dataSource} />
+  return <CommonTransferlist {...dataSource} handleTokenName={handleTokenName} />
 }
 export default SimpleERC721Transferlist

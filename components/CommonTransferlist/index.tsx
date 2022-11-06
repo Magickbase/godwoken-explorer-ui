@@ -17,6 +17,8 @@ import NoDataIcon from 'assets/icons/no-data.svg'
 import EmptyFilteredListIcon from 'assets/icons/empty-filtered-list.svg'
 import styles from './styles.module.scss'
 
+type udtType = Nullable<Pick<GraphQLSchema.Udt, 'decimal' | 'name' | 'symbol' | 'id' | 'icon'>>
+
 export type TransferListProps = {
   entries: Array<{
     amount: string
@@ -24,18 +26,19 @@ export type TransferListProps = {
     to_address: string
     log_index: number
     transaction_hash: string
-    udt: Nullable<Pick<GraphQLSchema.Udt, 'decimal' | 'name' | 'symbol' | 'id' | 'icon'>>
+    udt: udtType
     block?: Nullable<Pick<GraphQLSchema.Block, 'number' | 'timestamp'>>
     token_contract_address_hash?: string
     token_id?: number
   }>
+  handleTokenName?: (udt: udtType) => string
   metadata: GraphQLSchema.PageMetadata
   isShowValue?: boolean
 }
 
 const FILTER_KEYS = ['address_from', 'address_to']
 
-const TransferList: React.FC<TransferListProps> = ({ entries, metadata, isShowValue = false }) => {
+const TransferList: React.FC<TransferListProps> = ({ entries, metadata, isShowValue = false, handleTokenName }) => {
   const [isShowLogo, setIsShowLogo] = useState(true)
   const [t] = useTranslation('list')
   const {
@@ -138,7 +141,7 @@ const TransferList: React.FC<TransferListProps> = ({ entries, metadata, isShowVa
                       {isShowLogo ? (
                         <TokenLogo name={item.udt.name} logo={item.udt.icon} />
                       ) : (
-                        item.udt.symbol.split('.')[0] ?? ''
+                        handleTokenName?.(item.udt) ?? ''
                       )}
                     </a>
                   </NextLink>
