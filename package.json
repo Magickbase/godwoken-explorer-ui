@@ -51,7 +51,7 @@
     "@types/node": "16.11.68",
     "@types/phoenix": "1.5.4",
     "@types/qrcode": "1.5.0",
-    "@types/react": "17.0.50",
+    "@types/react": "17.0.52",
     "autoprefixer": "10.4.13",
     "@testing-library/jest-dom": "5.16.5",
     "@testing-library/react": "13.4.0",
