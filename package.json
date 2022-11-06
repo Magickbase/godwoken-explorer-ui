@@ -48,7 +48,7 @@
   "devDependencies": {
     "@cypress/code-coverage": "3.10.0",
     "@svgr/webpack": "6.5.1",
-    "@types/node": "16.11.68",
+    "@types/node": "16.18.3",
     "@types/phoenix": "1.5.4",
     "@types/qrcode": "1.5.0",
     "@types/react": "17.0.50",
