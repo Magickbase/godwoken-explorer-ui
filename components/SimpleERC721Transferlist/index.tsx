@@ -68,7 +68,7 @@ export const fetchTransferListForErc721 = (variables: {
 
 const SimpleERC721Transferlist: React.FC<ResponseProps> = props => {
   const { erc721_token_transfers: dataSource } = props
-  const handleTokenName = udt => `${udt.name}#${udt.id}`
+  const handleTokenName = (udt, token_id) => `${udt.name}#${token_id}`
 
   return <CommonTransferlist {...dataSource} handleTokenName={handleTokenName} />
 }

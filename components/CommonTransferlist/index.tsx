@@ -31,7 +31,7 @@ export type TransferListProps = {
     token_contract_address_hash?: string
     token_id?: number
   }>
-  handleTokenName?: (udt: udtType) => string
+  handleTokenName?: (udt: udtType, ...rest: any) => string
   metadata: GraphQLSchema.PageMetadata
   isShowValue?: boolean
 }
@@ -141,7 +141,7 @@ const TransferList: React.FC<TransferListProps> = ({ entries, metadata, isShowVa
                       {isShowLogo ? (
                         <TokenLogo name={item.udt.name} logo={item.udt.icon} />
                       ) : (
-                        handleTokenName?.(item.udt) ?? ''
+                        handleTokenName?.(item.udt, item.token_id) ?? ''
                       )}
                     </a>
                   </NextLink>
