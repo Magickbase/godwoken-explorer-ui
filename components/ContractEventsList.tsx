@@ -22,7 +22,7 @@ import ContractEventListItem from './ContractEventListItem'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import { ParsedEventLog, IMG_URL, useDebounce } from 'utils'
 
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
+const StyledTableCell = styled(TableCell)(() => ({
   [`&.${tableCellClasses.root}`]: {
     borderBottom: '1px solid #f0f0f0',
   },
