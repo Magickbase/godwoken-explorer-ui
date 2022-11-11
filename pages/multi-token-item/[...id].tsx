@@ -54,7 +54,7 @@ interface CollectionInfo
     name: string | null
     symbol: string | null
   }
-  metadata?: MetadataProps
+  metadata: MetadataProps
 }
 interface InfoProps {
   erc1155_udts: {
@@ -75,7 +75,7 @@ interface Variables {
 
 const tabs = ['activity', 'holders', 'inventory', 'metadata']
 
-const fetchInfo = (variables: Variables): Promise<CollectionInfo | undefined> =>
+const fetchInfo = (variables: Variables): Promise<CollectionInfo> =>
   client
     .request<InfoProps>(infoQuery, variables)
     .then(data => ({
