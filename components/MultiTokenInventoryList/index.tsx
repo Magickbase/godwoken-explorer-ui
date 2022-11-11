@@ -120,8 +120,8 @@ const MultiTokenInventoryList: React.FC<InventoryListProps> = ({ inventory, view
   return (
     <>
       <div className={styles.container}>
-        {inventory.entries.map(item => (
-          <div key={item.token_id} className={styles.card}>
+        {inventory.entries.map((item, idx) => (
+          <div key={item.token_id + idx} className={styles.card}>
             <NextLink href={`/multi-token-item/${item.contract_address_hash}/${item.token_id}`}>
               <a className={styles.cover}>
                 <img
