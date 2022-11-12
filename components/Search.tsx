@@ -50,6 +50,9 @@ const Search = () => {
         searchRef.current.value = queryValue[1] || ''
       }
     }
+    if (searchRef.current.value) {
+      setShowClearBtn(true)
+    }
   }, [query, asPath])
 
   const handleSearch = async (e: React.KeyboardEvent<HTMLInputElement>) => {
