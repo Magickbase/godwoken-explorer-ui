@@ -26,12 +26,12 @@ import PolyjuiceStatus from 'components/PolyjuiceStatus'
 import ExpandIcon from 'assets/icons/expand.svg'
 import {
   formatDatetime,
-  fetchEventLogsListByType,
   GraphQLSchema,
   client,
   getAddressDisplay,
   CKB_EXPLORER_URL,
   PCKB_UDT_INFO,
+  provider,
 } from 'utils'
 import styles from './styles.module.scss'
 
@@ -128,6 +128,18 @@ const txQuery = gql`
   }
 `
 
+const getAbiListQuery = (addrList: Array<string>) => {
+  const queryBody = addrList.map(
+    addr => `contract_${addr}: smart_contract( input: { contract_address: "${addr}"}) {
+    abi
+  }`,
+  )
+  return gql`query {
+  ${queryBody.join('\n')}
+}
+`
+}
+
 const Tx = () => {
   const {
     query: {
@@ -174,12 +186,21 @@ const Tx = () => {
     },
   )
 
-  const { isLoading: isLogListLoading, data: logsList } = useQuery(
-    ['tx-log-list', hash],
-    () => fetchEventLogsListByType('txs', hash as string).then(logList => logList.reverse()),
+  const { isLoading: isTxReceiptLoading, data: txReceipt } = useQuery(
+    ['tx-receipt-ethers', hash],
+    () => provider.getTransactionReceipt(hash as string),
     {
       enabled: tab === 'logs',
     },
+  )
+
+  const contractAddrList = [...new Set(txReceipt?.logs.map(log => log.address.toLowerCase()))]
+
+  const { data: abiList = {} } = useQuery<Record<string, { abi: Array<any> | null }>>(
+    ['contract-abi-list', contractAddrList.join(',')],
+    contractAddrList.length
+      ? () => client.request<Record<string, { abi: Array<any> | null }>>(getAbiListQuery(contractAddrList))
+      : null,
   )
 
   useEffect(() => {
@@ -482,8 +503,8 @@ const Tx = () => {
             )
           ) : null}
           {tab === 'logs' ? (
-            logsList || !isLogListLoading ? (
-              <TxLogsList list={logsList} />
+            txReceipt || !isTxReceiptLoading ? (
+              <TxLogsList list={txReceipt.logs} abiList={abiList} />
             ) : (
               <Skeleton animation="wave" />
             )
