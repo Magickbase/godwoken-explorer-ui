@@ -100,11 +100,11 @@ const ChartList: React.FC<{ charts: { dailyData: ReturnType<typeof getDailyDataR
             },
           },
         }}
-        action={<ClearIcon onClick={() => setAlertOpen(false)} />}
+        action={<ClearIcon data-cy="remove-charts-banner-btn" onClick={() => setAlertOpen(false)} />}
       >
         {t(`updateTimeInfo`)}
       </Alert>
-      <Stack spacing={{ xs: 3, md: 5 }}>
+      <Stack spacing={{ xs: 3, md: 5 }} data-cy="charts-list">
         {keysList.map(keys => (
           <Box key={keys.map(k => k.key).join()}>
             <Typography
@@ -113,6 +113,7 @@ const ChartList: React.FC<{ charts: { dailyData: ReturnType<typeof getDailyDataR
               color="secondary"
               fontSize={{ xs: 15, md: 20 }}
               mb={{ xs: 1.8, md: 3 }}
+              data-cy="chart-title"
             >
               {t(`title.${keys.map(k => k.key).join('/')}`)}
             </Typography>

@@ -1,10 +1,14 @@
 /// <reference types="cypress" />
 
 context('Block Page', () => {
-  const hash = '0x0a9fbb868d381f65328a811ffe441f80c328400b583887731ae7195579e0ca5d'
+  const blockWithTxs = '0x0a9fbb868d381f65328a811ffe441f80c328400b583887731ae7195579e0ca5d'
+  const blockWithBridgedTransfers = '0x2ae0d8f85f982800cbdf8b20c4b3e6b6023453dc60dd5e522d22f11cb34b2733'
+  const blockWithRawData = '0x2ae0d8f85f982800cbdf8b20c4b3e6b6023453dc60dd5e522d22f11cb34b2733'
+  const blockWithoutTxs = '0x90ce1c2c2e988167a55143e9abc13a68f70d0e04a8b47aa19fa8ac1918ed8dc9'
+  const blockWithoutBridgedTransfers = '0x90ce1c2c2e988167a55143e9abc13a68f70d0e04a8b47aa19fa8ac1918ed8dc9'
 
   before(() =>
-    cy.visit(`/en-US/block/${hash}`, {
+    cy.visit(`/en-US/block/${blockWithTxs}`, {
       headers: {
         'Accept-Encoding': 'gzip, deflate',
       },
@@ -17,7 +21,7 @@ context('Block Page', () => {
     })
 
     it('should have block hash', () => {
-      cy.get('dl').first().find('dt').should('have.text', 'block hash').next().should('have.text', hash)
+      cy.get('dl').first().find('dt').should('have.text', 'block hash').next().should('have.text', blockWithTxs)
     })
 
     it('should have timestamp', () => {
@@ -162,10 +166,10 @@ context('Block Page', () => {
       cy.get('[role=tab]')
         .first()
         .should('have.text', 'Transactions')
-        .should('have.attr', 'href', `/block/${hash}?tab=transactions`)
+        .should('have.attr', 'href', `/block/${blockWithTxs}?tab=transactions`)
         .next()
         .should('have.text', 'Bridged Transfers')
-        .should('have.attr', 'href', `/block/${hash}?tab=bridged`)
+        .should('have.attr', 'href', `/block/${blockWithTxs}?tab=bridged`)
     })
   })
 
@@ -228,6 +232,87 @@ context('Block Page', () => {
         .next()
         .next()
         .should('have.text', '0.00000000')
+    })
+  })
+
+  describe('should have a list of bridged transfers', () => {
+    before(() => {
+      cy.visit(`/en-US/block/${blockWithBridgedTransfers}?tab=bridged`)
+    })
+    it('should have 7 fields', () => {
+      cy.get('th')
+        .first()
+        .should('have.text', 'Type')
+        .next()
+        .should('contain.text', 'Value')
+        .next()
+        .should('have.text', 'pCKB')
+        .next()
+        .should('contain.text', 'Age')
+        .next()
+        .should('have.text', 'Account')
+        .next()
+        .should('have.text', 'CKB Txn')
+        .next()
+        .should('have.text', 'Block')
+    })
+
+    it('should have at least one record', () => {
+      cy.get('tbody tr').should('have.length.at.least', 1)
+    })
+
+    it('should have 7 values in a record', () => {
+      cy.get('tbody tr')
+        .first()
+        .find('td')
+        .first()
+        .should('have.text', 'Withdrawal')
+        .next()
+        .should('have.text', '10 USDC')
+        .next()
+        .should('have.text', '400')
+        .next()
+        .should(field => {
+          expect(field.find('time').attr('datetime')).to.eq('2022-07-10T14:08:57.261Z')
+        })
+        .next()
+        .should(field => {
+          expect(field.text()).to.eq('0x9c0992...62a638b5')
+          expect(field.find('a').attr('href')).to.eq('/account/0x9c09926927201527812364cf97aa9bb962a638b5')
+        })
+        .next()
+        .should(field => {
+          expect(field.text()).to.eq('0x1973a2...ab6a7ab4')
+          expect(field.find('a').attr('href')).to.eq(
+            'https://pudge.explorer.nervos.org/transaction/0x1973a24ce482a1988a667214d951514227d8d460e145a108998abee9ab6a7ab4#2',
+          )
+        })
+        .next()
+        .should(field => {
+          expect(field.text()).to.eq('178,574')
+          expect(field.find('a').attr('href')).to.eq(
+            '/block/0x2ae0d8f85f982800cbdf8b20c4b3e6b6023453dc60dd5e522d22f11cb34b2733',
+          )
+        })
+    })
+  })
+
+  describe('should have raw data', () => {
+    it('should have raw data', () => {
+      cy.visit(`/en-US/block/${blockWithRawData}?tab=raw-data`)
+      cy.get('h6').should('have.text', 'Block')
+      cy.get('[data-cy="raw-data"]').should('be.visible')
+    })
+  })
+
+  describe('should display tabs with empty data', () => {
+    it('should display empty transactions list', () => {
+      cy.visit(`/en-US/block/${blockWithoutTxs}`)
+      cy.get('tbody').should('contain.text', "There're no matching entries")
+    })
+    it('should display empty bridged transfers list', () => {
+      cy.visit(`/en-US/block/${blockWithoutBridgedTransfers}?tab=bridged`)
+      cy.get('tbody').should('contain.text', "There're no matching entries")
     })
   })
 })
