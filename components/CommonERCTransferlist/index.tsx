@@ -124,8 +124,9 @@ const SimpleERC1155Transferlist: React.FC<Erc1155ResponseProps> = props => {
   return <BaseTransferlist {...dataSource} handleTokenName={handleTokenName} />
 }
 
-const CommonERCTransferlist: React.FC<CommonERCTransferlistProps> = props => {
+const CommonERCTransferlist: React.FC<any> = props => {
   const { transferlistType = TransferlistType.Erc20, ...resData } = props
+  console.log(props, 'props')
 
   switch (transferlistType) {
     case TransferlistType.Erc20:

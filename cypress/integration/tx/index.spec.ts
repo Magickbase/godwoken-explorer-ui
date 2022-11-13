@@ -112,7 +112,7 @@ context('Transaction Page', () => {
     })
   })
 
-  describe('should have erc20 transfer, logs, raw data tabs', () => {
+  describe('should have erc20 transfer, erc721 transfer, erc1155 transfer, logs, raw data tabs', () => {
     it('should have 4 tabs', () => {
       cy.get('div[data-role="tabs"]')
         .find('a')
@@ -129,6 +129,13 @@ context('Transaction Page', () => {
           'have.attr',
           'href',
           '/tx/0x1c63fd6014c9c57ea68e283edfc1159b642e94c6bac7fe699b59bf7c299d1ee1?tab=erc721Records',
+        )
+        .next()
+        .should('have.text', 'ERC1155 Transfers')
+        .should(
+          'have.attr',
+          'href',
+          '/tx/0x1c63fd6014c9c57ea68e283edfc1159b642e94c6bac7fe699b59bf7c299d1ee1?tab=erc1155Records',
         )
         .next()
         .should('have.text', 'Logs')
