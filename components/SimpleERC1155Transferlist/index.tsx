@@ -3,13 +3,13 @@ import { gql } from 'graphql-request'
 import { client } from 'utils'
 
 type ResponseProps = {
-  erc721_token_transfers: TransferListProps & {
+  erc1155_token_transfers: TransferListProps & {
     token_contract_address_hash: string
     token_id: number
   }
 }
 
-const transferListQueryForErc721 = gql`
+const transferListQueryForErc1155 = gql`
   query (
     $transaction_hash: String!
     $before: String
@@ -20,7 +20,7 @@ const transferListQueryForErc721 = gql`
     $limit: Int
     $log_index_sort: SortType
   ) {
-    erc721_token_transfers(
+    erc1155_token_transfers(
       input: {
         transaction_hash: $transaction_hash
         before: $before
@@ -57,7 +57,7 @@ const transferListQueryForErc721 = gql`
   }
 `
 
-export const fetchTransferListForErc721 = (variables: {
+export const fetchTransferListForErc1155 = (variables: {
   transaction_hash: string
   before: string | null
   after: string | null
@@ -68,14 +68,14 @@ export const fetchTransferListForErc721 = (variables: {
   log_index_sort: 'ASC' | 'DESC'
 }) =>
   client
-    .request(transferListQueryForErc721, variables)
-    .then(data => data.erc721_token_transfers)
+    .request(transferListQueryForErc1155, variables)
+    .then(data => data.erc1155_token_transfers)
     .catch(() => ({ entries: [], metadata: { before: null, after: null, total_count: 0 } }))
 
-const SimpleERC721Transferlist: React.FC<ResponseProps> = props => {
-  const { erc721_token_transfers: dataSource } = props
+const SimpleERC1155Transferlist: React.FC<ResponseProps> = props => {
+  const { erc1155_token_transfers: dataSource } = props
   const handleTokenName = (udt, token_id) => `${udt.name}#${token_id}`
 
   return <BaseTransferlist {...dataSource} handleTokenName={handleTokenName} />
 }
-export default SimpleERC721Transferlist
+export default SimpleERC1155Transferlist

@@ -12,8 +12,10 @@ import Tabs from 'components/Tabs'
 import SubpageHead from 'components/SubpageHead'
 import PageTitle from 'components/PageTitle'
 import InfoList from 'components/InfoList'
-import TransferList, { fetchTransferList } from 'components/SimpleERC20Transferlist'
-import SimpleERC721Transferlist, { fetchTransferListForErc721 } from 'components/SimpleERC721Transferlist'
+import CommonERCTransferlist, { fetchERCTransferList, TransferlistType } from 'components/CommonERCTransferlist'
+// import TransferList, { fetchTransferList } from 'components/SimpleERC20Transferlist'
+// import SimpleERC721Transferlist, { fetchTransferListForErc721 } from 'components/SimpleERC721Transferlist'
+// import SimpleERC1155Transferlist, { fetchTransferListForErc1155 } from 'components/SimpleERC1155Transferlist'
 import TxLogsList from 'components/TxLogsList'
 import RawTxData from 'components/RawTxData'
 import CopyBtn from 'components/CopyBtn'
@@ -36,7 +38,7 @@ import {
 } from 'utils'
 import styles from './styles.module.scss'
 
-const tabs = ['erc20Records', 'erc721Records', 'logs', 'rawData']
+const tabs = ['erc20Records', 'erc721Records', 'erc1155Records', 'logs', 'rawData']
 
 interface Transaction {
   hash: string
@@ -158,41 +160,41 @@ const Tx = () => {
       refetchInterval: isFinalized ? undefined : 10000,
     },
   )
-
   const tx = txs?.eth_transaction ?? txs?.gw_transaction
-  const to_address = txs?.gw_transaction.to_account.eth_address
+
+  const commonParams = {
+    transaction_hash: hash as string,
+    before: before as string | null,
+    after: after as string | null,
+    from_address: address_from as string | null,
+    to_address: address_to as string | null,
+    combine_from_to: false,
+    limit: Number.isNaN(+page_size) ? +SIZES[1] : +page_size,
+    log_index_sort: log_index_sort as 'ASC' | 'DESC',
+  }
+  const commonNameArr = [hash, before, after, address_from, address_to, log_index_sort, page_size]
 
   const { isLoading: isTransferListLoading, data: transferList } = useQuery(
-    ['tx-transfer-list', hash, before, after, address_from, address_to, log_index_sort, page_size],
-    () =>
-      fetchTransferList({
-        transaction_hash: hash as string,
-        before: before as string | null,
-        after: after as string | null,
-        from_address: address_from as string | null,
-        to_address: address_to as string | null,
-        combine_from_to: false,
-        limit: Number.isNaN(+page_size) ? +SIZES[1] : +page_size,
-        log_index_sort: log_index_sort as 'ASC' | 'DESC',
-      }),
+    ['tx-transfer-list', ...commonNameArr],
+    () => fetchERCTransferList(commonParams, TransferlistType.Erc20),
     {
       enabled: tab === 'erc20Records',
     },
   )
 
   const { isLoading: isErc721TransferListLoading, data: erc721TransferList } = useQuery(
-    ['tx-erc721-transfer-list', address_from, to_address, before, after, log_index_sort, page_size],
-    () =>
-      fetchTransferListForErc721({
-        from_address: address_from as string | null,
-        to_address: to_address as string | null,
-        limit: Number.isNaN(+page_size) ? +SIZES[1] : +page_size,
-        before: before as string | null,
-        after: after as string | null,
-        log_index_sort: log_index_sort as 'ASC' | 'DESC',
-      }),
+    ['tx-erc721-transfer-list', ...commonNameArr],
+    () => fetchERCTransferList(commonParams, TransferlistType.Erc721),
     {
       enabled: tab === 'erc721Records',
+    },
+  )
+
+  const { isLoading: isErc1155TransferListLoading, data: erc1155TransferList } = useQuery(
+    ['tx-erc1155-transfer-list', ...commonNameArr],
+    () => fetchERCTransferList(commonParams, TransferlistType.Erc1155),
+    {
+      enabled: tab === 'erc1155Records',
     },
   )
 
@@ -507,14 +509,30 @@ const Tx = () => {
           />
           {tab === 'erc20Records' ? (
             transferList || !isTransferListLoading ? (
-              <TransferList token_transfers={transferList} />
+              // <TransferList token_transfers={transferList} />
+              <CommonERCTransferlist transferlistType={TransferlistType.Erc20} token_transfers={transferList} />
             ) : (
               <Skeleton animation="wave" />
             )
           ) : null}
           {tab === 'erc721Records' ? (
             erc721TransferList || !isErc721TransferListLoading ? (
-              <SimpleERC721Transferlist erc721_token_transfers={erc721TransferList} />
+              <CommonERCTransferlist
+                transferlistType={TransferlistType.Erc721}
+                erc721_token_transfers={erc721TransferList}
+              />
+            ) : (
+              // <SimpleERC721Transferlist  erc721_token_transfers={erc721TransferList} />
+              <Skeleton animation="wave" />
+            )
+          ) : null}
+          {tab === 'erc1155Records' ? (
+            erc1155TransferList || !isErc1155TransferListLoading ? (
+              // <SimpleERC1155Transferlist erc1155_token_transfers={erc1155TransferList} />
+              <CommonERCTransferlist
+                transferlistType={TransferlistType.Erc1155}
+                erc1155_token_transfers={erc1155TransferList}
+              />
             ) : (
               <Skeleton animation="wave" />
             )

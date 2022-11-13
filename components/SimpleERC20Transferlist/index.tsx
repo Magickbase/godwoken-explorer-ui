@@ -1,5 +1,5 @@
 import { gql } from 'graphql-request'
-import CommonTransferlist, { TransferListProps } from 'components/CommonTransferlist'
+import BaseTransferlist, { TransferListProps } from 'components/BaseTransferlist'
 import { GraphQLSchema, client } from 'utils'
 
 type ResponseProps = {
@@ -85,6 +85,6 @@ const TransferList: React.FC<ResponseProps> = props => {
   const { token_transfers: dataSource } = props
   const handleTokenName = udt => udt.symbol.split('.')[0] || ''
 
-  return <CommonTransferlist {...dataSource} isShowValue handleTokenName={handleTokenName} />
+  return <BaseTransferlist {...dataSource} isShowValue handleTokenName={handleTokenName} />
 }
 export default TransferList
