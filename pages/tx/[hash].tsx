@@ -263,7 +263,6 @@ const Tx = () => {
 
   const fromAddrDisplay = getAddressDisplay(tx?.from_account)
   const toAddrDisplay = getAddressDisplay(tx?.to_account, tx?.polyjuice?.native_transfer_address_hash)
-
   const method = tx?.method_name ?? tx?.method_id
 
   const overview = [
@@ -491,11 +490,8 @@ const Tx = () => {
             <DownloadMenu items={downloadItems} />
           </div>
         </PageTitle>
-
         <InfoList title={t(`overview`)} list={overview} style={{ marginBottom: '2rem' }} />
-
         <InfoList title={t(`basicInfo`)} list={basicInfo} style={{ marginBottom: '2rem' }} type="two-columns" />
-
         <div className={styles.list}>
           <Tabs
             value={tabs.indexOf(tab as string)}
@@ -506,7 +502,6 @@ const Tx = () => {
           />
           {tab === 'erc20Records' ? (
             transferList || !isTransferListLoading ? (
-              // <TransferList token_transfers={transferList} />
               <CommonERCTransferlist transferlistType={TransferlistType.Erc20} token_transfers={transferList} />
             ) : (
               <Skeleton animation="wave" />
@@ -519,13 +514,11 @@ const Tx = () => {
                 erc721_token_transfers={erc721TransferList}
               />
             ) : (
-              // <SimpleERC721Transferlist  erc721_token_transfers={erc721TransferList} />
               <Skeleton animation="wave" />
             )
           ) : null}
           {tab === 'erc1155Records' ? (
             erc1155TransferList || !isErc1155TransferListLoading ? (
-              // <SimpleERC1155Transferlist erc1155_token_transfers={erc1155TransferList} />
               <CommonERCTransferlist
                 transferlistType={TransferlistType.Erc1155}
                 erc1155_token_transfers={erc1155TransferList}

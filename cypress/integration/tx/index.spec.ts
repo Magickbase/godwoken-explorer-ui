@@ -113,7 +113,7 @@ context('Transaction Page', () => {
   })
 
   describe('should have erc20 transfer, erc721 transfer, erc1155 transfer, logs, raw data tabs', () => {
-    it('should have 4 tabs', () => {
+    it('should have 5 tabs', () => {
       cy.get('div[data-role="tabs"]')
         .find('a')
         .first()
