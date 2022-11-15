@@ -26,6 +26,7 @@
 .token {
   display: flex;
   align-items: center;
+  column-gap: 4px;
   svg {
     margin-left: 0.25rem;
     cursor: pointer;
@@ -48,6 +49,7 @@
 .to {
   display: flex;
   align-items: center;
+  column-gap: 4px;
 }
 
 .noRecords {

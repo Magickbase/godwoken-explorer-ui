@@ -45,6 +45,8 @@
   "block_to": "to",
   "address_from": "from",
   "address_to": "to",
+  "age_range_start": "date start",
+  "age_range_end": "date end",
   "filter": "filter",
   "clear": "clear",
   "n_contracts_in_total": "{{number}} Kinds in Total",
@@ -54,6 +56,8 @@
     "block_to": "Block Number",
     "address_from": "Search by address",
     "address_to": "Search by address",
+    "age_range_start": "YYYY-MM-DD",
+    "age_range_end": "YYYY-MM-DD",
     "asset": "Asset",
     "token_type": "Token Type"
   },

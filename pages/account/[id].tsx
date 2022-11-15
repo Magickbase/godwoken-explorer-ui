@@ -54,6 +54,10 @@ const Account = () => {
       sort_asset = 'ASC',
       sort_token_type = 'ASC',
       token_type = null,
+      address_from = null,
+      address_to = null,
+      age_range_start = null,
+      age_range_end = null,
     },
   } = useRouter()
   const [t] = useTranslation(['account', 'common'])
@@ -108,13 +112,31 @@ const Account = () => {
   )
 
   const { isLoading: isTransferListLoading, data: transferList } = useQuery(
-    ['account-transfer-list', q.address, before, after, pageSize],
+    [
+      'account-transfer-list',
+      q.address,
+      before,
+      after,
+      pageSize,
+      block_from,
+      block_to,
+      address_from,
+      address_to,
+      age_range_start,
+      age_range_end,
+    ],
     () =>
       fetchTransferList({
-        address: q.address,
         limit: pageSize,
         before: before as string,
         after: after as string,
+        block_from: block_from ? +block_from : null,
+        block_to: block_to ? +block_to : null,
+        address_from: (address_from as string) || q.address,
+        address_to: (address_to as string) || q.address,
+        age_range_start: age_range_start as string,
+        age_range_end: age_range_end as string,
+        combine_from_to: true,
       }),
     { enabled: tab === 'erc20' && !!q.address },
   )

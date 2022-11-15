@@ -6,6 +6,8 @@ import ClearIcon from 'assets/icons/clear.svg'
 import styles from './styles.module.scss'
 
 const NUM_KEYS = ['block_from', 'block_to']
+const DATE_KEYS = ['age_range_end', 'age_range_start']
+
 const FilterMenu: React.FC<{ filterKeys: Array<string> }> = ({ filterKeys }) => {
   const [t] = useTranslation('list')
   const { query, push, asPath } = useRouter()
@@ -22,6 +24,12 @@ const FilterMenu: React.FC<{ filterKeys: Array<string> }> = ({ filterKeys }) => 
         if (v) {
           if (NUM_KEYS.includes(field)) {
             q[field] = `${+v}`
+          } else if (DATE_KEYS.includes(field)) {
+            try {
+              q[field] = new Date(v).toISOString()
+            } catch (e) {
+              delete q[field]
+            }
           } else {
             q[field] = v
           }
@@ -66,6 +74,8 @@ const FilterMenu: React.FC<{ filterKeys: Array<string> }> = ({ filterKeys }) => 
       <form onSubmit={handleFilterSubmit} className={styles.menu} data-role="filter-menu">
         {filterKeys.map(field => {
           const isNum = NUM_KEYS.includes(field)
+          const isDate = DATE_KEYS.includes(field)
+          const defualtValue = query[field] ?? ''
           return (
             <div key={field} className={styles.field}>
               <label>{t(field)}</label>
@@ -73,7 +83,7 @@ const FilterMenu: React.FC<{ filterKeys: Array<string> }> = ({ filterKeys }) => 
                 type={isNum ? 'number' : 'text'}
                 name={field}
                 placeholder={t(`filter_menu.${field}`)}
-                defaultValue={query[field] ?? ''}
+                defaultValue={isDate ? (defualtValue as string).split('T')[0] : defualtValue}
                 inputMode={isNum ? 'numeric' : 'text'}
                 id={`${field}_filter`}
               />
