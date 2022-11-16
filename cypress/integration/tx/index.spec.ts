@@ -112,13 +112,31 @@ context('Transaction Page', () => {
     })
   })
 
-  describe('should have erc20 transfer, logs, raw data tabs', () => {
-    it('should have 3 tabs', () => {
+  describe('should have erc20 transfer, erc721 transfer, erc1155 transfer, logs, raw data tabs', () => {
+    it('should have 5 tabs', () => {
       cy.get('div[data-role="tabs"]')
         .find('a')
         .first()
         .should('have.text', 'ERC20 Transfers')
-        .should('have.attr', 'href', '/tx/0x1c63fd6014c9c57ea68e283edfc1159b642e94c6bac7fe699b59bf7c299d1ee1?tab=erc20')
+        .should(
+          'have.attr',
+          'href',
+          '/tx/0x1c63fd6014c9c57ea68e283edfc1159b642e94c6bac7fe699b59bf7c299d1ee1?tab=erc20Records',
+        )
+        .next()
+        .should('have.text', 'ERC721 Transfers')
+        .should(
+          'have.attr',
+          'href',
+          '/tx/0x1c63fd6014c9c57ea68e283edfc1159b642e94c6bac7fe699b59bf7c299d1ee1?tab=erc721Records',
+        )
+        .next()
+        .should('have.text', 'ERC1155 Transfers')
+        .should(
+          'have.attr',
+          'href',
+          '/tx/0x1c63fd6014c9c57ea68e283edfc1159b642e94c6bac7fe699b59bf7c299d1ee1?tab=erc1155Records',
+        )
         .next()
         .should('have.text', 'Logs')
         .should('have.attr', 'href', '/tx/0x1c63fd6014c9c57ea68e283edfc1159b642e94c6bac7fe699b59bf7c299d1ee1?tab=logs')
@@ -127,7 +145,7 @@ context('Transaction Page', () => {
         .should(
           'have.attr',
           'href',
-          '/tx/0x1c63fd6014c9c57ea68e283edfc1159b642e94c6bac7fe699b59bf7c299d1ee1?tab=raw-data',
+          '/tx/0x1c63fd6014c9c57ea68e283edfc1159b642e94c6bac7fe699b59bf7c299d1ee1?tab=rawData',
         )
     })
   })
