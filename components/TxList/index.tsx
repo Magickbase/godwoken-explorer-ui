@@ -8,9 +8,9 @@ import HashLink from 'components/HashLink'
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/SimplePagination'
 import TransferDirection from 'components/TransferDirection'
-import Tooltip from 'components/Tooltip'
 import FilterMenu from 'components/FilterMenu'
 import RoundedAmount from 'components/RoundedAmount'
+import Tooltip from 'components/Tooltip'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import EmptyFilteredListIcon from 'assets/icons/empty-filtered-list.svg'
 import { timeDistance, GraphQLSchema, client, PCKB_UDT_INFO } from 'utils'
@@ -27,7 +27,7 @@ export type TxListProps = {
       block?: Pick<GraphQLSchema.Block, 'hash' | 'number' | 'status' | 'timestamp'>
       from_account: Pick<GraphQLSchema.Account, 'eth_address' | 'script_hash' | 'type'>
       to_account: Pick<GraphQLSchema.Account, 'eth_address' | 'script_hash' | 'type'>
-      polyjuice: Pick<GraphQLSchema.Polyjuice, 'value' | 'status'>
+      polyjuice: Pick<GraphQLSchema.Polyjuice, 'value' | 'status' | 'native_transfer_address_hash'>
     }>
     metadata: GraphQLSchema.PageMetadata
   }
@@ -84,6 +84,7 @@ const txListQuery = gql`
         polyjuice {
           value
           status
+          native_transfer_address_hash
         }
         type
       }
@@ -157,9 +158,15 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
             entries.map(item => {
               const hash = item.eth_hash || item.hash
               const from = item.from_account?.eth_address || item.from_account?.script_hash || '-'
-              const to = item.to_account?.eth_address || item.to_account?.script_hash || '-'
-              const method = item.method_name || item.method_id
+              let to = item.to_account?.eth_address || item.to_account?.script_hash || '-'
+              let toType = item.to_account?.type
 
+              if (item.polyjuice?.native_transfer_address_hash) {
+                to = item.polyjuice.native_transfer_address_hash
+                toType = GraphQLSchema.AccountType.EthUser
+              }
+
+              const method = item.method_name || item.method_id
               return (
                 <tr key={hash}>
                   <td>
@@ -180,12 +187,10 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
                   <td>
                     {method ? (
                       <Tooltip title={item.method_id} placement="top">
-                        <div className={styles.method} title={method}>
-                          {method}
-                        </div>
+                        <div className={styles.method}>{method}</div>
                       </Tooltip>
                     ) : (
-                      '-'
+                      <div className={styles.method} data-is-native-transfer="true" />
                     )}
                   </td>
                   <td>
@@ -210,7 +215,7 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
                     <Address address={from} type={item.from_account?.type} />
                   </td>
                   <td>
-                    <Address address={to} type={item.to_account?.type} />
+                    <Address address={to} type={toType} />
                   </td>
                   <td className={styles.direction}>
                     <TransferDirection from={from} to={to} viewer={viewer ?? ''} />

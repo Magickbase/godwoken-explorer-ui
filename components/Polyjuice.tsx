@@ -1,12 +1,12 @@
 import type { PolyjuiceCreator as PolyjuiceCreatorProps } from './AccountOverview'
 import { useTranslation } from 'next-i18next'
-import Tooltip from 'components/Tooltip'
 import ScriptCode from 'components/ScriptCode'
-import InfoList from './InfoList'
+import Tooltip from './Tooltip'
+import InfoList, { InfoItermProps } from './InfoList'
 
 const Polyjuice = ({ script, scriptHash }: { script: PolyjuiceCreatorProps['script']; scriptHash: string }) => {
   const [t] = useTranslation('account')
-  const list: Array<{ field: string; content: React.ReactNode; expandable?: boolean }> = [
+  const list: Array<InfoItermProps> = [
     {
       field: t('type'),
       content: `Polyjuice`,

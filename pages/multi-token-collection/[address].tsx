@@ -18,7 +18,7 @@ import InventoryList, { fetchInventoryListOfCollection } from 'components/MultiT
 import { client, GraphQLSchema } from 'utils'
 import styles from './styles.module.scss'
 
-type CollectionInfoProps = Omit<GraphQLSchema.NftCollectionListItem, 'id' | 'account'> | undefined
+type CollectionInfoProps = Omit<GraphQLSchema.MultiTokenCollectionListItem, 'id' | 'account'> | undefined
 
 interface InfoProps {
   erc1155_udts: {
@@ -37,6 +37,7 @@ const infoQuery = gql`
         name
         symbol
         icon
+        token_type_count
         holders_count
         minted_count
       }
@@ -110,16 +111,25 @@ const MultiTokenCollection = () => {
       field: t('contract'),
       content: <HashLink label={address as string} href={`/account/${address}`} />,
     },
+
+    {
+      field: '',
+      content: <div data-role="placeholder" style={{ height: `1.5rem` }}></div>,
+    },
   ]
 
   const stats: Array<{ field: string; content: React.ReactNode }> = [
     {
-      field: t('holder_count'),
-      content: isInfoLoading ? <Skeleton animation="wave" /> : info?.holders_count.toLocaleString('en') ?? '-',
+      field: t('type_count'),
+      content: isInfoLoading ? <Skeleton animation="wave" /> : (+info?.token_type_count ?? 0).toLocaleString('en'),
     },
     {
-      field: t('minted_count'),
-      content: isInfoLoading ? <Skeleton animation="wave" /> : info?.minted_count.toLocaleString('en') ?? '-',
+      field: t('item_count'),
+      content: isInfoLoading ? <Skeleton animation="wave" /> : (+info?.minted_count ?? 0).toLocaleString('en'),
+    },
+    {
+      field: t('holder_count'),
+      content: isInfoLoading ? <Skeleton animation="wave" /> : (+info?.holders_count ?? 0).toLocaleString('en'),
     },
   ]
 
@@ -131,7 +141,7 @@ const MultiTokenCollection = () => {
         <PageTitle>
           <div className={styles.title}>
             <TokenLogo name={info?.name} logo={info?.icon} />
-            <span>{info?.name}</span>
+            <span>{info?.name ?? '-'}</span>
           </div>
         </PageTitle>
         <div className={styles.overview}>

@@ -14,11 +14,11 @@ import Table from 'components/Table'
 import PageTitle from 'components/PageTitle'
 import HashLink from 'components/HashLink'
 import TokenLogo from 'components/TokenLogo'
-import Tooltip from 'components/Tooltip'
 import FilterMenu from 'components/FilterMenu'
 import SortIcon from 'assets/icons/sort.svg'
 import { SIZES } from 'components/PageSize'
 import Amount from 'components/Amount'
+import Tooltip from 'components/Tooltip'
 import AddIcon from 'assets/icons/add.svg'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import EmptyFilteredListIcon from 'assets/icons/empty-filtered-list.svg'
@@ -167,7 +167,7 @@ const TokenList = () => {
     <>
       <SubpageHead subtitle={title} />
       <Container
-        sx={{ px: { xs: 2, sm: 3, md: 2, lg: 0 }, pb: { xs: 5.5, md: 11 } }}
+        sx={{ px: { xs: 2, lg: 0 }, pb: { xs: 5.5, md: 11 } }}
         className={styles.container}
         data-is-filter-unnecessary={isFilterUnnecessary}
       >

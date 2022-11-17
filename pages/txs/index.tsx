@@ -5,14 +5,13 @@ import NextLink from 'next/link'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useQuery } from 'react-query'
-import { Container, Typography, Box, Stack, TableContainer, Skeleton } from '@mui/material'
+import { Container, Typography, Box, Stack, TableContainer, Skeleton, Tooltip } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import Table from 'components/Table'
 import PageTitle from 'components/PageTitle'
 import SubpageHead from 'components/SubpageHead'
 import TxListComp, { fetchTxList } from 'components/TxList'
-import Tooltip from 'components/Tooltip'
 import FilterIcon from 'assets/icons/filter.svg'
 import PendingIcon from 'assets/icons/pending.svg'
 import IsPendingListIcon from 'assets/icons/is-pending-tx-list.svg'
@@ -60,7 +59,7 @@ const TxList = () => {
     return (
       <>
         <SubpageHead subtitle={title} />
-        <Container sx={{ px: { xs: 2, sm: 3, md: 2, lg: 0 }, pb: { xs: 5.5, md: 11 } }}>
+        <Container sx={{ px: { xs: 2, lg: 0 }, pb: { xs: 5.5, md: 11 } }}>
           <PageTitle>
             <Typography variant="inherit" display="inline" pr={1}>
               {title}
@@ -147,7 +146,7 @@ const TxList = () => {
   return (
     <>
       <SubpageHead subtitle={title} />
-      <Container sx={{ px: { xs: 2, sm: 3, md: 2, lg: 0 }, pb: { xs: 5.5, md: 11 } }}>
+      <Container sx={{ px: { xs: 2, lg: 0 }, pb: { xs: 5.5, md: 11 } }}>
         <PageTitle>{title}</PageTitle>
         <Box
           sx={{

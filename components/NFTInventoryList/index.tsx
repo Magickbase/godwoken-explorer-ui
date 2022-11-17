@@ -3,10 +3,10 @@ import NextLink from 'next/link'
 import { gql } from 'graphql-request'
 import Pagination from 'components/SimplePagination'
 import HashLink from 'components/HashLink'
-import Tooltip from 'components/Tooltip'
 import NoDataIcon from 'assets/icons/no-data.svg'
-import { client, GraphQLSchema, handleNftImageLoadError } from 'utils'
+import { client, getIpfsUrl, GraphQLSchema, handleNftImageLoadError } from 'utils'
 import styles from './styles.module.scss'
+import Tooltip from 'components/Tooltip'
 
 type InventoryListProps = {
   inventory: {
@@ -14,10 +14,13 @@ type InventoryListProps = {
       token_id: string
       address_hash: string
       token_contract_address_hash: string
-      udt: {
+      udt?: {
         id: number
         name: string | null
         icon: string | null
+      }
+      token_instance?: {
+        metadata?: Record<'image', string>
       }
     }>
     metadata: GraphQLSchema.PageMetadata
@@ -27,17 +30,13 @@ type InventoryListProps = {
 
 const inventoryListOfCollectionQuery = gql`
   query ($address: HashAddress!, $before: String, $after: String, $limit: Int) {
-    inventory: erc721_erc1155_inventory(
-      input: { contract_address: $address, before: $before, after: $after, limit: $limit }
-    ) {
+    inventory: erc721_inventory(input: { contract_address: $address, before: $before, after: $after, limit: $limit }) {
       entries {
         token_id
         address_hash
         token_contract_address_hash
-        udt {
-          id
-          name
-          icon
+        token_instance {
+          metadata
         }
       }
       metadata {
@@ -56,8 +55,12 @@ const inventoryListOfAccountQuery = gql`
         token_id
         token_contract_address_hash
         udt {
+          id
           name
           icon
+        }
+        token_instance {
+          metadata
         }
       }
       metadata {
@@ -109,7 +112,7 @@ const NFTInventoryList: React.FC<InventoryListProps> = ({ inventory, viewer }) =
             <NextLink href={`/nft-item/${item.token_contract_address_hash}/${item.token_id}`}>
               <a className={styles.cover}>
                 <img
-                  src={item.udt?.icon ?? '/images/nft-placeholder.svg'}
+                  src={getIpfsUrl(item.token_instance?.metadata?.image) ?? '/images/nft-placeholder.svg'}
                   onError={handleNftImageLoadError}
                   alt="nft-cover"
                 />
@@ -119,7 +122,7 @@ const NFTInventoryList: React.FC<InventoryListProps> = ({ inventory, viewer }) =
             {viewer ? (
               <div className={styles.info}>
                 <span>{t('name')}</span>
-                <span>{item.udt.name?.length > 15 ? item.udt.name.slice(0, 15) + '...' : item.udt.name || '-'}</span>
+                <span>{item.udt?.name?.length > 15 ? item.udt?.name.slice(0, 15) + '...' : item.udt?.name || '-'}</span>
               </div>
             ) : null}
 

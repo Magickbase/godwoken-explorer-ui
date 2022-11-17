@@ -50,7 +50,7 @@ const Layout = ({ children }) => {
         {!isHome && (
           <Container
             sx={{
-              px: { md: 2, lg: 0 },
+              px: { xs: 2, md: 2, lg: 0 },
               pb: 2,
               boxShadow: {
                 xs: '0px 1px 2px rgba(0, 0, 0, 0.05)',

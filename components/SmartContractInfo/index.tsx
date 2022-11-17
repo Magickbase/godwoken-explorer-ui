@@ -1,7 +1,6 @@
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import { Skeleton } from '@mui/material'
-import Tooltip from 'components/Tooltip'
 import InfoList from '../InfoList'
 import NextPageIcon from 'assets/icons/next-page.svg'
 import VerifiedIcon from 'assets/icons/check-success.svg'
@@ -96,13 +95,11 @@ const SmartContract: React.FC<{
     {
       field: t('deployer'),
       content: deployer ? (
-        <Tooltip title={deployer} placement="top">
-          <span>
-            <NextLink href={`/account/${deployer}`}>
-              <a className="mono-font">{deployer}</a>
-            </NextLink>
-          </span>
-        </Tooltip>
+        <span className="tooltip" data-tooltip={deployer}>
+          <NextLink href={`/account/${deployer}`}>
+            <a className="mono-font">{deployer}</a>
+          </NextLink>
+        </span>
       ) : isLoading ? (
         <Skeleton animation="wave" />
       ) : (
@@ -112,13 +109,11 @@ const SmartContract: React.FC<{
     {
       field: t('deployTx'),
       content: deployTxHash ? (
-        <Tooltip title={deployTxHash} placement="top">
-          <span>
-            <NextLink href={`/tx/${deployTxHash}`}>
-              <a className="mono-font">{deployTxHash}</a>
-            </NextLink>
-          </span>
-        </Tooltip>
+        <span className="tooltip" data-tooltip={deployTxHash}>
+          <NextLink href={`/tx/${deployTxHash}`}>
+            <a className="mono-font">{deployTxHash}</a>
+          </NextLink>
+        </span>
       ) : isLoading ? (
         <Skeleton animation="wave" />
       ) : (
@@ -171,18 +166,21 @@ const SmartContract: React.FC<{
         <span>{t(`basicInfo`)}</span>
         <div>
           {isVerified ? (
-            <Tooltip title={t('verified')} placement="top" key="verified">
-              <a href="https://sourcify.dev/#/lookup" target="_blank" rel="noopener noreferrer">
-                <VerifiedIcon />
-              </a>
-            </Tooltip>
+            <a
+              className="tooltip"
+              data-tooltip={t('verified')}
+              key="verified"
+              href="https://sourcify.dev/#/lookup"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <VerifiedIcon />
+            </a>
           ) : null}
           {isSubmitted ? (
-            <Tooltip title={t('submitted')} placement="top" key="submitted">
-              <div>
-                <SubmittedIcon />
-              </div>
-            </Tooltip>
+            <div className="tooltip" data-tooltip={t('submitted')} key="submitted">
+              <SubmittedIcon />
+            </div>
           ) : null}
         </div>
       </div>

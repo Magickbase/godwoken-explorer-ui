@@ -27,7 +27,6 @@ import { useTheme } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded'
 import Search from 'components/Search'
-import Tooltip from 'components/Tooltip'
 import BlockStateIcon from 'components/BlockStateIcon'
 import TxStatusIcon from 'components/TxStatusIcon'
 import { fetchHome, timeDistance, formatInt, client, GraphQLSchema, IS_MAINNET } from 'utils'
@@ -87,6 +86,7 @@ const queryHomeLists = gql`
         }
         polyjuice {
           status
+          native_transfer_address_hash
         }
         type
       }
@@ -111,7 +111,7 @@ interface HomeLists {
       type: GraphQLSchema.TransactionType
       from_account: Pick<GraphQLSchema.Account, 'eth_address' | 'script_hash' | 'type'>
       to_account: Pick<GraphQLSchema.Account, 'eth_address' | 'script_hash' | 'type'>
-      polyjuice: Pick<GraphQLSchema.Polyjuice, 'status'>
+      polyjuice: Pick<GraphQLSchema.Polyjuice, 'status' | 'native_transfer_address_hash'>
     }>
   }
 }
@@ -151,7 +151,7 @@ const Statistic: React.FC<State['statistic'] & { isLoading: boolean }> = ({
         txCount: calclateCurValue(progress, +txCount, +start.txCount),
         tps: calclateCurValue(progress, +tps * 10, +start.tps * 10) / 10,
         accountCount: calclateCurValue(progress, +accountCount, +start.accountCount),
-        averageBlockTime: calclateCurValue(progress, +averageBlockTime, start.averageBlockTime),
+        averageBlockTime: calclateCurValue(progress, +averageBlockTime * 100, start.averageBlockTime * 100) / 100,
       }))
 
       if (progress < 1) {
@@ -226,14 +226,14 @@ const ListContainer = ({ link, title, tooltip, children }) => {
           {title}
         </Typography>
         <NextLink href={link} passHref>
-          <Tooltip placement="top" title={tooltip}>
+          <div className="tooltip " data-tooltip={tooltip}>
             <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
               <Typography variant="body2" fontSize={{ xs: 13, md: 14 }} fontWeight={500} color="primary">
                 {t('all')}
               </Typography>
               <ArrowForwardIosRoundedIcon color="primary" sx={{ fontSize: 12, m: '0 2px 1px 2px' }} />
             </Box>
-          </Tooltip>
+          </div>
         </NextLink>
       </Box>
       <List
@@ -248,6 +248,7 @@ const ListContainer = ({ link, title, tooltip, children }) => {
           overflow: 'hidden',
         }}
         className="list-container"
+        style={{ overflow: 'visible' }}
       >
         {children}
       </List>
@@ -360,20 +361,20 @@ const BlockList: React.FC<{ list: HomeLists['blocks']; isLoading: boolean; lengt
                       </NextLink>
                       <BlockStateIcon state={block.status} />
                     </Box>
-                    <Tooltip title={block.hash} className="mono-font" hidden>
-                      <Box
-                        component="span"
-                        sx={{
-                          'overflow': 'hidden',
-                          'textOverflow': 'ellipsis',
-                          '&:hover': { backgroundColor: 'unset' },
-                        }}
-                        className="mono-font"
-                        px={1}
-                      >
-                        {block.hash}
-                      </Box>
-                    </Tooltip>
+                    <Box
+                      className="mono-font tooltip"
+                      data-tooltip={block.hash}
+                      component="span"
+                      style={{ display: 'none' }}
+                      sx={{
+                        'overflow': 'hidden',
+                        'textOverflow': 'ellipsis',
+                        '&:hover': { backgroundColor: 'unset' },
+                      }}
+                      px={1}
+                    >
+                      {block.hash}
+                    </Box>
                     <Box alignItems="bottom" fontWeight={400} fontSize={{ xs: 12, md: 14 }} color="secondary.light">
                       <time
                         dateTime={new Date(block.timestamp).toISOString()}
@@ -447,9 +448,15 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
       {list?.slice(0, length).map((tx, idx) => {
         const hash = tx.eth_hash ?? tx.hash
         const from = tx.from_account.eth_address || tx.from_account.script_hash
-        const to = tx.to_account?.eth_address || tx.to_account?.script_hash || '-'
+        let to = tx.to_account?.eth_address || tx.to_account?.script_hash || '-'
+        let toType = tx.to_account?.type
+
+        if (tx.polyjuice?.native_transfer_address_hash) {
+          to = tx.polyjuice.native_transfer_address_hash
+          toType = GraphQLSchema.AccountType.EthUser
+        }
         const isSpecialFrom = SPECIAL_ADDR_TYPES.includes(tx.from_account.type)
-        const isSpecialTo = SPECIAL_ADDR_TYPES.includes(tx.to_account?.type)
+        const isSpecialTo = SPECIAL_ADDR_TYPES.includes(toType)
         return (
           <Box key={hash} sx={{ '& :hover': { backgroundColor: 'primary.light' } }}>
             {idx !== 0 && <Divider variant="middle" color="#f0f0f0" sx={{ borderColor: 'transparent' }} />}
@@ -465,33 +472,31 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
                       height={{ xs: 36, md: 56 }}
                     >
                       <Box sx={{ width: 'min-content', display: 'flex', alignItems: 'center' }}>
-                        <Tooltip title={hash} className="mono-font">
-                          <Box>
-                            <NextLink href={`/tx/${hash}`} passHref>
-                              <Button
-                                title="tx hash"
-                                color="primary"
-                                href={`/tx/${hash}`}
-                                component={Link}
-                                className="mono-font"
-                                disableRipple
-                                fontSize={{ xs: 13, md: 14 }}
-                                sx={{
-                                  'textTransform': 'lowercase',
-                                  'whiteSpace': 'nowrap',
-                                  'fontSize': 14,
-                                  'p': 0,
-                                  'mr': { xs: 0.4, md: 1 },
-                                  '&:hover': { backgroundColor: 'unset' },
-                                  'lineHeight': { xs: '20px', md: '16px' },
-                                  'height': { xs: '20px', md: '16px' },
-                                }}
-                              >
-                                {formatAddress(hash, isBigScreen)}
-                              </Button>
-                            </NextLink>
-                          </Box>
-                        </Tooltip>
+                        <Box className="mono-font tooltip " data-tooltip={hash}>
+                          <NextLink href={`/tx/${hash}`} passHref>
+                            <Button
+                              title="tx hash"
+                              color="primary"
+                              href={`/tx/${hash}`}
+                              component={Link}
+                              className="mono-font"
+                              disableRipple
+                              fontSize={{ xs: 13, md: 14 }}
+                              sx={{
+                                'textTransform': 'lowercase',
+                                'whiteSpace': 'nowrap',
+                                'fontSize': 14,
+                                'p': 0,
+                                'mr': { xs: 0.4, md: 1 },
+                                '&:hover': { backgroundColor: 'unset' },
+                                'lineHeight': { xs: '20px', md: '16px' },
+                                'height': { xs: '20px', md: '16px' },
+                              }}
+                            >
+                              {formatAddress(hash, isBigScreen)}
+                            </Button>
+                          </NextLink>
+                        </Box>
                         <TxStatusIcon
                           status={tx.block?.status}
                           isSuccess={
@@ -529,35 +534,33 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
                         >
                           {`${t('from')}`}
                         </Typography>
-                        <Tooltip title={from} className="mono-font">
-                          <Box>
-                            <NextLink href={`/account/${from}`} passHref>
-                              <Button
-                                title="from"
-                                color="primary"
-                                href={`/account/${from}`}
-                                component={Link}
-                                className={isSpecialFrom ? 'Roboto' : 'mono-font'}
-                                disableRipple
-                                fontSize={{ xs: 13, md: 14 }}
-                                sx={{
-                                  'p': 0,
-                                  'pl': 1,
-                                  'textTransform': 'lowercase',
-                                  '&:hover': { backgroundColor: 'unset' },
-                                  'whiteSpace': 'nowrap',
-                                  'fontWeight': 400,
-                                }}
-                              >
-                                {formatAddress(
-                                  isSpecialFrom ? tx.from_account.type.replace(/_/g, ' ') : from,
-                                  isBigScreen,
-                                  isSpecialFrom,
-                                )}
-                              </Button>
-                            </NextLink>
-                          </Box>
-                        </Tooltip>
+                        <Box className="mono-font tooltip " data-tooltip={from}>
+                          <NextLink href={`/account/${from}`} passHref>
+                            <Button
+                              title="from"
+                              color="primary"
+                              href={`/account/${from}`}
+                              component={Link}
+                              className={isSpecialFrom ? 'Roboto' : 'mono-font'}
+                              disableRipple
+                              fontSize={{ xs: 13, md: 14 }}
+                              sx={{
+                                'p': 0,
+                                'pl': 1,
+                                'textTransform': 'lowercase',
+                                '&:hover': { backgroundColor: 'unset' },
+                                'whiteSpace': 'nowrap',
+                                'fontWeight': 400,
+                              }}
+                            >
+                              {formatAddress(
+                                isSpecialFrom ? tx.from_account.type.replace(/_/g, ' ') : from,
+                                isBigScreen,
+                                isSpecialFrom,
+                              )}
+                            </Button>
+                          </NextLink>
+                        </Box>
                       </Stack>
                       <Stack direction="row" justifyContent="space-between" alignItems="center">
                         <Typography
@@ -570,37 +573,31 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
                         >
                           {`${t('to')}`}
                         </Typography>
-                        <Tooltip title={to} className="mono-font">
-                          <Box>
-                            <NextLink href={`/account/${to}`} passHref>
-                              <Button
-                                title="to"
-                                color="primary"
-                                href={`/account/${to}`}
-                                component={Link}
-                                className={isSpecialTo ? 'Roboto' : 'mono-font'}
-                                disableRipple
-                                fontSize={{ xs: 13, md: 14 }}
-                                minWidth={{ xs: 98, sm: 'auto' }}
-                                justifyContent={{ xs: 'flex-end', sm: 'center' }}
-                                sx={{
-                                  'p': 0,
-                                  'pl': 1,
-                                  'textTransform': 'lowercase',
-                                  '&:hover': { backgroundColor: 'unset' },
-                                  'whiteSpace': 'nowrap',
-                                  'fontWeight': 400,
-                                }}
-                              >
-                                {formatAddress(
-                                  isSpecialTo ? tx.to_account.type.replace(/_/g, ' ') : to,
-                                  isBigScreen,
-                                  isSpecialTo,
-                                )}
-                              </Button>
-                            </NextLink>
-                          </Box>
-                        </Tooltip>
+                        <Box className="mono-font tooltip " data-tooltip={to}>
+                          <NextLink href={`/account/${to}`} passHref>
+                            <Button
+                              title="to"
+                              color="primary"
+                              href={`/account/${to}`}
+                              component={Link}
+                              className={isSpecialTo ? 'Roboto' : 'mono-font'}
+                              disableRipple
+                              fontSize={{ xs: 13, md: 14 }}
+                              minWidth={{ xs: 98, sm: 'auto' }}
+                              justifyContent={{ xs: 'flex-end', sm: 'center' }}
+                              sx={{
+                                'p': 0,
+                                'pl': 1,
+                                'textTransform': 'lowercase',
+                                '&:hover': { backgroundColor: 'unset' },
+                                'whiteSpace': 'nowrap',
+                                'fontWeight': 400,
+                              }}
+                            >
+                              {formatAddress(isSpecialTo ? toType.replace(/_/g, ' ') : to, isBigScreen, isSpecialTo)}
+                            </Button>
+                          </NextLink>
+                        </Box>
                       </Stack>
                     </Stack>
                   </Stack>
@@ -640,7 +637,7 @@ const Home = () => {
   return (
     <Box sx={{ pb: { xs: 5, md: 11 } }}>
       <Box sx={{ bgcolor: 'primary.light' }}>
-        <Container sx={{ px: { md: 3, lg: 0 } }}>
+        <Container sx={{ px: { xs: 2, md: 2, lg: 0 } }}>
           <Search />
         </Container>
         <Container sx={{ px: { md: 3, lg: 0 }, pr: { xs: 0 } }}>

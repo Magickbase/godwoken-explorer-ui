@@ -22,6 +22,13 @@
 
 .method {
   @include tx-method;
+  &[data-is-native-transfer] {
+    color: var(--secondary-text-color);
+    pointer-events: none;
+    &:after {
+      content: 'Send';
+    }
+  }
 }
 
 .noRecords {
