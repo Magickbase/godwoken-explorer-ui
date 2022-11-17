@@ -15,5 +15,7 @@
   "erc-721": "ERC 721",
   "token-id": "通证 ID",
   "owner": "所属人",
-  "name": "名称"
+  "name": "名称",
+  "description": "简介",
+  "officialSite": "官方网站"
 }
