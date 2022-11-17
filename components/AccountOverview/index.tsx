@@ -74,7 +74,6 @@ export interface MetaContract extends AccountBase {
     last_finalized_block_number: number
     reverted_block_root: string
     status: 'running' | 'halting'
-    className: string
   }
 }
 
