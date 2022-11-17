@@ -2,8 +2,13 @@ import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import FilterIcon from 'assets/icons/filter.svg'
 import ClearIcon from 'assets/icons/clear.svg'
-
+import utc from 'dayjs/plugin/utc'
+import timezones from 'dayjs/plugin/timezone'
 import styles from './styles.module.scss'
+import dayjs from 'dayjs'
+
+dayjs.extend(utc)
+dayjs.extend(timezones)
 
 const NUM_KEYS = ['block_from', 'block_to']
 const DATE_KEYS = ['age_range_end', 'age_range_start']
@@ -25,11 +30,10 @@ const FilterMenu: React.FC<{ filterKeys: Array<string> }> = ({ filterKeys }) => 
           if (NUM_KEYS.includes(field)) {
             q[field] = `${+v}`
           } else if (DATE_KEYS.includes(field)) {
-            try {
-              q[field] = new Date(v).toISOString()
-            } catch (e) {
-              delete q[field]
-            }
+            const localDate = dayjs(v)
+            const timezone = dayjs.tz.guess()
+            const utcDate = localDate.tz(timezone).utc().toISOString()
+            q[field] = utcDate
           } else {
             q[field] = v
           }
@@ -79,14 +83,25 @@ const FilterMenu: React.FC<{ filterKeys: Array<string> }> = ({ filterKeys }) => 
           return (
             <div key={field} className={styles.field}>
               <label>{t(field)}</label>
-              <input
-                type={isNum ? 'number' : 'text'}
-                name={field}
-                placeholder={t(`filter_menu.${field}`)}
-                defaultValue={isDate ? (defualtValue as string).split('T')[0] : defualtValue}
-                inputMode={isNum ? 'numeric' : 'text'}
-                id={`${field}_filter`}
-              />
+              {isDate ? (
+                <input
+                  type="datetime-local"
+                  key={field}
+                  name={field}
+                  placeholder={t(`filter_menu.${field}`)}
+                  defaultValue={(defualtValue as string).replace('Z', '')}
+                  id={`${field}_filter`}
+                />
+              ) : (
+                <input
+                  type={isNum ? 'number' : 'text'}
+                  name={field}
+                  placeholder={t(`filter_menu.${field}`)}
+                  defaultValue={defualtValue}
+                  inputMode={isNum ? 'numeric' : 'text'}
+                  id={`${field}_filter`}
+                />
+              )}
             </div>
           )
         })}

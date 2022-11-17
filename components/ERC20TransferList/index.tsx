@@ -255,65 +255,67 @@ const TransferList: React.FC<
         </thead>
         <tbody>
           {token_transfers.metadata.total_count ? (
-            token_transfers.entries.map(item => {
-              return (
-                <tr key={item.transaction_hash + item.log_index}>
-                  <td>
-                    <div className={styles.hash}>
-                      <Tooltip title={item.transaction_hash} placement="top">
-                        <span>
-                          <NextLink href={`/tx/${item.transaction_hash}`}>
-                            <a className="mono-font">{`${item.transaction_hash.slice(
-                              0,
-                              8,
-                            )}...${item.transaction_hash.slice(-8)}`}</a>
-                          </NextLink>
-                        </span>
-                      </Tooltip>
-                      <TxStatusIcon
-                        status={item.block.status}
-                        isSuccess={item.polyjuice.status === GraphQLSchema.PolyjuiceStatus.Succeed}
-                      />
-                    </div>
-                  </td>
-                  <td>
-                    <NextLink href={`/block/${item.block.number}`}>
-                      <a>{(+item.block.number).toLocaleString('en')}</a>
-                    </NextLink>
-                  </td>
-                  <td>
-                    <time dateTime={item.block.timestamp}>
-                      {timeDistance(new Date(item.block.timestamp).getTime(), language)}
-                    </time>
-                  </td>
-                  <td>
-                    <Address address={item.from_address} type={item.from_account?.type} />
-                  </td>
-                  <td>
-                    <Address address={item.to_address} type={item.to_account?.type} />
-                  </td>
-                  <td className={styles.direction}>
-                    <TransferDirection from={item.from_address} to={item.to_address} viewer={viewer ?? ''} />
-                  </td>
-                  {showToken ? (
+            token_transfers.entries
+              .filter(item => [item.from_address, item.to_address].includes(viewer.toLowerCase()))
+              .map(item => {
+                return (
+                  <tr key={item.transaction_hash + item.log_index}>
                     <td>
-                      <NextLink href={`/token/${item.udt.id}`}>
-                        <a className={isShowLogo ? undefined : styles.tokenUrl}>
-                          {isShowLogo ? (
-                            <TokenLogo name={item.udt?.name} logo={item.udt?.icon} />
-                          ) : (
-                            item.udt?.symbol.split('.')[0]
-                          )}
-                        </a>
+                      <div className={styles.hash}>
+                        <Tooltip title={item.transaction_hash} placement="top">
+                          <span>
+                            <NextLink href={`/tx/${item.transaction_hash}`}>
+                              <a className="mono-font">{`${item.transaction_hash.slice(
+                                0,
+                                8,
+                              )}...${item.transaction_hash.slice(-8)}`}</a>
+                            </NextLink>
+                          </span>
+                        </Tooltip>
+                        <TxStatusIcon
+                          status={item.block.status}
+                          isSuccess={item.polyjuice.status === GraphQLSchema.PolyjuiceStatus.Succeed}
+                        />
+                      </div>
+                    </td>
+                    <td>
+                      <NextLink href={`/block/${item.block.number}`}>
+                        <a>{(+item.block.number).toLocaleString('en')}</a>
                       </NextLink>
                     </td>
-                  ) : null}
-                  <td>
-                    <RoundedAmount amount={item.amount} udt={item.udt} />
-                  </td>
-                </tr>
-              )
-            })
+                    <td>
+                      <time dateTime={item.block.timestamp}>
+                        {timeDistance(new Date(item.block.timestamp).getTime(), language)}
+                      </time>
+                    </td>
+                    <td>
+                      <Address address={item.from_address} type={item.from_account?.type} />
+                    </td>
+                    <td>
+                      <Address address={item.to_address} type={item.to_account?.type} />
+                    </td>
+                    <td className={styles.direction}>
+                      <TransferDirection from={item.from_address} to={item.to_address} viewer={viewer ?? ''} />
+                    </td>
+                    {showToken ? (
+                      <td>
+                        <NextLink href={`/token/${item.udt.id}`}>
+                          <a className={isShowLogo ? undefined : styles.tokenUrl}>
+                            {isShowLogo ? (
+                              <TokenLogo name={item.udt?.name} logo={item.udt?.icon} />
+                            ) : (
+                              item.udt?.symbol.split('.')[0]
+                            )}
+                          </a>
+                        </NextLink>
+                      </td>
+                    ) : null}
+                    <td>
+                      <RoundedAmount amount={item.amount} udt={item.udt} />
+                    </td>
+                  </tr>
+                )
+              })
           ) : (
             <tr>
               <td colSpan={showToken ? 8 : 7}>

@@ -45,8 +45,8 @@
   "block_to": "到",
   "address_from": "从",
   "address_to": "到",
-  "age_range_start": "开始日期",
-  "age_range_end": "结束日期",
+  "age_range_start": "从",
+  "age_range_end": "到",
   "filter": "筛选",
   "clear": "清除",
   "filter_menu": {
@@ -55,8 +55,8 @@
     "block_to": "区块高度",
     "address_from": "通过地址搜索",
     "address_to": "通过地址搜索",
-    "age_range_start": "YYYY-MM-DD",
-    "age_range_end": "YYYY-MM-DD",
+    "age_range_start": "开始日期",
+    "age_range_end": "结束日期",
     "asset": "资产",
     "token_type": "代币类型"
   },
