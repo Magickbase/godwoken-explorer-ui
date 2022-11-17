@@ -1,5 +1,4 @@
 import { useTranslation } from 'next-i18next'
-import Tooltip from 'components/Tooltip'
 import PendingIcon from 'assets/icons/pending.svg'
 import CommittedIcon from 'assets/icons/committed.svg'
 import FailedIcon from 'assets/icons/failed.svg'
@@ -14,9 +13,10 @@ const TxStatusIcon: React.FC<{ status: GraphQLSchema.BlockStatus | null; isSucce
 
   if (status === GraphQLSchema.BlockStatus.Pending || !status) {
     return (
-      <Tooltip title={t('pending')} placement="top">
+      // TODO  there is no div before, should be verified in page later
+      <div className="tooltip" data-tooltip={t('pending')}>
         <PendingIcon />
-      </Tooltip>
+      </div>
     )
   }
 
@@ -26,20 +26,24 @@ const TxStatusIcon: React.FC<{ status: GraphQLSchema.BlockStatus | null; isSucce
 
   if (status === GraphQLSchema.BlockStatus.Committed) {
     return (
-      <Tooltip title={t('committed')} placement="top">
-        <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-          <CommittedIcon />
-        </div>
-      </Tooltip>
+      <div
+        className="tooltip"
+        data-tooltip={t('committed')}
+        style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}
+      >
+        <CommittedIcon />
+      </div>
     )
   }
   if (status === GraphQLSchema.BlockStatus.Finalized) {
     return (
-      <Tooltip title={t('finalized')} placement="top">
-        <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-          <FinalizedIcon />
-        </div>
-      </Tooltip>
+      <div
+        className="tooltip"
+        data-tooltip={t('finalized')}
+        style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}
+      >
+        <FinalizedIcon />
+      </div>
     )
   }
 

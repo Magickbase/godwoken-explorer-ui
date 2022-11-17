@@ -1,7 +1,7 @@
 import { Box, SxProps } from '@mui/material'
-import Tooltip from 'components/Tooltip'
 import HashLink from './HashLink'
-import { GraphQLSchema, ZERO_ADDRESS } from 'utils'
+import { getAddressDisplay, GraphQLSchema, ZERO_ADDRESS } from 'utils'
+import Tooltip from 'components/Tooltip'
 
 const TruncatedAddress = ({
   address,
@@ -29,30 +29,28 @@ const TruncatedAddress = ({
       </Tooltip>
     )
   }
-  const getDisplayText = (type, address: string) => {
-    if (
-      [
-        GraphQLSchema.AccountType.EthAddrReg,
-        GraphQLSchema.AccountType.MetaContract,
-        GraphQLSchema.AccountType.PolyjuiceCreator,
-      ].includes(type)
-    ) {
-      return type.replace(/_/g, ' ').toLowerCase()
-    } else if (address.length > leading * 2) {
-      if (ellipsisPosition === 'middle') {
-        return `${address.slice(0, leading)}...${address.slice(-leading)}`
-      } else {
-        return `${address.slice(0, leading)}...`
-      }
+
+  const addrDisplay = getAddressDisplay({
+    eth_address: address,
+    script_hash: address,
+    type,
+    smart_contract: null,
+  })
+
+  let label = addrDisplay.label
+
+  if (label.startsWith('0x') && label.length > leading * 2) {
+    if (ellipsisPosition === 'middle') {
+      label = `${label.slice(0, leading)}...${label.slice(-leading)}`
     } else {
-      return address
+      label = `${label.slice(0, leading)}...`
     }
   }
 
   return (
     <Tooltip title={address} placement="top" sx={sx}>
       <Box sx={sx}>
-        <HashLink label={getDisplayText(type, address)} href={`/account/${address}`} monoFont={monoFont} />
+        <HashLink label={label} href={`/account/${address}`} monoFont={monoFont} />
       </Box>
     </Tooltip>
   )

@@ -1,1 +1,2 @@
-module.exports = require('@cypress/code-coverage/middleware/nextjs')
+import coverage from '@cypress/code-coverage/middleware/nextjs'
+export default coverage

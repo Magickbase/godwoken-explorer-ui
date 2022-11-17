@@ -6,6 +6,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { Container, Typography, Box, TableContainer, Stack, Skeleton } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
+import { gql } from 'graphql-request'
 import PageTitle from 'components/PageTitle'
 import SubpageHead from 'components/SubpageHead'
 import Address from 'components/TruncatedAddress'
@@ -13,7 +14,37 @@ import Pagination from 'components/Pagination'
 import Table from 'components/Table'
 import Amount from 'components/Amount'
 import { SIZES } from 'components/PageSize'
-import { fetchContractList, PCKB_UDT_INFO } from 'utils'
+import { fetchContractList, PCKB_UDT_INFO, client, GraphQLSchema } from 'utils'
+
+interface ContractListProps {
+  smart_contracts: {
+    metadata: GraphQLSchema.PageMetadata
+  }
+}
+
+const contractListQuery = gql`
+  query {
+    smart_contracts(input: {}) {
+      metadata {
+        total_count
+        after
+        before
+      }
+    }
+  }
+`
+
+const fetchList = () =>
+  client
+    .request<ContractListProps>(contractListQuery)
+    .then(data => data.smart_contracts)
+    .catch((): ContractListProps['smart_contracts'] => ({
+      metadata: {
+        total_count: 0,
+        before: null,
+        after: null,
+      },
+    }))
 
 const ContractList = () => {
   const [t] = useTranslation(['list', 'common'])
@@ -30,10 +61,12 @@ const ContractList = () => {
     { refetchInterval: 10000 },
   )
 
+  const { data: list } = useQuery(['contract-list'], () => fetchList())
+
   return (
     <>
       <SubpageHead subtitle={title} />
-      <Container sx={{ px: { xs: 2, sm: 3, md: 2, lg: 0 }, pb: { xs: 5.5, md: 11 } }}>
+      <Container sx={{ px: { xs: 2, lg: 0 }, pb: { xs: 5.5, md: 11 } }}>
         <PageTitle>
           <Typography variant="inherit" display="inline" pr={1}>
             {title}
@@ -66,7 +99,7 @@ const ContractList = () => {
             {!isLoading ? (
               <Typography variant="inherit" color="secondary" fontWeight={500} fontSize={{ xs: 14, md: 16 }}>
                 {t(`n_kinds_in_total`, {
-                  number: data.contracts.length,
+                  number: list?.metadata.total_count ?? '-',
                 })}
               </Typography>
             ) : (

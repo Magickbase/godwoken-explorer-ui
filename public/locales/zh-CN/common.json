@@ -15,6 +15,7 @@
   "multi-token-collections": "Multi-token 藏品",
   "contracts": "合约",
   "registered_contracts": "已登记合约",
+  "mainnetAnnotation": "由于 Layer 1 的交易拥堵，Godwoken 遇到了意外的挑战。我们想告知社区，我们已经了解到这些问题，并正在提交一个修复。同时，我们暂停了节点以等待修复。",
   "testnetAnnotation": "当前为测试网浏览器, 主网数据请访问:",
   "alphanetAnnotation": "Godwoken v1 正处于积极开发阶段, Godwoken v1 alphanet 会定期重置状态",
   "betanetAnnotation": "Godwoken v1 正处于积极开发阶段",

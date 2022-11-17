@@ -3,7 +3,6 @@
   background-color: #fff;
   border: 0.5px solid var(--border-color);
   border-radius: 1rem;
-  overflow: hidden;
   font-family: Roboto;
   font-size: 0.875rem;
 
@@ -33,7 +32,7 @@
     align-items: center;
     flex-basis: 100%;
     order: -99;
-    overflow: hidden;
+    overflow: unset;
     text-overflow: ellipsis;
     height: 4rem;
     padding-left: 1.5rem;
@@ -58,6 +57,10 @@
     border-top: 1px solid transparent;
     border-bottom: 1px solid var(--border-color);
 
+    &[data-show-tooltip='true'] {
+      overflow: visible;
+    }
+
     dt.term {
       flex-shrink: 0;
       flex-basis: 7.25rem;
@@ -69,8 +72,13 @@
     dd.desc {
       margin: 0;
       flex: 1;
-      overflow: hidden;
       text-overflow: ellipsis;
+      overflow: hidden;
+
+      &[data-show-tooltip='true'] {
+        overflow: visible;
+        display: grid;
+      }
     }
 
     dd.desc[data-expandable='true'] {

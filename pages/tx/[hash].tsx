@@ -8,12 +8,11 @@ import { gql } from 'graphql-request'
 import { Skeleton } from '@mui/material'
 import { ethers } from 'ethers'
 import BigNumber from 'bignumber.js'
-import Tooltip from 'components/Tooltip'
 import Tabs from 'components/Tabs'
 import SubpageHead from 'components/SubpageHead'
 import PageTitle from 'components/PageTitle'
 import InfoList from 'components/InfoList'
-import TransferList, { fetchTransferList } from 'components/SimpleERC20Transferlist'
+import CommonERCTransferlist, { fetchERCTransferList, TransferlistType } from 'components/CommonERCTransferlist'
 import TxLogsList from 'components/TxLogsList'
 import RawTxData from 'components/RawTxData'
 import CopyBtn from 'components/CopyBtn'
@@ -22,20 +21,21 @@ import TxType from 'components/TxType'
 import HashLink from 'components/HashLink'
 import Amount from 'components/Amount'
 import { SIZES } from 'components/PageSize'
+import Tooltip from 'components/Tooltip'
 import PolyjuiceStatus from 'components/PolyjuiceStatus'
 import ExpandIcon from 'assets/icons/expand.svg'
 import {
   formatDatetime,
-  fetchEventLogsListByType,
   GraphQLSchema,
   client,
+  getAddressDisplay,
   CKB_EXPLORER_URL,
   PCKB_UDT_INFO,
-  ZERO_ADDRESS,
+  provider,
 } from 'utils'
 import styles from './styles.module.scss'
 
-const tabs = ['erc20', 'logs', 'raw-data']
+const tabs = ['erc20Records', 'erc721Records', 'erc1155Records', 'logs', 'rawData']
 
 interface Transaction {
   hash: string
@@ -44,8 +44,8 @@ interface Transaction {
   index: number
   method_id: string | null
   method_name: string | null
-  from_account: Pick<GraphQLSchema.Account, 'eth_address' | 'type'> | null
-  to_account: Pick<GraphQLSchema.Account, 'eth_address' | 'type' | 'smart_contract'> | null
+  from_account: Pick<GraphQLSchema.Account, 'eth_address' | 'type' | 'smart_contract' | 'script_hash'> | null
+  to_account: Pick<GraphQLSchema.Account, 'eth_address' | 'type' | 'smart_contract' | 'script_hash'> | null
   polyjuice: Pick<
     GraphQLSchema.Polyjuice,
     | 'tx_hash'
@@ -77,10 +77,7 @@ const txQuery = gql`
     to_account {
       eth_address
       type
-    }
-    to_account {
-      eth_address
-      type
+      script_hash
       smart_contract {
         name
         abi
@@ -122,11 +119,23 @@ const txQuery = gql`
   }
 `
 
+const getAbiListQuery = (addrList: Array<string>) => {
+  const queryBody = addrList.map(
+    addr => `contract_${addr}: smart_contract( input: { contract_address: "${addr}"}) {
+    abi
+  }`,
+  )
+  return gql`query {
+  ${queryBody.join('\n')}
+}
+`
+}
+
 const Tx = () => {
   const {
     query: {
       hash,
-      tab = 'erc20',
+      tab = 'erc20Records',
       before = null,
       after = null,
       address_from = null,
@@ -136,6 +145,7 @@ const Tx = () => {
     },
     replace,
   } = useRouter()
+
   const [t, { language }] = useTranslation('tx')
   const [isFinalized, setIsFinalized] = useState(false)
 
@@ -147,33 +157,59 @@ const Tx = () => {
       refetchInterval: isFinalized ? undefined : 10000,
     },
   )
-
   const tx = txs?.eth_transaction ?? txs?.gw_transaction
 
+  const commonParams = {
+    transaction_hash: hash as string,
+    before: before as string | null,
+    after: after as string | null,
+    from_address: address_from as string | null,
+    to_address: address_to as string | null,
+    combine_from_to: false,
+    limit: Number.isNaN(+page_size) ? +SIZES[1] : +page_size,
+    log_index_sort: log_index_sort as 'ASC' | 'DESC',
+  }
+  const commonNameArr = [hash, before, after, address_from, address_to, log_index_sort, page_size]
+
   const { isLoading: isTransferListLoading, data: transferList } = useQuery(
-    ['tx-transfer-list', hash, before, after, address_from, address_to, log_index_sort, page_size],
-    () =>
-      fetchTransferList({
-        transaction_hash: hash as string,
-        before: before as string | null,
-        after: after as string | null,
-        from_address: address_from as string | null,
-        to_address: address_to as string | null,
-        combine_from_to: false,
-        limit: Number.isNaN(+page_size) ? +SIZES[1] : +page_size,
-        log_index_sort: log_index_sort as 'ASC' | 'DESC',
-      }),
+    ['tx-transfer-list', ...commonNameArr],
+    () => fetchERCTransferList(commonParams, TransferlistType.Erc20),
     {
-      enabled: tab === 'erc20',
+      enabled: tab === 'erc20Records',
     },
   )
 
-  const { isLoading: isLogListLoading, data: logsList } = useQuery(
-    ['tx-log-list', hash],
-    () => fetchEventLogsListByType('txs', hash as string).then(logList => logList.reverse()),
+  const { isLoading: isErc721TransferListLoading, data: erc721TransferList } = useQuery(
+    ['tx-erc721-transfer-list', ...commonNameArr],
+    () => fetchERCTransferList(commonParams, TransferlistType.Erc721),
+    {
+      enabled: tab === 'erc721Records',
+    },
+  )
+
+  const { isLoading: isErc1155TransferListLoading, data: erc1155TransferList } = useQuery(
+    ['tx-erc1155-transfer-list', ...commonNameArr],
+    () => fetchERCTransferList(commonParams, TransferlistType.Erc1155),
+    {
+      enabled: tab === 'erc1155Records',
+    },
+  )
+
+  const { isLoading: isTxReceiptLoading, data: txReceipt } = useQuery(
+    ['tx-receipt-ethers', hash],
+    () => provider.getTransactionReceipt(hash as string),
     {
       enabled: tab === 'logs',
     },
+  )
+
+  const contractAddrList = [...new Set(txReceipt?.logs.map(log => log.address.toLowerCase()))]
+
+  const { data: abiList = {} } = useQuery<Record<string, { abi: Array<any> | null }>>(
+    ['contract-abi-list', contractAddrList.join(',')],
+    contractAddrList.length
+      ? () => client.request<Record<string, { abi: Array<any> | null }>>(getAbiListQuery(contractAddrList))
+      : null,
   )
 
   useEffect(() => {
@@ -225,25 +261,8 @@ const Tx = () => {
     utf8Input ? { type: 'utf8', text: utf8Input } : null,
   ].filter(v => v)
 
-  const from = tx?.from_account?.eth_address
-  let toLabel = tx?.to_account?.eth_address || 'zero address'
-  let toAddr = tx?.to_account?.eth_address ?? ZERO_ADDRESS
-
-  if (tx?.polyjuice?.native_transfer_address_hash) {
-    toLabel = tx.polyjuice.native_transfer_address_hash
-    toAddr = tx.polyjuice.native_transfer_address_hash
-  } else if (tx?.to_account?.smart_contract?.name) {
-    toLabel = `${tx.to_account.smart_contract.name} (${tx.to_account?.eth_address})`
-  } else if (
-    [
-      GraphQLSchema.AccountType.EthAddrReg,
-      GraphQLSchema.AccountType.MetaContract,
-      GraphQLSchema.AccountType.PolyjuiceCreator,
-    ].includes(tx?.to_account?.type)
-  ) {
-    toLabel = tx.to_account.type.replace(/_/g, ' ').toLowerCase()
-  }
-
+  const fromAddrDisplay = getAddressDisplay(tx?.from_account)
+  const toAddrDisplay = getAddressDisplay(tx?.to_account, tx?.polyjuice?.native_transfer_address_hash)
   const method = tx?.method_name ?? tx?.method_id
 
   const overview = [
@@ -261,7 +280,11 @@ const Tx = () => {
       content: isTxLoading ? (
         <Skeleton animation="wave" />
       ) : tx ? (
-        <HashLink label={from} href={`/address/${from}`} style={{ wordBreak: 'break-all' }} />
+        <HashLink
+          label={fromAddrDisplay.label}
+          href={`/address/${fromAddrDisplay.address}`}
+          style={{ wordBreak: 'break-all' }}
+        />
       ) : (
         t('pending')
       ),
@@ -271,7 +294,7 @@ const Tx = () => {
       content: isTxLoading ? (
         <Skeleton animation="wave" />
       ) : tx ? (
-        <HashLink label={toLabel} href={`/address/${toAddr}`} />
+        <HashLink label={toAddrDisplay.label} href={`/address/${toAddrDisplay.address}`} />
       ) : (
         t('pending')
       ),
@@ -314,7 +337,7 @@ const Tx = () => {
       ? {
           field: t('method'),
           content: (
-            <Tooltip title={tx.method_id} placement="top">
+            <Tooltip title={tx?.method_id || false} placement="top">
               <span className="mono-font">{method}</span>
             </Tooltip>
           ),
@@ -467,34 +490,51 @@ const Tx = () => {
             <DownloadMenu items={downloadItems} />
           </div>
         </PageTitle>
-
         <InfoList title={t(`overview`)} list={overview} style={{ marginBottom: '2rem' }} />
-
         <InfoList title={t(`basicInfo`)} list={basicInfo} style={{ marginBottom: '2rem' }} type="two-columns" />
-
         <div className={styles.list}>
           <Tabs
             value={tabs.indexOf(tab as string)}
-            tabs={['erc20_records', 'logs', 'rawData'].map((label, idx) => ({
+            tabs={tabs.map(label => ({
               label: t(label),
-              href: `/tx/${hash}?tab=${tabs[idx]}`,
+              href: `/tx/${hash}?tab=${label}`,
             }))}
           />
-          {tab === 'erc20' ? (
+          {tab === 'erc20Records' ? (
             transferList || !isTransferListLoading ? (
-              <TransferList token_transfers={transferList} />
+              <CommonERCTransferlist transferlistType={TransferlistType.Erc20} token_transfers={transferList} />
+            ) : (
+              <Skeleton animation="wave" />
+            )
+          ) : null}
+          {tab === 'erc721Records' ? (
+            erc721TransferList || !isErc721TransferListLoading ? (
+              <CommonERCTransferlist
+                transferlistType={TransferlistType.Erc721}
+                erc721_token_transfers={erc721TransferList}
+              />
+            ) : (
+              <Skeleton animation="wave" />
+            )
+          ) : null}
+          {tab === 'erc1155Records' ? (
+            erc1155TransferList || !isErc1155TransferListLoading ? (
+              <CommonERCTransferlist
+                transferlistType={TransferlistType.Erc1155}
+                erc1155_token_transfers={erc1155TransferList}
+              />
             ) : (
               <Skeleton animation="wave" />
             )
           ) : null}
           {tab === 'logs' ? (
-            logsList || !isLogListLoading ? (
-              <TxLogsList list={logsList} />
+            txReceipt || !isTxReceiptLoading ? (
+              <TxLogsList list={txReceipt.logs} abiList={abiList} />
             ) : (
               <Skeleton animation="wave" />
             )
           ) : null}
-          {tab === 'raw-data' && tx ? <RawTxData hash={hash as string} /> : null}
+          {tab === 'rawData' && tx ? <RawTxData hash={hash as string} /> : null}
         </div>
       </div>
     </>

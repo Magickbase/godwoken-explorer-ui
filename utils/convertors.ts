@@ -36,8 +36,8 @@ dayjs.updateLocale('en', {
   },
 })
 
-export const formatDatetime = (datetime: Parameters<typeof dayjs>[0]) => {
-  return dayjs(datetime).format('YYYY/MM/DD HH:mm:ss')
+export const formatDatetime = (datetime: Parameters<typeof dayjs>[0], format = 'YYYY/MM/DD HH:mm:ss') => {
+  return dayjs(datetime).format(format)
 }
 
 export const timeDistance = (time: number | string, locale?: 'zh-CN' | 'en-US' | string) => {

@@ -28,6 +28,11 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    display: flex;
+    flex-direction: column;
+    .collection {
+      font-size: 0.875rem;
+    }
   }
   .item {
     & > div:first-of-type {

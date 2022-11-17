@@ -13,31 +13,36 @@ import {
   TableRow,
   TableCell,
   Link,
-  Tooltip,
   InputAdornment,
   TextField,
+  tableCellClasses,
 } from '@mui/material'
+import { styled } from '@mui/material/styles'
 import ContractEventListItem from './ContractEventListItem'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import { ParsedEventLog, IMG_URL, useDebounce } from 'utils'
 
+const StyledTableCell = styled(TableCell)(() => ({
+  [`&.${tableCellClasses.root}`]: {
+    borderBottom: '1px solid #f0f0f0',
+  },
+}))
+
 export const EventFilterIcon = ({ setSearchText, tooltip, value }) => (
-  <Tooltip title={tooltip} placement="top">
-    <Box>
-      <Image
-        src={`${IMG_URL}filter.svg`}
-        loading="lazy"
-        width="12"
-        height="12"
-        layout="fixed"
-        alt="filter-icon"
-        color="#333333"
-        onClick={() => {
-          setSearchText(value)
-        }}
-      />
-    </Box>
-  </Tooltip>
+  <Box className="tooltip" data-tooltip={tooltip}>
+    <Image
+      src={`${IMG_URL}filter.svg`}
+      loading="lazy"
+      width="12"
+      height="12"
+      layout="fixed"
+      alt="filter-icon"
+      color="#333333"
+      onClick={() => {
+        setSearchText(value)
+      }}
+    />
+  </Box>
 )
 
 const ContractEventsList = ({ list }: { list: ParsedEventLog[] }) => {
@@ -80,7 +85,14 @@ const ContractEventsList = ({ list }: { list: ParsedEventLog[] }) => {
         </Typography>
         <TextField
           InputProps={{
-            style: { fontSize: 14 },
+            sx: {
+              'fontSize': 14,
+              'height': 48,
+              '& .MuiOutlinedInput-notchedOutline': {
+                border: '1px solid #f0f0f0',
+                borderRadius: 2,
+              },
+            },
             startAdornment: (
               <InputAdornment position="start">
                 <Image
@@ -101,22 +113,22 @@ const ContractEventsList = ({ list }: { list: ParsedEventLog[] }) => {
           }}
           placeholder={t('eventsFilterPlaceholder')}
           size="small"
-          sx={{ fontSize: 14, flex: '0 1 260px' }}
+          sx={{ fontSize: 14, flex: '0 1 240px', height: 48 }}
         />
       </Stack>
       <TableContainer>
         <Table size="small">
           <TableHead sx={{ textTransform: 'capitalize' }}>
             <TableRow sx={{ color: '#666666' }}>
-              <TableCell component="th">{t('txHash')}</TableCell>
-              {/* <TableCell component="th">{t('method')} </TableCell> */}
-              <TableCell component="th">{t('logs')}</TableCell>
+              <StyledTableCell component="th">{t('txHash')}</StyledTableCell>
+              {/* <StyledTableCell component="th">{t('method')} </StyledTableCell> */}
+              <StyledTableCell component="th">{t('logs')}</StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {listItems?.map((item, idx) => (
               <TableRow key={item.id + '-' + idx}>
-                <TableCell>
+                <StyledTableCell>
                   <Stack>
                     <NextLink href={`/tx/${item.txHash}`} passHref>
                       <Link
@@ -149,11 +161,11 @@ const ContractEventsList = ({ list }: { list: ParsedEventLog[] }) => {
                       />
                     </Box>
                   </Stack>
-                </TableCell>
-                {/* <TableCell>{item.method}</TableCell> */}
-                <TableCell sx={{ pr: 1 }}>
+                </StyledTableCell>
+                {/* <StyledTableCell>{item.method}</StyledTableCell> */}
+                <StyledTableCell sx={{ pr: 1 }}>
                   <ContractEventListItem item={item} setSearchText={setSearchText} />
-                </TableCell>
+                </StyledTableCell>
               </TableRow>
             ))}
           </TableBody>

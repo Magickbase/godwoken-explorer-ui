@@ -52,7 +52,9 @@
     "block_from": "区块高度",
     "block_to": "区块高度",
     "address_from": "通过地址搜索",
-    "address_to": "通过地址搜索"
+    "address_to": "通过地址搜索",
+    "asset": "资产",
+    "token_type": "代币类型"
   },
   "n_kinds_in_total": "共计 {{number}} 种",
   "no_related_content": "没有相关数据",
@@ -60,5 +62,22 @@
   "tx_in_mem_pool": "交易池中的交易",
   "view-filter": "查看筛选条件",
   "view-pending-txs": "查看交易池中的交易",
-  "token_amount": "数量"
+  "token_amount": "数量",
+  "last_update_time": "最近更新时间",
+  "asset": "资产",
+  "token_type": "代币类型",
+  "approved_type": "许可类型",
+  "approved_spender": "许可使用者",
+  "revoke": "撤销",
+  "revoking": "撤销中",
+  "click_to_revoke": "点击撤销许可",
+  "not_owner": "只有账户持有人可以撤销",
+  "connect-mm-fail": "连接 MetaMask 失败",
+  "revoke-success": "撤销成功",
+  "revokeTxn-sent-success": "交易发送成功",
+  "user-rejected": "请求被拒绝",
+  "please-connect-mm": "请先连接到 MetaMask",
+  "switch_network_success": "切换网络成功",
+  "waiting_for_confirm": "等待确认中",
+  "waiting_for_block": "等待出块中"
 }

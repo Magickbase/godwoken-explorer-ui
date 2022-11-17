@@ -1,6 +1,5 @@
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
-import Tooltip from 'components/Tooltip'
 import Table from 'components/Table'
 import HashLink from 'components/HashLink'
 import Address from 'components/TruncatedAddress'
@@ -9,6 +8,7 @@ import NoDataIcon from 'assets/icons/no-data.svg'
 import Amount from 'components/Amount'
 import { timeDistance, getBridgedRecordListRes, CKB_EXPLORER_URL, PCKB_UAN, PCKB_UDT_INFO } from 'utils'
 import styles from './styles.module.scss'
+import Tooltip from 'components/Tooltip'
 
 type ParsedList = ReturnType<typeof getBridgedRecordListRes>
 

@@ -53,4 +53,59 @@ const LogFieldItem: React.FC<{ value: string; parsed?: Record<'type' | 'hex', st
 
 LogFieldItem.displayName = 'LogFieldItem'
 
+export const LogFieldItemInTx: React.FC<{ value: string; type: string; indexed: boolean; parsed: any }> = ({
+  value,
+  type,
+  parsed,
+}) => {
+  const [isDecoded, setIsDecoded] = useState(true)
+
+  if (type === 'hex') {
+    return (
+      <div className={styles.logItemWithToggle}>
+        <div className={`mono-font ${styles.content}`}>{value}</div>
+      </div>
+    )
+  }
+
+  switch (type) {
+    case 'address': {
+      return (
+        <div className={styles.logItemWithToggle}>
+          <div className={`mono-font ${styles.content}`}>
+            {
+              <NextLink href={`/account/${value}`}>
+                <Link
+                  href={`/account/${value}`}
+                  underline="none"
+                  color="primary.main"
+                  className="mono-font"
+                  whiteSpace="nowrap"
+                >
+                  {parsed.toLowerCase()}
+                </Link>
+              </NextLink>
+            }
+          </div>
+        </div>
+      )
+    }
+
+    default: {
+      return (
+        <div className={styles.logItemWithToggle}>
+          <div className={`mono-font ${styles.content}`}>{isDecoded ? `${parsed}` : value}</div>
+          <div className={styles.toggle}>
+            {['dec', 'hex'].map(label => (
+              <span key={label} data-active={isDecoded && label === 'dec'} onClick={() => setIsDecoded(d => !d)}>
+                {label}
+              </span>
+            ))}
+          </div>
+        </div>
+      )
+    }
+  }
+}
+
 export default LogFieldItem
