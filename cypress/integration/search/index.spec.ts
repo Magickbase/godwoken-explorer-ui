@@ -128,7 +128,7 @@ context('Search', () => {
       cy.get(`${ROOT_SELECTOR} input`).type(UNKNOWN_STRING)
       cy.get(ROOT_SELECTOR).type('{enter}')
       cy.url({ timeout: REDIRECT_TIMEOUT }).should('contain', `/tokens/native`)
-      cy.location('search').should('eq', `?name=${UNKNOWN_STRING}&search=${UNKNOWN_STRING}`)
+      cy.location('search').should('eq', `?name=${UNKNOWN_STRING}`)
     })
 
     it('404', () => {
