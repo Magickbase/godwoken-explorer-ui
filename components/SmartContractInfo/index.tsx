@@ -5,7 +5,6 @@ import InfoList from '../InfoList'
 import NextPageIcon from 'assets/icons/next-page.svg'
 import VerifiedIcon from 'assets/icons/check-success.svg'
 import SubmittedIcon from 'assets/icons/submit-success.svg'
-import Tooltip from 'components/Tooltip'
 import { useState } from 'react'
 import { gql } from 'graphql-request'
 import { client, GraphQLSchema } from 'utils'
@@ -96,13 +95,11 @@ const SmartContract: React.FC<{
     {
       field: t('deployer'),
       content: deployer ? (
-        <Tooltip title={deployer} placement="top">
-          <span>
-            <NextLink href={`/account/${deployer}`}>
-              <a className="mono-font">{deployer}</a>
-            </NextLink>
-          </span>
-        </Tooltip>
+        <span className="tooltip" data-tooltip={deployer}>
+          <NextLink href={`/account/${deployer}`}>
+            <a className="mono-font">{deployer}</a>
+          </NextLink>
+        </span>
       ) : isLoading ? (
         <Skeleton animation="wave" />
       ) : (
@@ -112,13 +109,11 @@ const SmartContract: React.FC<{
     {
       field: t('deployTx'),
       content: deployTxHash ? (
-        <Tooltip title={deployTxHash} placement="top">
-          <span>
-            <NextLink href={`/tx/${deployTxHash}`}>
-              <a className="mono-font">{deployTxHash}</a>
-            </NextLink>
-          </span>
-        </Tooltip>
+        <span className="tooltip" data-tooltip={deployTxHash}>
+          <NextLink href={`/tx/${deployTxHash}`}>
+            <a className="mono-font">{deployTxHash}</a>
+          </NextLink>
+        </span>
       ) : isLoading ? (
         <Skeleton animation="wave" />
       ) : (
