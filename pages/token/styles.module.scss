@@ -85,7 +85,7 @@
   }
   @media screen and (min-width: 1024px) {
     .info-width {
-      width: 50%;
+      width: calc(50% - 32px);
     }
   }
 }
