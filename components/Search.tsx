@@ -44,10 +44,10 @@ const Search = () => {
     if (query.search) {
       searchRef.current.value = (query.search as string) || ''
     } else {
-      const queryKey = 'search'
-      const queryValue = query[queryKey] || asPath.match(new RegExp(`[&?]${queryKey}=(.*)(&|$)`))
+      // on page refresh, next.js's query.search will always be null, so need this fallback
+      const queryValue = new URLSearchParams(asPath.split('?')[1]).get('search')
       if (queryValue) {
-        searchRef.current.value = queryValue[1] || ''
+        searchRef.current.value = queryValue || ''
       }
     }
     if (searchRef.current.value) {
