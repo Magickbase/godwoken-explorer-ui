@@ -120,16 +120,16 @@ const SmartContract: React.FC<{
         '-'
       ),
     },
-    {
-      field: t('token'),
-      content: tokenUrl ? (
-        <NextLink href={tokenUrl}>
-          <a className="mono-font">{udt?.name ?? '-'}</a>
-        </NextLink>
-      ) : (
-        '-'
-      ),
-    },
+    tokenUrl
+      ? {
+          field: t('token'),
+          content: (
+            <NextLink href={tokenUrl}>
+              <a className="mono-font">{udt?.name ?? '-'}</a>
+            </NextLink>
+          ),
+        }
+      : null,
     !isVerified
       ? {
           field: t('verify_status'),
