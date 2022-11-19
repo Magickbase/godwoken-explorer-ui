@@ -50,6 +50,7 @@
   "filter": "filter",
   "clear": "clear",
   "n_contracts_in_total": "{{number}} Kinds in Total",
+  "invalid_date": "Invalid Date",
   "filter_menu": {
     "name": "Name",
     "block_from": "Block Number",

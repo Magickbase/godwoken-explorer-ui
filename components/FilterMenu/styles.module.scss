@@ -67,20 +67,6 @@
       &::placeholder {
         color: #999;
       }
-      &[type='datetime-local'] {
-        &::-webkit-datetime-edit {
-          color: var(--primary-text-color);
-          font-family: 'Roboto', sans-serif;
-          // color: var(--primary-color);
-          &::selection {
-            color: var(--primary-text-color);
-            background-color: var(--selection-color);
-          }
-        }
-        ::-webkit-calendar-picker-indicator {
-          font-size: 15px;
-        }
-      }
     }
   }
 

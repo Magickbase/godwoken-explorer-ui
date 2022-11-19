@@ -12,6 +12,7 @@ import RoundedAmount from 'components/RoundedAmount'
 import TokenLogo from 'components/TokenLogo'
 import Tooltip from 'components/Tooltip'
 import FilterMenu from 'components/FilterMenu'
+import AgeFilterMenu from 'components/FilterMenu/AgeFilterMenu'
 import ChangeIcon from 'assets/icons/change.svg'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import { client, timeDistance, GraphQLSchema } from 'utils'
@@ -226,7 +227,7 @@ const TransferList: React.FC<
             <th>
               <div className={styles.ageHeader}>
                 {t('age')}
-                <FilterMenu filterKeys={[FILTER_KEYS[4], FILTER_KEYS[5]]} />
+                <AgeFilterMenu filterKeys={[FILTER_KEYS[4], FILTER_KEYS[5]]} />
               </div>
             </th>
             <th>

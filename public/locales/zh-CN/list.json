@@ -49,6 +49,7 @@
   "age_range_end": "到",
   "filter": "筛选",
   "clear": "清除",
+  "invalid_date": "无效日期",
   "filter_menu": {
     "name": "名称",
     "block_from": "区块高度",
