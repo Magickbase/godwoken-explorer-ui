@@ -45,7 +45,7 @@ const Search = () => {
       searchRef.current.value = (query.search as string) || ''
     } else {
       // on page refresh, next.js's query.search will always be null, so need this fallback
-      const queryValue = new URLSearchParams(asPath.split('?')[1]).get('search')
+      const queryValue = new URLSearchParams(window.location.search).get('search')
       if (queryValue) {
         searchRef.current.value = queryValue || ''
       }
