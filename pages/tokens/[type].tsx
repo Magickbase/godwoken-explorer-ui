@@ -50,7 +50,16 @@ type TokenListProps = {
 }
 
 const tokenListQuery = gql`
-  query ($name: String, $type: UdtType, $before: String, $after: String, $limit: Int, $holder_count_sort: SortType) {
+  query (
+    $name: String
+    $type: UdtType
+    $before: String
+    $after: String
+    $limit: Int
+    $holder_count_sort: SortType
+    $name_sort: SortType
+    $supply_sort: SortType
+  ) {
     udts(
       input: {
         type: $type
@@ -58,7 +67,11 @@ const tokenListQuery = gql`
         after: $after
         limit: $limit
         fuzzy_name: $name
-        sorter: [{ sort_type: $holder_count_sort, sort_value: EX_HOLDERS_COUNT }]
+        sorter: [
+          { sort_type: $holder_count_sort, sort_value: EX_HOLDERS_COUNT }
+          { sort_type: $name_sort, sort_value: NAME }
+          { sort_type: $supply_sort, sort_value: SUPPLY }
+        ]
       }
     ) {
       entries {
@@ -93,6 +106,8 @@ interface Variables {
   type: string
   limit: number
   holder_count_sort: string
+  name_sort: string
+  supply_sort: string
 }
 
 const fetchTokenList = (variables: Variables): Promise<TokenListProps['udts']> =>
@@ -114,6 +129,8 @@ const TokenList = () => {
       name = null,
       page_size = SIZES[1],
       holder_count_sort = 'DESC',
+      name_sort = 'DESC',
+      supply_sort = 'DESC',
       ...query
     },
   } = useRouter()
@@ -130,7 +147,7 @@ const TokenList = () => {
   ]
 
   const { isLoading, data } = useQuery(
-    ['tokens', type, before, after, name, page_size, holder_count_sort],
+    ['tokens', type, before, after, name, page_size, holder_count_sort, name_sort, supply_sort],
     () =>
       fetchTokenList({
         type: type.toString().toUpperCase(),
@@ -139,6 +156,8 @@ const TokenList = () => {
         name: name ? `${name}%` : null,
         limit: Number.isNaN(+page_size) ? +SIZES[1] : +page_size,
         holder_count_sort: holder_count_sort as string,
+        name_sort: name_sort as string,
+        supply_sort: supply_sort as string,
       }),
     {
       refetchInterval: 10000,
@@ -148,7 +167,12 @@ const TokenList = () => {
   const isFiltered = !!name
   const isFilterUnnecessary = !data?.metadata.total_count && !isFiltered
 
-  const handleHolderCountSortClick = (e: React.MouseEvent<HTMLOrSVGElement>) => {
+  enum SortTypesEnum {
+    holder_count_sort = 'holder_count_sort',
+    name_sort = 'name_sort',
+    supply_sort = 'supply_sort',
+  }
+  const handleSorterClick = (e: React.MouseEvent<HTMLOrSVGElement>, type) => {
     const {
       dataset: { order },
     } = e.currentTarget
@@ -157,7 +181,10 @@ const TokenList = () => {
         ...query,
         name: name ? (name as string) : '',
         page_size: page_size as string,
-        holder_count_sort: order === 'ASC' ? 'DESC' : 'ASC',
+        holder_count_sort: holder_count_sort as string,
+        name_sort: name_sort as string,
+        supply_sort: supply_sort as string,
+        [type]: order === 'ASC' ? 'DESC' : 'ASC',
       })}`,
     )
   }
@@ -236,14 +263,28 @@ const TokenList = () => {
                     <span>
                       {t(h.label ?? h.key)}
                       {h.key === 'token' ? (
-                        <span>
-                          <FilterMenu filterKeys={[FILTER_KEYS[0]]} />
-                        </span>
+                        <>
+                          <span>
+                            <FilterMenu filterKeys={[FILTER_KEYS[0]]} />
+                          </span>
+                          <SortIcon
+                            onClick={e => handleSorterClick(e, SortTypesEnum.name_sort)}
+                            data-order={name_sort}
+                            className={styles.sorter}
+                          />
+                        </>
                       ) : null}
                       {h.key === 'holderCount' ? (
                         <SortIcon
-                          onClick={handleHolderCountSortClick}
+                          onClick={e => handleSorterClick(e, SortTypesEnum.holder_count_sort)}
                           data-order={holder_count_sort}
+                          className={styles.sorter}
+                        />
+                      ) : null}
+                      {h.key === 'circulatingSupply' || h.key === 'totalSupply' ? (
+                        <SortIcon
+                          onClick={e => handleSorterClick(e, SortTypesEnum.supply_sort)}
+                          data-order={supply_sort}
                           className={styles.sorter}
                         />
                       ) : null}
