@@ -76,3 +76,11 @@
 .noRecords {
   @include empty-list;
 }
+
+.pr-4 {
+  padding-right: 4px;
+}
+
+.pr-8 {
+  padding-right: 8px;
+}

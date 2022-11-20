@@ -260,17 +260,19 @@ const TokenList = () => {
                 {headers.map(h => (
                   <th key={h.key} title={t(h.label ?? h.key)}>
                     <span>
-                      {t(h.label ?? h.key)}
+                      <span className={styles['pr-4']}>{t(h.label ?? h.key)}</span>
                       {h.key === 'token' ? (
                         <>
+                          <div className={`${styles['pr-8']}`}>
+                            <SortIcon
+                              onClick={e => handleSorterClick(e, SortTypesEnum.name_sort)}
+                              data-order={name_sort}
+                              className={styles.sorter}
+                            />
+                          </div>
                           <span>
                             <FilterMenu filterKeys={[FILTER_KEYS[0]]} />
                           </span>
-                          <SortIcon
-                            onClick={e => handleSorterClick(e, SortTypesEnum.name_sort)}
-                            data-order={name_sort}
-                            className={styles.sorter}
-                          />
                         </>
                       ) : null}
                       {h.key === 'holderCount' ? (
