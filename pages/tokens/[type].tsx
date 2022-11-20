@@ -15,10 +15,10 @@ import PageTitle from 'components/PageTitle'
 import HashLink from 'components/HashLink'
 import TokenLogo from 'components/TokenLogo'
 import FilterMenu from 'components/FilterMenu'
-import SortIcon from 'assets/icons/sort.svg'
-import { SIZES } from 'components/PageSize'
 import Amount from 'components/Amount'
 import Tooltip from 'components/Tooltip'
+import { SIZES } from 'components/PageSize'
+import SortIcon from 'assets/icons/sort.svg'
 import AddIcon from 'assets/icons/add.svg'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import EmptyFilteredListIcon from 'assets/icons/empty-filtered-list.svg'
@@ -47,6 +47,21 @@ type TokenListProps = {
     }>
     metadata: GraphQLSchema.PageMetadata
   }
+}
+interface Variables {
+  before: string | null
+  after: string | null
+  name: string | null
+  type: string
+  limit: number
+  holder_count_sort: string
+  name_sort: string
+  supply_sort: string
+}
+enum SortTypesEnum {
+  holder_count_sort = 'holder_count_sort',
+  name_sort = 'name_sort',
+  supply_sort = 'supply_sort',
 }
 
 const tokenListQuery = gql`
@@ -98,17 +113,6 @@ const tokenListQuery = gql`
     }
   }
 `
-
-interface Variables {
-  before: string | null
-  after: string | null
-  name: string | null
-  type: string
-  limit: number
-  holder_count_sort: string
-  name_sort: string
-  supply_sort: string
-}
 
 const fetchTokenList = (variables: Variables): Promise<TokenListProps['udts']> =>
   client
@@ -164,14 +168,6 @@ const TokenList = () => {
     },
   )
 
-  const isFiltered = !!name
-  const isFilterUnnecessary = !data?.metadata.total_count && !isFiltered
-
-  enum SortTypesEnum {
-    holder_count_sort = 'holder_count_sort',
-    name_sort = 'name_sort',
-    supply_sort = 'supply_sort',
-  }
   const handleSorterClick = (e: React.MouseEvent<HTMLOrSVGElement>, type) => {
     const {
       dataset: { order },
@@ -189,7 +185,10 @@ const TokenList = () => {
     )
   }
 
+  const isFiltered = !!name
+  const isFilterUnnecessary = !data?.metadata.total_count && !isFiltered
   const title = t(`${type}-udt-list`)
+
   return (
     <>
       <SubpageHead subtitle={title} />
