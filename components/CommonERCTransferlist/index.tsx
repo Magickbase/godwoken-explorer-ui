@@ -1,12 +1,6 @@
-import BaseTransferlist, { TransferListProps } from 'components/BaseTransferlist'
+import BaseTransferlist, { TransferListProps, TransferlistType } from 'components/BaseTransferlist'
 import { gql } from 'graphql-request'
 import { client, GraphQLSchema } from 'utils'
-
-export enum TransferlistType {
-  'Erc20' = 'Erc20',
-  'Erc721' = 'Erc721',
-  'Erc1155' = 'Erc1155',
-}
 
 type Erc20ResponseProps = {
   token_transfers: TransferListProps & {
@@ -107,21 +101,21 @@ const SimpleERC20Transferlist: React.FC<Erc20ResponseProps> = props => {
   const { token_transfers: dataSource } = props
   const handleTokenName = udt => udt.symbol.split('.')[0] || ''
 
-  return <BaseTransferlist {...dataSource} handleTokenName={handleTokenName} isShowValue />
+  return <BaseTransferlist {...dataSource} handleTokenName={handleTokenName} type={TransferlistType.Erc20} />
 }
 
 const SimpleERC721Transferlist: React.FC<Erc721ResponseProps> = props => {
   const { erc721_token_transfers: dataSource } = props
   const handleTokenName = (udt, token_id) => `${udt.name}#${token_id}`
 
-  return <BaseTransferlist {...dataSource} handleTokenName={handleTokenName} />
+  return <BaseTransferlist {...dataSource} handleTokenName={handleTokenName} type={TransferlistType.Erc721} />
 }
 
 const SimpleERC1155Transferlist: React.FC<Erc1155ResponseProps> = props => {
   const { erc1155_token_transfers: dataSource } = props
   const handleTokenName = (udt, token_id) => `${udt.name}#${token_id}`
 
-  return <BaseTransferlist {...dataSource} handleTokenName={handleTokenName} />
+  return <BaseTransferlist {...dataSource} handleTokenName={handleTokenName} type={TransferlistType.Erc1155} />
 }
 
 const CommonERCTransferlist: React.FC<any> = props => {
