@@ -124,6 +124,7 @@ const SmartContract: React.FC<{
       ) : (
         '-'
       ),
+      ddClassName: styles['item-dd-cls'],
     },
     {
       field: t('token'),
