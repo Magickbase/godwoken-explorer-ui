@@ -169,7 +169,7 @@ const NftCollectionList = () => {
               <tr>
                 {headers.map(item => (
                   <th>
-                    <span className={styles['pr-6']}>{t(item)}</span>
+                    <span className={styles['pr-4']}>{t(item)}</span>
                     {item === 'token' ? (
                       <>
                         <span className={styles['pr-8']}>
