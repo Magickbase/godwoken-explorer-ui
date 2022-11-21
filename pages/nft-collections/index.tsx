@@ -147,6 +147,8 @@ const NftCollectionList = () => {
     )
   }
 
+  const headers = ['token', 'address', 'holder_count', 'minted_count']
+
   return (
     <>
       <SubpageHead subtitle={title} />
@@ -165,27 +167,30 @@ const NftCollectionList = () => {
           <Table>
             <thead>
               <tr>
-                <th>
-                  {t('token')}
-                  <span className={styles['pr-6']}>
-                    <FilterMenu filterKeys={[FILTER_KEYS[0]]} />
-                  </span>
-                  <SortIcon
-                    onClick={e => handleSorterClick(e, SortTypesEnum.name_sort)}
-                    data-order={name_sort}
-                    className={styles.sorter}
-                  />
-                </th>
-                <th>{t('address')} </th>
-                <th>
-                  <span className={styles['pr-6']}>{t('holder_count')}</span>
-                  <SortIcon
-                    onClick={e => handleSorterClick(e, SortTypesEnum.holder_count_sort)}
-                    data-order={holder_count_sort}
-                    className={styles.sorter}
-                  />
-                </th>
-                <th>{t('minted_count')}</th>
+                {headers.map(item => (
+                  <th>
+                    <span className={styles['pr-6']}>{t(item)}</span>
+                    {item === 'token' ? (
+                      <>
+                        <span className={styles['pr-8']}>
+                          <SortIcon
+                            onClick={e => handleSorterClick(e, SortTypesEnum.name_sort)}
+                            data-order={name_sort}
+                            className={styles.sorter}
+                          />
+                        </span>
+                        <FilterMenu filterKeys={[FILTER_KEYS[0]]} />
+                      </>
+                    ) : null}
+                    {item === 'holder_count' ? (
+                      <SortIcon
+                        onClick={e => handleSorterClick(e, SortTypesEnum.holder_count_sort)}
+                        data-order={holder_count_sort}
+                        className={styles.sorter}
+                      />
+                    ) : null}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
