@@ -121,6 +121,7 @@ const TokenList = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
   const headers = [
+    { key: '#' },
     { key: 'token' },
     { key: 'address', label: 'address' },
     { key: type === 'bridge' ? 'circulatingSupply' : 'totalSupply' },
@@ -232,7 +233,11 @@ const TokenList = () => {
             <thead style={{ textTransform: 'capitalize', fontSize: isMobile ? 12 : 14 }}>
               <tr style={{ borderTop: '1px solid #f0f0f0', borderBottom: '1px solid #f0f0f0' }}>
                 {headers.map(h => (
-                  <th key={h.key} title={t(h.label ?? h.key)}>
+                  <th
+                    className={`${h.key === '#' ? styles['number-column'] : ''}`}
+                    key={h.key}
+                    title={t(h.label ?? h.key)}
+                  >
                     <span>
                       {t(h.label ?? h.key)}
                       {h.key === 'token' ? (
@@ -262,7 +267,7 @@ const TokenList = () => {
                   </tr>
                 ))
               ) : data && data.metadata.total_count ? (
-                data.entries.map(token => {
+                data.entries.map((token, idx) => {
                   let { name, bridge, origin } = parseTokenName(token.name)
                   if (!name) {
                     name = token.name
@@ -271,6 +276,7 @@ const TokenList = () => {
                   const addr = token.contract_address_hash || token.account.script_hash
                   return (
                     <tr key={id}>
+                      <td>{idx + 1}</td>
                       <td title={name}>
                         <Stack direction="row" alignItems="center">
                           <div className={styles.logo}>

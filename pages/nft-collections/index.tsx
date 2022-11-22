@@ -78,7 +78,6 @@ const NftCollectionList = () => {
     query: { before = null, after = null, name = null, page_size = SIZES[1] },
   } = useRouter()
 
-  const title = t(`nft-collections`)
   const { isLoading, data: list } = useQuery(
     ['erc721-list', page_size, before, after, name],
     () =>
@@ -90,6 +89,9 @@ const NftCollectionList = () => {
       }),
     { refetchInterval: 10000 },
   )
+
+  const title = t(`nft-collections`)
+  const headers = ['#', 'token', 'address', 'holder_count', 'minted_count']
 
   return (
     <>
@@ -109,22 +111,26 @@ const NftCollectionList = () => {
           <Table>
             <thead>
               <tr>
-                <th>
-                  {t('token')}
-                  <span>
-                    <FilterMenu filterKeys={[FILTER_KEYS[0]]} />
-                  </span>
-                </th>
-                <th>{t('address')} </th>
-                <th>{t('holder_count')} </th>
-                <th>{t('minted_count')}</th>
+                {headers.map(item => (
+                  <th className={`${item === '#' ? styles['number-column'] : ''}`} key={item} title={t(item)}>
+                    <span>
+                      {t(item)}
+                      {item === 'token' ? (
+                        <span>
+                          <FilterMenu filterKeys={[FILTER_KEYS[0]]} />
+                        </span>
+                      ) : null}
+                    </span>
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
               {list?.metadata.total_count ? (
-                list.entries.map(item => {
+                list.entries.map((item, idx) => {
                   return (
                     <tr key={item.id}>
+                      <td>{idx + 1}</td>
                       <td title={item.name}>
                         <NextLink href={`/nft-collection/${item.account.eth_address}`}>
                           <a className={styles.token}>

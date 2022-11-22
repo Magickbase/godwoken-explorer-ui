@@ -90,3 +90,7 @@
 .noRecords {
   @include empty-list;
 }
+
+.number-column {
+  width: 1rem;
+}

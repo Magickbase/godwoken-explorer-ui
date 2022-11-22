@@ -12,11 +12,12 @@ import Table from 'components/Table'
 import Pagination from 'components/SimplePagination'
 import TokenLogo from 'components/TokenLogo'
 import HashLink from 'components/HashLink'
+import FilterMenu from 'components/FilterMenu'
 import { SIZES } from 'components/PageSize'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import { client, GraphQLSchema } from 'utils'
+
 import styles from './styles.module.scss'
-import FilterMenu from 'components/FilterMenu'
 
 interface MultiTokenCollectionListProps {
   erc1155_udts: {
@@ -92,6 +93,8 @@ const MultiTokenCollectionList = () => {
     { refetchInterval: 10000 },
   )
 
+  const headers = ['#', 'token', 'address', 'type_count', 'holder_count']
+
   return (
     <>
       <SubpageHead subtitle={title} />
@@ -110,22 +113,24 @@ const MultiTokenCollectionList = () => {
           <Table>
             <thead>
               <tr>
-                <th>
-                  {t('token')}
-                  <span>
-                    <FilterMenu filterKeys={[FILTER_KEYS[0]]} />
-                  </span>
-                </th>
-                <th>{t('address')} </th>
-                <th>{t('type_count')}</th>
-                <th>{t('holder_count')} </th>
+                {headers.map(item => (
+                  <th className={`${item === '#' ? styles['number-column'] : ''}`} key={item} title={t(item)}>
+                    {t(item)}
+                    {item === 'token' ? (
+                      <span>
+                        <FilterMenu filterKeys={[FILTER_KEYS[0]]} />
+                      </span>
+                    ) : null}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
               {list?.metadata.total_count ? (
-                list.entries.map(item => {
+                list.entries.map((item, idx) => {
                   return (
                     <tr key={item.id}>
+                      <td>{idx + 1}</td>
                       <td title={item.name}>
                         <NextLink href={`/multi-token-collection/${item.account.eth_address}`}>
                           <a className={styles.token}>

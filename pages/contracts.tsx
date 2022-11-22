@@ -111,6 +111,7 @@ const ContractList = () => {
             <Table>
               <thead style={{ textTransform: 'capitalize', fontSize: isMobile ? 12 : 14 }}>
                 <tr>
+                  <th style={{ width: '1rem' }}>{t(`#`)}</th>
                   <th>{t(`address`)}</th>
                   <th>{t(`contract_name`)}</th>
                   <th>{t(`compiler`)}</th>
@@ -132,8 +133,9 @@ const ContractList = () => {
                     </tr>
                   ))
                 ) : data.meta.totalPage ? (
-                  data.contracts.map(c => (
+                  data.contracts.map((c, idx) => (
                     <tr key={c.id} title={c.address}>
+                      <td>{idx + 1}</td>
                       <td style={{ width: '25%' }}>
                         <Address address={c.address} leading={isMobile ? 8 : 30} sx={{ width: 'min-content' }} />
                       </td>
