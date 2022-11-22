@@ -27,7 +27,19 @@ const Block = () => {
   const [isFinalized, setIsFinalized] = useState(false)
   const {
     replace,
-    query: { id, tab = 'transactions', before = null, after = null, page = '1' },
+    query: {
+      id,
+      tab = 'transactions',
+      before = null,
+      after = null,
+      page = '1',
+      address_from = null,
+      address_to = null,
+      age_range_start = null,
+      age_range_end = null,
+      method_id = null,
+      method_name = null,
+    },
   } = useRouter()
 
   const { isLoading: isBlockLoading, data: block } = useQuery(['block', id], () => fetchBlock(id as string), {
@@ -44,13 +56,30 @@ const Block = () => {
   }, [isBlockLoading, block, replace, setIsFinalized])
 
   const { isLoading: isTxListLoading, data: txList } = useQuery(
-    ['block-tx-list', block?.number, before, after],
+    [
+      'block-tx-list',
+      block?.number,
+      before,
+      after,
+      address_from,
+      address_to,
+      age_range_start,
+      age_range_end,
+      method_id,
+      method_name,
+    ],
     () =>
       fetchTxList({
         start_block_number: block?.number,
         end_block_number: block?.number,
         before: before as string | null,
         after: after as string | null,
+        address_from: address_from as string | null,
+        address_to: address_to as string | null,
+        age_range_start: age_range_start as string | null,
+        age_range_end: age_range_end as string | null,
+        method_id: method_id as string | null,
+        method_name: method_name as string | null,
       }),
     {
       enabled: tab === 'transactions' && !!block?.hash,
@@ -216,7 +245,7 @@ const Block = () => {
           />
           {tab === 'transactions' ? (
             !isTxListLoading && txList ? (
-              <TxList transactions={txList} />
+              <TxList transactions={txList} blockNumber={block.number} />
             ) : (
               <Skeleton animation="wave" />
             )

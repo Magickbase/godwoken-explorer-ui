@@ -54,6 +54,12 @@ const Account = () => {
       sort_asset = 'ASC',
       sort_token_type = 'ASC',
       token_type = null,
+      address_from = null,
+      address_to = null,
+      age_range_start = null,
+      age_range_end = null,
+      method_id = null,
+      method_name = null,
     },
   } = useRouter()
   const [t] = useTranslation(['account', 'common'])
@@ -91,7 +97,21 @@ const Account = () => {
   )
 
   const { isLoading: isTxListLoading, data: txList } = useQuery(
-    ['account-tx-list', id, before, after, block_from, block_to, pageSize],
+    [
+      'account-tx-list',
+      id,
+      before,
+      after,
+      block_from,
+      block_to,
+      pageSize,
+      address_from,
+      address_to,
+      age_range_start,
+      age_range_end,
+      method_id,
+      method_name,
+    ],
     () =>
       fetchTxList({
         ...q,
@@ -101,6 +121,12 @@ const Account = () => {
         end_block_number: block_to ? +block_to : null,
         limit: pageSize,
         status: null,
+        address_from: address_from as string | null,
+        address_to: address_to as string | null,
+        age_range_start: age_range_start as string | null,
+        age_range_end: age_range_end as string | null,
+        method_id: method_id as string | null,
+        method_name: method_name as string | null,
       }),
     {
       enabled: tab === 'transactions' && !!id,

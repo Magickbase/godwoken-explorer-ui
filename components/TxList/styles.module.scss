@@ -7,6 +7,16 @@
       text-align: right;
     }
   }
+  th {
+    .methodHeader .ageHeader,
+    .blockHeader,
+    .fromHeader,
+    .toHeader {
+      column-gap: 4px;
+      display: flex;
+      align-items: center;
+    }
+  }
   &[data-is-filter-unnecessary='true'] {
     th {
       svg {

@@ -29,6 +29,12 @@ const TxList = () => {
       block_from = null,
       block_to = null,
       status = 'ON_CHAINED',
+      address_from = null,
+      address_to = null,
+      age_range_start = null,
+      age_range_end = null,
+      method_id = null,
+      method_name = null,
     },
   } = useRouter()
 
@@ -40,7 +46,21 @@ const TxList = () => {
 
   const isPendingList = status === 'pending'
   const { isLoading, data: txList } = useQuery(
-    ['transactions', before, after, block_from, block_to, page_size, status],
+    [
+      'transactions',
+      before,
+      after,
+      block_from,
+      block_to,
+      page_size,
+      status,
+      address_from,
+      address_to,
+      age_range_start,
+      age_range_end,
+      method_id,
+      method_name,
+    ],
     () =>
       fetchTxList({
         limit: +page_size as number,
@@ -49,6 +69,12 @@ const TxList = () => {
         start_block_number: block_from ? +block_from : null,
         end_block_number: block_to ? +block_to : null,
         status: isPendingList ? 'PENDING' : 'ON_CHAINED',
+        address_from: address_from as string | null,
+        address_to: address_to as string | null,
+        age_range_start: age_range_start as string | null,
+        age_range_end: age_range_end as string | null,
+        method_id: method_id as string | null,
+        method_name: method_name as string | null,
       }),
   )
   const theme = useTheme()
