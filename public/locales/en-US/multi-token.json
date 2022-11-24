@@ -17,5 +17,7 @@
   "token-id": "Token ID",
   "owner": "Owner",
   "name": "Name",
-  "quantity": "Quantity"
+  "quantity": "Quantity",
+  "description": "Description",
+  "officialSite": "Official Site"
 }

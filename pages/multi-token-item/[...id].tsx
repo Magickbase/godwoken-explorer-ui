@@ -100,7 +100,7 @@ const MultiTokenItem = () => {
     limit: Number.isNaN(+page_size) ? +SIZES[1] : +page_size,
   }
 
-  const { isLoading: isInfoLoading, data: info = {} } = useQuery(
+  const { isLoading: isInfoLoading, data: info } = useQuery(
     ['multi-token-item-info', address],
     () => fetchInfo({ address, token_id }),
     {
@@ -153,8 +153,8 @@ const MultiTokenItem = () => {
     },
   ]
 
-  const { metadata = {}, collection } = info as CollectionInfo
-  const { image: imageUrl = '', name = '' } = metadata as MetadataProps
+  const { metadata = {}, collection } = (info as CollectionInfo) || {}
+  const { image: imageUrl = '', name = '' } = (metadata as MetadataProps) || {}
 
   const title = `${t('multi-token-collection')} ${name ?? collection?.name ?? '-'}`
 
