@@ -32,6 +32,7 @@
   dd {
     white-space: breaks-spaces;
     word-break: break-all;
+    text-transform: none;
   }
 
   @media screen and (min-width: 1024px) {
@@ -51,6 +52,9 @@
     flex-direction: column;
     & > div {
       margin-bottom: 1rem;
+    }
+    dl[title=''] {
+      display: none;
     }
   }
 }

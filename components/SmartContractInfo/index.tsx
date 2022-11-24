@@ -1,11 +1,12 @@
+import { useState } from 'react'
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import { Skeleton } from '@mui/material'
 import InfoList from '../InfoList'
+import Tooltip from 'components/Tooltip'
 import NextPageIcon from 'assets/icons/next-page.svg'
 import VerifiedIcon from 'assets/icons/check-success.svg'
 import SubmittedIcon from 'assets/icons/submit-success.svg'
-import { useState } from 'react'
 import { gql } from 'graphql-request'
 import { client, GraphQLSchema } from 'utils'
 import styles from './styles.module.scss'
@@ -95,30 +96,36 @@ const SmartContract: React.FC<{
     {
       field: t('deployer'),
       content: deployer ? (
-        <span className="tooltip" data-tooltip={deployer}>
-          <NextLink href={`/account/${deployer}`}>
-            <a className="mono-font">{deployer}</a>
-          </NextLink>
-        </span>
+        <Tooltip title={deployer} placement="top">
+          <span>
+            <NextLink href={`/account/${deployer}`}>
+              <a className="mono-font">{deployer}</a>
+            </NextLink>
+          </span>
+        </Tooltip>
       ) : isLoading ? (
         <Skeleton animation="wave" />
       ) : (
         '-'
       ),
+      ddClassName: styles['item-dd-cls'],
     },
     {
       field: t('deployTx'),
       content: deployTxHash ? (
-        <span className="tooltip" data-tooltip={deployTxHash}>
-          <NextLink href={`/tx/${deployTxHash}`}>
-            <a className="mono-font">{deployTxHash}</a>
-          </NextLink>
-        </span>
+        <Tooltip title={deployTxHash} placement="top">
+          <span>
+            <NextLink href={`/tx/${deployTxHash}`}>
+              <a className="mono-font">{deployTxHash}</a>
+            </NextLink>
+          </span>
+        </Tooltip>
       ) : isLoading ? (
         <Skeleton animation="wave" />
       ) : (
         '-'
       ),
+      ddClassName: styles['item-dd-cls'],
     },
     {
       field: t('token'),
@@ -129,6 +136,7 @@ const SmartContract: React.FC<{
       ) : (
         '-'
       ),
+      ddClassName: styles['item-dd-cls'],
     },
     !isVerified
       ? {

@@ -15,5 +15,7 @@
   "erc-721": "ERC 721",
   "token-id": "Token ID",
   "owner": "Owner",
-  "name": "Name"
+  "name": "Name",
+  "description": "Description",
+  "officialSite": "Official Site"
 }

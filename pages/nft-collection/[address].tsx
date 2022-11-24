@@ -18,7 +18,10 @@ import InventoryList, { fetchInventoryListOfCollection } from 'components/NFTInv
 import { client, GraphQLSchema } from 'utils'
 import styles from './styles.module.scss'
 
-type CollectionInfoProps = Omit<GraphQLSchema.NftCollectionListItem, 'id' | 'account'> | undefined
+type CollectionInfoProps =
+  | (Omit<GraphQLSchema.NftCollectionListItem, 'id' | 'account'> &
+      Record<'description' | 'official_site', string | null>)
+  | undefined
 
 interface CollectionProps {
   erc721_udts: {
@@ -39,6 +42,8 @@ const infoQuery = gql`
         icon
         holders_count
         minted_count
+        description
+        official_site
       }
     }
   }
@@ -110,6 +115,22 @@ const NftCollection = () => {
       field: t('contract'),
       content: <HashLink label={address as string} href={`/account/${address}`} />,
     },
+    {
+      field: t('officialSite'),
+      content: info ? (
+        info.official_site ? (
+          <HashLink label={info.official_site} href={info.official_site} external />
+        ) : (
+          '-'
+        )
+      ) : (
+        <Skeleton animation="wave" />
+      ),
+    },
+    {
+      field: t('description'),
+      content: info ? info.description || '-' : <Skeleton animation="wave" />,
+    },
   ]
 
   const stats: Array<{ field: string; content: React.ReactNode }> = [
@@ -121,6 +142,12 @@ const NftCollection = () => {
       field: t('minted_count'),
       content: isInfoLoading ? <Skeleton animation="wave" /> : (+info?.minted_count ?? 0).toLocaleString('en'),
     },
+    info?.official_site
+      ? {
+          field: '',
+          content: <div data-role="placeholder"></div>,
+        }
+      : null,
   ]
 
   const title = t(`nft-collection`)

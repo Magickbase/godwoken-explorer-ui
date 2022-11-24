@@ -18,7 +18,10 @@ import InventoryList, { fetchInventoryListOfCollection } from 'components/MultiT
 import { client, GraphQLSchema } from 'utils'
 import styles from './styles.module.scss'
 
-type CollectionInfoProps = Omit<GraphQLSchema.MultiTokenCollectionListItem, 'id' | 'account'> | undefined
+type CollectionInfoProps =
+  | (Omit<GraphQLSchema.MultiTokenCollectionListItem, 'id' | 'account'> &
+      Record<'description' | 'official_site', string | null>)
+  | undefined
 
 interface InfoProps {
   erc1155_udts: {
@@ -40,6 +43,8 @@ const infoQuery = gql`
         token_type_count
         holders_count
         minted_count
+        description
+        official_site
       }
     }
   }
@@ -111,10 +116,21 @@ const MultiTokenCollection = () => {
       field: t('contract'),
       content: <HashLink label={address as string} href={`/account/${address}`} />,
     },
-
     {
-      field: '',
-      content: <div data-role="placeholder" style={{ height: `1.5rem` }}></div>,
+      field: t('officialSite'),
+      content: info ? (
+        info.official_site ? (
+          <HashLink label={info.official_site} href={info.official_site} external />
+        ) : (
+          '-'
+        )
+      ) : (
+        <Skeleton animation="wave" />
+      ),
+    },
+    {
+      field: t('description'),
+      content: info ? info.description || '-' : <Skeleton animation="wave" />,
     },
   ]
 
@@ -130,6 +146,10 @@ const MultiTokenCollection = () => {
     {
       field: t('holder_count'),
       content: isInfoLoading ? <Skeleton animation="wave" /> : (+info?.holders_count ?? 0).toLocaleString('en'),
+    },
+    {
+      field: '',
+      content: <div data-role="placeholder" style={{ height: `1.5rem` }}></div>,
     },
   ]
 
