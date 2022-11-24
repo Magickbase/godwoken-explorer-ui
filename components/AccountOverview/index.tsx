@@ -21,11 +21,9 @@ export interface AccountBase {
   transaction_count: number
   nonce: number
 }
-
 interface UnknownUser extends AccountBase {
   type: GraphQLSchema.AccountType.Unknown
 }
-
 interface EthUser extends AccountBase {
   type: GraphQLSchema.AccountType.EthUser
   script: BasicScript
