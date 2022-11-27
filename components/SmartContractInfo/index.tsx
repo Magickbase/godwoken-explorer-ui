@@ -127,17 +127,17 @@ const SmartContract: React.FC<{
       ),
       ddClassName: styles['item-dd-cls'],
     },
-    {
-      field: t('token'),
-      content: tokenUrl ? (
-        <NextLink href={tokenUrl}>
-          <a className="mono-font">{udt?.name ?? '-'}</a>
-        </NextLink>
-      ) : (
-        '-'
-      ),
-      ddClassName: styles['item-dd-cls'],
-    },
+    tokenUrl
+      ? {
+          field: t('token'),
+          content: (
+            <NextLink href={tokenUrl}>
+              <a className="mono-font">{udt?.name ?? '-'}</a>
+            </NextLink>
+          ),
+          ddClassName: styles['item-dd-cls'],
+        }
+      : null,
     !isVerified
       ? {
           field: t('verify_status'),
