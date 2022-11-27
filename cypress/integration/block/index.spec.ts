@@ -8,7 +8,7 @@ context('Block Page', () => {
   let blockWithoutBridgedTransfers: string
 
   before(() => {
-    const blocks = cy.fixture('blocks').then(blocks => {
+    cy.fixture('blocks').then(blocks => {
       blockWithTxs = blocks.blockWithTxs
       blockWithBridgedTransfers = blocks.blockWithBridgedTransfers
       blockWithRawData = blocks.blockWithRawData
@@ -308,7 +308,7 @@ context('Block Page', () => {
     it('should have raw data', () => {
       cy.visit(`/en-US/block/${blockWithRawData}?tab=raw-data`)
       cy.get('h6').should('have.text', 'Block')
-      cy.get('[data-cy="raw-data"]').should('be.visible')
+      cy.get('[data-cy="raw-data"]', { timeout: 60000 }).should('be.visible')
     })
   })
 
