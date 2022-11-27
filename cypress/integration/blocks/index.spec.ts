@@ -65,7 +65,11 @@ context('Blocks List Page', () => {
     })
     it('should navigate back to page 1 on click prev arrow', () => {
       cy.visit('/en-US/blocks?page=2')
-      cy.get('p+div a[title="Prev"]').should('be.visible').first().should('exist').click()
+      cy.get('p+div a[title="Prev"]')
+        .should('be.visible')
+        .first()
+        .should('not.have.css', 'pointer-events', 'none')
+        .click()
       cy.location('pathname').should('eq', '/blocks')
       cy.location('search').should('eq', '?page=1')
     })

@@ -52,7 +52,7 @@ context('Transactions List Pages Common Features', () => {
           expect(loc.search).to.match(/after=/)
         })
       })
-      it('should navigate back to default page 1 on click prev arrow', () => {
+      it('should navigate back to prev page on click prev arrow', () => {
         cy.get('@prevBtn')
           .should(link => {
             expect(link).to.has.css('cursor', 'pointer')
@@ -69,13 +69,12 @@ context('Transactions List Pages Common Features', () => {
         waitForLoading()
         cy.get(`table tbody`).children().should('have.length', 30)
       })
-      it('should show more 50 records after selecting 50', () => {
+      it('should show 50 records after selecting 50', () => {
         cy.get('p').contains(/Show/).siblings().first().click()
         cy.get('ul').find('li[data-value=50]').click()
         cy.get(`table tbody tr`).should('have.length', 50)
       })
     })
-
     describe('filter actions', () => {
       beforeEach(() => {
         cy.get('table tbody tr:nth-child(1) td:nth-child(3) a').as('link')
