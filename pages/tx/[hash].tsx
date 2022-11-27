@@ -12,7 +12,7 @@ import Tabs from 'components/Tabs'
 import SubpageHead from 'components/SubpageHead'
 import PageTitle from 'components/PageTitle'
 import InfoList from 'components/InfoList'
-import TransferList, { fetchTransferList } from 'components/SimpleERC20Transferlist'
+import CommonERCTransferlist, { fetchERCTransferList } from 'components/CommonERCTransferlist'
 import TxLogsList from 'components/TxLogsList'
 import RawTxData from 'components/RawTxData'
 import CopyBtn from 'components/CopyBtn'
@@ -23,6 +23,7 @@ import Amount from 'components/Amount'
 import { SIZES } from 'components/PageSize'
 import Tooltip from 'components/Tooltip'
 import PolyjuiceStatus from 'components/PolyjuiceStatus'
+import { TransferlistType } from 'components/BaseTransferlist'
 import ExpandIcon from 'assets/icons/expand.svg'
 import {
   formatDatetime,
@@ -35,7 +36,7 @@ import {
 } from 'utils'
 import styles from './styles.module.scss'
 
-const tabs = ['erc20', 'logs', 'raw-data']
+const tabs = ['erc20Records', 'erc721Records', 'erc1155Records', 'logs', 'rawData']
 
 interface Transaction {
   hash: string
@@ -73,15 +74,6 @@ const txQuery = gql`
     from_account {
       eth_address
       type
-    }
-    to_account {
-      eth_address
-      type
-      script_hash
-      smart_contract {
-        name
-        abi
-      }
     }
     to_account {
       eth_address
@@ -144,7 +136,7 @@ const Tx = () => {
   const {
     query: {
       hash,
-      tab = 'erc20',
+      tab = 'erc20Records',
       before = null,
       after = null,
       address_from = null,
@@ -154,6 +146,7 @@ const Tx = () => {
     },
     replace,
   } = useRouter()
+
   const [t, { language }] = useTranslation('tx')
   const [isFinalized, setIsFinalized] = useState(false)
 
@@ -165,24 +158,41 @@ const Tx = () => {
       refetchInterval: isFinalized ? undefined : 10000,
     },
   )
-
   const tx = txs?.eth_transaction ?? txs?.gw_transaction
 
+  const commonParams = {
+    transaction_hash: hash as string,
+    before: before as string | null,
+    after: after as string | null,
+    from_address: address_from as string | null,
+    to_address: address_to as string | null,
+    combine_from_to: false,
+    limit: Number.isNaN(+page_size) ? +SIZES[1] : +page_size,
+    log_index_sort: log_index_sort as 'ASC' | 'DESC',
+  }
+  const commonNameArr = [hash, before, after, address_from, address_to, log_index_sort, page_size]
+
   const { isLoading: isTransferListLoading, data: transferList } = useQuery(
-    ['tx-transfer-list', hash, before, after, address_from, address_to, log_index_sort, page_size],
-    () =>
-      fetchTransferList({
-        transaction_hash: hash as string,
-        before: before as string | null,
-        after: after as string | null,
-        from_address: address_from as string | null,
-        to_address: address_to as string | null,
-        combine_from_to: false,
-        limit: Number.isNaN(+page_size) ? +SIZES[1] : +page_size,
-        log_index_sort: log_index_sort as 'ASC' | 'DESC',
-      }),
+    ['tx-transfer-list', ...commonNameArr],
+    () => fetchERCTransferList(commonParams, TransferlistType.Erc20),
     {
-      enabled: tab === 'erc20',
+      enabled: tab === 'erc20Records',
+    },
+  )
+
+  const { isLoading: isErc721TransferListLoading, data: erc721TransferList } = useQuery(
+    ['tx-erc721-transfer-list', ...commonNameArr],
+    () => fetchERCTransferList(commonParams, TransferlistType.Erc721),
+    {
+      enabled: tab === 'erc721Records',
+    },
+  )
+
+  const { isLoading: isErc1155TransferListLoading, data: erc1155TransferList } = useQuery(
+    ['tx-erc1155-transfer-list', ...commonNameArr],
+    () => fetchERCTransferList(commonParams, TransferlistType.Erc1155),
+    {
+      enabled: tab === 'erc1155Records',
     },
   )
 
@@ -254,7 +264,6 @@ const Tx = () => {
 
   const fromAddrDisplay = getAddressDisplay(tx?.from_account)
   const toAddrDisplay = getAddressDisplay(tx?.to_account, tx?.polyjuice?.native_transfer_address_hash)
-
   const method = tx?.method_name ?? tx?.method_id
 
   const overview = [
@@ -482,22 +491,39 @@ const Tx = () => {
             <DownloadMenu items={downloadItems} />
           </div>
         </PageTitle>
-
         <InfoList title={t(`overview`)} list={overview} style={{ marginBottom: '2rem' }} />
-
         <InfoList title={t(`basicInfo`)} list={basicInfo} style={{ marginBottom: '2rem' }} type="two-columns" />
-
         <div className={styles.list}>
           <Tabs
             value={tabs.indexOf(tab as string)}
-            tabs={['erc20_records', 'logs', 'rawData'].map((label, idx) => ({
+            tabs={tabs.map(label => ({
               label: t(label),
-              href: `/tx/${hash}?tab=${tabs[idx]}`,
+              href: `/tx/${hash}?tab=${label}`,
             }))}
           />
-          {tab === 'erc20' ? (
+          {tab === 'erc20Records' ? (
             transferList || !isTransferListLoading ? (
-              <TransferList token_transfers={transferList} />
+              <CommonERCTransferlist transferlistType={TransferlistType.Erc20} token_transfers={transferList} />
+            ) : (
+              <Skeleton animation="wave" />
+            )
+          ) : null}
+          {tab === 'erc721Records' ? (
+            erc721TransferList || !isErc721TransferListLoading ? (
+              <CommonERCTransferlist
+                transferlistType={TransferlistType.Erc721}
+                erc721_token_transfers={erc721TransferList}
+              />
+            ) : (
+              <Skeleton animation="wave" />
+            )
+          ) : null}
+          {tab === 'erc1155Records' ? (
+            erc1155TransferList || !isErc1155TransferListLoading ? (
+              <CommonERCTransferlist
+                transferlistType={TransferlistType.Erc1155}
+                erc1155_token_transfers={erc1155TransferList}
+              />
             ) : (
               <Skeleton animation="wave" />
             )
@@ -509,7 +535,7 @@ const Tx = () => {
               <Skeleton animation="wave" />
             )
           ) : null}
-          {tab === 'raw-data' && tx ? <RawTxData hash={hash as string} /> : null}
+          {tab === 'rawData' && tx ? <RawTxData hash={hash as string} /> : null}
         </div>
       </div>
     </>

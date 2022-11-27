@@ -6,6 +6,7 @@ import Address from 'components/TruncatedAddress'
 import Pagination from 'components/SimplePagination'
 import TxStatusIcon from 'components/TxStatusIcon'
 import TransferDirection from 'components/TransferDirection'
+import Tooltip from 'components/Tooltip'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import { client, timeDistance, GraphQLSchema } from 'utils'
 import styles from './styles.module.scss'
@@ -130,14 +131,16 @@ const ActivityList: React.FC<
                 <tr key={item.transaction.eth_hash + item.log_index}>
                   <td>
                     <div className={styles.hash}>
-                      <span className="tooltip" data-tooltip={item.transaction.eth_hash}>
-                        <NextLink href={`/tx/${item.transaction.eth_hash}`}>
-                          <a className="mono-font">{`${item.transaction.eth_hash.slice(
-                            0,
-                            8,
-                          )}...${item.transaction.eth_hash.slice(-8)}`}</a>
-                        </NextLink>
-                      </span>
+                      <Tooltip title={item.transaction.eth_hash} placement="top">
+                        <span>
+                          <NextLink href={`/tx/${item.transaction.eth_hash}`}>
+                            <a className="mono-font">{`${item.transaction.eth_hash.slice(
+                              0,
+                              8,
+                            )}...${item.transaction.eth_hash.slice(-8)}`}</a>
+                          </NextLink>
+                        </span>
+                      </Tooltip>
                       <TxStatusIcon
                         status={item.block.status}
                         isSuccess={item.polyjuice.status === GraphQLSchema.PolyjuiceStatus.Succeed}

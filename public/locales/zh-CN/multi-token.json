@@ -17,5 +17,7 @@
   "token-id": "通证 ID",
   "owner": "所属人",
   "name": "名称",
-  "quantity": "数量"
+  "quantity": "数量",
+  "description": "简介",
+  "officialSite": "官方网站"
 }
