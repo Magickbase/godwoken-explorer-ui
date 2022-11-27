@@ -1,19 +1,26 @@
 /// <reference types="cypress" />
 
 context('Block Page', () => {
-  const blockWithTxs = '0x0a9fbb868d381f65328a811ffe441f80c328400b583887731ae7195579e0ca5d'
-  const blockWithBridgedTransfers = '0x2ae0d8f85f982800cbdf8b20c4b3e6b6023453dc60dd5e522d22f11cb34b2733'
-  const blockWithRawData = '0x2ae0d8f85f982800cbdf8b20c4b3e6b6023453dc60dd5e522d22f11cb34b2733'
-  const blockWithoutTxs = '0x90ce1c2c2e988167a55143e9abc13a68f70d0e04a8b47aa19fa8ac1918ed8dc9'
-  const blockWithoutBridgedTransfers = '0x90ce1c2c2e988167a55143e9abc13a68f70d0e04a8b47aa19fa8ac1918ed8dc9'
+  let blockWithTxs: string
+  let blockWithBridgedTransfers: string
+  let blockWithRawData: string
+  let blockWithoutTxs: string
+  let blockWithoutBridgedTransfers: string
 
-  before(() =>
-    cy.visit(`/en-US/block/${blockWithTxs}`, {
-      headers: {
-        'Accept-Encoding': 'gzip, deflate',
-      },
-    }),
-  )
+  before(() => {
+    const blocks = cy.fixture('blocks').then(blocks => {
+      blockWithTxs = blocks.blockWithTxs
+      blockWithBridgedTransfers = blocks.blockWithBridgedTransfers
+      blockWithRawData = blocks.blockWithRawData
+      blockWithoutTxs = blocks.blockWithoutTxs
+      blockWithoutBridgedTransfers = blocks.blockWithoutBridgedTransfers
+      return cy.visit(`/en-US/block/${blockWithTxs}`, {
+        headers: {
+          'Accept-Encoding': 'gzip, deflate',
+        },
+      })
+    })
+  })
 
   describe('block info', () => {
     it('should have title with block number', () => {
