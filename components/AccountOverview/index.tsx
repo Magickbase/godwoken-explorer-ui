@@ -21,11 +21,9 @@ export interface AccountBase {
   transaction_count: number
   nonce: number
 }
-
 interface UnknownUser extends AccountBase {
   type: GraphQLSchema.AccountType.Unknown
 }
-
 interface EthUser extends AccountBase {
   type: GraphQLSchema.AccountType.EthUser
   script: BasicScript
@@ -267,16 +265,14 @@ const AccountOverview: React.FC<AccountOverviewProps & { refetch: () => Promise<
       ),
     })
 
-  return (
-    <div className={styles.container} data-account-type={account.type}>
-      {account.type === GraphQLSchema.AccountType.MetaContract ? (
-        <MetaContract {...(account.script as MetaContract['script'])} />
-      ) : null}
-      {account.type === GraphQLSchema.AccountType.EthUser ? (
-        <User nonce={account.nonce} isLoading={isOverviewLoading} />
-      ) : null}
-      {account.type === GraphQLSchema.AccountType.EthAddrReg ? <EthAddrReg /> : null}
-      {account.type === GraphQLSchema.AccountType.PolyjuiceContract ? (
+  const getInfoBlock = account => {
+    const { type } = account
+
+    const blockMap = {
+      [`${GraphQLSchema.AccountType.MetaContract}`]: <MetaContract {...(account.script as MetaContract['script'])} />,
+      [`${GraphQLSchema.AccountType.EthUser}`]: <User nonce={account.nonce} isLoading={isOverviewLoading} />,
+      [`${GraphQLSchema.AccountType.EthAddrReg}`]: <EthAddrReg />,
+      [`${GraphQLSchema.AccountType.PolyjuiceContract}`]: (
         <SmartContract
           deployer={deployerAddr}
           deployTxHash={account.smart_contract?.deployment_tx_hash!}
@@ -286,15 +282,23 @@ const AccountOverview: React.FC<AccountOverviewProps & { refetch: () => Promise<
           refetch={refetch}
           isLoading={isOverviewLoading}
         />
-      ) : null}
-      {account.type === GraphQLSchema.AccountType.PolyjuiceCreator ? (
+      ),
+      [`${GraphQLSchema.AccountType.PolyjuiceCreator}`]: (
         <Polyjuice script={account.script as PolyjuiceCreator['script']} scriptHash={account.script_hash} />
-      ) : null}
-      {account.type === GraphQLSchema.AccountType.Udt && account.udt ? (
+      ),
+      [`${GraphQLSchema.AccountType.Udt}`]: account.udt ? (
         <SUDT udt={account.udt} script={account.script} script_hash={account.script_hash} />
-      ) : null}
-      {account.type === GraphQLSchema.AccountType.Unknown ? <UnknownAccount nonce={account.nonce} /> : null}
+      ) : null,
+      [`${GraphQLSchema.AccountType.Unknown}`]: <UnknownAccount nonce={account.nonce} />,
+    }
+    const infoBlock = blockMap[type]
 
+    return infoBlock ? <div className={`${styles['info-width']}`}>{infoBlock}</div> : null
+  }
+
+  return (
+    <div className={styles.container} data-account-type={account.type}>
+      {getInfoBlock(account)}
       <InfoList title={t('overview')} list={infoList} />
     </div>
   )

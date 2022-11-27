@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
 import { OutlinedInput, InputAdornment, styled, InputBaseProps } from '@mui/material'
@@ -33,17 +33,32 @@ const StyledInputBase = styled((props: InputBaseProps) => <OutlinedInput {...pro
 }))
 
 const Search = () => {
-  const { push, asPath } = useRouter()
+  const { push, asPath, query } = useRouter()
   const searchRef = useRef<HTMLInputElement | null>(null)
   const [showClearBtn, setShowClearBtn] = useState(false)
   const isHome = asPath === '/' || asPath === '/zh-CN'
   const theme = useTheme()
 
+  useEffect(() => {
+    if (!searchRef.current) return
+    if (query.search) {
+      searchRef.current.value = (query.search as string) || ''
+    } else {
+      // on page refresh, next.js's query.search will always be null, so need this fallback
+      const queryValue = new URLSearchParams(window.location.search).get('search')
+      if (queryValue) {
+        searchRef.current.value = queryValue || ''
+      }
+    }
+    if (searchRef.current.value) {
+      setShowClearBtn(true)
+    }
+  }, [query, asPath])
+
   const handleSearch = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     await handleSearchKeyPress(e, push)
     if (e.key === 'Enter') {
       searchRef.current?.blur()
-      searchRef.current.value = ''
       setShowClearBtn(false)
     }
   }
