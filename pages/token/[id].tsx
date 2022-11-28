@@ -160,6 +160,7 @@ const Token: React.FC<Props> = () => {
       ) : (
         '-'
       ),
+      ddClassName: styles['item-dd-cls'],
     },
     {
       field: t('officialSite'),
