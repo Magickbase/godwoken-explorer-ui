@@ -304,13 +304,13 @@ context('Block Page', () => {
     })
   })
 
-  describe('should have raw data', () => {
-    it('should have raw data', () => {
-      cy.visit(`/en-US/block/${blockWithRawData}?tab=raw-data`)
-      cy.get('h6').should('have.text', 'Block')
-      cy.get('[data-cy="raw-data"]', { timeout: 60000 }).should('be.visible')
-    })
-  })
+  // describe('should have raw data', () => {
+  //   it('should have raw data', () => {
+  //     cy.visit(`/en-US/block/${blockWithRawData}?tab=raw-data`)
+  //     cy.get('h6').should('have.text', 'Block')
+  //     cy.get('[data-cy="raw-data"]', { timeout: 60000 }).should('be.visible')
+  //   })
+  // })
 
   describe('should display tabs with empty data', () => {
     it('should display empty transactions list', () => {

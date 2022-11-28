@@ -14,12 +14,12 @@ context('Blocks List Page', () => {
       cy.get('h5').should('have.text', 'Blocks')
     })
     it('should have a subtitle', () => {
-      cy.get('h5+div p', { timeout: 40000 })
+      cy.get('h5+div p', { timeout: 140000 })
         .contains(/Blocks From #\d+ To #\d+/)
         .should('not.be.undefined')
     })
     it('should have page navigation arrows', () => {
-      cy.get('p+div a[title="Prev"]', { timeout: 40000 })
+      cy.get('p+div a[title="Prev"]')
         .should('be.visible')
         .should(link => {
           expect(link).to.has.attr('href').to.contain(`/blocks`)
@@ -33,7 +33,7 @@ context('Blocks List Page', () => {
         })
     })
     it('should have page navigation numbers', () => {
-      cy.get('p+div > div > a', { timeout: 40000 })
+      cy.get('p+div > div > a')
         .contains('1')
         .should(link => {
           expect(link).to.has.attr('href').to.contain(`/blocks?page=1`)
@@ -43,7 +43,7 @@ context('Blocks List Page', () => {
 
   describe('list page common navigation actions', () => {
     it('should have disabled prev arrow', () => {
-      cy.get('p+div a[title="Prev"]', { timeout: 40000 })
+      cy.get('p+div a[title="Prev"]', { timeout: 100000 })
         .should('be.visible')
         .first()
         .should(link => {
@@ -54,7 +54,7 @@ context('Blocks List Page', () => {
       cy.location('search').should('eq', '')
     })
     it('should navigate to page 2 on click number 2', () => {
-      cy.get('p+div > div > a', { timeout: 40000 }).contains('2').click()
+      cy.get('p+div > div > a').contains('2').click()
       cy.location('pathname').should('eq', '/blocks')
       cy.location('search').should('eq', '?page=2')
     })
