@@ -111,7 +111,7 @@ const ContractList = () => {
             <Table>
               <thead style={{ textTransform: 'capitalize', fontSize: isMobile ? 12 : 14 }}>
                 <tr>
-                  <th style={{ width: '1rem' }}>{t(`#`)}</th>
+                  <th style={{ minWidth: '1rem' }}>{t(`#`)}</th>
                   <th>{t(`address`)}</th>
                   <th>{t(`contract_name`)}</th>
                   <th>{t(`compiler`)}</th>
