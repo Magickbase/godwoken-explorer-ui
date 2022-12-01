@@ -106,7 +106,7 @@
   padding-right: 1rem;
   :global {
     & .tooltip:hover::before {
-      min-width: 180px !important;
+      min-width: 180px;
     }
   }
 }
