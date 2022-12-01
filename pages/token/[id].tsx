@@ -299,6 +299,7 @@ const Token: React.FC<Props> = () => {
         </PageTitle>
         <div className={styles.overview}>
           <InfoList
+            className={styles['info-width']}
             title={
               <div className={styles.infoTitle}>
                 {t(`tokenInfo`)}
