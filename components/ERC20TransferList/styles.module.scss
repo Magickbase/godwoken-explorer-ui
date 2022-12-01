@@ -31,7 +31,6 @@
 .tokenHeader {
   display: flex;
   align-items: center;
-  column-gap: 4px;
   svg {
     margin-left: 0.25rem;
     cursor: pointer;
@@ -58,7 +57,9 @@
 .blockHeader,
 .fromHeader,
 .toHeader {
-  column-gap: 4px;
   display: flex;
   align-items: center;
+  svg {
+    margin-left: 0.25rem;
+  }
 }
