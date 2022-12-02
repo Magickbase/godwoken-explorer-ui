@@ -38,8 +38,9 @@ context('Home Page', () => {
     describe('each block', () => {
       it('should have number which is a link', () => {
         cy.get(`${ROOT_SELECTOR} .list-container`)
+          .should('be.visible')
           .children()
-          .first()
+          .last()
           .find(`a[title='block number']`)
           .should(link => {
             expect(link).to.has.attr('href').contains('/block/')
@@ -50,6 +51,9 @@ context('Home Page', () => {
       })
       it('should have time', () => {
         cy.get(`${ROOT_SELECTOR} .list-container`).children().first().find('time').should('not.be.undefined')
+      })
+      it('should have a status', () => {
+        cy.get(`${ROOT_SELECTOR} .list-container`).children().first().find('svg').should('not.be.undefined')
       })
     })
   })
@@ -94,6 +98,9 @@ context('Home Page', () => {
       })
       it('should have time', () => {
         cy.get(`${ROOT_SELECTOR} .list-container`).children().first().find('time').should('not.be.undefined')
+      })
+      it('should have a status', () => {
+        cy.get(`${ROOT_SELECTOR} .list-container`).children().first().find('svg').should('not.be.undefined')
       })
     })
   })
