@@ -156,11 +156,12 @@ const Token: React.FC<Props> = () => {
       content: !token ? (
         <Skeleton animation="wave" />
       ) : token.contract_address_hash ? (
-        <HashLink label={token.contract_address_hash} href={`/account/${token.contract_address_hash}`} />
+        <div className={styles.contract}>
+          <HashLink label={token.contract_address_hash} href={`/account/${token.contract_address_hash}`} />
+        </div>
       ) : (
         '-'
       ),
-      ddClassName: styles['dd-class-from-token-detail-page'],
     },
     {
       field: t('officialSite'),
