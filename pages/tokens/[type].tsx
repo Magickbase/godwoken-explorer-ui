@@ -259,11 +259,11 @@ const TokenList = () => {
               <tr style={{ borderTop: '1px solid #f0f0f0', borderBottom: '1px solid #f0f0f0' }}>
                 {headers.map(h => (
                   <th key={h.key} title={t(h.label ?? h.key)}>
-                    <span>
-                      <span className={styles['pr-4']}>{t(h.label ?? h.key)}</span>
+                    <div>
+                      <div>{t(h.label ?? h.key)}</div>
                       {h.key === 'token' ? (
                         <>
-                          <div className={`${styles['pr-8']}`}>
+                          <div className={styles.sortIcon}>
                             <SortIcon
                               onClick={e => handleSorterClick(e, SortTypesEnum.name_sort)}
                               data-order={name_sort}
@@ -289,7 +289,7 @@ const TokenList = () => {
                           className={styles.sorter}
                         />
                       ) : null}
-                    </span>
+                    </div>
                   </th>
                 ))}
               </tr>
