@@ -170,6 +170,7 @@ const AgeFilterMenu: React.FC<{ filterKeys: Array<string> }> = ({ filterKeys }) 
       setAlert({ open: true, type: 'warning', msg: t('invalid_date') })
       return
     }
+    popupState.setOpen(false)
     push(`${window.location.pathname ?? ''}?${new URLSearchParams(q)}`)
   }
 
@@ -179,6 +180,7 @@ const AgeFilterMenu: React.FC<{ filterKeys: Array<string> }> = ({ filterKeys }) 
 
   const handleFilterContentClear = () => {
     setState(defaultState)
+    popupState.setOpen(false)
   }
 
   const handleFilterClear = (e: React.MouseEvent<HTMLOrSVGElement>) => {

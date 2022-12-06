@@ -111,7 +111,11 @@ const Account = () => {
     },
   )
 
-  const { isLoading: isTransferListLoading, data: transferList } = useQuery(
+  const {
+    isLoading: isTransferListLoading,
+    data: transferList,
+    error: isTransferListError,
+  } = useQuery(
     [
       'account-transfer-list',
       q.address,
@@ -286,8 +290,13 @@ const Account = () => {
             )
           ) : null}
           {tab === 'erc20' ? (
-            !isTransferListLoading && transferList ? (
-              <ERC20TransferList token_transfers={transferList} viewer={id as string} />
+            !isTransferListLoading && (transferList || isTransferListError) ? (
+              <ERC20TransferList
+                token_transfers={
+                  transferList || { entries: [], metadata: { total_count: 0, before: null, after: null } }
+                }
+                viewer={id as string}
+              />
             ) : (
               <Skeleton animation="wave" />
             )
