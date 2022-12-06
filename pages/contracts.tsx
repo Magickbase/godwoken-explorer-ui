@@ -98,7 +98,7 @@ const ContractList = () => {
   const {
     push,
     asPath,
-    query: { before = null, after = null, page_size = SIZES[2], tx_count_sort = 'DESC', ...restQuery },
+    query: { before = null, after = null, page_size = SIZES[1], tx_count_sort = 'DESC', ...restQuery },
   } = useRouter()
 
   const { isLoading, data } = useQuery(
@@ -108,7 +108,7 @@ const ContractList = () => {
         tx_count_sort: tx_count_sort as string,
         before: before as string,
         after: after as string,
-        limit: Number.isNaN(+page_size) ? +SIZES[2] : +page_size,
+        limit: Number.isNaN(+page_size) ? +SIZES[1] : +page_size,
       }),
     {
       refetchInterval: 10000,
