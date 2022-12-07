@@ -18,12 +18,12 @@ import HashLink from 'components/HashLink'
 import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
 import Amount from 'components/Amount'
 import Alert from 'components/Alert'
-import { fetchToken, fetchBridgedRecordList, fetchTokenHolderList, client, currentChain, withWagmi } from 'utils'
-import styles from './styles.module.scss'
-
-import type { API } from 'utils/api/utils'
 import { SIZES } from 'components/PageSize'
 import TokenLogo from 'components/TokenLogo'
+import { fetchToken, fetchBridgedRecordList, fetchTokenHolderList, client, currentChain, withWagmi } from 'utils'
+import type { API } from 'utils/api/utils'
+import TipsIcon from 'assets/icons/tips.svg'
+import styles from './styles.module.scss'
 
 const tabs = ['transfers', 'bridged', 'holders']
 
@@ -46,6 +46,7 @@ interface TokenInfoProps {
     eth_type: 'ERC20' | 'ERC721' | 'ERC1155'
     decimal: null
     official_site: string | null
+    price: string | null
     description: string | null
     supply: string
     holders_count: number
@@ -192,6 +193,21 @@ const Token: React.FC<Props> = () => {
         '-'
       ),
     },
+    token?.price
+      ? {
+          field: t('price'),
+          content: token ? (
+            <>
+              <span>{token.price} </span>
+              <div className="tooltip" data-tooltip={t('price-updated-at', { time: Date.now() })}>
+                <TipsIcon />
+              </div>
+            </>
+          ) : (
+            <Skeleton animation="wave" />
+          ),
+        }
+      : null,
     {
       field: t('holderCount'),
       content: token ? token.holders_count || '-' : <Skeleton animation="wave" />,
