@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 import dayjs, { Dayjs } from 'dayjs'
@@ -7,21 +7,19 @@ import 'dayjs/locale/zh-cn'
 import utc from 'dayjs/plugin/utc'
 import timezones from 'dayjs/plugin/timezone'
 import TextField from '@mui/material/TextField'
-import { usePopupState, bindTrigger, bindPopover } from 'material-ui-popup-state/hooks'
+import { usePopupState, bindTrigger, bindPopper } from 'material-ui-popup-state/hooks'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
-import { Popover } from '@mui/material'
+import { Popper, ClickAwayListener, Fade } from '@mui/material'
 import styled from '@emotion/styled'
 import Alert from 'components/Alert'
 import FilterIcon from 'assets/icons/filter.svg'
 import ClearIcon from 'assets/icons/clear.svg'
-import { red } from '@mui/material/colors'
 
 dayjs.extend(utc)
 dayjs.extend(timezones)
 
-const DATE_KEYS = ['age_range_start', 'age_range_end']
 const locales = { 'en-US': 'en', 'zh-CN': 'zh-cn' }
 
 const Container = styled.div`
@@ -140,6 +138,7 @@ const AgeFilterMenu: React.FC<{ filterKeys: Array<string> }> = ({ filterKeys }) 
   const [t] = useTranslation('list')
   const { query, push, locale } = useRouter()
   const defaultState = filterKeys.reduce((res, key) => ({ ...res, [key]: null }), {})
+  const filterRef = useRef<HTMLLabelElement>(null)
   const [state, setState] = useState<Record<string, Dayjs>>(
     filterKeys.reduce((res, key) => ({ ...res, [key]: query[key] ? dayjs(query[key] as string) : null }), {}),
   )
@@ -148,9 +147,14 @@ const AgeFilterMenu: React.FC<{ filterKeys: Array<string> }> = ({ filterKeys }) 
     type: 'success',
     msg: '',
   })
+
+  const handleClickAway = () => {
+    popupState.setOpen(false)
+  }
+
   const popupState = usePopupState({
-    variant: 'popover',
-    popupId: 'menuPopover',
+    variant: 'popper',
+    popupId: 'formPopover',
   })
 
   const handleFilterSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -180,10 +184,9 @@ const AgeFilterMenu: React.FC<{ filterKeys: Array<string> }> = ({ filterKeys }) 
 
   const handleFilterContentClear = () => {
     setState(defaultState)
-    popupState.setOpen(false)
   }
 
-  const handleFilterClear = (e: React.MouseEvent<HTMLOrSVGElement>) => {
+  const handleFilterIconClear = (e: React.MouseEvent<HTMLOrSVGElement>) => {
     e.stopPropagation()
     e.preventDefault()
     const q = { ...query } as Record<string, string>
@@ -195,66 +198,67 @@ const AgeFilterMenu: React.FC<{ filterKeys: Array<string> }> = ({ filterKeys }) 
   }
 
   return (
-    <Container data-active={filterKeys.some(field => query[field])}>
-      <label htmlFor={`${filterKeys[0]}_filter`} className="filterBtn">
-        <FilterIcon fontSize="inherit" {...bindTrigger(popupState)} />
-        <ClearIcon className="clearIcon" onClick={handleFilterClear} />
-      </label>
-      <Alert
-        open={alert?.open}
-        onClose={() => setAlert({ ...alert, open: false })}
-        content={alert.msg}
-        type={alert.type}
-      />
-      <Popover
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'center',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'center',
-        }}
-        sx={{ top: 25 }}
-        PaperProps={{
-          sx: {
-            bgcolor: 'unset',
-            borderRadius: 'unset',
-            boxShadow: 'unset',
-            overflow: 'unset',
-          },
-        }}
-        {...bindPopover(popupState)}
-      >
-        <FormMenu onSubmit={handleFilterSubmit} className="menu" data-role="filter-menu">
-          {filterKeys.map(field => {
-            return (
-              <div key={field} className="field">
-                <label>{t(field)}</label>
-                <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={locales[locale]}>
-                  <DateTimePicker
-                    key={field}
-                    value={state[field]}
-                    disableFuture
-                    disableMaskedInput
-                    ampm
-                    onChange={(newValue: Dayjs) => handleDateChange(newValue, field)}
-                    inputFormat="YYYY/MM/DD, HH:mm"
-                    renderInput={params => <TextField {...params} helperText="" autoFocus={field === filterKeys[0]} />}
-                  />
-                </LocalizationProvider>
+    <ClickAwayListener onClickAway={handleClickAway}>
+      <Container data-active={filterKeys.some(field => query[field])}>
+        <label htmlFor={`${filterKeys[0]}_filter`} className="filterBtn" ref={filterRef}>
+          <FilterIcon fontSize="inherit" {...bindTrigger(popupState)} />
+          <ClearIcon className="clearIcon" onClick={handleFilterIconClear} />
+        </label>
+        <Alert
+          open={alert?.open}
+          onClose={() => setAlert({ ...alert, open: false })}
+          content={alert.msg}
+          type={alert.type}
+        />
+        <Popper
+          {...bindPopper(popupState)}
+          onResize={undefined}
+          onResizeCapture={undefined}
+          open={popupState.isOpen}
+          placement="bottom"
+          sx={{ pt: '25px' }}
+          container={filterRef.current}
+          disablePortal
+          transition
+        >
+          {({ TransitionProps }) => (
+            <Fade {...TransitionProps} timeout={300}>
+              <div>
+                <FormMenu onSubmit={handleFilterSubmit} className="menu" data-role="filter-menu">
+                  {filterKeys.map(field => {
+                    return (
+                      <div key={field} className="field">
+                        <label>{t(field)}</label>
+                        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={locales[locale]}>
+                          <DateTimePicker
+                            key={field}
+                            value={state[field]}
+                            disableFuture
+                            disableMaskedInput
+                            ampm
+                            onChange={(newValue: Dayjs) => handleDateChange(newValue, field)}
+                            inputFormat="YYYY/MM/DD, HH:mm"
+                            renderInput={params => (
+                              <TextField {...params} helperText="" autoFocus={field === filterKeys[0]} />
+                            )}
+                          />
+                        </LocalizationProvider>
+                      </div>
+                    )
+                  })}
+                  <div className="btns">
+                    <button type="button" onClick={handleFilterContentClear}>
+                      {t(`clear`)}
+                    </button>
+                    <button type="submit">{t(`filter`)}</button>
+                  </div>
+                </FormMenu>
               </div>
-            )
-          })}
-          <div className="btns">
-            <button type="button" onClick={handleFilterContentClear}>
-              {t(`clear`)}
-            </button>
-            <button type="submit">{t(`filter`)}</button>
-          </div>
-        </FormMenu>
-      </Popover>
-    </Container>
+            </Fade>
+          )}
+        </Popper>
+      </Container>
+    </ClickAwayListener>
   )
 }
 

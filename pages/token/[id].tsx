@@ -152,7 +152,7 @@ const Token: React.FC<Props> = () => {
         address_to: address_to as string,
         age_range_start: age_range_start as string,
         age_range_end: age_range_end as string,
-        combine_from_to: true,
+        combine_from_to: address_from && address_to ? false : true,
       }),
     { enabled: tab === tabs[0] && !!token?.contract_address_hash },
   )
