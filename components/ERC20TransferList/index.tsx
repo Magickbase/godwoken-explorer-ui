@@ -160,7 +160,7 @@ const TransferList: React.FC<
 > = ({ token_transfers, viewer, showToken = true }) => {
   const [t, { language }] = useTranslation('list')
   const [isShowLogo, setIsShowLogo] = useState(true)
-  const [isShowUsd, setIsShowUsd] = useState(true)
+  const [isShowUsd, setIsShowUsd] = useState(false)
 
   const handleValueDisplayChange = () => setIsShowUsd(show => !show)
   const handleTokenDisplayChange = () => setIsShowLogo(show => !show)
@@ -257,6 +257,7 @@ const TransferList: React.FC<
                           ns: 'list',
                         })}
                         placement="top"
+                        hidden={!item.udt.token_exchange_rate?.exchange_rate}
                       >
                         <span>
                           {item.udt.token_exchange_rate?.exchange_rate

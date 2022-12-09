@@ -239,7 +239,7 @@ const Token: React.FC<Props> = () => {
     },
     {
       field: '',
-      content: <div data-role="placeholder" style={{ height: `1.5rem` }}></div>,
+      content: <div data-role="placeholder" style={{ height: token?.token_exchange_rate ? `1.5rem` : `5rem` }}></div>,
     },
   ]
 

@@ -55,7 +55,7 @@ export const fetchUdtList = (variables: Variables) =>
 
 const AssetList = ({ list = [] }: { list: UdtList }) => {
   const [t] = useTranslation(['account', 'list'])
-  const [isShowUsd, setIsShowUsd] = useState(true)
+  const [isShowUsd, setIsShowUsd] = useState(false)
 
   const handleBalanceDisplayChange = () => setIsShowUsd(show => !show)
 
@@ -103,6 +103,7 @@ const AssetList = ({ list = [] }: { list: UdtList }) => {
                         ns: 'list',
                       })}
                       placement="top"
+                      hidden={!item.udt.token_exchange_rate?.exchange_rate}
                     >
                       <span>
                         {item.udt.token_exchange_rate?.exchange_rate
