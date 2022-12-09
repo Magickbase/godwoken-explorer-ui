@@ -6,9 +6,11 @@
       "url": "/api/__coverage__"
     }
   },
-  "defaultCommandTimeout": 12000,
-  "responseTimeout": 15000,
-  "pageLoadTimeout": 20000,
+  "defaultCommandTimeout": 24000,
+  "responseTimeout": 16000,
+  "pageLoadTimeout": 24000,
+  "viewportWidth": 1100,
+  "viewportHeight": 1000,
   "pluginsFile": "node_modules/@cypress/code-coverage/plugins",
   "supportFile": "node_modules/@cypress/code-coverage/support",
   "projectId": "2sb35d"

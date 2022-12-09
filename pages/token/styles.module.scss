@@ -88,6 +88,12 @@
       width: calc(50% - 32px);
     }
   }
+
+  .contract {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    color: var(--primary-color);
+  }
 }
 
 .list {
@@ -104,6 +110,11 @@
   align-items: center;
   justify-content: space-between;
   padding-right: 1rem;
+  :global {
+    & .tooltip:hover::before {
+      min-width: 180px;
+    }
+  }
 }
 
 .metamask {

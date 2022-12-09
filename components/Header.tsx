@@ -306,6 +306,7 @@ const Header = () => {
             <Button
               color="secondary"
               disableRipple
+              id="token-menu"
               sx={{
                 'textTransform': 'none',
                 'mx': 2,
@@ -326,6 +327,7 @@ const Header = () => {
             <Button
               color="secondary"
               disableRipple
+              id="contracts-menu"
               sx={{
                 'textTransform': 'none',
                 'mx': 2,
@@ -349,6 +351,7 @@ const Header = () => {
             <Button
               color="secondary"
               disableRipple
+              id="charts-menu"
               sx={{
                 'textTransform': 'none',
                 'mx': 2,
@@ -372,6 +375,7 @@ const Header = () => {
             <Button
               color="secondary"
               disableRipple
+              id="chains-menu"
               sx={{
                 'textTransform': 'none',
                 'mx': 2,
@@ -392,6 +396,7 @@ const Header = () => {
             <Button
               color="secondary"
               disableRipple
+              id="i18n-menu"
               sx={{
                 'textTransform': 'none',
                 'ml': 2,

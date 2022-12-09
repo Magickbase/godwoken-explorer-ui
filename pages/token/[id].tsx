@@ -156,7 +156,9 @@ const Token: React.FC<Props> = () => {
       content: !token ? (
         <Skeleton animation="wave" />
       ) : token.contract_address_hash ? (
-        <HashLink label={token.contract_address_hash} href={`/account/${token.contract_address_hash}`} />
+        <div className={styles.contract}>
+          <HashLink label={token.contract_address_hash} href={`/account/${token.contract_address_hash}`} />
+        </div>
       ) : (
         '-'
       ),
@@ -273,11 +275,12 @@ const Token: React.FC<Props> = () => {
                 {t(`tokenInfo`)}
                 {token?.eth_type === 'ERC20' ? (
                   <div className="tooltip" data-tooltip={t('import-token-into-metamask')}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src="/logos/metamask.png"
                       alt="MetaMask"
                       className={styles.metamask}
-                      title={t('import-into-metamask')}
+                      title={t('import-token-into-metamask')}
                       onClick={handleImportIntoMetamask}
                     />
                   </div>
