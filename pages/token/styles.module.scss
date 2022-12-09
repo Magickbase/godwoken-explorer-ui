@@ -108,6 +108,10 @@
     & .tooltip:hover::before {
       min-width: 180px;
     }
+    & .tooltip {
+      display: inline-flex;
+      align-items: center;
+    }
   }
 }
 
@@ -118,5 +122,15 @@
   @media screen and (max-width: 1024px) {
     width: 1.25rem;
     height: 1.25rem;
+  }
+}
+
+.priceIcon {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 4px;
+  width: 20px;
+  &:hover svg {
+    color: var(--primary-color);
   }
 }

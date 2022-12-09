@@ -46,3 +46,16 @@
     margin: 0 auto;
   }
 }
+
+.balance {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  span {
+    height: 16px;
+    svg {
+      margin-left: 0.25rem;
+      cursor: pointer;
+    }
+  }
+}

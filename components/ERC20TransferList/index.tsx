@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import { gql } from 'graphql-request'
+import dayjs from 'dayjs'
+import BigNumber from 'bignumber.js'
 import Table from 'components/Table'
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/SimplePagination'
@@ -11,6 +13,7 @@ import RoundedAmount from 'components/RoundedAmount'
 import TokenLogo from 'components/TokenLogo'
 import ChangeIcon from 'assets/icons/change.svg'
 import NoDataIcon from 'assets/icons/no-data.svg'
+import UsdIcon from 'assets/icons/usd.svg'
 import { client, timeDistance, GraphQLSchema } from 'utils'
 import styles from './styles.module.scss'
 import Tooltip from 'components/Tooltip'
@@ -27,7 +30,7 @@ export type TransferListProps = {
       log_index: number
       polyjuice: Pick<GraphQLSchema.Polyjuice, 'status'>
       transaction_hash: string
-      udt: Pick<GraphQLSchema.Udt, 'id' | 'decimal' | 'symbol' | 'icon' | 'name'>
+      udt: Pick<GraphQLSchema.Udt, 'id' | 'decimal' | 'symbol' | 'icon' | 'name' | 'token_exchange_rate'>
     }>
     metadata: GraphQLSchema.PageMetadata
   }
@@ -79,6 +82,11 @@ const transferListQuery = gql`
           symbol
           icon
           name
+          token_exchange_rate {
+            exchange_rate
+            symbol
+            timestamp
+          }
         }
       }
 
@@ -121,6 +129,11 @@ const tokenTransferListQuery = gql`
           symbol
           icon
           name
+          token_exchange_rate {
+            exchange_rate
+            symbol
+            timestamp
+          }
         }
       }
 
@@ -145,9 +158,11 @@ const TransferList: React.FC<
     showToken?: boolean
   }
 > = ({ token_transfers, viewer, showToken = true }) => {
-  const [isShowLogo, setIsShowLogo] = useState(true)
   const [t, { language }] = useTranslation('list')
+  const [isShowLogo, setIsShowLogo] = useState(true)
+  const [isShowUsd, setIsShowUsd] = useState(true)
 
+  const handleValueDisplayChange = () => setIsShowUsd(show => !show)
   const handleTokenDisplayChange = () => setIsShowLogo(show => !show)
 
   return (
@@ -169,7 +184,14 @@ const TransferList: React.FC<
                 </div>
               </th>
             ) : null}
-            <th>{`${t('value')}`}</th>
+            <th>
+              <div className={styles.value}>
+                {isShowUsd ? t(`USD`) : t('value')}
+                <span style={{ color: isShowUsd ? 'var(--primary-color)' : '#ccc' }}>
+                  <UsdIcon onClick={handleValueDisplayChange} />
+                </span>
+              </div>
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -228,7 +250,26 @@ const TransferList: React.FC<
                     </td>
                   ) : null}
                   <td>
-                    <RoundedAmount amount={item.amount} udt={item.udt} />
+                    {isShowUsd ? (
+                      <Tooltip
+                        title={t('price-updated-at', {
+                          time: dayjs(item.udt.token_exchange_rate?.timestamp).format('YYYY-MM-DD HH:mm:ss'),
+                          ns: 'list',
+                        })}
+                        placement="top"
+                      >
+                        <span>
+                          {item.udt.token_exchange_rate?.exchange_rate
+                            ? `$${new BigNumber(item.amount ?? 0)
+                                .dividedBy(10 ** item.udt.decimal)
+                                .multipliedBy(item.udt.token_exchange_rate?.exchange_rate)
+                                .toFixed(2)}`
+                            : '-'}
+                        </span>
+                      </Tooltip>
+                    ) : (
+                      <RoundedAmount amount={item.amount} udt={item.udt} />
+                    )}
                   </td>
                 </tr>
               )

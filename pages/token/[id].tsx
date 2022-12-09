@@ -5,6 +5,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useRouter } from 'next/router'
 import { useQuery } from 'react-query'
 import { gql } from 'graphql-request'
+import dayjs from 'dayjs'
 import { Skeleton } from '@mui/material'
 import { ConnectorAlreadyConnectedError, useConnect, UserRejectedRequestError } from 'wagmi'
 import SubpageHead from 'components/SubpageHead'
@@ -20,6 +21,7 @@ import Amount from 'components/Amount'
 import Alert from 'components/Alert'
 import { SIZES } from 'components/PageSize'
 import TokenLogo from 'components/TokenLogo'
+import Tooltip from 'components/Tooltip'
 import { fetchToken, fetchBridgedRecordList, fetchTokenHolderList, client, currentChain, withWagmi } from 'utils'
 import type { API } from 'utils/api/utils'
 import TipsIcon from 'assets/icons/tips.svg'
@@ -46,12 +48,16 @@ interface TokenInfoProps {
     eth_type: 'ERC20' | 'ERC721' | 'ERC1155'
     decimal: null
     official_site: string | null
-    price: string | null
     description: string | null
     supply: string
     holders_count: number
     minted_count: number
     contract_address_hash: string
+    token_exchange_rate: {
+      exchange_rate: number | null
+      symbol: string
+      timestamp: number | null
+    }
   }
 }
 
@@ -72,6 +78,11 @@ const tokenInfoQuery = gql`
       holders_count
       minted_count
       contract_address_hash
+      token_exchange_rate {
+        exchange_rate
+        symbol
+        timestamp
+      }
     }
   }
 `
@@ -193,16 +204,26 @@ const Token: React.FC<Props> = () => {
         '-'
       ),
     },
-    token?.price
+    token?.token_exchange_rate
       ? {
-          field: t('price'),
+          field: t('price', { ns: 'list' }),
           content: token ? (
-            <>
-              <span>{token.price} </span>
-              <div className="tooltip" data-tooltip={t('price-updated-at', { time: Date.now() })}>
-                <TipsIcon />
-              </div>
-            </>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <span>
+                {token.token_exchange_rate?.exchange_rate ? `$${token.token_exchange_rate?.exchange_rate}` : '-'}
+              </span>
+              <Tooltip
+                title={t('price-updated-at', {
+                  time: dayjs(token.token_exchange_rate?.timestamp).format('YYYY-MM-DD HH:mm:ss'),
+                  ns: 'list',
+                })}
+                placement="top"
+              >
+                <div className={styles.priceIcon}>
+                  <TipsIcon />
+                </div>
+              </Tooltip>
+            </div>
           ) : (
             <Skeleton animation="wave" />
           ),
@@ -218,7 +239,7 @@ const Token: React.FC<Props> = () => {
     },
     {
       field: '',
-      content: <div data-role="placeholder" style={{ height: `5rem` }}></div>,
+      content: <div data-role="placeholder" style={{ height: `1.5rem` }}></div>,
     },
   ]
 
