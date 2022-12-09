@@ -49,6 +49,7 @@ const RawBlockData: React.FC<{ no: number }> = ({ no }) => {
           readOnly
           style={textareaStyle}
           className="mono-font"
+          data-cy="raw-data"
         />
       ) : isLoading ? (
         <Skeleton variant="rectangular" animation="wave" height="80ch" />

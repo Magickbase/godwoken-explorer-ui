@@ -20,6 +20,11 @@
       display: inline-flex;
       align-items: center;
     }
+    .sortIcon {
+      margin-right: 8px;
+      display: flex;
+      align-items: center;
+    }
   }
   form[data-role='filter-menu']:first-of-type {
     left: 0;
