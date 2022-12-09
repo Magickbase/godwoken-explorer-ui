@@ -206,48 +206,11 @@ const TransferList: React.FC<
   const [isShowLogo, setIsShowLogo] = useState(true)
   const [t, { language }] = useTranslation('list')
   const { query } = useRouter()
-  const [filteredEntries, setFilteredEntries] = useState(token_transfers.entries)
 
   const isFiltered = Object.keys(query).some(key => FILTER_KEYS.includes(key))
   const isFilterUnnecessary = !token_transfers.metadata.total_count && !isFiltered
 
   const handleTokenDisplayChange = () => setIsShowLogo(show => !show)
-
-  useEffect(() => {
-    setFilteredEntries(
-      token_transfers.entries.filter(item => {
-        // 1. one of item's to_address or from_address must be the current account/token page's address
-        if ([item.from_address, item.to_address].includes(viewer.toLowerCase())) {
-          // 2. must match with at least one of filtered from/to address if they exist
-          const queryFromAddress = query?.address_from?.toString().toLowerCase() || null
-          const queryToAddress = query?.address_to?.toString().toLowerCase() || null
-          if (queryFromAddress && queryToAddress) {
-            // both are specified, must match both
-            if (item.from_address === queryFromAddress && item.to_address === queryToAddress) {
-              return true
-            } else {
-              return false
-            }
-          } else if (queryFromAddress || queryToAddress) {
-            // only one is specified, must match at least one
-            if (
-              (queryFromAddress && item.from_address === queryFromAddress) ||
-              (queryToAddress && item.to_address === queryToAddress)
-            ) {
-              return true
-            } else {
-              return false
-            }
-          } else {
-            // none is specified, all good
-            return true
-          }
-        } else {
-          return false
-        }
-      }),
-    )
-  }, [query, token_transfers])
 
   return (
     <div className={styles.container} data-is-filter-unnecessary={isFilterUnnecessary}>
@@ -292,8 +255,8 @@ const TransferList: React.FC<
           </tr>
         </thead>
         <tbody>
-          {filteredEntries.length ? (
-            filteredEntries.map(item => {
+          {token_transfers.metadata.total_count ? (
+            token_transfers.entries.map(item => {
               return (
                 <tr key={item.transaction_hash + item.log_index}>
                   <td>
