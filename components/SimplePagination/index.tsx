@@ -34,7 +34,7 @@ const SimplePagination: React.FC<Partial<Record<'before' | 'after' | 'note', str
           </a>
         </NextLink>
         <NextLink href={nextPage}>
-          <a title={t(`next`)} data-disabled={!after || total_count <= (+query.pageSize || SIZES[1])}>
+          <a title={t(`next`)} data-disabled={!after || total_count <= (+query.page_size || SIZES[1])}>
             <NextPageIcon />
           </a>
         </NextLink>
