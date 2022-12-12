@@ -152,5 +152,12 @@
         margin-left: -116px;
       }
     }
+    &[data-page-name='transaction-detail'] {
+      dl[role='listitem'] {
+        dt {
+          flex-basis: 168px !important;
+        }
+      }
+    }
   }
 }

@@ -102,7 +102,20 @@ const Token: React.FC<Props> = () => {
   const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string }>(null)
   const {
     replace,
-    query: { id, tab = 'transfers', page = '1', before = null, after = null, page_size = SIZES[1] },
+    query: {
+      id,
+      tab = 'transfers',
+      page = '1',
+      before = null,
+      after = null,
+      block_from = null,
+      block_to = null,
+      page_size = SIZES[1],
+      address_from = null,
+      address_to = null,
+      age_range_start = null,
+      age_range_end = null,
+    },
   } = useRouter()
 
   const { data: stats } = useQuery(['token-basic-info', id], () => fetchToken(id.toString()))
@@ -126,13 +139,32 @@ const Token: React.FC<Props> = () => {
   }, [isTokenLoading, token, replace])
 
   const { isLoading: isTransferListLoading, data: transferList } = useQuery(
-    ['token-transfer-list', token?.contract_address_hash, page_size, before, after],
+    [
+      'token-transfer-list',
+      token?.contract_address_hash,
+      page_size,
+      before,
+      after,
+      block_from,
+      block_to,
+      address_from,
+      address_to,
+      age_range_start,
+      age_range_end,
+    ],
     () =>
       fetchTokenTransferList({
-        address: token?.contract_address_hash,
+        contract_address: token?.contract_address_hash,
         limit: +page_size,
         before: before as string,
         after: after as string,
+        block_from: block_from ? +block_from : null,
+        block_to: block_to ? +block_to : null,
+        address_from: address_from as string,
+        address_to: address_to as string,
+        age_range_start: age_range_start as string,
+        age_range_end: age_range_end as string,
+        combine_from_to: address_from && address_to ? false : true,
       }),
     { enabled: tab === tabs[0] && !!token?.contract_address_hash },
   )
@@ -168,7 +200,9 @@ const Token: React.FC<Props> = () => {
       content: !token ? (
         <Skeleton animation="wave" />
       ) : token.contract_address_hash ? (
-        <HashLink label={token.contract_address_hash} href={`/account/${token.contract_address_hash}`} />
+        <div className={styles.contract}>
+          <HashLink label={token.contract_address_hash} href={`/account/${token.contract_address_hash}`} />
+        </div>
       ) : (
         '-'
       ),
@@ -337,7 +371,7 @@ const Token: React.FC<Props> = () => {
           />
           {tab === tabs[0] ? (
             !isTransferListLoading && transferList ? (
-              <ERC20TransferList token_transfers={transferList} showToken={false} />
+              <ERC20TransferList token_transfers={transferList} showToken={false} viewer={id as string} />
             ) : (
               <Skeleton animation="wave" />
             )

@@ -2,10 +2,15 @@ import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
 import NextPageIcon from 'assets/icons/next-page.svg'
-import PageSize from 'components/PageSize'
+import PageSize, { SIZES } from 'components/PageSize'
 import styles from './styles.module.scss'
 
-const SimplePagination: React.FC<Partial<Record<'before' | 'after' | 'note', string>>> = ({ before, after, note }) => {
+const SimplePagination: React.FC<Partial<Record<'before' | 'after' | 'note', string> & { total_count: number }>> = ({
+  before,
+  after,
+  note,
+  total_count,
+}) => {
   const [t] = useTranslation('common')
   const {
     query: { before: _before, after: _after, id: _, ...query },
@@ -29,7 +34,7 @@ const SimplePagination: React.FC<Partial<Record<'before' | 'after' | 'note', str
           </a>
         </NextLink>
         <NextLink href={nextPage}>
-          <a title={t(`next`)} data-disabled={!after}>
+          <a title={t(`next`)} data-disabled={!after || total_count <= (+query.page_size || SIZES[1])}>
             <NextPageIcon />
           </a>
         </NextLink>
