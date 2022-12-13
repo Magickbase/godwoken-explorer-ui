@@ -1,16 +1,21 @@
+import { useState } from 'react'
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import { gql } from 'graphql-request'
+import dayjs from 'dayjs'
+import BigNumber from 'bignumber.js'
+import Tooltip from 'components/Tooltip'
 import Table from 'components/Table'
 import TokenLogo from 'components/TokenLogo'
 import Amount from 'components/Amount'
 import NoDataIcon from 'assets/icons/no-data.svg'
+import UsdIcon from 'assets/icons/usd.svg'
 import { parseTokenName, client, GraphQLSchema } from 'utils'
 import styles from './styles.module.scss'
 
 export type UdtList = Array<{
   value: string
-  udt: Pick<GraphQLSchema.Udt, 'id' | 'type' | 'name' | 'decimal' | 'icon' | 'symbol'>
+  udt: Pick<GraphQLSchema.Udt, 'id' | 'type' | 'name' | 'decimal' | 'icon' | 'symbol' | 'token_exchange_rate'>
 }>
 
 const udtListQuery = gql`
@@ -24,6 +29,11 @@ const udtListQuery = gql`
         icon
         decimal
         symbol
+        token_exchange_rate {
+          exchange_rate
+          symbol
+          timestamp
+        }
       }
     }
   }
@@ -44,14 +54,32 @@ export const fetchUdtList = (variables: Variables) =>
     })
 
 const AssetList = ({ list = [] }: { list: UdtList }) => {
-  const [t] = useTranslation('account')
+  const [t] = useTranslation(['account', 'list'])
+  const [isShowUsd, setIsShowUsd] = useState(false)
+
+  const handleBalanceDisplayChange = () => setIsShowUsd(show => !show)
+
   return (
     <Table>
       <thead className={styles.tableHeader}>
         <tr style={{ textTransform: 'capitalize' }}>
           <th>{t(`asset`)}</th>
           <th>{t(`assetType`)}</th>
-          <th>{t(`balance`)}</th>
+          <th>
+            <div className={styles.balance}>
+              <Tooltip
+                title={isShowUsd ? t('switch-to-amount', { ns: 'list' }) : t('switch-to-price', { ns: 'list' })}
+                placement="top"
+              >
+                <div onClick={handleBalanceDisplayChange}>
+                  {isShowUsd ? t(`USD`, { ns: 'list' }) : t(`balance`)}
+                  <span style={{ color: isShowUsd ? 'var(--primary-color)' : '#ccc' }}>
+                    <UsdIcon />
+                  </span>
+                </div>
+              </Tooltip>
+            </div>
+          </th>
         </tr>
       </thead>
       <tbody className={styles.tableBody}>
@@ -74,8 +102,28 @@ const AssetList = ({ list = [] }: { list: UdtList }) => {
                 <td className={styles.type}>
                   {t(item.udt.type === GraphQLSchema.UdtType.Native ? 'native' : 'bridged')}
                 </td>
-                <td>
-                  <Amount amount={item.value} udt={item.udt} />
+                <td width={'40%'}>
+                  {isShowUsd ? (
+                    <Tooltip
+                      title={t('price-updated-at', {
+                        time: dayjs(item.udt.token_exchange_rate?.timestamp).format('YYYY-MM-DD HH:mm:ss'),
+                        ns: 'list',
+                      })}
+                      placement="top"
+                      disableHoverListener={!item.udt.token_exchange_rate?.exchange_rate}
+                    >
+                      <span>
+                        {item.udt.token_exchange_rate?.exchange_rate
+                          ? `$${new BigNumber(item.value ?? 0)
+                              .dividedBy(10 ** item.udt.decimal)
+                              .multipliedBy(item.udt.token_exchange_rate?.exchange_rate)
+                              .toFixed(2)}` || '-'
+                          : '-'}
+                      </span>
+                    </Tooltip>
+                  ) : (
+                    <Amount amount={item.value} udt={item.udt} />
+                  )}
                 </td>
               </tr>
             )
