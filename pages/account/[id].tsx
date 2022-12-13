@@ -133,14 +133,36 @@ const Account = () => {
     },
   )
 
-  const { isLoading: isTransferListLoading, data: transferList } = useQuery(
-    ['account-transfer-list', q.address, before, after, pageSize],
+  const {
+    isLoading: isTransferListLoading,
+    data: transferList,
+    error: isTransferListError,
+  } = useQuery(
+    [
+      'account-transfer-list',
+      q.address,
+      before,
+      after,
+      pageSize,
+      block_from,
+      block_to,
+      address_from,
+      address_to,
+      age_range_start,
+      age_range_end,
+    ],
     () =>
       fetchTransferList({
-        address: q.address,
         limit: pageSize,
         before: before as string,
         after: after as string,
+        block_from: block_from ? +block_from : null,
+        block_to: block_to ? +block_to : null,
+        address_from: (address_from as string) || (address_to === q.address ? null : q.address),
+        address_to: (address_to as string) || (address_from === q.address ? null : q.address),
+        age_range_start: age_range_start as string,
+        age_range_end: age_range_end as string,
+        combine_from_to: !address_from && !address_to ? true : false,
       }),
     { enabled: tab === 'erc20' && !!q.address },
   )
@@ -290,8 +312,13 @@ const Account = () => {
             )
           ) : null}
           {tab === 'erc20' ? (
-            !isTransferListLoading && transferList ? (
-              <ERC20TransferList token_transfers={transferList} viewer={id as string} />
+            !isTransferListLoading && (transferList || isTransferListError) ? (
+              <ERC20TransferList
+                token_transfers={
+                  transferList || { entries: [], metadata: { total_count: 0, before: null, after: null } }
+                }
+                viewer={id as string}
+              />
             ) : (
               <Skeleton animation="wave" />
             )

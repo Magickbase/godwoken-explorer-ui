@@ -5,6 +5,7 @@ export interface InfoItermProps {
   content: React.ReactNode
   expandable?: boolean
   tooltipTitle?: string
+  ddClassName?: string
 }
 
 const InfoList: React.FC<{
@@ -26,7 +27,7 @@ const InfoList: React.FC<{
         ) : null}
         {list
           .filter(v => v)
-          .map(({ field, content, expandable, tooltipTitle }, idx) => {
+          .map(({ field, content, expandable, tooltipTitle, ddClassName }, idx) => {
             return (
               <dl
                 key={field}
@@ -40,7 +41,7 @@ const InfoList: React.FC<{
               >
                 <dt className={styles.term}>{field}</dt>
                 <dd
-                  className={`${styles.desc} ${tooltipTitle ? 'tooltip' : ''}`}
+                  className={`${styles.desc} ${ddClassName} ${tooltipTitle ? 'tooltip' : ''}`}
                   data-tooltip={tooltipTitle}
                   data-show-tooltip={!!tooltipTitle}
                   data-expandable={expandable}
