@@ -67,10 +67,17 @@ const AssetList = ({ list = [] }: { list: UdtList }) => {
           <th>{t(`assetType`)}</th>
           <th>
             <div className={styles.balance}>
-              {isShowUsd ? t(`USD`, { ns: 'list' }) : t(`balance`)}
-              <span style={{ color: isShowUsd ? 'var(--primary-color)' : '#ccc' }}>
-                <UsdIcon onClick={handleBalanceDisplayChange} />
-              </span>
+              <Tooltip
+                title={isShowUsd ? t('switch-to-amount', { ns: 'list' }) : t('switch-to-price', { ns: 'list' })}
+                placement="top"
+              >
+                <div onClick={handleBalanceDisplayChange}>
+                  {isShowUsd ? t(`USD`, { ns: 'list' }) : t(`balance`)}
+                  <span style={{ color: isShowUsd ? 'var(--primary-color)' : '#ccc' }}>
+                    <UsdIcon />
+                  </span>
+                </div>
+              </Tooltip>
             </div>
           </th>
         </tr>
@@ -95,7 +102,7 @@ const AssetList = ({ list = [] }: { list: UdtList }) => {
                 <td className={styles.type}>
                   {t(item.udt.type === GraphQLSchema.UdtType.Native ? 'native' : 'bridged')}
                 </td>
-                <td>
+                <td width={'40%'}>
                   {isShowUsd ? (
                     <Tooltip
                       title={t('price-updated-at', {
@@ -103,14 +110,14 @@ const AssetList = ({ list = [] }: { list: UdtList }) => {
                         ns: 'list',
                       })}
                       placement="top"
-                      hidden={!item.udt.token_exchange_rate?.exchange_rate}
+                      disableHoverListener={!item.udt.token_exchange_rate?.exchange_rate}
                     >
                       <span>
                         {item.udt.token_exchange_rate?.exchange_rate
                           ? `$${new BigNumber(item.value ?? 0)
                               .dividedBy(10 ** item.udt.decimal)
                               .multipliedBy(item.udt.token_exchange_rate?.exchange_rate)
-                              .toFixed(2)}`
+                              .toFixed(2)}` || '-'
                           : '-'}
                       </span>
                     </Tooltip>

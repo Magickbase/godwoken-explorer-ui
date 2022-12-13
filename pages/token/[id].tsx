@@ -242,7 +242,7 @@ const Token: React.FC<Props> = () => {
       ? {
           field: t('price', { ns: 'list' }),
           content: token ? (
-            <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div className={styles.price}>
               <span>
                 {token.token_exchange_rate?.exchange_rate ? `$${token.token_exchange_rate?.exchange_rate}` : '-'}
               </span>
@@ -252,6 +252,7 @@ const Token: React.FC<Props> = () => {
                   ns: 'list',
                 })}
                 placement="top"
+                enterTouchDelay={0}
               >
                 <div className={styles.priceIcon}>
                   <TipsIcon />

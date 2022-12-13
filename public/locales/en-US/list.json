@@ -88,5 +88,7 @@
   "waiting_for_block": "Waiting for block",
   "USD": "USD",
   "price": "Price",
-  "price-updated-at": "Price updated at {{time}}"
+  "price-updated-at": "Price updated at {{time}}",
+  "switch-to-price": "Switch to price",
+  "switch-to-amount": "Switch to amount"
 }

@@ -41,11 +41,18 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  span {
-    height: 17px;
-    svg {
-      margin-left: 0.25rem;
-      cursor: pointer;
+  div {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    cursor: pointer;
+    span {
+      display: block;
+      height: 17px;
+      svg {
+        margin-left: 0.25rem;
+        cursor: pointer;
+      }
     }
   }
 }

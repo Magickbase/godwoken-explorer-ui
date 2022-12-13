@@ -131,11 +131,21 @@
   }
 }
 
+.price {
+  display: flex;
+  align-items: center;
+  span {
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
 .priceIcon {
   display: inline-flex;
   align-items: center;
-  margin-left: 4px;
-  width: 20px;
+  margin: 0 4px;
+  width: 16px;
   &:hover svg {
     color: var(--primary-color);
   }

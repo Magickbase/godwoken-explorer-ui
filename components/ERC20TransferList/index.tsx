@@ -268,10 +268,14 @@ const TransferList: React.FC<
             ) : null}
             <th>
               <div className={styles.value}>
-                {isShowUsd ? t(`USD`) : t('value')}
-                <span style={{ color: isShowUsd ? 'var(--primary-color)' : '#ccc' }}>
-                  <UsdIcon onClick={handleValueDisplayChange} />
-                </span>
+                <Tooltip title={isShowUsd ? t('switch-to-amount') : t('switch-to-price')} placement="top">
+                  <div onClick={handleValueDisplayChange}>
+                    {isShowUsd ? t(`USD`) : t('value')}
+                    <span style={{ color: isShowUsd ? 'var(--primary-color)' : '#ccc' }}>
+                      <UsdIcon />
+                    </span>
+                  </div>
+                </Tooltip>
               </div>
             </th>
           </tr>
@@ -331,7 +335,7 @@ const TransferList: React.FC<
                       </NextLink>
                     </td>
                   ) : null}
-                  <td>
+                  <td width={'13%'}>
                     {isShowUsd ? (
                       <Tooltip
                         title={t('price-updated-at', {
@@ -339,14 +343,14 @@ const TransferList: React.FC<
                           ns: 'list',
                         })}
                         placement="top"
-                        hidden={!item.udt.token_exchange_rate?.exchange_rate}
+                        disableHoverListener={!item.udt.token_exchange_rate?.exchange_rate}
                       >
                         <span>
                           {item.udt.token_exchange_rate?.exchange_rate
                             ? `$${new BigNumber(item.amount ?? 0)
                                 .dividedBy(10 ** item.udt.decimal)
                                 .multipliedBy(item.udt.token_exchange_rate?.exchange_rate)
-                                .toFixed(2)}`
+                                .toFixed(2)}` || '-'
                             : '-'}
                         </span>
                       </Tooltip>

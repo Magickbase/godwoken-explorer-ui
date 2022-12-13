@@ -87,5 +87,7 @@
   "waiting_for_block": "等待出块中",
   "USD": "美元",
   "price": "价格",
-  "price-updated-at": "价格更新于 {{time}}"
+  "price-updated-at": "价格更新于 {{time}}",
+  "switch-to-price": "切换到价格",
+  "switch-to-amount": "切换到数量"
 }
