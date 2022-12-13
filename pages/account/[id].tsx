@@ -127,7 +127,7 @@ const Account = () => {
         age_range_end: age_range_end as string | null,
         method_id: method_id as string | null,
         method_name: method_name as string | null,
-        combine_from_to: !address_from && !address_to ? true : false,
+        combine_from_to: address_from || address_to ? false : true,
       }),
     {
       enabled: tab === 'transactions' && !!id,
