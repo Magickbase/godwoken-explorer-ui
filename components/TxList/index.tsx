@@ -52,6 +52,7 @@ const txListQuery = gql`
     $age_range_end: DateTime
     $method_id: String
     $method_name: String
+    $combine_from_to: Boolean
   ) {
     transactions(
       input: {
@@ -62,7 +63,7 @@ const txListQuery = gql`
         limit: $limit
         start_block_number: $start_block_number
         end_block_number: $end_block_number
-        combine_from_to: true
+        combine_from_to: $combine_from_to
         status: $status
         from_eth_address: $address_from
         to_eth_address: $address_to
@@ -122,6 +123,7 @@ interface Filter {
   age_range_end: string
   method_id: string
   method_name: string
+  combine_from_to: boolean
 }
 interface EthAccountTxListVariables extends Nullable<Filter> {
   address?: string | null
@@ -160,19 +162,6 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
   const { query } = useRouter()
   const isFiltered = Object.keys(query).some(key => FILTER_KEYS.includes(key))
   const isFilterUnnecessary = !metadata.total_count && !isFiltered
-  const [filteredEntries, setFilteredEntries] = useState(entries)
-
-  useEffect(() => {
-    if (viewer) {
-      setFilteredEntries(
-        entries.filter(item => [item.from_account.eth_address, item.to_account.eth_address].includes(viewer)),
-      )
-    }
-    if (blockNumber) {
-      setFilteredEntries(entries.filter(item => item.block.number === blockNumber))
-    }
-    setFilteredEntries(entries)
-  }, [viewer, blockNumber, entries])
 
   return (
     <div className={styles.container} data-is-filter-unnecessary={isFilterUnnecessary}>
@@ -216,7 +205,7 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
         </thead>
         <tbody>
           {metadata.total_count ? (
-            filteredEntries.map(item => {
+            entries.map(item => {
               const hash = item.eth_hash || item.hash
               const from = item.from_account?.eth_address || item.from_account?.script_hash || '-'
               let to = item.to_account?.eth_address || item.to_account?.script_hash || '-'
