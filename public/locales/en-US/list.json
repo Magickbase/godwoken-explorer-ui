@@ -41,6 +41,8 @@
   "logs": "Logs",
   "eventsFilterPlaceholder": "Filter by BlockNo Or Topic0",
   "filterEventBy": "Apply filter by {{filter}}",
+  "method_id": "Method ID",
+  "method_name": "Method Name",
   "block_from": "from",
   "block_to": "to",
   "address_from": "from",
@@ -53,6 +55,8 @@
   "invalid_date": "Invalid Date",
   "filter_menu": {
     "name": "Name",
+    "method_id": "Method ID",
+    "method_name": "Method Name",
     "block_from": "Block Number",
     "block_to": "Block Number",
     "address_from": "Search by address",
