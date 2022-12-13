@@ -85,5 +85,10 @@
   "please-connect-mm": "Please connect to MetaMask first",
   "switch_network_success": "Switch network success",
   "waiting_for_confirm": "Waiting for confirmation",
-  "waiting_for_block": "Waiting for block"
+  "waiting_for_block": "Waiting for block",
+  "USD": "USD",
+  "price": "Price",
+  "price-updated-at": "Price updated at {{time}}",
+  "switch-to-price": "Switch to price",
+  "switch-to-amount": "Switch to amount"
 }

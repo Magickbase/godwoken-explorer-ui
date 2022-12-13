@@ -84,5 +84,10 @@
   "please-connect-mm": "请先连接到 MetaMask",
   "switch_network_success": "切换网络成功",
   "waiting_for_confirm": "等待确认中",
-  "waiting_for_block": "等待出块中"
+  "waiting_for_block": "等待出块中",
+  "USD": "美元",
+  "price": "价格",
+  "price-updated-at": "价格更新于 {{time}}",
+  "switch-to-price": "切换到价格",
+  "switch-to-amount": "切换到数量"
 }
