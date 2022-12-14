@@ -37,7 +37,7 @@
     "graphql-request": "5.0.0",
     "material-ui-popup-state": "4.1.0",
     "next": "12.3.4",
-    "next-i18next": "13.0.0",
+    "next-i18next": "13.0.1",
     "next-pwa": "5.5.4",
     "phoenix": "1.6.15",
     "qrcode": "1.5.1",
