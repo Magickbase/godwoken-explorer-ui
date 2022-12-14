@@ -1,7 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
+import { useRouter } from 'next/router'
 import { gql } from 'graphql-request'
+import dayjs from 'dayjs'
+import BigNumber from 'bignumber.js'
 import Table from 'components/Table'
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/SimplePagination'
@@ -9,11 +12,14 @@ import TxStatusIcon from 'components/TxStatusIcon'
 import TransferDirection from 'components/TransferDirection'
 import RoundedAmount from 'components/RoundedAmount'
 import TokenLogo from 'components/TokenLogo'
+import Tooltip from 'components/Tooltip'
+import FilterMenu from 'components/FilterMenu'
+import AgeFilterMenu from 'components/FilterMenu/AgeFilterMenu'
 import ChangeIcon from 'assets/icons/change.svg'
 import NoDataIcon from 'assets/icons/no-data.svg'
+import UsdIcon from 'assets/icons/usd.svg'
 import { client, timeDistance, GraphQLSchema } from 'utils'
 import styles from './styles.module.scss'
-import Tooltip from 'components/Tooltip'
 
 export type TransferListProps = {
   token_transfers: {
@@ -27,31 +33,58 @@ export type TransferListProps = {
       log_index: number
       polyjuice: Pick<GraphQLSchema.Polyjuice, 'status'>
       transaction_hash: string
-      udt: Pick<GraphQLSchema.Udt, 'id' | 'decimal' | 'symbol' | 'icon' | 'name'>
+      udt: Pick<GraphQLSchema.Udt, 'id' | 'decimal' | 'symbol' | 'icon' | 'name' | 'token_exchange_rate'>
     }>
     metadata: GraphQLSchema.PageMetadata
   }
 }
 
-interface Cursor {
+interface FilterAndCursor {
   limit?: number
   before: string
   after: string
+  block_from?: number | null
+  block_to?: number | null
+  address_from: string
+  address_to: string
+  age_range_start: string
+  age_range_end: string
+  combine_from_to: boolean
 }
 
-interface AccountTransferListVariables extends Nullable<Cursor> {
-  address: string
-}
+interface AccountTransferListVariables extends Nullable<FilterAndCursor> {}
 
-export interface TokenTransferListVariables extends Nullable<Cursor> {
+export interface TokenTransferListVariables extends Nullable<FilterAndCursor> {
   contract_address: string
 }
 type Variables = AccountTransferListVariables | TokenTransferListVariables
 
 const transferListQuery = gql`
-  query ($address: HashAddress, $before: String, $after: String, $limit: Int) {
+  query transferListQuery(
+    $before: String
+    $after: String
+    $limit: Int
+    $block_from: Int
+    $block_to: Int
+    $address_from: HashAddress
+    $address_to: HashAddress
+    $age_range_start: DateTime
+    $age_range_end: DateTime
+    $combine_from_to: Boolean
+  ) {
     token_transfers(
-      input: { from_address: $address, to_address: $address, before: $before, after: $after, limit: $limit }
+      input: {
+        before: $before
+        after: $after
+        limit: $limit
+        start_block_number: $block_from
+        end_block_number: $block_to
+        from_address: $address_from
+        to_address: $address_to
+        age_range_start: $age_range_start
+        age_range_end: $age_range_end
+        combine_from_to: $combine_from_to
+      }
     ) {
       entries {
         amount
@@ -79,6 +112,11 @@ const transferListQuery = gql`
           symbol
           icon
           name
+          token_exchange_rate {
+            exchange_rate
+            symbol
+            timestamp
+          }
         }
       }
 
@@ -93,8 +131,34 @@ const transferListQuery = gql`
 
 // FIXME: a patch because API returns 500 if from, to, contract_address are specified simultaneously
 const tokenTransferListQuery = gql`
-  query ($address: HashAddress, $before: String, $after: String, $limit: Int) {
-    token_transfers(input: { token_contract_address_hash: $address, before: $before, after: $after, limit: $limit }) {
+  query tokenTransferListQuery(
+    $contract_address: HashAddress
+    $before: String
+    $after: String
+    $limit: Int
+    $block_from: Int
+    $block_to: Int
+    $address_from: HashAddress
+    $address_to: HashAddress
+    $age_range_start: DateTime
+    $age_range_end: DateTime
+    $combine_from_to: Boolean
+  ) {
+    token_transfers(
+      input: {
+        token_contract_address_hash: $contract_address
+        before: $before
+        after: $after
+        limit: $limit
+        start_block_number: $block_from
+        end_block_number: $block_to
+        from_address: $address_from
+        to_address: $address_to
+        age_range_start: $age_range_start
+        age_range_end: $age_range_end
+        combine_from_to: $combine_from_to
+      }
+    ) {
       entries {
         amount
         transaction_hash
@@ -121,6 +185,11 @@ const tokenTransferListQuery = gql`
           symbol
           icon
           name
+          token_exchange_rate {
+            exchange_rate
+            symbol
+            timestamp
+          }
         }
       }
 
@@ -139,37 +208,76 @@ export const fetchTransferList = (variables: Variables) =>
 export const fetchTokenTransferList = (variables: Variables) =>
   client.request<TransferListProps>(tokenTransferListQuery, variables).then(data => data.token_transfers)
 
+const FILTER_KEYS = ['block_from', 'block_to', 'address_from', 'address_to', 'age_range_start', 'age_range_end']
+
 const TransferList: React.FC<
   TransferListProps & {
     viewer?: string
     showToken?: boolean
   }
 > = ({ token_transfers, viewer, showToken = true }) => {
-  const [isShowLogo, setIsShowLogo] = useState(true)
   const [t, { language }] = useTranslation('list')
+  const [isShowLogo, setIsShowLogo] = useState(true)
+  const [isShowUsd, setIsShowUsd] = useState(false)
+  const { query } = useRouter()
 
+  const isFiltered = Object.keys(query).some(key => FILTER_KEYS.includes(key))
+  const isFilterUnnecessary = !token_transfers.metadata.total_count && !isFiltered
+
+  const handleValueDisplayChange = () => setIsShowUsd(show => !show)
   const handleTokenDisplayChange = () => setIsShowLogo(show => !show)
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} data-is-filter-unnecessary={isFilterUnnecessary}>
       <Table>
         <thead>
           <tr>
             <th>{t('txHash')}</th>
-            <th>{t('block')} </th>
-            <th>{t('age')} </th>
-            <th>{t('from')}</th>
-            <th>{t('to')}</th>
+            <th>
+              <div className={styles.blockHeader}>
+                {t('block')}
+                <FilterMenu filterKeys={[FILTER_KEYS[0], FILTER_KEYS[1]]} />
+              </div>
+            </th>
+            <th>
+              <div className={styles.ageHeader}>
+                {t('age')}
+                <AgeFilterMenu filterKeys={[FILTER_KEYS[4], FILTER_KEYS[5]]} />
+              </div>
+            </th>
+            <th>
+              <div className={styles.fromHeader}>
+                {t('from')}
+                <FilterMenu filterKeys={[FILTER_KEYS[2]]} />
+              </div>
+            </th>
+            <th>
+              <div className={styles.toHeader}>
+                {t('to')}
+                <FilterMenu filterKeys={[FILTER_KEYS[3]]} />
+              </div>
+            </th>
             <th className={styles.direction}></th>
             {showToken ? (
               <th>
-                <div className={styles.token}>
+                <div className={styles.tokenHeader}>
                   {t('token')}
                   <ChangeIcon onClick={handleTokenDisplayChange} />
                 </div>
               </th>
             ) : null}
-            <th>{`${t('value')}`}</th>
+            <th>
+              <div className={styles.value}>
+                <Tooltip title={isShowUsd ? t('switch-to-amount') : t('switch-to-price')} placement="top">
+                  <div onClick={handleValueDisplayChange}>
+                    {isShowUsd ? t(`USD`) : t('value')}
+                    <span style={{ color: isShowUsd ? 'var(--primary-color)' : '#ccc' }}>
+                      <UsdIcon />
+                    </span>
+                  </div>
+                </Tooltip>
+              </div>
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -227,8 +335,28 @@ const TransferList: React.FC<
                       </NextLink>
                     </td>
                   ) : null}
-                  <td>
-                    <RoundedAmount amount={item.amount} udt={item.udt} />
+                  <td width={'13%'}>
+                    {isShowUsd ? (
+                      <Tooltip
+                        title={t('price-updated-at', {
+                          time: dayjs(item.udt.token_exchange_rate?.timestamp).format('YYYY-MM-DD HH:mm:ss'),
+                          ns: 'list',
+                        })}
+                        placement="top"
+                        disableHoverListener={!item.udt.token_exchange_rate?.exchange_rate}
+                      >
+                        <span>
+                          {item.udt.token_exchange_rate?.exchange_rate
+                            ? `$${new BigNumber(item.amount ?? 0)
+                                .dividedBy(10 ** item.udt.decimal)
+                                .multipliedBy(item.udt.token_exchange_rate?.exchange_rate)
+                                .toFixed(2)}` || '-'
+                            : '-'}
+                        </span>
+                      </Tooltip>
+                    ) : (
+                      <RoundedAmount amount={item.amount} udt={item.udt} />
+                    )}
                   </td>
                 </tr>
               )
