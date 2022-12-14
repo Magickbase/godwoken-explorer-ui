@@ -8,6 +8,7 @@ import { gql } from 'graphql-request'
 import dayjs from 'dayjs'
 import { Skeleton } from '@mui/material'
 import { ConnectorAlreadyConnectedError, useConnect, UserRejectedRequestError } from 'wagmi'
+import BigNumber from 'bignumber.js'
 import SubpageHead from 'components/SubpageHead'
 import PageTitle from 'components/PageTitle'
 import Tabs from 'components/Tabs'
@@ -244,7 +245,9 @@ const Token: React.FC<Props> = () => {
           content: token ? (
             <div className={styles.price}>
               <span>
-                {token.token_exchange_rate?.exchange_rate ? `$${token.token_exchange_rate?.exchange_rate}` : '-'}
+                {token.token_exchange_rate?.exchange_rate
+                  ? `$${new BigNumber(token.token_exchange_rate?.exchange_rate).precision(4)}`
+                  : '-'}
               </span>
               <Tooltip
                 title={t('price-updated-at', {
