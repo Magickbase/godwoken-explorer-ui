@@ -23,7 +23,6 @@
     border-radius: 5px;
     overflow-wrap: break-word;
     background-color: var(--tooltip-background-color);
-    opacity: 0.8;
     color: var(--tooltip-font-color);
     user-select: text;
     white-space: normal;
@@ -39,15 +38,14 @@
   &::after {
     content: '';
     user-select: text;
-    top: 6px;
+    top: 8px;
     width: 0;
     height: 0;
-    border-width: 7px;
+    border-width: 10px;
     border-style: solid;
     border-color: transparent;
     display: none;
     border-top-color: var(--tooltip-border-color);
-    opacity: 0.8;
   }
 
   &:hover::after,
