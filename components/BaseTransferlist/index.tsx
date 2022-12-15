@@ -10,8 +10,8 @@ import TokenLogo from 'components/TokenLogo'
 import FilterMenu from 'components/FilterMenu'
 import RoundedAmount from 'components/RoundedAmount'
 import Tooltip from 'components/Tooltip'
-import SortIcon from 'assets/icons/sort.svg'
 import { GraphQLSchema, ZERO_ADDRESS } from 'utils'
+import SortIcon from 'assets/icons/sort.svg'
 import ChangeIcon from 'assets/icons/change.svg'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import EmptyFilteredListIcon from 'assets/icons/empty-filtered-list.svg'
@@ -19,26 +19,34 @@ import styles from './styles.module.scss'
 
 type udtType = Nullable<Pick<GraphQLSchema.Udt, 'decimal' | 'name' | 'symbol' | 'id' | 'icon'>>
 
+export type TransferListItem = {
+  amount: string
+  from_address: string
+  to_address: string
+  log_index: number
+  transaction_hash: string
+  udt: udtType
+  block?: Nullable<Pick<GraphQLSchema.Block, 'number' | 'timestamp'>>
+  token_contract_address_hash?: string
+  token_id?: number
+}
+
 export type TransferListProps = {
-  entries: Array<{
-    amount: string
-    from_address: string
-    to_address: string
-    log_index: number
-    transaction_hash: string
-    udt: udtType
-    block?: Nullable<Pick<GraphQLSchema.Block, 'number' | 'timestamp'>>
-    token_contract_address_hash?: string
-    token_id?: number
-  }>
+  entries: Array<TransferListItem>
   handleTokenName?: (udt: udtType, ...rest: any) => string
   metadata: GraphQLSchema.PageMetadata
   isShowValue?: boolean
+  type: TransferlistType
+}
+export enum TransferlistType {
+  'Erc20' = 'Erc20',
+  'Erc721' = 'Erc721',
+  'Erc1155' = 'Erc1155',
 }
 
 const FILTER_KEYS = ['address_from', 'address_to']
 
-const TransferList: React.FC<TransferListProps> = ({ entries, metadata, isShowValue = false, handleTokenName }) => {
+const TransferList: React.FC<TransferListProps> = ({ entries, metadata, type, handleTokenName }) => {
   const [isShowLogo, setIsShowLogo] = useState(true)
   const [t] = useTranslation('list')
   const {
@@ -49,6 +57,19 @@ const TransferList: React.FC<TransferListProps> = ({ entries, metadata, isShowVa
 
   const isFiltered = Object.keys(query).some(key => FILTER_KEYS.includes(key))
   const isFilterUnnecessary = !metadata?.total_count && !isFiltered
+
+  const handleTokenLink = (item: TransferListItem, type: TransferlistType) => {
+    switch (type) {
+      case TransferlistType.Erc20:
+        return `/token/${item.udt.id}`
+      case TransferlistType.Erc721:
+        return `/nft-item/${item.token_contract_address_hash}/${item.token_id}`
+      case TransferlistType.Erc1155:
+        return `/multi-token-item/${item.token_contract_address_hash}/${item.token_id}`
+      default:
+        return ''
+    }
+  }
 
   const handleLogIndexSortClick = (e: React.MouseEvent<HTMLOrSVGImageElement>) => {
     const {
@@ -93,7 +114,7 @@ const TransferList: React.FC<TransferListProps> = ({ entries, metadata, isShowVa
                 <ChangeIcon onClick={handleTokenDisplayChange} />
               </div>
             </th>
-            {isShowValue && <th className={styles['ta-r']}>{`${t('value')}`}</th>}
+            {type === TransferlistType.Erc20 && <th className={styles['ta-r']}>{`${t('value')}`}</th>}
           </tr>
         </thead>
         <tbody>
@@ -131,11 +152,9 @@ const TransferList: React.FC<TransferListProps> = ({ entries, metadata, isShowVa
                 </td>
                 <td className={styles.tokenLogo}>
                   <NextLink
-                    href={
-                      isShowValue
-                        ? `/token/${item.udt.id}`
-                        : `/nft-item/${item.token_contract_address_hash}/${item.token_id}`
-                    }
+                    href={{
+                      pathname: handleTokenLink(item, type),
+                    }}
                   >
                     <a>
                       {isShowLogo ? (
@@ -146,7 +165,7 @@ const TransferList: React.FC<TransferListProps> = ({ entries, metadata, isShowVa
                     </a>
                   </NextLink>
                 </td>
-                {isShowValue && (
+                {type === TransferlistType.Erc20 && (
                   <td title={item.udt.name} className={styles['ta-r']}>
                     <RoundedAmount amount={item.amount} udt={item.udt} />
                   </td>

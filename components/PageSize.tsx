@@ -21,6 +21,8 @@ const PageSize = () => {
     if (s === pageSize) {
       return
     }
+    delete query.after
+    delete query.before
     push(`${url}?${new URLSearchParams({ ...query, page_size: s.toString() })}`)
   }
 

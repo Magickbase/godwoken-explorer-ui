@@ -83,6 +83,17 @@
       display: none;
     }
   }
+  @media screen and (min-width: 1024px) {
+    .info-width {
+      width: calc(50% - 32px);
+    }
+  }
+
+  .contract {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    color: var(--primary-color);
+  }
 }
 
 .list {
@@ -99,6 +110,15 @@
   align-items: center;
   justify-content: space-between;
   padding-right: 1rem;
+  :global {
+    & .tooltip:hover::before {
+      min-width: 180px;
+    }
+    & .tooltip {
+      display: inline-flex;
+      align-items: center;
+    }
+  }
 }
 
 .metamask {
@@ -108,5 +128,25 @@
   @media screen and (max-width: 1024px) {
     width: 1.25rem;
     height: 1.25rem;
+  }
+}
+
+.price {
+  display: flex;
+  align-items: center;
+  span {
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.priceIcon {
+  display: inline-flex;
+  align-items: center;
+  margin: 0 4px;
+  width: 16px;
+  &:hover svg {
+    color: var(--primary-color);
   }
 }

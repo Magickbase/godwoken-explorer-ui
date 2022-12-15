@@ -3,7 +3,7 @@ import styles from './styles.module.scss'
 export const CustomTooltip: React.FC<any> = ({ active, payload, label, theme }) => {
   if (active && payload && payload.length) {
     return (
-      <div className={styles.tooltipContent}>
+      <div className={styles.tooltipContent} data-cy="chart-tooltip">
         <div>{`${label}`}</div>
         <ul>
           {payload.map(({ name, value }, idx) => (
@@ -29,6 +29,7 @@ export const CustomYLabel: React.FC<any> = ({ value, theme, isMobile, align = 'l
       fontSize={isMobile ? 12 : 14}
       textAnchor="middle"
       style={{ transform: 'rotate(-90deg)' }}
+      data-cy="chart-y-label"
     >
       {value}
     </text>

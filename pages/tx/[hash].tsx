@@ -11,8 +11,8 @@ import BigNumber from 'bignumber.js'
 import Tabs from 'components/Tabs'
 import SubpageHead from 'components/SubpageHead'
 import PageTitle from 'components/PageTitle'
-import InfoList from 'components/InfoList'
-import CommonERCTransferlist, { fetchERCTransferList, TransferlistType } from 'components/CommonERCTransferlist'
+import InfoList, { InfoItermProps } from 'components/InfoList'
+import CommonERCTransferlist, { fetchERCTransferList } from 'components/CommonERCTransferlist'
 import TxLogsList from 'components/TxLogsList'
 import RawTxData from 'components/RawTxData'
 import CopyBtn from 'components/CopyBtn'
@@ -23,6 +23,7 @@ import Amount from 'components/Amount'
 import { SIZES } from 'components/PageSize'
 import Tooltip from 'components/Tooltip'
 import PolyjuiceStatus from 'components/PolyjuiceStatus'
+import { TransferlistType } from 'components/BaseTransferlist'
 import ExpandIcon from 'assets/icons/expand.svg'
 import {
   formatDatetime,
@@ -265,7 +266,7 @@ const Tx = () => {
   const toAddrDisplay = getAddressDisplay(tx?.to_account, tx?.polyjuice?.native_transfer_address_hash)
   const method = tx?.method_name ?? tx?.method_id
 
-  const overview = [
+  const overview: InfoItermProps[] = [
     {
       field: t('hash'),
       content: (
@@ -483,7 +484,7 @@ const Tx = () => {
   return (
     <>
       <SubpageHead subtitle={`${title} ${hash}`} />
-      <div className={styles.container}>
+      <div className={styles.container} data-page-name="transaction-detail">
         <PageTitle>
           <div className={styles.title}>
             {title}

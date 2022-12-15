@@ -5,8 +5,10 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useRouter } from 'next/router'
 import { useQuery } from 'react-query'
 import { gql } from 'graphql-request'
+import dayjs from 'dayjs'
 import { Skeleton } from '@mui/material'
 import { ConnectorAlreadyConnectedError, useConnect, UserRejectedRequestError } from 'wagmi'
+import BigNumber from 'bignumber.js'
 import SubpageHead from 'components/SubpageHead'
 import PageTitle from 'components/PageTitle'
 import Tabs from 'components/Tabs'
@@ -18,12 +20,13 @@ import HashLink from 'components/HashLink'
 import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
 import Amount from 'components/Amount'
 import Alert from 'components/Alert'
-import { fetchToken, fetchBridgedRecordList, fetchTokenHolderList, client, currentChain, withWagmi } from 'utils'
-import styles from './styles.module.scss'
-
-import type { API } from 'utils/api/utils'
 import { SIZES } from 'components/PageSize'
 import TokenLogo from 'components/TokenLogo'
+import Tooltip from 'components/Tooltip'
+import { fetchToken, fetchBridgedRecordList, fetchTokenHolderList, client, currentChain, withWagmi } from 'utils'
+import type { API } from 'utils/api/utils'
+import TipsIcon from 'assets/icons/tips.svg'
+import styles from './styles.module.scss'
 
 const tabs = ['transfers', 'bridged', 'holders']
 
@@ -51,6 +54,11 @@ interface TokenInfoProps {
     holders_count: number
     minted_count: number
     contract_address_hash: string
+    token_exchange_rate: {
+      exchange_rate: number | null
+      symbol: string
+      timestamp: number | null
+    }
   }
 }
 
@@ -71,6 +79,11 @@ const tokenInfoQuery = gql`
       holders_count
       minted_count
       contract_address_hash
+      token_exchange_rate {
+        exchange_rate
+        symbol
+        timestamp
+      }
     }
   }
 `
@@ -90,7 +103,20 @@ const Token: React.FC<Props> = () => {
   const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string }>(null)
   const {
     replace,
-    query: { id, tab = 'transfers', page = '1', before = null, after = null, page_size = SIZES[1] },
+    query: {
+      id,
+      tab = 'transfers',
+      page = '1',
+      before = null,
+      after = null,
+      block_from = null,
+      block_to = null,
+      page_size = SIZES[1],
+      address_from = null,
+      address_to = null,
+      age_range_start = null,
+      age_range_end = null,
+    },
   } = useRouter()
 
   const { data: stats } = useQuery(['token-basic-info', id], () => fetchToken(id.toString()))
@@ -114,13 +140,32 @@ const Token: React.FC<Props> = () => {
   }, [isTokenLoading, token, replace])
 
   const { isLoading: isTransferListLoading, data: transferList } = useQuery(
-    ['token-transfer-list', token?.contract_address_hash, page_size, before, after],
+    [
+      'token-transfer-list',
+      token?.contract_address_hash,
+      page_size,
+      before,
+      after,
+      block_from,
+      block_to,
+      address_from,
+      address_to,
+      age_range_start,
+      age_range_end,
+    ],
     () =>
       fetchTokenTransferList({
-        address: token?.contract_address_hash,
+        contract_address: token?.contract_address_hash,
         limit: +page_size,
         before: before as string,
         after: after as string,
+        block_from: block_from ? +block_from : null,
+        block_to: block_to ? +block_to : null,
+        address_from: address_from as string,
+        address_to: address_to as string,
+        age_range_start: age_range_start as string,
+        age_range_end: age_range_end as string,
+        combine_from_to: address_from && address_to ? false : true,
       }),
     { enabled: tab === tabs[0] && !!token?.contract_address_hash },
   )
@@ -156,7 +201,9 @@ const Token: React.FC<Props> = () => {
       content: !token ? (
         <Skeleton animation="wave" />
       ) : token.contract_address_hash ? (
-        <HashLink label={token.contract_address_hash} href={`/account/${token.contract_address_hash}`} />
+        <div className={styles.contract}>
+          <HashLink label={token.contract_address_hash} href={`/account/${token.contract_address_hash}`} />
+        </div>
       ) : (
         '-'
       ),
@@ -192,6 +239,34 @@ const Token: React.FC<Props> = () => {
         '-'
       ),
     },
+    token?.token_exchange_rate
+      ? {
+          field: t('price', { ns: 'list' }),
+          content: token ? (
+            <div className={styles.price}>
+              <span>
+                {token.token_exchange_rate?.exchange_rate
+                  ? `$${new BigNumber(token.token_exchange_rate?.exchange_rate).precision(4)}`
+                  : '-'}
+              </span>
+              <Tooltip
+                title={t('price-updated-at', {
+                  time: dayjs(token.token_exchange_rate?.timestamp).format('YYYY-MM-DD HH:mm:ss'),
+                  ns: 'list',
+                })}
+                placement="top"
+                enterTouchDelay={0}
+              >
+                <div className={styles.priceIcon}>
+                  <TipsIcon />
+                </div>
+              </Tooltip>
+            </div>
+          ) : (
+            <Skeleton animation="wave" />
+          ),
+        }
+      : null,
     {
       field: t('holderCount'),
       content: token ? token.holders_count || '-' : <Skeleton animation="wave" />,
@@ -202,7 +277,7 @@ const Token: React.FC<Props> = () => {
     },
     {
       field: '',
-      content: <div data-role="placeholder" style={{ height: `5rem` }}></div>,
+      content: <div data-role="placeholder" style={{ height: token?.token_exchange_rate ? `1.5rem` : `5rem` }}></div>,
     },
   ]
 
@@ -267,16 +342,18 @@ const Token: React.FC<Props> = () => {
         </PageTitle>
         <div className={styles.overview}>
           <InfoList
+            className={styles['info-width']}
             title={
               <div className={styles.infoTitle}>
                 {t(`tokenInfo`)}
                 {token?.eth_type === 'ERC20' ? (
                   <div className="tooltip" data-tooltip={t('import-token-into-metamask')}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src="/logos/metamask.png"
                       alt="MetaMask"
                       className={styles.metamask}
-                      title={t('import-into-metamask')}
+                      title={t('import-token-into-metamask')}
                       onClick={handleImportIntoMetamask}
                     />
                   </div>
@@ -298,7 +375,7 @@ const Token: React.FC<Props> = () => {
           />
           {tab === tabs[0] ? (
             !isTransferListLoading && transferList ? (
-              <ERC20TransferList token_transfers={transferList} showToken={false} />
+              <ERC20TransferList token_transfers={transferList} showToken={false} viewer={id as string} />
             ) : (
               <Skeleton animation="wave" />
             )

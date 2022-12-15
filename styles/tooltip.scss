@@ -8,8 +8,8 @@
 
 .tooltip {
   @include relative-inline-block;
-  --tooltip-border-color: #333;
-  --tooltip-background-color: #333;
+  --tooltip-border-color: #000;
+  --tooltip-background-color: #000;
   --tooltip-font-color: #fff;
 
   display: inline-block;
@@ -19,7 +19,7 @@
     min-width: 100px;
     max-width: 246px;
     padding: 8px;
-    top: -8px;
+    top: -16.5px;
     border-radius: 5px;
     overflow-wrap: break-word;
     background-color: var(--tooltip-background-color);
@@ -38,10 +38,10 @@
   &::after {
     content: '';
     user-select: text;
-    top: 8px;
+    top: 0;
     width: 0;
     height: 0;
-    border-width: 10px;
+    border-width: 9px;
     border-style: solid;
     border-color: transparent;
     display: none;

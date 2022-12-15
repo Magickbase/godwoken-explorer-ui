@@ -55,13 +55,13 @@
     }
     dl[role='listitem'] {
       dt {
-        flex-basis: 133px !important;
+        flex-basis: 138px !important;
       }
     }
     &[data-account-type='META_CONTRACT'] {
       dl[role='listitem'] {
         dt {
-          flex-basis: 133px !important;
+          flex-basis: 138px !important;
         }
       }
     }
@@ -72,5 +72,11 @@
         margin-left: -133px;
       }
     }
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  .info-width {
+    width: calc(50% - 32px);
   }
 }

@@ -75,6 +75,11 @@ export namespace GraphQLSchema {
     eth_type: TokenType
     type_script: object
     value: string
+    token_exchange_rate: {
+      exchange_rate: number | null
+      symbol: string | null
+      timestamp: number | null
+    }
   }
 
   export interface SmartContract {

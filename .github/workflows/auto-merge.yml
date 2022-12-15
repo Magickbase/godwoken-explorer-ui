@@ -31,7 +31,7 @@ jobs:
           source_branch: 'develop'
           destination_branch: 'v1/master'
           pr_title: 'Merge develop into v1 mainnet'
-          pr_reviewer: 'keith-cy'
+          pr_reviewer: 'keith-cy,FrederLu'
           pr_label: 'auto-pr'
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -46,7 +46,7 @@ jobs:
           source_branch: 'develop'
           destination_branch: 'v1/testnet'
           pr_title: 'Merge develop into v1 testnet'
-          pr_reviewer: 'keith-cy'
+          pr_reviewer: 'keith-cy,FrederLu'
           pr_label: 'auto-pr'
           github_token: ${{ secrets.GITHUB_TOKEN }}
 

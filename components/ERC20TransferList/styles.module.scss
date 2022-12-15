@@ -19,14 +19,41 @@
   .noRecords {
     @include empty-list;
   }
+  &[data-is-filter-unnecessary='true'] {
+    th {
+      svg {
+        display: none;
+      }
+    }
+  }
 }
 
-.token {
+.tokenHeader {
   display: flex;
   align-items: center;
   svg {
     margin-left: 0.25rem;
     cursor: pointer;
+  }
+}
+
+.value {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  div {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    cursor: pointer;
+    span {
+      display: block;
+      height: 17px;
+      svg {
+        margin-left: 0.25rem;
+        cursor: pointer;
+      }
+    }
   }
 }
 
@@ -41,6 +68,18 @@
   padding-left: 0 !important;
   padding-right: 0 !important;
 }
+
 .amount {
   margin-right: 0.25rem;
+}
+
+.ageHeader,
+.blockHeader,
+.fromHeader,
+.toHeader {
+  display: flex;
+  align-items: center;
+  svg {
+    margin-left: 0.25rem;
+  }
 }
