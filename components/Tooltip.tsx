@@ -11,7 +11,7 @@ export default styled(({ className, ...props }: TooltipProps) => (
     padding: theme.spacing(2),
     borderRadius: theme.spacing(1),
     backgroundColor: '#000000',
-    opacity: '0.8 !important',
+    opacity: '1 !important',
     fontSize: 14,
   },
 }))

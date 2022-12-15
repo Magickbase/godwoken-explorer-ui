@@ -45,15 +45,20 @@
   "block_to": "to",
   "address_from": "from",
   "address_to": "to",
+  "age_range_start": "from",
+  "age_range_end": "to",
   "filter": "filter",
   "clear": "clear",
   "n_contracts_in_total": "{{number}} Kinds in Total",
+  "invalid_date": "Invalid Date",
   "filter_menu": {
     "name": "Name",
     "block_from": "Block Number",
     "block_to": "Block Number",
     "address_from": "Search by address",
     "address_to": "Search by address",
+    "age_range_start": "Start Date",
+    "age_range_end": "End Date",
     "asset": "Asset",
     "token_type": "Token Type"
   },
@@ -80,5 +85,10 @@
   "please-connect-mm": "Please connect to MetaMask first",
   "switch_network_success": "Switch network success",
   "waiting_for_confirm": "Waiting for confirmation",
-  "waiting_for_block": "Waiting for block"
+  "waiting_for_block": "Waiting for block",
+  "USD": "USD",
+  "price": "Price",
+  "price-updated-at": "Price updated at {{time}}",
+  "switch-to-price": "Switch to price",
+  "switch-to-amount": "Switch to amount"
 }
