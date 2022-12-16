@@ -52,13 +52,12 @@ context('Transactions List Pages Common Features', () => {
           expect(loc.search).to.match(/after=/)
         })
       })
-      it('should navigate back to prev page on click prev arrow', () => {
+      it.skip('should navigate back to prev page on click prev arrow', () => {
         cy.get('@prevBtn')
           .should(link => {
             expect(link).to.has.css('cursor', 'pointer')
           })
           .click()
-        waitForLoading()
         cy.location().should(loc => {
           expect(loc.pathname).to.eq('/txs')
           expect(loc.search).to.match(/before=/)
