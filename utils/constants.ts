@@ -8,6 +8,7 @@ export const API_ENDPOINT = `https://${process.env.NEXT_PUBLIC_SERVER_ENDPOINT}/
 export const WS_ENDPOINT = `wss://${process.env.NEXT_PUBLIC_SERVER_ENDPOINT}/socket`
 export const GRAPHQL_ENDPOINT = `https://${process.env.NEXT_PUBLIC_SERVER_ENDPOINT}/graphql`
 export const NODE_URL = process.env.NEXT_PUBLIC_NODE_URL
+export const DOMAIN_LOGO_BASE_URL = 'https://identicons.did.id/identicon/'
 
 export const EXPLORER_TITLE = process.env.NEXT_PUBLIC_EXPLORER_TITLE
 export const IS_MAINNET = process.env.NEXT_PUBLIC_CHAIN_TYPE === 'mainnet'

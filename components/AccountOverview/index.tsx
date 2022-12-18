@@ -89,6 +89,7 @@ const accountOverviewQuery = gql`
     account(input: { script_hash: $script_hash, address: $address }) {
       type
       eth_address
+      bit_alias
       script_hash
       script
       transaction_count
@@ -338,10 +339,13 @@ const AccountOverview: React.FC<AccountOverviewProps & { refetch: () => Promise<
 
   const getInfoBlock = account => {
     const { type } = account
+    const domain = account?.bit_alias
 
     const blockMap = {
       [`${GraphQLSchema.AccountType.MetaContract}`]: <MetaContract {...(account.script as MetaContract['script'])} />,
-      [`${GraphQLSchema.AccountType.EthUser}`]: <User nonce={account.nonce} isLoading={isOverviewLoading} />,
+      [`${GraphQLSchema.AccountType.EthUser}`]: (
+        <User nonce={account.nonce} isLoading={isOverviewLoading} domain={domain} />
+      ),
       [`${GraphQLSchema.AccountType.EthAddrReg}`]: <EthAddrReg />,
       [`${GraphQLSchema.AccountType.PolyjuiceContract}`]: (
         <SmartContract
@@ -355,7 +359,11 @@ const AccountOverview: React.FC<AccountOverviewProps & { refetch: () => Promise<
         />
       ),
       [`${GraphQLSchema.AccountType.PolyjuiceCreator}`]: (
-        <Polyjuice script={account.script as PolyjuiceCreator['script']} scriptHash={account.script_hash} />
+        <Polyjuice
+          script={account.script as PolyjuiceCreator['script']}
+          scriptHash={account.script_hash}
+          domain={domain}
+        />
       ),
       [`${GraphQLSchema.AccountType.Udt}`]: account.udt ? (
         <SUDT udt={account.udt} script={account.script} script_hash={account.script_hash} />
