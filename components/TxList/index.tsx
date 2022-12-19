@@ -25,8 +25,8 @@ export type TxListProps = {
       method_name: string | null
       type: GraphQLSchema.TransactionType
       block?: Pick<GraphQLSchema.Block, 'hash' | 'number' | 'status' | 'timestamp'>
-      from_account: Pick<GraphQLSchema.Account, 'eth_address' | 'script_hash' | 'type'>
-      to_account: Pick<GraphQLSchema.Account, 'eth_address' | 'script_hash' | 'type'>
+      from_account: Pick<GraphQLSchema.Account, 'eth_address' | 'script_hash' | 'type' | 'bit_alias'>
+      to_account: Pick<GraphQLSchema.Account, 'eth_address' | 'script_hash' | 'type' | 'bit_alias'>
       polyjuice: Pick<GraphQLSchema.Polyjuice, 'value' | 'status' | 'native_transfer_address_hash'>
     }>
     metadata: GraphQLSchema.PageMetadata
@@ -75,11 +75,13 @@ const txListQuery = gql`
           type
           eth_address
           script_hash
+          bit_alias
         }
         to_account {
           type
           eth_address
           script_hash
+          bit_alias
         }
         polyjuice {
           value
@@ -158,8 +160,10 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
             entries.map(item => {
               const hash = item.eth_hash || item.hash
               const from = item.from_account?.eth_address || item.from_account?.script_hash || '-'
+              const from_alias = item.from_account?.bit_alias
               let to = item.to_account?.eth_address || item.to_account?.script_hash || '-'
               let toType = item.to_account?.type
+              let to_alias = item.to_account?.bit_alias
 
               if (item.polyjuice?.native_transfer_address_hash) {
                 to = item.polyjuice.native_transfer_address_hash
@@ -212,10 +216,15 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
                     )}
                   </td>
                   <td>
-                    <Address address={from} type={item.from_account?.type} />
+                    <Address
+                      address={from}
+                      type={item.from_account?.type}
+                      domain={from_alias}
+                      showDomain={!!from_alias}
+                    />
                   </td>
                   <td>
-                    <Address address={to} type={toType} />
+                    <Address address={to} type={toType} domain={to_alias} showDomain={!!to_alias} />
                   </td>
                   <td className={styles.direction}>
                     <TransferDirection from={from} to={to} viewer={viewer ?? ''} />

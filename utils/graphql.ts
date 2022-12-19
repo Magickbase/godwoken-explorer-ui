@@ -117,6 +117,7 @@ export namespace GraphQLSchema {
     token_transfer_count: number
     transaction_count: number
     type: AccountType
+    bit_alias: string
   }
 
   export interface AccountCkb {

@@ -7,9 +7,9 @@ type Props = {
   domain: string
 }
 
-const TitleWithDomain = ({ domain }: Props) => {
+const TitleWithDomain = ({ domain = '' }: Props) => {
   const [t] = useTranslation('account')
-  const logoUrl = DOMAIN_LOGO_BASE_URL + 'dear.bit'
+  const logoUrl = DOMAIN_LOGO_BASE_URL + domain
 
   return (
     <div className={styles.title}>
