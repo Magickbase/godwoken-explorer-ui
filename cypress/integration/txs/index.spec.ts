@@ -52,6 +52,7 @@ context('Transactions List Pages Common Features', () => {
           expect(loc.search).to.match(/after=/)
         })
       })
+      // TODO: fix this case
       // it('should navigate back to prev page on click prev arrow', () => {
       //   cy.get('@prevBtn')
       //     .should(link => {
