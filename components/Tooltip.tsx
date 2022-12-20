@@ -7,7 +7,7 @@ export default styled(({ className, ...props }: TooltipProps) => (
     arrow
     classes={{ popper: className, tooltip: className }}
     enterTouchDelay={0}
-    leaveTouchDelay={3000}
+    leaveTouchDelay={1000}
     {...props}
   />
 ))(({ theme }) => ({
