@@ -18,7 +18,7 @@ const AddressWithDomain = ({ domain, hash, href = '', leading = 8 }: Props) => {
         <img src={`${IMG_URL}bit-logo.svg`} loading="lazy" crossOrigin="anonymous" referrerPolicy="no-referrer" />
       </Tooltip>
       <Tooltip title={hash} placement="top">
-        <div style={{ paddingRight: 4 }}>
+        <div>
           <HashLink
             label={domain?.length > leading * 2 ? `${domain?.slice(0, leading)}...${domain?.slice(-leading)}` : domain}
             href={href}

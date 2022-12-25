@@ -538,6 +538,8 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
                           sx={{ textTransform: 'capitalize' }}
                           color="secondary"
                           noWrap
+                          minWidth={'34px'}
+                          textAlign={{ xs: 'right', sm: 'left' }}
                         >
                           {`${t('from')}`}
                         </Typography>
@@ -552,7 +554,7 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
                               disableRipple
                               fontSize={{ xs: 13, md: 14 }}
                               minWidth={{ xs: 98, sm: 'auto' }}
-                              justifyContent={{ xs: 'flex-start', sm: 'center' }}
+                              justifyContent={{ xs: 'flex-end', sm: 'center' }}
                               sx={{
                                 'p': 0,
                                 'pl': 1,
@@ -581,8 +583,9 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
                           sx={{ textTransform: 'capitalize' }}
                           color="secondary"
                           noWrap
-                          width={{ xs: '100%', sm: 'auto' }}
-                          textAlign={{ xs: 'left', sm: 'left' }}
+                          // width={{ xs: '100%', sm: 'auto' }}
+                          textAlign={{ xs: 'right', sm: 'left' }}
+                          minWidth={'34px'}
                         >
                           {`${t('to')}`}
                         </Typography>
@@ -597,7 +600,7 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
                               disableRipple
                               fontSize={{ xs: 13, md: 14 }}
                               minWidth={{ xs: 98, sm: 'auto' }}
-                              justifyContent={{ xs: 'flex-start', sm: 'center' }}
+                              justifyContent={{ xs: 'flex-end', sm: 'center' }}
                               sx={{
                                 'p': 0,
                                 'pl': 1,
@@ -608,7 +611,7 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
                               }}
                             >
                               {to_bit_alias ? (
-                                <Address address={to} domain={to_bit_alias} leading={isBigScreen ? 8 : 4} />
+                                <Address address={to} domain={to_bit_alias} leading={isBigScreen ? 7 : 3} />
                               ) : (
                                 formatAddress(isSpecialTo ? toType.replace(/_/g, ' ') : to, isBigScreen, isSpecialTo)
                               )}
