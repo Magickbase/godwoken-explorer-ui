@@ -10,7 +10,7 @@
 
   text-transform: initial;
   .logo-domain {
-    width: 134px;
+    max-width: 134px;
     height: 24px;
     background-color: #fafafa;
     border: 1px solid #f0f0f0;
@@ -19,11 +19,13 @@
     font-weight: 400;
     display: flex;
     align-items: center;
+    margin-right: 4px;
   }
   .domian {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    padding-right: 4px;
   }
   & img {
     width: 16px;

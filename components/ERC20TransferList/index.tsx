@@ -322,7 +322,6 @@ const TransferList: React.FC<
                       address={item.from_address}
                       type={item.from_account?.type}
                       domain={item.from_account?.bit_alias}
-                      showDomain={!!item.from_account?.bit_alias}
                     />
                   </td>
                   <td>
@@ -330,7 +329,6 @@ const TransferList: React.FC<
                       address={item.to_address}
                       type={item.to_account?.type}
                       domain={item.to_account?.bit_alias}
-                      showDomain={!!item.to_account?.bit_alias}
                     />
                   </td>
                   <td className={styles.direction}>

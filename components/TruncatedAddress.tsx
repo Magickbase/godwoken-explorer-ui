@@ -11,8 +11,7 @@ const TruncatedAddress = ({
   sx = {},
   type,
   monoFont = true,
-  showDomain = false,
-  domain = '',
+  domain,
 }: {
   address: string
   leading?: number
@@ -20,7 +19,6 @@ const TruncatedAddress = ({
   sx?: SxProps
   type?: GraphQLSchema.AccountType
   monoFont?: boolean
-  showDomain?: boolean
   domain?: string
 }) => {
   if (address === ZERO_ADDRESS) {
@@ -54,9 +52,9 @@ const TruncatedAddress = ({
 
   return (
     <>
-      {showDomain ? (
+      {domain ? (
         <Box sx={sx}>
-          <AddressWithDomain domain={domain} hash={address} href={`/account/${address}`} />
+          <AddressWithDomain domain={domain} hash={address} href={`/account/${address}`} leading={leading} />
         </Box>
       ) : (
         <Tooltip title={address} placement="top" sx={sx}>

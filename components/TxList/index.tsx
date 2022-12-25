@@ -216,15 +216,10 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
                     )}
                   </td>
                   <td>
-                    <Address
-                      address={from}
-                      type={item.from_account?.type}
-                      domain={from_alias}
-                      showDomain={!!from_alias}
-                    />
+                    <Address address={from} type={item.from_account?.type} domain={from_alias} />
                   </td>
                   <td>
-                    <Address address={to} type={toType} domain={to_alias} showDomain={!!to_alias} />
+                    <Address address={to} type={toType} domain={to_alias} />
                   </td>
                   <td className={styles.direction}>
                     <TransferDirection from={from} to={to} viewer={viewer ?? ''} />

@@ -1,19 +1,10 @@
 import type { PolyjuiceCreator as PolyjuiceCreatorProps } from './AccountOverview'
 import { useTranslation } from 'next-i18next'
 import ScriptCode from 'components/ScriptCode'
-import TitleWithDomain from 'components/TitleWithDomain'
 import Tooltip from './Tooltip'
 import InfoList, { InfoItermProps } from './InfoList'
 
-const Polyjuice = ({
-  script,
-  scriptHash,
-  domain,
-}: {
-  script: PolyjuiceCreatorProps['script']
-  scriptHash: string
-  domain: string
-}) => {
+const Polyjuice = ({ script, scriptHash }: { script: PolyjuiceCreatorProps['script']; scriptHash: string }) => {
   const [t] = useTranslation('account')
   const list: Array<InfoItermProps> = [
     {
@@ -36,7 +27,7 @@ const Polyjuice = ({
       expandable: true,
     },
   ]
-  return <InfoList title={domain ? <TitleWithDomain domain={domain} /> : t('basicInfo')} list={list} />
+  return <InfoList title={t('basicInfo')} list={list} />
 }
 
 export default Polyjuice

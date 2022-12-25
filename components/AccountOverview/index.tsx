@@ -339,7 +339,7 @@ const AccountOverview: React.FC<AccountOverviewProps & { refetch: () => Promise<
 
   const getInfoBlock = account => {
     const { type } = account
-    const domain = account?.bit_alias
+    const domain = account.bit_alias
 
     const blockMap = {
       [`${GraphQLSchema.AccountType.MetaContract}`]: <MetaContract {...(account.script as MetaContract['script'])} />,
@@ -359,11 +359,7 @@ const AccountOverview: React.FC<AccountOverviewProps & { refetch: () => Promise<
         />
       ),
       [`${GraphQLSchema.AccountType.PolyjuiceCreator}`]: (
-        <Polyjuice
-          script={account.script as PolyjuiceCreator['script']}
-          scriptHash={account.script_hash}
-          domain={domain}
-        />
+        <Polyjuice script={account.script as PolyjuiceCreator['script']} scriptHash={account.script_hash} />
       ),
       [`${GraphQLSchema.AccountType.Udt}`]: account.udt ? (
         <SUDT udt={account.udt} script={account.script} script_hash={account.script_hash} />

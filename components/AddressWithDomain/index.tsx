@@ -8,9 +8,10 @@ type Props = {
   domain: string
   hash: string
   href: string
+  leading?: number
 }
 
-const AddressWithDomain = ({ domain, hash, href = '' }: Props) => {
+const AddressWithDomain = ({ domain, hash, href = '', leading = 8 }: Props) => {
   return (
     <div className={styles.container}>
       <Tooltip title={domain} placement="top">
@@ -18,7 +19,10 @@ const AddressWithDomain = ({ domain, hash, href = '' }: Props) => {
       </Tooltip>
       <Tooltip title={hash} placement="top">
         <div style={{ paddingRight: 4 }}>
-          <HashLink label={`${domain?.slice(0, 8)}...${domain?.slice(-8)}`} href={href} />
+          <HashLink
+            label={domain?.length > leading * 2 ? `${domain?.slice(0, leading)}...${domain?.slice(-leading)}` : domain}
+            href={href}
+          />
         </div>
       </Tooltip>
     </div>
