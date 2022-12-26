@@ -565,7 +565,7 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
                               }}
                             >
                               {from_bit_alias ? (
-                                <Address address={from} domain={from_bit_alias} leading={isBigScreen ? 8 : 4} />
+                                <Address address={from} domain={from_bit_alias} leading={isBigScreen ? 7 : 3} />
                               ) : (
                                 formatAddress(
                                   isSpecialFrom ? tx.from_account.type.replace(/_/g, ' ') : from,
@@ -583,7 +583,6 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
                           sx={{ textTransform: 'capitalize' }}
                           color="secondary"
                           noWrap
-                          // width={{ xs: '100%', sm: 'auto' }}
                           textAlign={{ xs: 'right', sm: 'left' }}
                           minWidth={'34px'}
                         >
