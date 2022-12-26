@@ -1,7 +1,37 @@
 import { addressToScript } from '@nervosnetwork/ckb-sdk-utils'
+import { gql } from 'graphql-request'
+import { client } from 'utils/graphql'
 import { isError, ErrorResponse, API_ENDPOINT, HttpStatus } from './utils'
 
-export const fetchSearch = (search: string) => {
+const searchKeywordQuery = gql`
+  query searchKeyword($input: String!) {
+    search_keyword(input: { keyword: "%MSHKUUPS%" }) {
+      type
+      id
+    }
+  }
+`
+
+interface Variables {
+  input: {
+    keyword: string
+  }
+}
+
+type SearchKeywordProps = {
+  search_keyword: {
+    type: string | null
+    id: string | null
+  }
+}
+
+const fetchSearchResult = (variables: Variables): Promise<SearchKeywordProps['search_keyword']> =>
+  client
+    .request<SearchKeywordProps>(searchKeywordQuery, variables)
+    .then(data => data.search_keyword)
+    .catch(() => ({ type: null, id: null }))
+
+export const fetchSearchKeyword = (search: string) => {
   let query = search
   if (query.startsWith('ck')) {
     try {
@@ -11,28 +41,23 @@ export const fetchSearch = (search: string) => {
       console.warn(err)
     }
   }
-
-  return fetch(`${API_ENDPOINT}/search?keyword=${query}`)
+  return fetchSearchResult({ input: { keyword: query } })
     .then(async res => {
-      if (res.status === HttpStatus.NotFound) {
+      if (!res || !res.id) {
         return `/404`
       }
-      const found: Record<'id' | 'type', string> | ErrorResponse = await res.json()
-      if (isError(found)) {
-        return `/404`
-      }
-      switch (found.type) {
+      switch (res.type) {
         case 'block': {
-          return `/block/${found.id}`
+          return `/block/${res.id}`
         }
         case 'transaction': {
-          return `/tx/${found.id}`
+          return `/tx/${res.id}`
         }
         case 'account': {
-          return `/account/${found.id}`
+          return `/account/${res.id}`
         }
         case 'udt': {
-          return `/token/${found.id}`
+          return `/token/${res.id}`
         }
         default: {
           return `/404`

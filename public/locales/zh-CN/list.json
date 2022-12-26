@@ -89,5 +89,6 @@
   "price": "价格",
   "price-updated-at": "价格更新于 {{time}}",
   "switch-to-price": "切换到价格",
-  "switch-to-amount": "切换到数量"
+  "switch-to-amount": "切换到数量",
+  "search_result_title": "代币名 \"{{name}}\" 搜索结果"
 }
