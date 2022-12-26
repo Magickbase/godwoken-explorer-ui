@@ -456,7 +456,7 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
         let toType = tx.to_account?.type
 
         const from_bit_alias = tx.from_account?.bit_alias
-        const to_bit_alias = tx.to_account?.bit_alias || 'uahsdhojdgcgg.bit'
+        const to_bit_alias = tx.to_account?.bit_alias
 
         if (tx.polyjuice?.native_transfer_address_hash) {
           to = tx.polyjuice.native_transfer_address_hash
@@ -554,7 +554,7 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
                               disableRipple
                               fontSize={{ xs: 13, md: 14 }}
                               minWidth={{ xs: 98, sm: 'auto' }}
-                              justifyContent={{ xs: 'flex-end', sm: 'center' }}
+                              justifyContent={{ xs: 'flex-start', sm: 'center' }}
                               sx={{
                                 'p': 0,
                                 'pl': 1,
@@ -600,7 +600,7 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
                               disableRipple
                               fontSize={{ xs: 13, md: 14 }}
                               minWidth={{ xs: 98, sm: 'auto' }}
-                              justifyContent={{ xs: 'flex-end', sm: 'center' }}
+                              justifyContent={{ xs: 'flex-start', sm: 'center' }}
                               sx={{
                                 'p': 0,
                                 'pl': 1,

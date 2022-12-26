@@ -17,9 +17,9 @@ type ActivityListProps = {
       transaction: Pick<GraphQLSchema.Transaction, 'eth_hash' | 'method_id' | 'method_name'>
       block: Pick<GraphQLSchema.Block, 'number' | 'status' | 'timestamp'>
       from_address: string
-      from_account?: Pick<GraphQLSchema.Account, 'type'>
+      from_account?: Pick<GraphQLSchema.Account, 'type' | 'bit_alias'>
       to_address: string
-      to_account?: Pick<GraphQLSchema.Account, 'type'>
+      to_account?: Pick<GraphQLSchema.Account, 'type' | 'bit_alias'>
       log_index: number
       polyjuice: Pick<GraphQLSchema.Polyjuice, 'status'>
       token_id: number
@@ -60,10 +60,12 @@ const activityListQuery = gql`
         from_address
         from_account {
           type
+          bit_alias
         }
         to_address
         to_account {
           type
+          bit_alias
         }
         log_index
         block {

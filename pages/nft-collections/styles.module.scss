@@ -48,9 +48,6 @@
 }
 
 .addr {
-  a:last-child {
-    display: none;
-  }
   @media screen and (max-width: 1024px) {
     a:first-child {
       display: none;

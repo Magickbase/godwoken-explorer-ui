@@ -5,13 +5,14 @@ import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useQuery } from 'react-query'
 import { gql } from 'graphql-request'
-import { Skeleton, Tooltip } from '@mui/material'
+import { Skeleton } from '@mui/material'
 import SubpageHead from 'components/SubpageHead'
 import PageTitle from 'components/PageTitle'
 import Table from 'components/Table'
 import Pagination from 'components/SimplePagination'
 import TokenLogo from 'components/TokenLogo'
 import HashLink from 'components/HashLink'
+import Address from 'components/TruncatedAddress'
 import { SIZES } from 'components/PageSize'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import { client, GraphQLSchema } from 'utils'
@@ -35,6 +36,7 @@ const erc721ListQuery = gql`
         icon
         account {
           eth_address
+          bit_alias
         }
         holders_count
         minted_count
@@ -123,6 +125,8 @@ const NftCollectionList = () => {
             <tbody>
               {list?.metadata.total_count ? (
                 list.entries.map(item => {
+                  const domain = item?.account?.bit_alias
+
                   return (
                     <tr key={item.id}>
                       <td title={item.name}>
@@ -137,15 +141,11 @@ const NftCollectionList = () => {
                         </NextLink>
                       </td>
                       <td className={styles.addr} title={item.account.eth_address}>
-                        <HashLink label={item.account.eth_address} href={`/account/${item.account.eth_address}`} />
-                        <Tooltip title={item.account.eth_address} placement="top">
-                          <span>
-                            <HashLink
-                              label={`${item.account.eth_address.slice(0, 8)}...${item.account.eth_address.slice(-8)}`}
-                              href={`/account/${item.account.eth_address}`}
-                            />
-                          </span>
-                        </Tooltip>
+                        {domain ? (
+                          <Address address={item.account.eth_address} domain={domain} />
+                        ) : (
+                          <HashLink label={item.account.eth_address} href={`/account/${item.account.eth_address}`} />
+                        )}
                       </td>
                       <td title={(+item.holders_count).toLocaleString('en')}>
                         {(+item.holders_count).toLocaleString('en')}

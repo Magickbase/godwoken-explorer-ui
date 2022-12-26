@@ -12,6 +12,7 @@ import Table from 'components/Table'
 import Pagination from 'components/SimplePagination'
 import TokenLogo from 'components/TokenLogo'
 import HashLink from 'components/HashLink'
+import Address from 'components/TruncatedAddress'
 import { SIZES } from 'components/PageSize'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import { client, GraphQLSchema } from 'utils'
@@ -35,6 +36,7 @@ const erc1155ListQuery = gql`
         icon
         account {
           eth_address
+          bit_alias
         }
         holders_count
         minted_count
@@ -124,6 +126,8 @@ const MultiTokenCollectionList = () => {
             <tbody>
               {list?.metadata.total_count ? (
                 list.entries.map(item => {
+                  const domain = item?.account?.bit_alias
+
                   return (
                     <tr key={item.id}>
                       <td title={item.name}>
@@ -138,13 +142,11 @@ const MultiTokenCollectionList = () => {
                         </NextLink>
                       </td>
                       <td className={styles.addr} title={item.account.eth_address}>
-                        <HashLink label={item.account.eth_address} href={`/account/${item.account.eth_address}`} />
-                        <span className="tooltip" data-tooltip={item.account.eth_address}>
-                          <HashLink
-                            label={`${item.account.eth_address.slice(0, 8)}...${item.account.eth_address.slice(-8)}`}
-                            href={`/account/${item.account.eth_address}`}
-                          />
-                        </span>
+                        {domain ? (
+                          <Address address={item.account.eth_address} domain={domain} />
+                        ) : (
+                          <HashLink label={item.account.eth_address} href={`/account/${item.account.eth_address}`} />
+                        )}
                       </td>
                       <td title={item.token_type_count.toLocaleString('en')}>
                         {item.token_type_count.toLocaleString('en')}
