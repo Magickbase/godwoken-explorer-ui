@@ -143,9 +143,21 @@ const MultiTokenCollectionList = () => {
                       </td>
                       <td className={styles.addr} title={item.account.eth_address}>
                         {domain ? (
-                          <Address address={item.account.eth_address} domain={domain} />
+                          <div className={styles['address-with-domain']}>
+                            <Address address={item.account.eth_address} domain={domain} />
+                          </div>
                         ) : (
-                          <HashLink label={item.account.eth_address} href={`/account/${item.account.eth_address}`} />
+                          <>
+                            <HashLink label={item.account.eth_address} href={`/account/${item.account.eth_address}`} />
+                            <span className="tooltip" data-tooltip={item.account.eth_address}>
+                              <HashLink
+                                label={`${item.account.eth_address.slice(0, 8)}...${item.account.eth_address.slice(
+                                  -8,
+                                )}`}
+                                href={`/account/${item.account.eth_address}`}
+                              />
+                            </span>
+                          </>
                         )}
                       </td>
                       <td title={item.token_type_count.toLocaleString('en')}>

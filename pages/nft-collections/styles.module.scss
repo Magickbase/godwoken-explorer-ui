@@ -48,6 +48,14 @@
 }
 
 .addr {
+  a:last-child {
+    display: none;
+  }
+  .address-with-domain {
+    a:last-child {
+      display: inline !important;
+    }
+  }
   @media screen and (max-width: 1024px) {
     a:first-child {
       display: none;
