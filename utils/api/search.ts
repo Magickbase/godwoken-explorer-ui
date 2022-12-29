@@ -53,6 +53,9 @@ export const fetchSearchKeyword = (search: string) => {
         case 'ACCOUNT': {
           return `/account/${res.id}`
         }
+        case 'ADDRESS': {
+          return `/account/${res.id}`
+        }
         case 'UDT': {
           return `/token/${res.id}`
         }
