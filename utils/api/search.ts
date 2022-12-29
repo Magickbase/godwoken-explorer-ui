@@ -1,11 +1,10 @@
 import { addressToScript } from '@nervosnetwork/ckb-sdk-utils'
 import { gql } from 'graphql-request'
 import { client } from 'utils/graphql'
-import { isError, ErrorResponse, API_ENDPOINT, HttpStatus } from './utils'
 
 const searchKeywordQuery = gql`
-  query searchKeyword($input: String!) {
-    search_keyword(input: { keyword: "%MSHKUUPS%" }) {
+  query searchKeyword($text: String!) {
+    search_keyword(input: { keyword: $text }) {
       type
       id
     }
@@ -13,9 +12,7 @@ const searchKeywordQuery = gql`
 `
 
 interface Variables {
-  input: {
-    keyword: string
-  }
+  text: string
 }
 
 type SearchKeywordProps = {
@@ -41,22 +38,22 @@ export const fetchSearchKeyword = (search: string) => {
       console.warn(err)
     }
   }
-  return fetchSearchResult({ input: { keyword: query } })
+  return fetchSearchResult({ text: query })
     .then(async res => {
       if (!res || !res.id) {
         return `/404`
       }
       switch (res.type) {
-        case 'block': {
+        case 'BLOCK': {
           return `/block/${res.id}`
         }
-        case 'transaction': {
+        case 'TRANSACTION': {
           return `/tx/${res.id}`
         }
-        case 'account': {
+        case 'ACCOUNT': {
           return `/account/${res.id}`
         }
-        case 'udt': {
+        case 'UDT': {
           return `/token/${res.id}`
         }
         default: {
