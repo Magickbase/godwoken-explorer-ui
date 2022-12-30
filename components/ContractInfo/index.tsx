@@ -12,6 +12,7 @@ import {
   useConnect,
   useAccount,
   useSigner,
+  useProvider,
   useNetwork,
   useSwitchNetwork,
   useContract,
@@ -54,9 +55,8 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
   })
   const connector = connectors[0] // only have metamask
   const { address: addr } = useAccount()
-  const { data: signer } = useSigner({
-    chainId: targetChain.id,
-  })
+  const { data: signer } = useSigner()
+  const provider = useProvider()
   const { chain } = useNetwork()
   const { switchNetwork, switchNetworkAsync } = useSwitchNetwork({
     onSuccess: () => {
@@ -69,7 +69,7 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
   const contract = useContract({
     address: address,
     abi: abi,
-    signerOrProvider: signer,
+    signerOrProvider: tabIdx === 2 ? signer : provider,
   })
 
   useEffect(() => {
