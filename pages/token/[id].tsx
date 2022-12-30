@@ -5,8 +5,10 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useRouter } from 'next/router'
 import { useQuery } from 'react-query'
 import { gql } from 'graphql-request'
+import dayjs from 'dayjs'
 import { Skeleton } from '@mui/material'
 import { ConnectorAlreadyConnectedError, useConnect, UserRejectedRequestError } from 'wagmi'
+import BigNumber from 'bignumber.js'
 import SubpageHead from 'components/SubpageHead'
 import PageTitle from 'components/PageTitle'
 import Tabs from 'components/Tabs'
@@ -18,12 +20,13 @@ import HashLink from 'components/HashLink'
 import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
 import Amount from 'components/Amount'
 import Alert from 'components/Alert'
-import { fetchToken, fetchBridgedRecordList, fetchTokenHolderList, client, currentChain, withWagmi } from 'utils'
-import styles from './styles.module.scss'
-
-import type { API } from 'utils/api/utils'
 import { SIZES } from 'components/PageSize'
 import TokenLogo from 'components/TokenLogo'
+import Tooltip from 'components/Tooltip'
+import { fetchToken, fetchBridgedRecordList, fetchTokenHolderList, client, currentChain, withWagmi } from 'utils'
+import type { API } from 'utils/api/utils'
+import TipsIcon from 'assets/icons/tips.svg'
+import styles from './styles.module.scss'
 
 const tabs = ['transfers', 'bridged', 'holders']
 
@@ -51,6 +54,11 @@ interface TokenInfoProps {
     holders_count: number
     minted_count: number
     contract_address_hash: string
+    token_exchange_rate: {
+      exchange_rate: number | null
+      symbol: string
+      timestamp: number | null
+    }
   }
 }
 
@@ -71,6 +79,11 @@ const tokenInfoQuery = gql`
       holders_count
       minted_count
       contract_address_hash
+      token_exchange_rate {
+        exchange_rate
+        symbol
+        timestamp
+      }
     }
   }
 `
@@ -226,6 +239,34 @@ const Token: React.FC<Props> = () => {
         '-'
       ),
     },
+    token?.token_exchange_rate
+      ? {
+          field: t('price', { ns: 'list' }),
+          content: token ? (
+            <div className={styles.price}>
+              <span>
+                {token.token_exchange_rate?.exchange_rate
+                  ? `$${new BigNumber(token.token_exchange_rate?.exchange_rate).precision(4)}`
+                  : '-'}
+              </span>
+              <Tooltip
+                title={t('price-updated-at', {
+                  time: dayjs(token.token_exchange_rate?.timestamp).format('YYYY-MM-DD HH:mm:ss'),
+                  ns: 'list',
+                })}
+                placement="top"
+                enterTouchDelay={0}
+              >
+                <div className={styles.priceIcon}>
+                  <TipsIcon />
+                </div>
+              </Tooltip>
+            </div>
+          ) : (
+            <Skeleton animation="wave" />
+          ),
+        }
+      : null,
     {
       field: t('holderCount'),
       content: token ? token.holders_count || '-' : <Skeleton animation="wave" />,
@@ -236,7 +277,7 @@ const Token: React.FC<Props> = () => {
     },
     {
       field: '',
-      content: <div data-role="placeholder" style={{ height: `5rem` }}></div>,
+      content: <div data-role="placeholder" style={{ height: token?.token_exchange_rate ? `1.5rem` : `5rem` }}></div>,
     },
   ]
 

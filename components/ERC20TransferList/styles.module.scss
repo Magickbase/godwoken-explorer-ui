@@ -37,6 +37,26 @@
   }
 }
 
+.value {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  div {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    cursor: pointer;
+    span {
+      display: block;
+      height: 17px;
+      svg {
+        margin-left: 0.25rem;
+        cursor: pointer;
+      }
+    }
+  }
+}
+
 .tokenUrl {
   display: block;
   max-width: 60px;

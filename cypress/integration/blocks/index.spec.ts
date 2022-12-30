@@ -54,7 +54,7 @@ context('Blocks List Page', () => {
       cy.location('search').should('eq', '')
     })
     it('should navigate to page 2 on click number 2', () => {
-      cy.get('p+div > div > a').contains('2').click()
+      cy.get('a[href="/blocks?page=2"]').first().click()
       cy.location('pathname').should('eq', '/blocks')
       cy.location('search').should('eq', '?page=2')
     })

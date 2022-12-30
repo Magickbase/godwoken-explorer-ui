@@ -1,6 +1,6 @@
 import { utils, providers } from 'ethers'
 import { NODE_URL, PCKB_UDT_INFO, ZERO_ADDRESS, IS_MAINNET } from './constants'
-import { Chain, configureChains, createClient, defaultChains, WagmiConfig } from 'wagmi'
+import { Chain, configureChains, createClient, WagmiConfig } from 'wagmi'
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc'
 import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
 import { client, GraphQLSchema } from './graphql'
@@ -37,7 +37,9 @@ export const mainnet: Chain = {
     symbol: PCKB_UDT_INFO.symbol,
   },
   rpcUrls: {
-    default: 'https://v1.mainnet.godwoken.io/rpc',
+    default: {
+      http: ['https://v1.mainnet.godwoken.io/rpc'],
+    },
   },
   blockExplorers: {
     default: { name: 'Godwoken', url: 'https://v1.gwscan.com' },
@@ -55,7 +57,9 @@ export const testnet: Chain = {
     symbol: PCKB_UDT_INFO.symbol,
   },
   rpcUrls: {
-    default: 'https://godwoken-testnet-v1.ckbapp.dev',
+    default: {
+      http: ['https://godwoken-testnet-v1.ckbapp.dev'],
+    },
   },
   blockExplorers: {
     default: { name: 'Godwoken', url: 'https://v1.testnet.gwscan.com' },
@@ -67,11 +71,11 @@ export const currentChain = IS_MAINNET ? mainnet : testnet
 
 // wagmi config chains
 const { chains, provider: wagmiProvider } = configureChains(
-  [mainnet, testnet, ...defaultChains],
+  [mainnet, testnet],
   [
     jsonRpcProvider({
       rpc: chain => {
-        return { http: chain.rpcUrls.default }
+        return { http: chain.rpcUrls.default.http[0] }
       },
     }),
   ],

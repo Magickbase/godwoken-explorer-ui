@@ -3,6 +3,8 @@ import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
 import { gql } from 'graphql-request'
+import dayjs from 'dayjs'
+import BigNumber from 'bignumber.js'
 import Table from 'components/Table'
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/SimplePagination'
@@ -15,6 +17,7 @@ import FilterMenu from 'components/FilterMenu'
 import AgeFilterMenu from 'components/FilterMenu/AgeFilterMenu'
 import ChangeIcon from 'assets/icons/change.svg'
 import NoDataIcon from 'assets/icons/no-data.svg'
+import UsdIcon from 'assets/icons/usd.svg'
 import { client, timeDistance, GraphQLSchema } from 'utils'
 import styles from './styles.module.scss'
 
@@ -30,7 +33,7 @@ export type TransferListProps = {
       log_index: number
       polyjuice: Pick<GraphQLSchema.Polyjuice, 'status'>
       transaction_hash: string
-      udt: Pick<GraphQLSchema.Udt, 'id' | 'decimal' | 'symbol' | 'icon' | 'name'>
+      udt: Pick<GraphQLSchema.Udt, 'id' | 'decimal' | 'symbol' | 'icon' | 'name' | 'token_exchange_rate'>
     }>
     metadata: GraphQLSchema.PageMetadata
   }
@@ -109,6 +112,11 @@ const transferListQuery = gql`
           symbol
           icon
           name
+          token_exchange_rate {
+            exchange_rate
+            symbol
+            timestamp
+          }
         }
       }
 
@@ -177,6 +185,11 @@ const tokenTransferListQuery = gql`
           symbol
           icon
           name
+          token_exchange_rate {
+            exchange_rate
+            symbol
+            timestamp
+          }
         }
       }
 
@@ -203,13 +216,15 @@ const TransferList: React.FC<
     showToken?: boolean
   }
 > = ({ token_transfers, viewer, showToken = true }) => {
-  const [isShowLogo, setIsShowLogo] = useState(true)
   const [t, { language }] = useTranslation('list')
+  const [isShowLogo, setIsShowLogo] = useState(true)
+  const [isShowUsd, setIsShowUsd] = useState(false)
   const { query } = useRouter()
 
   const isFiltered = Object.keys(query).some(key => FILTER_KEYS.includes(key))
   const isFilterUnnecessary = !token_transfers.metadata.total_count && !isFiltered
 
+  const handleValueDisplayChange = () => setIsShowUsd(show => !show)
   const handleTokenDisplayChange = () => setIsShowLogo(show => !show)
 
   return (
@@ -251,7 +266,18 @@ const TransferList: React.FC<
                 </div>
               </th>
             ) : null}
-            <th>{`${t('value')}`}</th>
+            <th>
+              <div className={styles.value}>
+                <Tooltip title={isShowUsd ? t('switch-to-amount') : t('switch-to-price')} placement="top">
+                  <div onClick={handleValueDisplayChange}>
+                    {isShowUsd ? t(`USD`) : t('value')}
+                    <span style={{ color: isShowUsd ? 'var(--primary-color)' : '#ccc' }}>
+                      <UsdIcon />
+                    </span>
+                  </div>
+                </Tooltip>
+              </div>
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -309,8 +335,28 @@ const TransferList: React.FC<
                       </NextLink>
                     </td>
                   ) : null}
-                  <td>
-                    <RoundedAmount amount={item.amount} udt={item.udt} />
+                  <td width={'18%'}>
+                    {isShowUsd ? (
+                      <Tooltip
+                        title={t('price-updated-at', {
+                          time: dayjs(item.udt.token_exchange_rate?.timestamp).format('YYYY-MM-DD HH:mm:ss'),
+                          ns: 'list',
+                        })}
+                        placement="top"
+                        disableHoverListener={!item.udt.token_exchange_rate?.exchange_rate}
+                      >
+                        <span>
+                          {item.udt.token_exchange_rate?.exchange_rate
+                            ? `$${new BigNumber(item.amount ?? 0)
+                                .dividedBy(10 ** item.udt.decimal)
+                                .multipliedBy(item.udt.token_exchange_rate?.exchange_rate)
+                                .toFixed(2)}` || '-'
+                            : '-'}
+                        </span>
+                      </Tooltip>
+                    ) : (
+                      <RoundedAmount amount={item.amount} udt={item.udt} />
+                    )}
                   </td>
                 </tr>
               )
