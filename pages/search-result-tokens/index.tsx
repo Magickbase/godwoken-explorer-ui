@@ -93,7 +93,7 @@ const SearchUdtResultList = () => {
       fetchSearchUdtList({
         before: before as string,
         after: after as string,
-        name: search ? (search as string).trim() : null,
+        name: search ? `${search}%` : null,
         limit: Number.isNaN(+page_size) ? +SIZES[1] : +page_size,
         address: address as string,
       }),
