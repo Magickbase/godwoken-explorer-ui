@@ -112,8 +112,10 @@ const Account = () => {
       method_id,
       method_name,
     ],
-    () =>
-      fetchTxList({
+    () => {
+      let to_addr = (address_to as string) || (address_from === q.address ? null : q.address)
+      let from_addr = (address_from as string) || (address_to === q.address ? null : q.address)
+      return fetchTxList({
         ...q,
         before: before as string,
         after: after as string,
@@ -121,14 +123,17 @@ const Account = () => {
         end_block_number: block_to ? +block_to : null,
         limit: pageSize,
         status: null,
-        address_from: (address_from as string) || (address_to === q.address ? null : q.address),
-        address_to: (address_to as string) || (address_from === q.address ? null : q.address),
+        address_from: isEthAddress(from_addr) ? from_addr : null,
+        address_to: isEthAddress(to_addr) ? to_addr : null,
+        from_script_hash: !isEthAddress(from_addr) ? from_addr : null,
+        to_script_hash: !isEthAddress(to_addr) ? to_addr : null,
         age_range_start: age_range_start as string | null,
         age_range_end: age_range_end as string | null,
         method_id: method_id as string | null,
         method_name: method_name as string | null,
         combine_from_to: address_from || address_to ? false : true,
-      }),
+      })
+    },
     {
       enabled: tab === 'transactions' && !!id,
     },

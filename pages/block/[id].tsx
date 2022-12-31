@@ -17,7 +17,7 @@ import HashLink from 'components/HashLink'
 import CopyBtn from 'components/CopyBtn'
 import OpenInNewIcon from 'assets/icons/open-in-new.svg'
 import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
-import { fetchBlock, formatDatetime, CKB_EXPLORER_URL, formatInt, fetchBridgedRecordList } from 'utils'
+import { fetchBlock, formatDatetime, CKB_EXPLORER_URL, formatInt, fetchBridgedRecordList, isEthAddress } from 'utils'
 import styles from './styles.module.scss'
 
 const tabs = ['transactions', 'bridged', 'raw-data']
@@ -74,8 +74,10 @@ const Block = () => {
         end_block_number: block?.number,
         before: before as string | null,
         after: after as string | null,
-        address_from: address_from as string | null,
-        address_to: address_to as string | null,
+        address_from: isEthAddress(address_from as string) ? (address_from as string) : null,
+        address_to: isEthAddress(address_to as string) ? (address_to as string) : null,
+        from_script_hash: !isEthAddress(address_from as string) ? (address_from as string) : null,
+        to_script_hash: !isEthAddress(address_to as string) ? (address_to as string) : null,
         age_range_start: age_range_start as string | null,
         age_range_end: age_range_end as string | null,
         method_id: method_id as string | null,

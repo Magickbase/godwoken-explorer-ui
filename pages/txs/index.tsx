@@ -16,7 +16,7 @@ import FilterIcon from 'assets/icons/filter.svg'
 import PendingIcon from 'assets/icons/pending.svg'
 import IsPendingListIcon from 'assets/icons/is-pending-tx-list.svg'
 import { SIZES } from 'components/PageSize'
-import { PCKB_UDT_INFO } from 'utils'
+import { isEthAddress, PCKB_UDT_INFO } from 'utils'
 import styles from './styles.module.scss'
 
 const TxList = () => {
@@ -69,8 +69,10 @@ const TxList = () => {
         start_block_number: block_from ? +block_from : null,
         end_block_number: block_to ? +block_to : null,
         status: isPendingList ? 'PENDING' : 'ON_CHAINED',
-        address_from: address_from as string | null,
-        address_to: address_to as string | null,
+        address_from: isEthAddress(address_from as string) ? (address_from as string) : null,
+        address_to: isEthAddress(address_from as string) ? (address_to as string) : null,
+        from_script_hash: !isEthAddress(address_from as string) ? (address_from as string) : null,
+        to_script_hash: !isEthAddress(address_to as string) ? (address_to as string) : null,
         age_range_start: age_range_start as string | null,
         age_range_end: age_range_end as string | null,
         method_id: method_id as string | null,
@@ -228,7 +230,7 @@ const TxList = () => {
             </Stack>
           ) : null}
 
-          <TxListComp transactions={txList} maxCount={isMobile ? '100k' : '500k'} pageSize={+page_size} />
+          {txList && <TxListComp transactions={txList} maxCount={isMobile ? '100k' : '500k'} pageSize={+page_size} />}
         </Box>
       </Container>
     </>

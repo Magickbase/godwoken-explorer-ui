@@ -41,7 +41,8 @@ const txListQuery = gql`
   query txListQuery(
     $address_from: HashAddress
     $address_to: HashAddress
-    $script_hash: HashFull
+    $from_script_hash: HashFull
+    $to_script_hash: HashFull
     $before: String
     $after: String
     $limit: Int
@@ -56,8 +57,8 @@ const txListQuery = gql`
   ) {
     transactions(
       input: {
-        from_script_hash: $script_hash
-        to_script_hash: $script_hash
+        from_script_hash: $from_script_hash
+        to_script_hash: $to_script_hash
         before: $before
         after: $after
         limit: $limit
@@ -129,7 +130,8 @@ interface EthAccountTxListVariables extends Nullable<Filter> {
   address?: string | null
 }
 interface GwAccountTxListVariables extends Nullable<Filter> {
-  script_hash?: string | null
+  from_script_hash?: string | null
+  to_script_hash?: string | null
 }
 interface BlockTxListVariables extends Nullable<Filter> {}
 type Variables = Filter | EthAccountTxListVariables | GwAccountTxListVariables | BlockTxListVariables
