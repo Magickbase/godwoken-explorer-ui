@@ -1,12 +1,9 @@
 /// <reference types="cypress" />
 
 context('Pending Transactions List Page', () => {
-  before(() => cy.visit('/en-US/txs?status=pending'))
-
-  beforeEach(function () {
-    if (cy.contains("There're no matching entries")) {
-      this.skip()
-    }
+  before(() => {
+    cy.visit('/en-US/txs?status=pending')
+    cy.skipWhen(cy.contains("There're no matching entries") !== null)
   })
 
   it('should have a subtitle', () => {
