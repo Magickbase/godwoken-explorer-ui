@@ -129,10 +129,10 @@ const TransferList: React.FC<TransferListProps> = ({ entries, metadata, type, ha
         <tbody>
           {metadata?.total_count ? (
             entries?.map(item => {
-              const from_bit_alias = item.from_account.bit_alias
-              const from_address = item.from_account.eth_address
-              const to_bit_alias = item.to_account.bit_alias
-              const to_address = item.to_account.eth_address
+              const from_bit_alias = item.from_account?.bit_alias
+              const from_address = item.from_account?.eth_address
+              const to_bit_alias = item.to_account?.bit_alias
+              const to_address = item.to_account?.eth_address
 
               return (
                 <tr key={`${item.transaction_hash}-${item.log_index}`}>
