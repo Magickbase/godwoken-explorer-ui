@@ -43,7 +43,7 @@ const SmartContract: React.FC<{
   address: string
   isLoading: boolean
   refetch: () => Promise<void>
-}> = ({ deployer, deployTxHash, udt, isVerified, address, refetch, isLoading }) => {
+}> = ({ deployer = {}, deployTxHash, udt, isVerified, address, refetch, isLoading }) => {
   const [t] = useTranslation('account')
   const [isCheckAgain, setIsCheckAgain] = useState(false)
   const [isSourcifyCheckLoading, setIsSourcifyCheckLoading] = useState(false)

@@ -209,15 +209,13 @@ export const fetchDeployAddress = (variables: { eth_hash: string }) =>
       deployAddrQuery,
       variables,
     )
-    .then(data => {
-      console.log(data, 'datasss')
-      return (
+    .then(
+      data =>
         data.transaction.from_account ?? {
           eth_address: '',
           bit_alias: '',
-        }
-      )
-    })
+        },
+    )
 
 type SourcifyStatusResponse = {
   sourcify_check_by_addresses: [{ address: string; chain_ids: string[]; status: string }]
