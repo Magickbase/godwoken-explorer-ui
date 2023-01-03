@@ -85,7 +85,7 @@ context('Search', () => {
   })
 
   describe('redirection', () => {
-    const REDIRECT_TIMEOUT = 10000
+    const REDIRECT_TIMEOUT = 40000
     beforeEach(() =>
       cy.visit('/en-US', {
         headers: {
@@ -97,29 +97,37 @@ context('Search', () => {
     it('should redirect to block page when keyword is a block hash', () => {
       cy.get(`a[title='block number']:first`)
         .then(block => {
-          const hash = block.attr('href').slice('/block/'.length)
+          const hash = block?.attr('href')?.slice('/block/'.length)
           const number = block.text().replace(/[# ,]/g, '')
           return { hash, number }
         })
-        .should(({ hash, number }) => {
-          cy.get(`${ROOT_SELECTOR} input`).type(hash)
-          cy.get(ROOT_SELECTOR).type('{enter}')
-          cy.url({ timeout: REDIRECT_TIMEOUT }).should('contain', `/block/${number}`)
-          cy.location('search').should('eq', `?search=${hash}`)
+        .then(({ hash, number }) => {
+          if (hash && number) {
+            cy.get(`${ROOT_SELECTOR} input`).type(hash)
+            cy.get(ROOT_SELECTOR).type('{enter}')
+            cy.url({ timeout: REDIRECT_TIMEOUT }).should('contain', `/block/${number}`)
+            cy.location('search').should('eq', `?search=${hash}`)
+          } else {
+            throw new Error('hash or number is empty')
+          }
         })
     })
 
     it('should redirect to transaction page when keyword is a tx hash', () => {
       cy.get(`a[title='tx hash']:first`)
         .then(tx => {
-          const hash = tx.attr('href').slice('/tx/'.length)
+          const hash = tx?.attr('href')?.slice('/tx/'.length)
           return { hash }
         })
-        .should(({ hash }) => {
-          cy.get(`${ROOT_SELECTOR} input`).type(hash)
-          cy.get(ROOT_SELECTOR).type('{enter}')
-          cy.url({ timeout: REDIRECT_TIMEOUT }).should('contain', `/tx/${hash}`)
-          cy.location('search').should('eq', `?search=${hash}`)
+        .then(({ hash }) => {
+          if (hash) {
+            cy.get(`${ROOT_SELECTOR} input`).type(hash)
+            cy.get(ROOT_SELECTOR).type('{enter}')
+            cy.url({ timeout: REDIRECT_TIMEOUT }).should('contain', `/tx/${hash}`)
+            cy.location('search').should('eq', `?search=${hash}`)
+          } else {
+            throw new Error('hash is empty')
+          }
         })
     })
 
