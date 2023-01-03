@@ -219,7 +219,15 @@ const Account = () => {
       ]
     : []
 
-  const title = account ? t(`accountType.${account.type}`) : <Skeleton animation="wave" width="200px" />
+  const title = !isOverviewLoading ? (
+    account?.type ? (
+      t(`accountType.${account.type}`)
+    ) : (
+      t(`accountType.UNKNOWN`)
+    )
+  ) : (
+    <Skeleton animation="wave" width="200px" />
+  )
   const accountType = account?.type
 
   const tabs = [

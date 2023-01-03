@@ -139,45 +139,42 @@ const SearchUdtResultList = () => {
             <tbody>
               {list?.metadata.total_count ? (
                 list.entries.map(item => {
+                  const { id, eth_type, contract_address_hash, name, icon, symbol } = item
+                  const tokenLink = handleTokenLink(eth_type, id, contract_address_hash)
                   return (
-                    <tr key={item.id}>
-                      {handleTokenLink(item.eth_type, item.id, item.contract_address_hash) ? (
-                        <td title={item.name}>
-                          <NextLink href={handleTokenLink(item.eth_type, item.id, item.contract_address_hash)}>
+                    <tr key={id}>
+                      {tokenLink ? (
+                        <td title={name}>
+                          <NextLink href={tokenLink}>
                             <a className={styles.token}>
-                              <TokenLogo name={item.name} logo={item.icon} />
+                              <TokenLogo name={name} logo={icon} />
                               <span>
-                                {item.name ?? '-'}
-                                {item.symbol ? `(${item.symbol})` : ''}
+                                {name ?? '-'}
+                                {symbol ? `(${symbol})` : ''}
                               </span>
                             </a>
                           </NextLink>
                         </td>
                       ) : (
-                        <td title={item.name}>
+                        <td title={name}>
                           <span className={styles.token}>
-                            <TokenLogo name={item.name} logo={item.icon} />
+                            <TokenLogo name={name} logo={icon} />
                             <span>
-                              {item.name ?? '-'}
-                              {item.symbol ? `(${item.symbol})` : ''}
+                              {name ?? '-'}
+                              {symbol ? `(${symbol})` : ''}
                             </span>
                           </span>
                         </td>
                       )}
-                      <td className={styles.type}>{t(item.eth_type as string, { ns: 'account' })}</td>
-                      {item?.contract_address_hash ? (
-                        <td className={styles.addr} title={item.contract_address_hash}>
-                          <HashLink
-                            label={item.contract_address_hash}
-                            href={`/account/${item.contract_address_hash}`}
-                          />
-                          <Tooltip title={item.contract_address_hash} placement="top">
+                      <td className={styles.type}>{t(eth_type as string, { ns: 'account' })}</td>
+                      {contract_address_hash ? (
+                        <td className={styles.addr} title={contract_address_hash}>
+                          <HashLink label={contract_address_hash} href={`/account/${contract_address_hash}`} />
+                          <Tooltip title={contract_address_hash} placement="top">
                             <span>
                               <HashLink
-                                label={`${item.contract_address_hash.slice(0, 8)}...${item.contract_address_hash.slice(
-                                  -8,
-                                )}`}
-                                href={`/account/${item.contract_address_hash}`}
+                                label={`${contract_address_hash.slice(0, 8)}...${contract_address_hash.slice(-8)}`}
+                                href={`/account/${contract_address_hash}`}
                               />
                             </span>
                           </Tooltip>

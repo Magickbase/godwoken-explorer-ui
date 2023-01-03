@@ -208,7 +208,7 @@ const AccountOverview: React.FC<AccountOverviewProps & { refetch: () => Promise<
 }) => {
   const [t] = useTranslation(['account', 'common'])
 
-  if (!account) {
+  if (isOverviewLoading) {
     return (
       <div className={styles.container}>
         <InfoList
@@ -226,6 +226,31 @@ const AccountOverview: React.FC<AccountOverviewProps & { refetch: () => Promise<
             {
               field: t('ckbBalance'),
               content: <Skeleton animation="wave" />,
+            },
+          ]}
+        />
+      </div>
+    )
+  }
+
+  if (!account) {
+    return (
+      <div className={styles.container}>
+        <InfoList
+          title={t('basicInfo')}
+          list={[
+            {
+              field: t('type'),
+              content: '-',
+            },
+          ]}
+        />
+        <InfoList
+          title={t('overview')}
+          list={[
+            {
+              field: t('ckbBalance'),
+              content: '-',
             },
           ]}
         />
