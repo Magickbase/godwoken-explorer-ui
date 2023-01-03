@@ -335,7 +335,7 @@ const TransferList: React.FC<
                       </NextLink>
                     </td>
                   ) : null}
-                  <td width={'13%'}>
+                  <td width={'18%'}>
                     {isShowUsd ? (
                       <Tooltip
                         title={t('price-updated-at', {
