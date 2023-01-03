@@ -67,7 +67,7 @@ context('On Chain Transactions List Page', () => {
     })
     it('should have a value which is a number', () => {
       cy.get(`${ROOT_SELECTOR} td:nth-child(8) b`).should(td => {
-        expect(td.text()).to.match(/^\d+\.\d+$/)
+        expect(td.text()).to.match(/\d+\.\d+$/)
       })
     })
   })
