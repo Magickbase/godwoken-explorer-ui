@@ -9,6 +9,7 @@ import Pagination from 'components/SimplePagination'
 import TokenLogo from 'components/TokenLogo'
 import FilterMenu from 'components/FilterMenu'
 import RoundedAmount from 'components/RoundedAmount'
+import Address from 'components/TruncatedAddress'
 import Tooltip from 'components/Tooltip'
 import { GraphQLSchema, ZERO_ADDRESS } from 'utils'
 import SortIcon from 'assets/icons/sort.svg'
@@ -23,6 +24,14 @@ export type TransferListItem = {
   amount: string
   from_address: string
   to_address: string
+  from_account: {
+    eth_address: string
+    bit_alias: string
+  }
+  to_account: {
+    eth_address: string
+    bit_alias: string
+  }
   log_index: number
   transaction_hash: string
   udt: udtType
@@ -119,59 +128,74 @@ const TransferList: React.FC<TransferListProps> = ({ entries, metadata, type, ha
         </thead>
         <tbody>
           {metadata?.total_count ? (
-            entries?.map(item => (
-              <tr key={`${item.transaction_hash}-${item.log_index}`}>
-                <td>{item.log_index}</td>
-                <td className={styles.address}>
-                  <Tooltip title={item.from_address} placement="top">
-                    <span className="mono-font">
-                      {item.from_address === ZERO_ADDRESS ? (
-                        'zero address'
-                      ) : (
-                        <HashLink
-                          label={`${item?.from_address?.slice(0, 8)}...${item?.from_address?.slice(-8)}`}
-                          href={`/account/${item?.from_address}`}
-                        />
-                      )}
-                    </span>
-                  </Tooltip>
-                </td>
-                <td className={styles.address}>
-                  <Tooltip title={item.to_address} placement="top">
-                    <span className="mono-font">
-                      {item.to_address === ZERO_ADDRESS ? (
-                        'zero address'
-                      ) : (
-                        <HashLink
-                          label={`${item.to_address.slice(0, 8)}...${item.to_address.slice(-8)}`}
-                          href={`/account/${item.to_address}`}
-                        />
-                      )}
-                    </span>
-                  </Tooltip>
-                </td>
-                <td className={styles.tokenLogo}>
-                  <NextLink
-                    href={{
-                      pathname: handleTokenLink(item, type),
-                    }}
-                  >
-                    <a>
-                      {isShowLogo ? (
-                        <TokenLogo name={item.udt.name} logo={item.udt.icon} />
-                      ) : (
-                        handleTokenName?.(item.udt, item.token_id) ?? ''
-                      )}
-                    </a>
-                  </NextLink>
-                </td>
-                {type === TransferlistType.Erc20 && (
-                  <td title={item.udt.name} className={styles['ta-r']}>
-                    <RoundedAmount amount={item.amount} udt={item.udt} />
+            entries?.map(item => {
+              const from_bit_alias = item.from_account.bit_alias
+              const from_address = item.from_account.eth_address
+              const to_bit_alias = item.to_account.bit_alias
+              const to_address = item.to_account.eth_address
+
+              return (
+                <tr key={`${item.transaction_hash}-${item.log_index}`}>
+                  <td>{item.log_index}</td>
+                  <td className={styles.address}>
+                    {from_bit_alias ? (
+                      <Address address={from_address} domain={from_bit_alias} />
+                    ) : (
+                      <Tooltip title={item.from_address} placement="top">
+                        <span className="mono-font">
+                          {item.from_address === ZERO_ADDRESS ? (
+                            'zero address'
+                          ) : (
+                            <HashLink
+                              label={`${item?.from_address?.slice(0, 8)}...${item?.from_address?.slice(-8)}`}
+                              href={`/account/${item?.from_address}`}
+                            />
+                          )}
+                        </span>
+                      </Tooltip>
+                    )}
                   </td>
-                )}
-              </tr>
-            ))
+                  <td className={styles.address}>
+                    {to_bit_alias ? (
+                      <Address address={to_address} domain={to_bit_alias} />
+                    ) : (
+                      <Tooltip title={item.to_address} placement="top">
+                        <span className="mono-font">
+                          {item.to_address === ZERO_ADDRESS ? (
+                            'zero address'
+                          ) : (
+                            <HashLink
+                              label={`${item.to_address.slice(0, 8)}...${item.to_address.slice(-8)}`}
+                              href={`/account/${item.to_address}`}
+                            />
+                          )}
+                        </span>
+                      </Tooltip>
+                    )}
+                  </td>
+                  <td className={styles.tokenLogo}>
+                    <NextLink
+                      href={{
+                        pathname: handleTokenLink(item, type),
+                      }}
+                    >
+                      <a>
+                        {isShowLogo ? (
+                          <TokenLogo name={item.udt.name} logo={item.udt.icon} />
+                        ) : (
+                          handleTokenName?.(item.udt, item.token_id) ?? ''
+                        )}
+                      </a>
+                    </NextLink>
+                  </td>
+                  {type === TransferlistType.Erc20 && (
+                    <td title={item.udt.name} className={styles['ta-r']}>
+                      <RoundedAmount amount={item.amount} udt={item.udt} />
+                    </td>
+                  )}
+                </tr>
+              )
+            })
           ) : (
             <tr>
               <td colSpan={5}>
