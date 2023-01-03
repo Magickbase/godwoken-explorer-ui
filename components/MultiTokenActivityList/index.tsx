@@ -170,9 +170,11 @@ const ActivityList: React.FC<
                     </time>
                   </td>
                   <td>
-                    {<Address address={item.from_address} type={item.from_account?.type} domain={from_bit_alias} />}
+                    <Address address={item.from_address} type={item.from_account?.type} domain={from_bit_alias} />
                   </td>
-                  <td>{<Address address={item.to_address} type={item.to_account?.type} domain={to_bit_alias} />}</td>
+                  <td>
+                    <Address address={item.to_address} type={item.to_account?.type} domain={to_bit_alias} />
+                  </td>
                   {viewer ? (
                     <td>
                       <TransferDirection from={item.from_address} to={item.to_address} viewer={viewer ?? ''} />
