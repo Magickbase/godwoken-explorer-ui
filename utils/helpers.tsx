@@ -71,7 +71,7 @@ export const currentChain = IS_MAINNET ? mainnet : testnet
 
 // wagmi config chains
 const { chains, provider: wagmiProvider } = configureChains(
-  [mainnet, testnet],
+  [currentChain],
   [
     jsonRpcProvider({
       rpc: chain => {
