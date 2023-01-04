@@ -232,7 +232,7 @@ const Account = () => {
     : []
 
   const accountType = account?.type
-  const title = account && accountType ? t(`accountType.${accountType}`) : <Skeleton animation="wave" width="200px" />
+  const title = accountType ? t(`accountType.${accountType}`) : <Skeleton animation="wave" width="200px" />
 
   const tabs = [
     { label: t('transactionRecords'), key: 'transactions' },
