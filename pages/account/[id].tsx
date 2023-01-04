@@ -7,6 +7,7 @@ import { Skeleton } from '@mui/material'
 import SubpageHead from 'components/SubpageHead'
 import AccountOverview, {
   fetchAccountOverview,
+  fetchAccountOverviewUnion,
   fetchAccountBalance,
   fetchDeployAddress,
   AccountOverviewProps,
@@ -61,19 +62,30 @@ const Account = () => {
     },
   } = useRouter()
   const [t] = useTranslation(['account', 'common'])
-
   const q = isEthAddress(id as string) ? { address: id as string } : { script_hash: id as string }
 
   const pageSize = Number.isNaN(+page_size) ? +SIZES[1] : +page_size
 
   const {
     isLoading: isOverviewLoading,
-    data: account,
+    data: accountOverview,
     refetch: refetchAccountOverview,
   } = useQuery(['account-overview', id], () => fetchAccountOverview(q), {
     refetchInterval: 10000,
     enabled: !!id,
   })
+
+  const {
+    isLoading: isOverviewUnionLoading,
+    data: accountOverviewUnion,
+    refetch: refetchAccountOverviewUnion,
+  } = useQuery(['account-overview-union', id], () => fetchAccountOverviewUnion(q), {
+    refetchInterval: 10000,
+    enabled: !!id,
+  })
+  const account = accountOverview ?? accountOverviewUnion
+  const accountOverviewRefetch = () => Promise.allSettled([refetchAccountOverview, refetchAccountOverviewUnion])
+
   const deployment_tx_hash = isSmartContractAccount(account) && account?.smart_contract?.deployment_tx_hash
 
   const { data: deployerAddr } = useQuery(
@@ -263,12 +275,12 @@ const Account = () => {
           <QRCodeBtn content={id as string} />
         </div>
         <AccountOverview
-          isOverviewLoading={isOverviewLoading}
+          isOverviewLoading={isOverviewLoading || isOverviewUnionLoading}
           isBalanceLoading={isBalanceLoading}
           account={account}
           balance={balance}
           deployerAddr={deployerAddr}
-          refetch={refetchAccountOverview}
+          refetch={accountOverviewRefetch}
         />
         <div className={styles.list}>
           <Tabs
