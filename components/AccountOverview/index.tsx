@@ -118,6 +118,42 @@ const accountOverviewQuery = gql`
   }
 `
 
+const accountOverviewQueryUnion = gql`
+  query ($script_hash: String, $address: String) {
+    account(input: { script_hash: $script_hash, address: $address }) {
+      ... on Account {
+        type
+        eth_address
+        script_hash
+        script
+        transaction_count
+        nonce
+        udt {
+          id
+          name
+          decimal
+          symbol
+          description
+          official_site
+          icon
+        }
+        smart_contract {
+          name
+          deployment_tx_hash
+          compiler_version
+          compiler_file_format
+          contract_source_code
+          constructor_arguments
+          abi
+        }
+        udt {
+          eth_type
+        }
+      }
+    }
+  }
+`
+
 const deployAddrQuery = gql`
   query ($eth_hash: String!) {
     transaction(input: { eth_hash: $eth_hash }) {
@@ -140,8 +176,8 @@ const checkSourcify = gql`
 
 type Variables = { address: string } | { script_hash: string }
 
-export const fetchAccountOverview = (variables: Variables) =>
-  client.request<Omit<AccountOverviewProps, 'balance'>>(accountOverviewQuery, variables).then(
+const fetchAccount = (variables: Variables, fetchApi) =>
+  client.request<Omit<AccountOverviewProps, 'balance'>>(fetchApi, variables).then(
     data =>
       data.account ??
       ({
@@ -152,6 +188,8 @@ export const fetchAccountOverview = (variables: Variables) =>
         nonce: 0,
       } as UnknownUser),
   )
+export const fetchAccountOverview = (variables: Variables) => fetchAccount(variables, accountOverviewQuery)
+export const fetchAccountOverviewUnion = (variables: Variables) => fetchAccount(variables, accountOverviewQueryUnion)
 
 export const fetchAccountBalance = (address: string) => provider.getBalance(address).then(res => res.toString())
 
