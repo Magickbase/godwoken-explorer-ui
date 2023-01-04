@@ -529,7 +529,7 @@ const Tx = () => {
             )
           ) : null}
           {tab === 'logs' ? (
-            txReceipt || !isTxReceiptLoading ? (
+            txReceipt && !isTxReceiptLoading ? (
               <TxLogsList list={txReceipt.logs} abiList={abiList} />
             ) : (
               <Skeleton animation="wave" />
