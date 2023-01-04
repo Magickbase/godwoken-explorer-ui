@@ -150,6 +150,11 @@ const accountOverviewQueryUnion = gql`
           eth_type
         }
       }
+      ... on Address {
+        eth_address
+        token_transfer_count
+        bit_alias
+      }
     }
   }
 `
@@ -282,7 +287,9 @@ const AccountOverview: React.FC<AccountOverviewProps & { refetch: () => Promise<
 }) => {
   const [t] = useTranslation(['account', 'common'])
 
-  if (!account) {
+  // Over there, account.type is used to determine whether the data is type of Address.
+  // Cause the data of Address only have 3 parameters, `eth_address`,`token_transfer_count` and `bit_alias`
+  if (!account || !account.type) {
     return (
       <div className={styles.container}>
         <InfoList
