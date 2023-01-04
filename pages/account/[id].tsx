@@ -289,7 +289,7 @@ const Account = () => {
           account={account}
           balance={balance}
           deployer={deployer}
-          refetch={refetchAccountOverview}
+          refetch={accountOverviewRefetch}
         />
         <div className={styles.list}>
           <Tabs
