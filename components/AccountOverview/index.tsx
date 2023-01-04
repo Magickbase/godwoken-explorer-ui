@@ -159,42 +159,6 @@ const accountOverviewQueryUnion = gql`
   }
 `
 
-const accountOverviewQueryUnion = gql`
-  query ($script_hash: String, $address: String) {
-    account(input: { script_hash: $script_hash, address: $address }) {
-      ... on Account {
-        type
-        eth_address
-        script_hash
-        script
-        transaction_count
-        nonce
-        udt {
-          id
-          name
-          decimal
-          symbol
-          description
-          official_site
-          icon
-        }
-        smart_contract {
-          name
-          deployment_tx_hash
-          compiler_version
-          compiler_file_format
-          contract_source_code
-          constructor_arguments
-          abi
-        }
-        udt {
-          eth_type
-        }
-      }
-    }
-  }
-`
-
 const deployAddrQuery = gql`
   query ($eth_hash: String!) {
     transaction(input: { eth_hash: $eth_hash }) {
