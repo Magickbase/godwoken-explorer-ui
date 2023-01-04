@@ -84,7 +84,7 @@ const Account = () => {
     enabled: !!id,
   })
   const account = accountOverview ?? accountOverviewUnion
-  const accountOverviewRefetch = () => Promise.all([refetchAccountOverview, refetchAccountOverviewUnion])
+  const accountOverviewRefetch = () => Promise.allSettled([refetchAccountOverview, refetchAccountOverviewUnion])
 
   const deployment_tx_hash = isSmartContractAccount(account) && account?.smart_contract?.deployment_tx_hash
 
