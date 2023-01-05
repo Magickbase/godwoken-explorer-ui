@@ -4,6 +4,7 @@ import NextLink from 'next/link'
 import { Skeleton } from '@mui/material'
 import InfoList from '../InfoList'
 import Tooltip from 'components/Tooltip'
+import Address from 'components/TruncatedAddress'
 import NextPageIcon from 'assets/icons/next-page.svg'
 import VerifiedIcon from 'assets/icons/check-success.svg'
 import SubmittedIcon from 'assets/icons/submit-success.svg'
@@ -35,20 +36,21 @@ const verifyAndCheckSourcify = (address: string) =>
     .then(data => data.verify_and_update_from_sourcify.abi)
 
 const SmartContract: React.FC<{
-  deployer: string
+  deployer: Pick<GraphQLSchema.Account, 'eth_address' | 'bit_alias'>
   deployTxHash: string
   udt: Pick<GraphQLSchema.Udt, 'id' | 'name' | 'official_site' | 'description' | 'icon' | 'eth_type'> | null
   isVerified: boolean
   address: string
   isLoading: boolean
   refetch: () => Promise<void>
-}> = ({ deployer, deployTxHash, udt, isVerified, address, refetch, isLoading }) => {
+}> = ({ deployer = {}, deployTxHash, udt, isVerified, address, refetch, isLoading }) => {
   const [t] = useTranslation('account')
   const [isCheckAgain, setIsCheckAgain] = useState(false)
   const [isSourcifyCheckLoading, setIsSourcifyCheckLoading] = useState(false)
 
   const { official_site, description, icon } = udt || {}
   const isSubmitted = official_site || description || icon
+  const { eth_address: deployerAddr = '', bit_alias = '' } = deployer
 
   const handleCheckClick = async (e: React.SyntheticEvent) => {
     e.stopPropagation()
@@ -95,14 +97,18 @@ const SmartContract: React.FC<{
     },
     {
       field: t('deployer'),
-      content: deployer ? (
-        <Tooltip title={deployer} placement="top">
-          <span>
-            <NextLink href={`/account/${deployer}`}>
-              <a className="mono-font">{deployer}</a>
-            </NextLink>
-          </span>
-        </Tooltip>
+      content: deployerAddr ? (
+        bit_alias ? (
+          <Address address={deployerAddr} domain={bit_alias} />
+        ) : (
+          <Tooltip title={deployerAddr} placement="top">
+            <span>
+              <NextLink href={`/account/${deployerAddr}`}>
+                <a className="mono-font">{deployerAddr}</a>
+              </NextLink>
+            </span>
+          </Tooltip>
+        )
       ) : isLoading ? (
         <Skeleton animation="wave" />
       ) : (

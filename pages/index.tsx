@@ -29,7 +29,9 @@ import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRound
 import Search from 'components/Search'
 import BlockStateIcon from 'components/BlockStateIcon'
 import TxStatusIcon from 'components/TxStatusIcon'
+import Address from 'components/TruncatedAddress'
 import { fetchHome, timeDistance, formatInt, client, GraphQLSchema, IS_MAINNET } from 'utils'
+
 type State = API.Home.Parsed
 
 // TODO: add polyjuice status
@@ -46,7 +48,7 @@ const formatAddress = (addr: string, bigScreen: boolean = true, isSpecial: boole
     }
   }
   if (bigScreen && addr.length > 16) {
-    return `${addr.slice(0, 8)}...${addr.slice(-7)}`
+    return `${addr.slice(0, 8)}...${addr.slice(-8)}`
   }
   if (!bigScreen && addr.length > 8) {
     return `${addr.slice(0, 4)}...${addr.slice(-4)}`
@@ -78,11 +80,13 @@ const queryHomeLists = gql`
           eth_address
           script_hash
           type
+          bit_alias
         }
         to_account {
           eth_address
           script_hash
           type
+          bit_alias
         }
         polyjuice {
           status
@@ -109,8 +113,8 @@ interface HomeLists {
       eth_hash: string
       hash: string
       type: GraphQLSchema.TransactionType
-      from_account: Pick<GraphQLSchema.Account, 'eth_address' | 'script_hash' | 'type'>
-      to_account: Pick<GraphQLSchema.Account, 'eth_address' | 'script_hash' | 'type'>
+      from_account: Pick<GraphQLSchema.Account, 'eth_address' | 'script_hash' | 'type' | 'bit_alias'>
+      to_account: Pick<GraphQLSchema.Account, 'eth_address' | 'script_hash' | 'type' | 'bit_alias'>
       polyjuice: Pick<GraphQLSchema.Polyjuice, 'status' | 'native_transfer_address_hash'>
     }>
   }
@@ -451,6 +455,9 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
         let to = tx.to_account?.eth_address || tx.to_account?.script_hash || '-'
         let toType = tx.to_account?.type
 
+        const from_bit_alias = tx.from_account?.bit_alias
+        const to_bit_alias = tx.to_account?.bit_alias
+
         if (tx.polyjuice?.native_transfer_address_hash) {
           to = tx.polyjuice.native_transfer_address_hash
           toType = GraphQLSchema.AccountType.EthUser
@@ -525,16 +532,18 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
                       sx={{ pl: { xs: 1, sm: 0 } }}
                       justifyContent={{ xs: 'center', md: 'space-between' }}
                     >
-                      <Stack direction="row" justifyContent="space-between" alignItems="center">
+                      <Stack direction="row" justifyContent="flex-start" alignItems="center">
                         <Typography
                           fontSize={{ xs: 12, md: 14 }}
                           sx={{ textTransform: 'capitalize' }}
                           color="secondary"
                           noWrap
+                          minWidth={'34px'}
+                          textAlign={{ xs: 'right', sm: 'left' }}
                         >
                           {`${t('from')}`}
                         </Typography>
-                        <Box className="mono-font tooltip " data-tooltip={from}>
+                        <Box className={`mono-font ${from_bit_alias ? '' : 'tooltip'}`} data-tooltip={from}>
                           <NextLink href={`/account/${from}`} passHref>
                             <Button
                               title="from"
@@ -544,6 +553,8 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
                               className={isSpecialFrom ? 'Roboto' : 'mono-font'}
                               disableRipple
                               fontSize={{ xs: 13, md: 14 }}
+                              minWidth={{ xs: 98, sm: 'auto' }}
+                              justifyContent={{ xs: 'flex-start', sm: 'center' }}
                               sx={{
                                 'p': 0,
                                 'pl': 1,
@@ -553,27 +564,31 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
                                 'fontWeight': 400,
                               }}
                             >
-                              {formatAddress(
-                                isSpecialFrom ? tx.from_account.type.replace(/_/g, ' ') : from,
-                                isBigScreen,
-                                isSpecialFrom,
+                              {from_bit_alias ? (
+                                <Address address={from} domain={from_bit_alias} leading={isBigScreen ? 7 : 3} />
+                              ) : (
+                                formatAddress(
+                                  isSpecialFrom ? tx.from_account.type.replace(/_/g, ' ') : from,
+                                  isBigScreen,
+                                  isSpecialFrom,
+                                )
                               )}
                             </Button>
                           </NextLink>
                         </Box>
                       </Stack>
-                      <Stack direction="row" justifyContent="space-between" alignItems="center">
+                      <Stack direction="row" justifyContent="flex-start" alignItems="center">
                         <Typography
                           fontSize={{ xs: 12, md: 14 }}
                           sx={{ textTransform: 'capitalize' }}
                           color="secondary"
                           noWrap
-                          width={{ xs: '100%', sm: 'auto' }}
                           textAlign={{ xs: 'right', sm: 'left' }}
+                          minWidth={'34px'}
                         >
                           {`${t('to')}`}
                         </Typography>
-                        <Box className="mono-font tooltip " data-tooltip={to}>
+                        <Box className={`mono-font ${to_bit_alias ? '' : 'tooltip'}`} data-tooltip={to}>
                           <NextLink href={`/account/${to}`} passHref>
                             <Button
                               title="to"
@@ -584,7 +599,7 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
                               disableRipple
                               fontSize={{ xs: 13, md: 14 }}
                               minWidth={{ xs: 98, sm: 'auto' }}
-                              justifyContent={{ xs: 'flex-end', sm: 'center' }}
+                              justifyContent={{ xs: 'flex-start', sm: 'center' }}
                               sx={{
                                 'p': 0,
                                 'pl': 1,
@@ -594,7 +609,11 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
                                 'fontWeight': 400,
                               }}
                             >
-                              {formatAddress(isSpecialTo ? toType.replace(/_/g, ' ') : to, isBigScreen, isSpecialTo)}
+                              {to_bit_alias ? (
+                                <Address address={to} domain={to_bit_alias} leading={isBigScreen ? 7 : 3} />
+                              ) : (
+                                formatAddress(isSpecialTo ? toType.replace(/_/g, ' ') : to, isBigScreen, isSpecialTo)
+                              )}
                             </Button>
                           </NextLink>
                         </Box>

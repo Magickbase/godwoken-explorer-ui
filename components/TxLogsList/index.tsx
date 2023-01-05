@@ -21,7 +21,15 @@ const TxLogsList = ({
       {list.map((log, i) => {
         const address = log.address.toLowerCase()
         const abi = abiList[`contract_${address}`]?.abi ?? null
-        const parsed = abi ? new utils.Interface(abi).parseLog(log) : null
+        let parsed = null
+        if (abi) {
+          try {
+            parsed = new utils.Interface(abi).parseLog(log)
+          } catch (e) {
+            console.warn(e.message)
+            // ignore
+          }
+        }
         const inputs = [
           ...log.topics,
           ...log.data
