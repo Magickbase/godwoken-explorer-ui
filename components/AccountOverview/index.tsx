@@ -150,6 +150,11 @@ const accountOverviewQueryUnion = gql`
           eth_type
         }
       }
+      ... on Address {
+        eth_address
+        token_transfer_count
+        bit_alias
+      }
     }
   }
 `
@@ -188,6 +193,7 @@ const fetchAccount = (variables: Variables, fetchApi) =>
         nonce: 0,
       } as UnknownUser),
   )
+
 export const fetchAccountOverview = (variables: Variables) => fetchAccount(variables, accountOverviewQuery)
 export const fetchAccountOverviewUnion = (variables: Variables) => fetchAccount(variables, accountOverviewQueryUnion)
 
@@ -271,7 +277,9 @@ const AccountOverview: React.FC<AccountOverviewProps & { refetch: () => Promise<
     )
   }
 
-  if (!account) {
+  // Over there, account.type is used to determine whether the data is type of Address.
+  // Cause the data of Address only have 3 parameters, `eth_address`,`token_transfer_count` and `bit_alias`
+  if (!account.type) {
     return (
       <div className={styles.container}>
         <InfoList
@@ -279,7 +287,7 @@ const AccountOverview: React.FC<AccountOverviewProps & { refetch: () => Promise<
           list={[
             {
               field: t('type'),
-              content: '-',
+              content: 'Unknown',
             },
           ]}
         />
@@ -288,7 +296,7 @@ const AccountOverview: React.FC<AccountOverviewProps & { refetch: () => Promise<
           list={[
             {
               field: t('ckbBalance'),
-              content: '-',
+              content: 0,
             },
           ]}
         />
