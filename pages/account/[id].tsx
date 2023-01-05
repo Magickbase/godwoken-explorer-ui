@@ -232,7 +232,15 @@ const Account = () => {
     : []
 
   const accountType = account?.type
-  const title = accountType ? t(`accountType.${accountType}`) : <Skeleton animation="wave" width="200px" />
+  const title = account ? (
+    accountType ? (
+      t(`accountType.${accountType}`)
+    ) : (
+      t(`accountType.Unknown`)
+    )
+  ) : (
+    <Skeleton animation="wave" width="200px" />
+  )
 
   const tabs = [
     { label: t('transactionRecords'), key: 'transactions' },
@@ -261,6 +269,7 @@ const Account = () => {
       : null,
     [GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType) ? { label: t('events'), key: 'events' } : null,
   ].filter(v => v)
+
   return (
     <>
       <SubpageHead subtitle={account ? `${title} ${id}` : (id as string)} />
