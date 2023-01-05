@@ -1,9 +1,10 @@
+import { ReactNode } from 'react'
 import NextLink from 'next/link'
 import OpenInNewIcon from 'assets/icons/open-in-new.svg'
 import styles from './styles.module.scss'
 
 interface HashLinkProps {
-  label: string
+  label: string | ReactNode
   href: string
   external?: boolean
   style?: React.CSSProperties
@@ -14,7 +15,6 @@ const HashLink: React.FC<HashLinkProps> = ({ label, href, external = false, styl
   <NextLink href={href}>
     <a
       href={href}
-      title={label}
       className={`${styles.container} ${monoFont ? 'mono-font' : ''}`}
       style={style}
       target={external ? '_blank' : '_self'}

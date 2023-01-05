@@ -17,9 +17,9 @@ type ActivityListProps = {
       transaction: Pick<GraphQLSchema.Transaction, 'eth_hash' | 'method_id' | 'method_name'>
       block: Pick<GraphQLSchema.Block, 'number' | 'status' | 'timestamp'>
       from_address: string
-      from_account?: Pick<GraphQLSchema.Account, 'type'>
+      from_account?: Pick<GraphQLSchema.Account, 'type' | 'bit_alias'>
       to_address: string
-      to_account?: Pick<GraphQLSchema.Account, 'type'>
+      to_account?: Pick<GraphQLSchema.Account, 'type' | 'bit_alias'>
       log_index: number
       polyjuice: Pick<GraphQLSchema.Polyjuice, 'status'>
       token_id: number
@@ -60,10 +60,12 @@ const activityListQuery = gql`
         from_address
         from_account {
           type
+          bit_alias
         }
         to_address
         to_account {
           type
+          bit_alias
         }
         log_index
         block {
@@ -116,6 +118,8 @@ const ActivityList: React.FC<
           {transfers?.metadata.total_count ? (
             transfers.entries.map(item => {
               const method = item.transaction.method_name || item.transaction.method_id
+              const from_bit_alias = item?.from_account?.bit_alias
+              const to_bit_alias = item?.to_account?.bit_alias
 
               return (
                 <tr key={item.transaction.eth_hash + item.log_index}>
@@ -153,8 +157,12 @@ const ActivityList: React.FC<
                       {timeDistance(new Date(item.block.timestamp).getTime(), language)}
                     </time>
                   </td>
-                  <td>{<Address address={item.from_address} type={item.from_account?.type} />}</td>
-                  <td>{<Address address={item.to_address} type={item.to_account?.type} />}</td>
+                  <td>
+                    <Address address={item.from_address} type={item.from_account?.type} domain={from_bit_alias} />
+                  </td>
+                  <td>
+                    <Address address={item.to_address} type={item.to_account?.type} domain={to_bit_alias} />
+                  </td>
                   {viewer ? (
                     <td>
                       <TransferDirection from={item.from_address} to={item.to_address} viewer={viewer ?? ''} />

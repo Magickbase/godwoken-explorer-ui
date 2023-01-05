@@ -28,8 +28,8 @@ export type TransferListProps = {
       block: Pick<GraphQLSchema.Block, 'number' | 'status' | 'timestamp'>
       from_address: string
       to_address: string
-      from_account: Pick<GraphQLSchema.Account, 'type'>
-      to_account: Pick<GraphQLSchema.Account, 'type'>
+      from_account: Pick<GraphQLSchema.Account, 'type' | 'bit_alias'>
+      to_account: Pick<GraphQLSchema.Account, 'type' | 'bit_alias'>
       log_index: number
       polyjuice: Pick<GraphQLSchema.Polyjuice, 'status'>
       transaction_hash: string
@@ -97,9 +97,11 @@ const transferListQuery = gql`
         to_address
         from_account {
           type
+          bit_alias
         }
         to_account {
           type
+          bit_alias
         }
         block {
           number
@@ -170,9 +172,11 @@ const tokenTransferListQuery = gql`
         to_address
         from_account {
           type
+          bit_alias
         }
         to_account {
           type
+          bit_alias
         }
         block {
           number
@@ -314,10 +318,18 @@ const TransferList: React.FC<
                     </time>
                   </td>
                   <td>
-                    <Address address={item.from_address} type={item.from_account?.type} />
+                    <Address
+                      address={item.from_address}
+                      type={item.from_account?.type}
+                      domain={item.from_account?.bit_alias}
+                    />
                   </td>
                   <td>
-                    <Address address={item.to_address} type={item.to_account?.type} />
+                    <Address
+                      address={item.to_address}
+                      type={item.to_account?.type}
+                      domain={item.to_account?.bit_alias}
+                    />
                   </td>
                   <td className={styles.direction}>
                     <TransferDirection from={item.from_address} to={item.to_address} viewer={viewer ?? ''} />

@@ -80,39 +80,83 @@ export type AccountOverviewProps = {
   isOverviewLoading?: boolean
   isBalanceLoading?: boolean
   balance: string
-  deployerAddr?: string
+  deployer?: Pick<GraphQLSchema.Account, 'eth_address' | 'bit_alias'>
   isContractVerified?: boolean
 }
 
 const accountOverviewQuery = gql`
   query ($script_hash: String, $address: String) {
     account(input: { script_hash: $script_hash, address: $address }) {
-      type
-      eth_address
-      script_hash
-      script
-      transaction_count
-      nonce
-      udt {
-        id
-        name
-        decimal
-        symbol
-        description
-        official_site
-        icon
+      ... on Account {
+        type
+        eth_address
+        bit_alias
+        script_hash
+        script
+        transaction_count
+        nonce
+        udt {
+          id
+          name
+          decimal
+          symbol
+          description
+          official_site
+          icon
+        }
+        smart_contract {
+          name
+          deployment_tx_hash
+          compiler_version
+          compiler_file_format
+          contract_source_code
+          constructor_arguments
+          abi
+        }
+        udt {
+          eth_type
+        }
       }
-      smart_contract {
-        name
-        deployment_tx_hash
-        compiler_version
-        compiler_file_format
-        contract_source_code
-        constructor_arguments
-        abi
+    }
+  }
+`
+
+const accountOverviewQueryUnion = gql`
+  query ($script_hash: String, $address: String) {
+    account(input: { script_hash: $script_hash, address: $address }) {
+      ... on Account {
+        type
+        eth_address
+        script_hash
+        script
+        transaction_count
+        nonce
+        udt {
+          id
+          name
+          decimal
+          symbol
+          description
+          official_site
+          icon
+        }
+        smart_contract {
+          name
+          deployment_tx_hash
+          compiler_version
+          compiler_file_format
+          contract_source_code
+          constructor_arguments
+          abi
+        }
+        udt {
+          eth_type
+        }
       }
-      udt {
-        eth_type
+      ... on Address {
+        eth_address
+        token_transfer_count
+        bit_alias
       }
     }
   }
@@ -123,6 +167,7 @@ const deployAddrQuery = gql`
     transaction(input: { eth_hash: $eth_hash }) {
       from_account {
         eth_address
+        bit_alias
       }
     }
   }
@@ -140,8 +185,8 @@ const checkSourcify = gql`
 
 type Variables = { address: string } | { script_hash: string }
 
-export const fetchAccountOverview = (variables: Variables) =>
-  client.request<Omit<AccountOverviewProps, 'balance'>>(accountOverviewQuery, variables).then(
+const fetchAccount = (variables: Variables, fetchApi) =>
+  client.request<Omit<AccountOverviewProps, 'balance'>>(fetchApi, variables).then(
     data =>
       data.account ??
       ({
@@ -153,12 +198,24 @@ export const fetchAccountOverview = (variables: Variables) =>
       } as UnknownUser),
   )
 
+export const fetchAccountOverview = (variables: Variables) => fetchAccount(variables, accountOverviewQuery)
+export const fetchAccountOverviewUnion = (variables: Variables) => fetchAccount(variables, accountOverviewQueryUnion)
+
 export const fetchAccountBalance = (address: string) => provider.getBalance(address).then(res => res.toString())
 
 export const fetchDeployAddress = (variables: { eth_hash: string }) =>
   client
-    .request<{ transaction: { from_account: Pick<GraphQLSchema.Account, 'eth_address'> } }>(deployAddrQuery, variables)
-    .then(data => data.transaction.from_account.eth_address)
+    .request<{ transaction: { from_account: Pick<GraphQLSchema.Account, 'eth_address' | 'bit_alias'> } }>(
+      deployAddrQuery,
+      variables,
+    )
+    .then(
+      data =>
+        data.transaction.from_account ?? {
+          eth_address: '',
+          bit_alias: '',
+        },
+    )
 
 type SourcifyStatusResponse = {
   sourcify_check_by_addresses: [{ address: string; chain_ids: string[]; status: string }]
@@ -201,7 +258,7 @@ const overviewPlaceHolderCount = (account: AccountOverviewProps['account']) => {
 const AccountOverview: React.FC<AccountOverviewProps & { refetch: () => Promise<any> }> = ({
   account,
   balance,
-  deployerAddr = '',
+  deployer,
   isBalanceLoading,
   isOverviewLoading,
   refetch,
@@ -226,6 +283,33 @@ const AccountOverview: React.FC<AccountOverviewProps & { refetch: () => Promise<
             {
               field: t('ckbBalance'),
               content: <Skeleton animation="wave" />,
+            },
+          ]}
+        />
+      </div>
+    )
+  }
+
+  // Over there, account.type is used to determine whether the data is type of Address.
+  // Cause the data of Address only have 3 parameters, `eth_address`,`token_transfer_count` and `bit_alias`
+  if (!account.type) {
+    return (
+      <div className={styles.container}>
+        <InfoList
+          title={t('basicInfo')}
+          list={[
+            {
+              field: t('type'),
+              content: 'Unknown',
+            },
+          ]}
+        />
+        <InfoList
+          title={t('overview')}
+          list={[
+            {
+              field: t('ckbBalance'),
+              content: 0,
             },
           ]}
         />
@@ -267,14 +351,17 @@ const AccountOverview: React.FC<AccountOverviewProps & { refetch: () => Promise<
 
   const getInfoBlock = account => {
     const { type } = account
+    const domain = account.bit_alias
 
     const blockMap = {
       [`${GraphQLSchema.AccountType.MetaContract}`]: <MetaContract {...(account.script as MetaContract['script'])} />,
-      [`${GraphQLSchema.AccountType.EthUser}`]: <User nonce={account.nonce} isLoading={isOverviewLoading} />,
+      [`${GraphQLSchema.AccountType.EthUser}`]: (
+        <User nonce={account.nonce} isLoading={isOverviewLoading} domain={domain} />
+      ),
       [`${GraphQLSchema.AccountType.EthAddrReg}`]: <EthAddrReg />,
       [`${GraphQLSchema.AccountType.PolyjuiceContract}`]: (
         <SmartContract
-          deployer={deployerAddr}
+          deployer={deployer}
           deployTxHash={account.smart_contract?.deployment_tx_hash!}
           udt={account.udt}
           address={account.eth_address || ''}

@@ -59,6 +59,14 @@ const getTransferListQuery = (type: TransferlistType) => gql`
         log_index
         from_address
         to_address
+        from_account{
+          eth_address
+          bit_alias
+        }
+        to_account{
+          eth_address
+          bit_alias
+        }
         udt {
           decimal
           name

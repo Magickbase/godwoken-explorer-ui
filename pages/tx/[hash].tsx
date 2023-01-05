@@ -23,6 +23,7 @@ import Amount from 'components/Amount'
 import { SIZES } from 'components/PageSize'
 import Tooltip from 'components/Tooltip'
 import PolyjuiceStatus from 'components/PolyjuiceStatus'
+import Address from 'components/TruncatedAddress'
 import { TransferlistType } from 'components/BaseTransferlist'
 import ExpandIcon from 'assets/icons/expand.svg'
 import {
@@ -34,6 +35,7 @@ import {
   PCKB_UDT_INFO,
   provider,
 } from 'utils'
+
 import styles from './styles.module.scss'
 
 const tabs = ['erc20Records', 'erc721Records', 'erc1155Records', 'logs', 'rawData']
@@ -45,8 +47,14 @@ interface Transaction {
   index: number
   method_id: string | null
   method_name: string | null
-  from_account: Pick<GraphQLSchema.Account, 'eth_address' | 'type' | 'smart_contract' | 'script_hash'> | null
-  to_account: Pick<GraphQLSchema.Account, 'eth_address' | 'type' | 'smart_contract' | 'script_hash'> | null
+  from_account: Pick<
+    GraphQLSchema.Account,
+    'eth_address' | 'type' | 'smart_contract' | 'script_hash' | 'bit_alias'
+  > | null
+  to_account: Pick<
+    GraphQLSchema.Account,
+    'eth_address' | 'type' | 'smart_contract' | 'script_hash' | 'bit_alias'
+  > | null
   polyjuice: Pick<
     GraphQLSchema.Polyjuice,
     | 'tx_hash'
@@ -74,10 +82,12 @@ const txQuery = gql`
     from_account {
       eth_address
       type
+      bit_alias
     }
     to_account {
       eth_address
       type
+      bit_alias
       script_hash
       smart_contract {
         name
@@ -265,6 +275,7 @@ const Tx = () => {
   const fromAddrDisplay = getAddressDisplay(tx?.from_account)
   const toAddrDisplay = getAddressDisplay(tx?.to_account, tx?.polyjuice?.native_transfer_address_hash)
   const method = tx?.method_name ?? tx?.method_id
+  const from_bit_alias = tx?.from_account?.bit_alias
 
   const overview: InfoItermProps[] = [
     {
@@ -282,7 +293,9 @@ const Tx = () => {
         <Skeleton animation="wave" />
       ) : tx ? (
         <HashLink
-          label={fromAddrDisplay.label}
+          label={
+            from_bit_alias ? <Address address={fromAddrDisplay.label} domain={from_bit_alias} /> : fromAddrDisplay.label
+          }
           href={`/address/${fromAddrDisplay.address}`}
           style={{ wordBreak: 'break-all' }}
         />
@@ -529,7 +542,7 @@ const Tx = () => {
             )
           ) : null}
           {tab === 'logs' ? (
-            txReceipt || !isTxReceiptLoading ? (
+            txReceipt && !isTxReceiptLoading ? (
               <TxLogsList list={txReceipt.logs} abiList={abiList} />
             ) : (
               <Skeleton animation="wave" />
