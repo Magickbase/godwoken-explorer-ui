@@ -275,8 +275,8 @@ const Account = () => {
           <QRCodeBtn content={id as string} />
         </div>
         <AccountOverview
-          isOverviewLoading={isOverviewLoading || isOverviewUnionLoading}
-          isBalanceLoading={isBalanceLoading}
+          isOverviewLoading={!account && (isOverviewLoading || isOverviewUnionLoading)}
+          isBalanceLoading={!account && isBalanceLoading}
           account={account}
           balance={balance}
           deployerAddr={deployerAddr}
