@@ -233,7 +233,7 @@ context('Block Page', () => {
           expect(field.find('time').attr('datetime')).to.eq('2022-06-24T04:03:33.492000Z')
         })
         .next()
-        .should('have.text', '0x60a227...c90b8984')
+        .should('have.text', 'gwtest.bit')
         .next()
         .should('have.text', 'polyjuice creator')
         .next()
