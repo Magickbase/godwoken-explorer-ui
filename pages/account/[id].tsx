@@ -88,7 +88,7 @@ const Account = () => {
 
   const deployment_tx_hash = isSmartContractAccount(account) && account?.smart_contract?.deployment_tx_hash
 
-  const { data: deployerAddr } = useQuery(
+  const { data: deployer } = useQuery(
     ['deployer', deployment_tx_hash],
     () =>
       fetchDeployAddress({
@@ -288,7 +288,7 @@ const Account = () => {
           isBalanceLoading={!account && isBalanceLoading}
           account={account}
           balance={balance}
-          deployerAddr={deployerAddr}
+          deployer={deployer}
           refetch={accountOverviewRefetch}
         />
         <div className={styles.list}>
