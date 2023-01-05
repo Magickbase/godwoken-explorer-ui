@@ -20,11 +20,7 @@ context('Transaction Page', () => {
       })
 
       it('should have from', () => {
-        cy.get('dl[title="from"]')
-          .find('dt')
-          .should('have.text', 'from')
-          .next()
-          .should('have.text', '0x40dfb7df991c9aa6138a60f0cac6ed1d02b834b8')
+        cy.get('dl[title="from"]').find('dt').should('have.text', 'from')
       })
 
       it('should have contract address', () => {

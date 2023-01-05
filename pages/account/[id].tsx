@@ -88,7 +88,7 @@ const Account = () => {
 
   const deployment_tx_hash = isSmartContractAccount(account) && account?.smart_contract?.deployment_tx_hash
 
-  const { data: deployerAddr } = useQuery(
+  const { data: deployer } = useQuery(
     ['deployer', deployment_tx_hash],
     () =>
       fetchDeployAddress({
@@ -231,8 +231,16 @@ const Account = () => {
       ]
     : []
 
-  const title = account ? t(`accountType.${account.type}`) : <Skeleton animation="wave" width="200px" />
   const accountType = account?.type
+  const title = account ? (
+    accountType ? (
+      t(`accountType.${accountType}`)
+    ) : (
+      t(`accountType.Unknown`)
+    )
+  ) : (
+    <Skeleton animation="wave" width="200px" />
+  )
 
   const tabs = [
     { label: t('transactionRecords'), key: 'transactions' },
@@ -261,6 +269,7 @@ const Account = () => {
       : null,
     [GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType) ? { label: t('events'), key: 'events' } : null,
   ].filter(v => v)
+
   return (
     <>
       <SubpageHead subtitle={account ? `${title} ${id}` : (id as string)} />
@@ -275,11 +284,11 @@ const Account = () => {
           <QRCodeBtn content={id as string} />
         </div>
         <AccountOverview
-          isOverviewLoading={isOverviewLoading || isOverviewUnionLoading}
-          isBalanceLoading={isBalanceLoading}
+          isOverviewLoading={!account && (isOverviewLoading || isOverviewUnionLoading)}
+          isBalanceLoading={!account && isBalanceLoading}
           account={account}
           balance={balance}
-          deployerAddr={deployerAddr}
+          deployer={deployer}
           refetch={accountOverviewRefetch}
         />
         <div className={styles.list}>

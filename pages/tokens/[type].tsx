@@ -17,6 +17,7 @@ import TokenLogo from 'components/TokenLogo'
 import FilterMenu from 'components/FilterMenu'
 import Amount from 'components/Amount'
 import Tooltip from 'components/Tooltip'
+import Address from 'components/TruncatedAddress'
 import { SIZES } from 'components/PageSize'
 import SortIcon from 'assets/icons/sort.svg'
 import AddIcon from 'assets/icons/add.svg'
@@ -43,7 +44,7 @@ type TokenListProps = {
       icon: string | null
       symbol: string
       holders_count: number
-      account: Pick<GraphQLSchema.Account, 'eth_address' | 'script_hash'>
+      account: Pick<GraphQLSchema.Account, 'eth_address' | 'script_hash' | 'bit_alias'>
     }>
     metadata: GraphQLSchema.PageMetadata
   }
@@ -103,6 +104,7 @@ const tokenListQuery = gql`
         account {
           eth_address
           script_hash
+          bit_alias
         }
       }
       metadata {
@@ -311,6 +313,8 @@ const TokenList = () => {
                   }
                   const id = token.bridge_account_id ?? token.id
                   const addr = token.contract_address_hash || token.account.script_hash
+                  const domain = token.account?.bit_alias
+
                   return (
                     <tr key={id}>
                       <td title={name}>
@@ -374,7 +378,9 @@ const TokenList = () => {
                         </Stack>
                       </td>
                       <td title={addr}>
-                        {addr.length > 42 ? (
+                        {domain ? (
+                          <Address address={addr} domain={domain} />
+                        ) : addr.length > 42 ? (
                           <Tooltip title={addr} placement="top">
                             <span>
                               <HashLink label={`${addr.slice(0, 12)}...${addr.slice(-12)}`} href={`/account/${addr}`} />

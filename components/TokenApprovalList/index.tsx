@@ -307,7 +307,7 @@ const TokenApprovalList: React.FC<TokenApprovalListProps & { maxCount?: string; 
                   <td>{t(item.udt.eth_type as string, { ns: 'account' })}</td>
                   <td>{item.type === GraphQLSchema.ApprovalType.Approval ? 'approve' : 'approve for all'}</td>
                   <td>
-                    <Address address={item.spender_address_hash} />
+                    <Address address={item.spender_address_hash} domain={item.from_alias} />
                   </td>
                   <td>
                     <RevokeButton setAlert={setAlert} listItem={item} account={id as string} hideItem={hideItem} />
