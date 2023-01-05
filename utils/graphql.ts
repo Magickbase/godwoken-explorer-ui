@@ -117,6 +117,7 @@ export namespace GraphQLSchema {
     token_transfer_count: number
     transaction_count: number
     type: AccountType
+    bit_alias: string
   }
 
   export interface AccountCkb {
@@ -226,7 +227,7 @@ export namespace GraphQLSchema {
     name: string
     symbol: string
     icon: string
-    account: Pick<Account, 'eth_address'>
+    account: Pick<Account, 'eth_address' | 'bit_alias'>
     holders_count: string
     minted_count: string
   }
@@ -236,7 +237,7 @@ export namespace GraphQLSchema {
     name: string
     symbol: string
     icon: string
-    account: Pick<Account, 'eth_address'>
+    account: Pick<Account, 'eth_address' | 'bit_alias'>
     holders_count: string
     minted_count: string
     token_type_count: number
