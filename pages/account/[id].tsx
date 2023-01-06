@@ -264,7 +264,7 @@ const Account = () => {
     accountType ? (
       t(`accountType.${accountType}`)
     ) : (
-      t(`accountType.Unknown`)
+      t(`accountType.UNKNOWN`)
     )
   ) : (
     <Skeleton animation="wave" width="200px" />

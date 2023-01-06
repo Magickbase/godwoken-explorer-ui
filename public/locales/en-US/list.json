@@ -94,5 +94,6 @@
   "price": "Price",
   "price-updated-at": "Price updated at {{time}}",
   "switch-to-price": "Switch to price",
-  "switch-to-amount": "Switch to amount"
+  "switch-to-amount": "Switch to amount",
+  "search_result_title": "Search results for the token name \"{{name}}\""
 }
