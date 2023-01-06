@@ -23,3 +23,16 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+
+declare namespace Cypress {
+  interface Chainable<Subject = any> {
+    skipWhen(expression: boolean): Chainable<any>
+  }
+}
+
+// command for skipping tests
+Cypress.Commands.add('skipWhen', function (expression) {
+  if (expression) {
+    this.skip()
+  }
+})

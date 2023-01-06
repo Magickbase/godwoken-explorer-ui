@@ -41,6 +41,8 @@
   "logs": "日志",
   "eventsFilterPlaceholder": "输入区块号或者 Topic0 进行筛选",
   "filterEventBy": "筛选 {{filter}} 的事件",
+  "method_id": "方法 ID",
+  "method_name": "方法名",
   "block_from": "从",
   "block_to": "到",
   "address_from": "从",
@@ -52,6 +54,8 @@
   "invalid_date": "无效日期",
   "filter_menu": {
     "name": "名称",
+    "method_id": "方法 ID",
+    "method_name": "方法名",
     "block_from": "区块高度",
     "block_to": "区块高度",
     "address_from": "通过地址搜索",
