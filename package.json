@@ -68,7 +68,7 @@
     "jest": "29.3.1",
     "jest-environment-jsdom": "29.3.1",
     "lint-staged": "13.1.0",
-    "postcss": "8.4.20",
+    "postcss": "8.4.21",
     "postcss-flexbugs-fixes": "5.0.2",
     "postcss-import": "15.1.0",
     "postcss-nesting": "10.2.0",
