@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
 import NextLink from 'next/link'
@@ -9,6 +10,7 @@ import Address from 'components/TruncatedAddress'
 import Pagination from 'components/SimplePagination'
 import TransferDirection from 'components/TransferDirection'
 import FilterMenu from 'components/FilterMenu'
+import AgeFilterMenu from 'components/FilterMenu/AgeFilterMenu'
 import RoundedAmount from 'components/RoundedAmount'
 import Tooltip from 'components/Tooltip'
 import NoDataIcon from 'assets/icons/no-data.svg'
@@ -32,32 +34,44 @@ export type TxListProps = {
     metadata: GraphQLSchema.PageMetadata
   }
   viewer?: string
+  blockNumber?: number
 }
 
 const txListQuery = gql`
-  query (
-    $address: HashAddress
-    $script_hash: HashFull
+  query txListQuery(
+    $address_from: HashAddress
+    $address_to: HashAddress
+    $from_script_hash: HashFull
+    $to_script_hash: HashFull
     $before: String
     $after: String
     $limit: Int
     $start_block_number: Int
     $end_block_number: Int
     $status: Status
+    $age_range_start: DateTime
+    $age_range_end: DateTime
+    $method_id: String
+    $method_name: String
+    $combine_from_to: Boolean
   ) {
     transactions(
       input: {
-        from_eth_address: $address
-        to_eth_address: $address
-        from_script_hash: $script_hash
-        to_script_hash: $script_hash
+        from_script_hash: $from_script_hash
+        to_script_hash: $to_script_hash
         before: $before
         after: $after
         limit: $limit
         start_block_number: $start_block_number
         end_block_number: $end_block_number
-        combine_from_to: true
+        combine_from_to: $combine_from_to
         status: $status
+        from_eth_address: $address_from
+        to_eth_address: $address_to
+        age_range_start: $age_range_start
+        age_range_end: $age_range_end
+        method_id: $method_id
+        method_name: $method_name
       }
     ) {
       entries {
@@ -106,12 +120,20 @@ interface Filter {
   start_block_number?: number | null
   end_block_number?: number | null
   status?: Status
+  address_from: string
+  address_to: string
+  age_range_start: string
+  age_range_end: string
+  method_id: string
+  method_name: string
+  combine_from_to: boolean
 }
 interface EthAccountTxListVariables extends Nullable<Filter> {
   address?: string | null
 }
 interface GwAccountTxListVariables extends Nullable<Filter> {
-  script_hash?: string | null
+  from_script_hash?: string | null
+  to_script_hash?: string | null
 }
 interface BlockTxListVariables extends Nullable<Filter> {}
 type Variables = Filter | EthAccountTxListVariables | GwAccountTxListVariables | BlockTxListVariables
@@ -122,13 +144,23 @@ export const fetchTxList = ({ status = 'ON_CHAINED', ...variables }: Variables) 
     .then(data => data.transactions)
     .catch(() => ({ entries: [], metadata: { before: null, after: null, total_count: 0 } }))
 
-const FILTER_KEYS = ['block_from', 'block_to']
+const FILTER_KEYS = [
+  'block_from',
+  'block_to',
+  'method_id',
+  'method_name',
+  'address_from',
+  'address_to',
+  'age_range_start',
+  'age_range_end',
+]
 
 const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> = ({
   transactions: { entries, metadata },
   maxCount,
   pageSize,
   viewer,
+  blockNumber,
 }) => {
   const [t, { language }] = useTranslation('list')
   const { query } = useRouter()
@@ -141,16 +173,36 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
         <thead>
           <tr>
             <th>{t('txHash')}</th>
-            <th>{t('method')}</th>
             <th>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                {t('block')}
-                <FilterMenu filterKeys={FILTER_KEYS} />
+              <div className={styles.methodHeader}>
+                {t('method')}
+                <FilterMenu filterKeys={[FILTER_KEYS[2], FILTER_KEYS[3]]} />
               </div>
             </th>
-            <th>{t('age')}</th>
-            <th>{t('from')}</th>
-            <th>{t('to')}</th>
+            <th>
+              <div className={styles.blockHeader}>
+                {t('block')}
+                <FilterMenu filterKeys={[FILTER_KEYS[0], FILTER_KEYS[1]]} />
+              </div>
+            </th>
+            <th>
+              <div className={styles.ageHeader}>
+                {t('age')}
+                <AgeFilterMenu filterKeys={[FILTER_KEYS[6], FILTER_KEYS[7]]} />
+              </div>
+            </th>
+            <th>
+              <div className={styles.fromHeader}>
+                {t('from')}
+                <FilterMenu filterKeys={[FILTER_KEYS[4]]} />
+              </div>
+            </th>
+            <th>
+              <div className={styles.toHeader}>
+                {t('to')}
+                <FilterMenu filterKeys={[FILTER_KEYS[5]]} />
+              </div>
+            </th>
             <th className={styles.direction}></th>
             <th>{`${t('value')} (${PCKB_UDT_INFO.symbol})`}</th>
           </tr>

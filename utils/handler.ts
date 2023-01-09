@@ -1,6 +1,6 @@
 import { ServerResponse } from 'http'
 import { NotFoundException } from './exceptions'
-import { fetchSearch } from './api'
+import { fetchSearchKeyword } from './api'
 
 export const handleApiError = (err: Error, _res: ServerResponse | null, locale: string, query?: string) => {
   // return {
@@ -34,14 +34,18 @@ export const handleSearchKeyPress = async (e: React.KeyboardEvent<HTMLInputEleme
     return
   }
 
+  // A non-number, could be a token name
+  // Redirect to the `search-result-tokens` list page, uses `search_udt` query to fetch a list
   if (Number.isNaN(+search)) {
-    // could be token name
-    push(`/tokens/native?name=${encodeURIComponent(search)}&search=${encodeURIComponent(search)}`)
+    push(`/search-result-tokens?search=${encodeURIComponent(search)}`)
     return
   }
 
+  // Otherwise, search by keyword: address|tx hash|block number
+  // Using `search_keyword` query to get a single item
+  // Redirect to an account|block|token details page
   try {
-    const res = await fetchSearch(search.toLowerCase())
+    const res = await fetchSearchKeyword(search.toLowerCase())
     push(res)
   } catch (err) {
     window.alert(err.message)
