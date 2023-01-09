@@ -131,12 +131,12 @@ context('Search', () => {
         })
     })
 
-    it('should redirect to tokens page when keyword is not a number', () => {
+    it('should redirect to search tokens result page when keyword is not a number', () => {
       const UNKNOWN_STRING = 'unknown'
       cy.get(`${ROOT_SELECTOR} input`).type(UNKNOWN_STRING)
       cy.get(ROOT_SELECTOR).type('{enter}')
-      cy.url({ timeout: REDIRECT_TIMEOUT }).should('contain', `/tokens/native`)
-      cy.location('search').should('eq', `?name=${UNKNOWN_STRING}&search=${UNKNOWN_STRING}`)
+      cy.url({ timeout: REDIRECT_TIMEOUT }).should('contain', `/search-result-tokens`)
+      cy.location('search').should('eq', `?search=${UNKNOWN_STRING}`)
     })
 
     it('404', () => {
