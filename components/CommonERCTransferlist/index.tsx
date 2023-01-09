@@ -77,6 +77,7 @@ const getTransferListQuery = (type: TransferlistType) => gql`
         token_id
         token_ids
         token_contract_address_hash
+        amount
       }
       metadata {
         total_count

@@ -1,7 +1,34 @@
 import { addressToScript } from '@nervosnetwork/ckb-sdk-utils'
-import { isError, ErrorResponse, API_ENDPOINT, HttpStatus } from './utils'
+import { gql } from 'graphql-request'
+import { client } from 'utils/graphql'
 
-export const fetchSearch = (search: string) => {
+const searchKeywordQuery = gql`
+  query searchKeyword($text: String!) {
+    search_keyword(input: { keyword: $text }) {
+      type
+      id
+    }
+  }
+`
+
+interface Variables {
+  text: string
+}
+
+type SearchKeywordProps = {
+  search_keyword: {
+    type: string | null
+    id: string | null
+  }
+}
+
+const fetchSearchResult = (variables: Variables): Promise<SearchKeywordProps['search_keyword']> =>
+  client
+    .request<SearchKeywordProps>(searchKeywordQuery, variables)
+    .then(data => data.search_keyword)
+    .catch(() => ({ type: null, id: null }))
+
+export const fetchSearchKeyword = (search: string) => {
   let query = search
   if (query.startsWith('ck')) {
     try {
@@ -11,28 +38,26 @@ export const fetchSearch = (search: string) => {
       console.warn(err)
     }
   }
-
-  return fetch(`${API_ENDPOINT}/search?keyword=${query}`)
+  return fetchSearchResult({ text: query })
     .then(async res => {
-      if (res.status === HttpStatus.NotFound) {
+      if (!res || !res.id) {
         return `/404`
       }
-      const found: Record<'id' | 'type', string> | ErrorResponse = await res.json()
-      if (isError(found)) {
-        return `/404`
-      }
-      switch (found.type) {
-        case 'block': {
-          return `/block/${found.id}`
+      switch (res.type) {
+        case 'BLOCK': {
+          return `/block/${res.id}`
         }
-        case 'transaction': {
-          return `/tx/${found.id}`
+        case 'TRANSACTION': {
+          return `/tx/${res.id}`
         }
-        case 'account': {
-          return `/account/${found.id}`
+        case 'ACCOUNT': {
+          return `/account/${res.id}`
         }
-        case 'udt': {
-          return `/token/${found.id}`
+        case 'ADDRESS': {
+          return `/account/${res.id}`
+        }
+        case 'UDT': {
+          return `/token/${res.id}`
         }
         default: {
           return `/404`

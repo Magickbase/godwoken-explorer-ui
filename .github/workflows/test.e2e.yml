@@ -12,7 +12,7 @@ on:
 
 jobs:
   e2e_tests:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -31,7 +31,7 @@ jobs:
         run: npx cypress info
 
       - name: Cypress run
-        uses: cypress-io/github-action@v5.0.2
+        uses: cypress-io/github-action@v5.0.4
         with:
           install: false
           build: npm run build
