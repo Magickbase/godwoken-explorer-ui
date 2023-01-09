@@ -5,6 +5,7 @@ import Address from 'components/TruncatedAddress'
 import Pagination from 'components/SimplePagination'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import { client, GraphQLSchema } from 'utils'
+
 import styles from './styles.module.scss'
 
 export type HolderListProps = {
@@ -13,6 +14,7 @@ export type HolderListProps = {
       rank: number
       address_hash: string
       quantity: number
+      account: Pick<GraphQLSchema.Account, 'bit_alias' | 'eth_address'>
     }>
     metadata: GraphQLSchema.PageMetadata
   }
@@ -24,6 +26,10 @@ const holderFragment = gql`
       rank
       address_hash
       quantity
+      account {
+        bit_alias
+        eth_address
+      }
     }
     metadata {
       before
@@ -99,16 +105,21 @@ const MultiTokenHolderList: React.FC<HolderListProps> = ({ holders }) => {
         </thead>
         <tbody>
           {holders?.metadata.total_count ? (
-            holders.entries.map(item => (
-              <tr key={item.address_hash}>
-                <td>{item.rank}</td>
-                <td className={styles.address}>
-                  <Address address={item.address_hash} />
-                  <Address address={item.address_hash} leading={22} />
-                </td>
-                <td>{(+item.quantity).toLocaleString('en')}</td>
-              </tr>
-            ))
+            holders.entries.map(item => {
+              const address = item.account?.eth_address
+              const domain = item.account?.bit_alias
+
+              return (
+                <tr key={address}>
+                  <td>{item.rank}</td>
+                  <td className={styles.address}>
+                    <Address address={address} domain={domain} />
+                    <Address address={address} domain={domain} leading={22} />
+                  </td>
+                  <td>{(+item.quantity).toLocaleString('en')}</td>
+                </tr>
+              )
+            })
           ) : (
             <tr>
               <td colSpan={3}>

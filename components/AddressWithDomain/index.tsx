@@ -14,7 +14,7 @@ type Props = {
 const AddressWithDomain = ({ domain, hash, href = '', leading = 8 }: Props) => {
   return (
     <div className={styles.container}>
-      <Tooltip title={domain} placement="top">
+      <Tooltip title=".bit Name" placement="top">
         <img src={`${IMG_URL}bit-logo.svg`} loading="lazy" crossOrigin="anonymous" referrerPolicy="no-referrer" />
       </Tooltip>
       <Tooltip title={hash} placement="top">
