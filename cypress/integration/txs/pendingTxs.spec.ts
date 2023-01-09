@@ -1,10 +1,10 @@
 /// <reference types="cypress" />
 
-/*
- * skip for now, because pending transaction list is randomly empty
- */
-context.skip('Pending Transactions List Page', () => {
-  before(() => cy.visit('/en-US/txs?status=pending'))
+context('Pending Transactions List Page', () => {
+  before(() => {
+    cy.visit('/en-US/txs?status=pending')
+    cy.skipWhen(cy.contains("There're no matching entries") !== null)
+  })
 
   it('should have a subtitle', () => {
     cy.get('h5+div p')

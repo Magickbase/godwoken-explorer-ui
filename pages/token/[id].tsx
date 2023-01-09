@@ -52,7 +52,6 @@ interface TokenInfoProps {
     description: string | null
     supply: string
     holders_count: number
-    minted_count: number
     contract_address_hash: string
     token_exchange_rate: {
       exchange_rate: number | null
@@ -77,7 +76,6 @@ const tokenInfoQuery = gql`
       description
       supply
       holders_count
-      minted_count
       contract_address_hash
       token_exchange_rate {
         exchange_rate

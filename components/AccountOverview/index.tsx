@@ -265,7 +265,7 @@ const AccountOverview: React.FC<AccountOverviewProps & { refetch: () => Promise<
 }) => {
   const [t] = useTranslation(['account', 'common'])
 
-  if (!account) {
+  if (isOverviewLoading) {
     return (
       <div className={styles.container}>
         <InfoList

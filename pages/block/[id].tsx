@@ -17,7 +17,7 @@ import HashLink from 'components/HashLink'
 import CopyBtn from 'components/CopyBtn'
 import OpenInNewIcon from 'assets/icons/open-in-new.svg'
 import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
-import { fetchBlock, formatDatetime, CKB_EXPLORER_URL, formatInt, fetchBridgedRecordList } from 'utils'
+import { fetchBlock, formatDatetime, CKB_EXPLORER_URL, formatInt, fetchBridgedRecordList, isEthAddress } from 'utils'
 import styles from './styles.module.scss'
 
 const tabs = ['transactions', 'bridged', 'raw-data']
@@ -27,7 +27,19 @@ const Block = () => {
   const [isFinalized, setIsFinalized] = useState(false)
   const {
     replace,
-    query: { id, tab = 'transactions', before = null, after = null, page = '1' },
+    query: {
+      id,
+      tab = 'transactions',
+      before = null,
+      after = null,
+      page = '1',
+      address_from = null,
+      address_to = null,
+      age_range_start = null,
+      age_range_end = null,
+      method_id = null,
+      method_name = null,
+    },
   } = useRouter()
 
   const { isLoading: isBlockLoading, data: block } = useQuery(['block', id], () => fetchBlock(id as string), {
@@ -44,13 +56,33 @@ const Block = () => {
   }, [isBlockLoading, block, replace, setIsFinalized])
 
   const { isLoading: isTxListLoading, data: txList } = useQuery(
-    ['block-tx-list', block?.number, before, after],
+    [
+      'block-tx-list',
+      block?.number,
+      before,
+      after,
+      address_from,
+      address_to,
+      age_range_start,
+      age_range_end,
+      method_id,
+      method_name,
+    ],
     () =>
       fetchTxList({
         start_block_number: block?.number,
         end_block_number: block?.number,
         before: before as string | null,
         after: after as string | null,
+        address_from: isEthAddress(address_from as string) ? (address_from as string) : null,
+        address_to: isEthAddress(address_to as string) ? (address_to as string) : null,
+        from_script_hash: !isEthAddress(address_from as string) ? (address_from as string) : null,
+        to_script_hash: !isEthAddress(address_to as string) ? (address_to as string) : null,
+        age_range_start: age_range_start as string | null,
+        age_range_end: age_range_end as string | null,
+        method_id: method_id as string | null,
+        method_name: method_name as string | null,
+        combine_from_to: address_from && address_to ? false : true,
       }),
     {
       enabled: tab === 'transactions' && !!block?.hash,
@@ -216,7 +248,7 @@ const Block = () => {
           />
           {tab === 'transactions' ? (
             !isTxListLoading && txList ? (
-              <TxList transactions={txList} />
+              <TxList transactions={txList} blockNumber={block.number} />
             ) : (
               <Skeleton animation="wave" />
             )
