@@ -61,8 +61,10 @@ const Account = () => {
       age_range_end = null,
       method_id = null,
       method_name = null,
+      search = '',
     },
   } = useRouter()
+
   const [t] = useTranslation(['account', 'common'])
   const q = isEthAddress(id as string) ? { address: id as string } : { script_hash: id as string }
 
@@ -303,7 +305,16 @@ const Account = () => {
       <SubpageHead subtitle={account ? `${title} ${id}` : (id as string)} />
       <div className={styles.container}>
         <div className={styles.title}>
-          <PageTitle>{title}</PageTitle>
+          <PageTitle>
+            {title}
+            {search ? (
+              isEthAddress(search as string) ? null : (
+                <div className={styles['invalid-tips']}>
+                  <span>{t('invalidAddress')}</span>
+                </div>
+              )
+            ) : null}
+          </PageTitle>
           {downloadItems.length ? <DownloadMenu items={downloadItems} /> : null}
         </div>
         <div className={styles.hash}>

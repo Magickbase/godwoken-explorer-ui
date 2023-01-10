@@ -91,5 +91,6 @@
   "ERC721": "ERC-721",
   "erc721Assets": "ERC 721 资产",
   "erc1155Assets": "ERC 1155 资产",
-  "erc20Assets": "ERC 20 资产"
+  "erc20Assets": "ERC 20 资产",
+  "invalidAddress": "*无效的地址格式"
 }
