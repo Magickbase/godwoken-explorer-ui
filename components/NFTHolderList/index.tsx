@@ -13,6 +13,9 @@ export type HolderListProps = {
       rank: number
       address_hash: string
       quantity: string
+      account: {
+        bit_alias: string
+      }
     }>
     metadata: GraphQLSchema.PageMetadata
   }
@@ -25,6 +28,9 @@ const holdersListQuery = gql`
         rank
         address_hash
         quantity
+        account {
+          bit_alias
+        }
       }
       metadata {
         before
@@ -65,8 +71,8 @@ const NFTHolderList: React.FC<HolderListProps> = ({ holders }) => {
               <tr key={item.address_hash}>
                 <td>{item.rank}</td>
                 <td className={styles.address}>
-                  <Address address={item.address_hash} />
-                  <Address address={item.address_hash} leading={22} />
+                  <Address address={item.address_hash} domain={item.account?.bit_alias} />
+                  <Address address={item.address_hash} domain={item.account?.bit_alias} leading={22} />
                 </td>
                 <td>{(+item.quantity).toLocaleString('en')}</td>
               </tr>
