@@ -106,6 +106,7 @@ const txListQuery = gql`
           native_transfer_address_hash
           native_transfer_account {
             bit_alias
+            eth_address
           }
         }
         type
