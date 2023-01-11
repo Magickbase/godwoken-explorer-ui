@@ -286,6 +286,12 @@ const Tx = () => {
     utf8Input ? { type: 'utf8', text: utf8Input } : null,
   ].filter(v => v)
 
+  const getGasPriceDisplayValue = (gasPrice: string): string => {
+    return gasPrice === '0'
+      ? 'Gasless'
+      : `${new BigNumber(gasPrice).dividedBy(10 ** PCKB_UDT_INFO.decimal).toFormat()} ${PCKB_UDT_INFO.symbol}`
+  }
+
   const fromAddrDisplay = getAddressDisplay(tx?.from_account)
   const toAddrDisplay = getAddressDisplay(tx?.to_account, tx?.polyjuice?.native_transfer_address_hash)
   const method = tx?.method_name ?? tx?.method_id
@@ -441,9 +447,7 @@ const Tx = () => {
     {
       field: t('gasPrice'),
       content: tx?.polyjuice?.gas_price ? (
-        <span className={styles.gasPrice}>{`${new BigNumber(tx.polyjuice.gas_price)
-          .dividedBy(10 ** PCKB_UDT_INFO.decimal)
-          .toFormat()} ${PCKB_UDT_INFO.symbol}`}</span>
+        <span className={styles.gasPrice}>{getGasPriceDisplayValue(tx.polyjuice.gas_price)}</span>
       ) : isTxLoading ? (
         <Skeleton animation="wave" />
       ) : isPolyjuiceTx ? (
