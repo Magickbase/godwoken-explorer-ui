@@ -61,7 +61,6 @@ const Account = () => {
       age_range_end = null,
       method_id = null,
       method_name = null,
-      search = '',
     },
   } = useRouter()
 
@@ -307,13 +306,11 @@ const Account = () => {
         <div className={styles.title}>
           <PageTitle>
             {title}
-            {search ? (
-              isEthAddress(search as string) ? null : (
-                <div className={styles['invalid-tips']}>
-                  <span>{t('invalidAddress')}</span>
-                </div>
-              )
-            ) : null}
+            {!isEthAddress(id as string) && (
+              <div className={styles['invalid-tips']}>
+                <span>{t('invalidAddress')}</span>
+              </div>
+            )}
           </PageTitle>
           {downloadItems.length ? <DownloadMenu items={downloadItems} /> : null}
         </div>
