@@ -6,6 +6,7 @@ export interface InfoItermProps {
   expandable?: boolean
   tooltipTitle?: string
   ddClassName?: string
+  colSpan?: number
 }
 
 const InfoList: React.FC<{
@@ -16,6 +17,7 @@ const InfoList: React.FC<{
   type?: 'one-column' | 'two-columns'
 }> = ({ title, list, style, type = 'one-column', className = '' }) => {
   const midIndex = Math.floor(list.length / 2)
+  const numCols = type === 'one-column' ? 1 : 2
 
   return (
     <div className={`${styles.container} ${className}`} style={style} data-testid="infoList">
@@ -27,7 +29,7 @@ const InfoList: React.FC<{
         ) : null}
         {list
           .filter(v => v)
-          .map(({ field, content, expandable, tooltipTitle, ddClassName }, idx) => {
+          .map(({ field, content, expandable, tooltipTitle, ddClassName, colSpan = 1 }, idx) => {
             return (
               <dl
                 key={field}
@@ -37,6 +39,7 @@ const InfoList: React.FC<{
                 data-show-tooltip={!!tooltipTitle}
                 style={{
                   order: type === 'one-column' ? 1 : idx >= midIndex ? (idx - midIndex) * 2 + 1 : idx * 2,
+                  flexBasis: `${Math.floor((100 * colSpan) / numCols)}%`,
                 }}
               >
                 <dt className={styles.term}>{field}</dt>

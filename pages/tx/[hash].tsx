@@ -66,6 +66,13 @@ interface Transaction {
     | 'gas_used'
     | 'gas_limit'
     | 'gas_price'
+    | 'call_contract'
+    | 'call_data'
+    | 'call_gas_limit'
+    | 'verification_gas_limit'
+    | 'max_fee_per_gas'
+    | 'max_priority_fee_per_gas'
+    | 'paymaster_and_data'
   > | null
   polyjuice_creator: Pick<GraphQLSchema.PolyjuiceCreator, 'created_account'> | null
   block: Pick<GraphQLSchema.Block, 'number' | 'hash' | 'timestamp' | 'status' | 'layer1_block_number'>
@@ -104,6 +111,13 @@ const txQuery = gql`
       gas_used
       gas_limit
       gas_price
+      call_contract
+      call_data
+      call_gas_limit
+      verification_gas_limit
+      max_fee_per_gas
+      max_priority_fee_per_gas
+      paymaster_and_data
     }
     polyjuice_creator {
       created_account {
@@ -492,6 +506,86 @@ const Tx = () => {
     },
   ]
 
+  const userOperations: InfoItermProps[] = [
+    {
+      field: t('call_contract'),
+      content: tx?.polyjuice?.call_contract ? (
+        <HashLink label={tx.polyjuice.call_contract} href={`/address/${tx.polyjuice.call_contract}`} />
+      ) : (
+        '-'
+      ),
+    },
+    { field: t('call_gas_limit'), content: tx?.polyjuice?.call_gas_limit || '-' },
+    { field: t('verification_gas_limit'), content: tx?.polyjuice?.verification_gas_limit || '-' },
+    {
+      field: t('paymaster'),
+      content: tx?.polyjuice?.paymaster_and_data ? (
+        <HashLink
+          label={tx.polyjuice.paymaster_and_data.slice(0, 20)}
+          href={`/address/${tx.polyjuice.paymaster_and_data.slice(0, 20)}`}
+        />
+      ) : (
+        '-'
+      ),
+      colSpan: 2,
+    },
+    {
+      field: t('max_fee_per_gas'),
+      content: tx?.polyjuice?.max_fee_per_gas ? (
+        <span className={styles.gasFee}>
+          <Amount
+            amount={`${new BigNumber(tx.polyjuice.max_fee_per_gas).times(new BigNumber(tx.polyjuice.max_fee_per_gas))}`}
+            udt={PCKB_UDT_INFO}
+            showSymbol
+          />
+        </span>
+      ) : (
+        '-'
+      ),
+    },
+    {
+      field: t('max_priority_fee_per_gas'),
+      content: tx?.polyjuice?.max_priority_fee_per_gas ? (
+        <span className={styles.gasFee}>
+          <Amount
+            amount={`${new BigNumber(tx.polyjuice.max_priority_fee_per_gas).times(
+              new BigNumber(tx.polyjuice.max_priority_fee_per_gas),
+            )}`}
+            udt={PCKB_UDT_INFO}
+            showSymbol
+          />
+        </span>
+      ) : (
+        '-'
+      ),
+    },
+
+    {
+      field: t('paymaster_data'),
+      content: tx?.polyjuice?.paymaster_and_data ? tx.polyjuice.paymaster_and_data.slice(20) : '-',
+    },
+    {
+      field: t('call_data'),
+      content: tx?.polyjuice?.call_data ? (
+        <details className={styles.input}>
+          <summary>
+            {t('check')}
+            <ExpandIcon />
+          </summary>
+          <pre>
+            <dl className={styles.decodedInput}>
+              <dd>{tx.polyjuice.call_data}</dd>
+            </dl>
+          </pre>
+        </details>
+      ) : (
+        '-'
+      ),
+      expandable: true,
+      colSpan: 2,
+    },
+  ]
+
   const title = t('txInfo')
 
   return (
@@ -506,6 +600,14 @@ const Tx = () => {
         </PageTitle>
         <InfoList title={t(`overview`)} list={overview} style={{ marginBottom: '2rem' }} />
         <InfoList title={t(`basicInfo`)} list={basicInfo} style={{ marginBottom: '2rem' }} type="two-columns" />
+        {tx?.polyjuice?.gas_price === '0' ? (
+          <InfoList
+            title={t(`userOperations`)}
+            list={userOperations}
+            style={{ marginBottom: '2rem' }}
+            type="two-columns"
+          />
+        ) : null}
         <div className={styles.list}>
           <Tabs
             value={tabs.indexOf(tab as string)}
