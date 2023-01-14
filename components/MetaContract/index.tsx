@@ -1,7 +1,7 @@
 import type { MetaContract as MetaContractProps } from '../AccountOverview'
 import { useTranslation } from 'next-i18next'
 import BigNumber from 'bignumber.js'
-import InfoList, { InfoItermProps } from '../InfoList'
+import InfoList, { InfoItemProps } from '../InfoList'
 
 const MetaContract = ({
   status,
@@ -11,7 +11,7 @@ const MetaContract = ({
   last_finalized_block_number,
 }: MetaContractProps['script']) => {
   const [t] = useTranslation('account')
-  const list: Array<InfoItermProps> = [
+  const list: Array<InfoItemProps> = [
     {
       field: t(`type`),
       content: `Meta Contract`,

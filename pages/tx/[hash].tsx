@@ -11,7 +11,7 @@ import BigNumber from 'bignumber.js'
 import Tabs from 'components/Tabs'
 import SubpageHead from 'components/SubpageHead'
 import PageTitle from 'components/PageTitle'
-import InfoList, { InfoItermProps } from 'components/InfoList'
+import InfoList, { InfoItemProps } from 'components/InfoList'
 import CommonERCTransferlist, { fetchERCTransferList } from 'components/CommonERCTransferlist'
 import TxLogsList from 'components/TxLogsList'
 import RawTxData from 'components/RawTxData'
@@ -286,8 +286,10 @@ const Tx = () => {
     utf8Input ? { type: 'utf8', text: utf8Input } : null,
   ].filter(v => v)
 
-  const getGasPriceDisplayValue = (gasPrice: string): string => {
-    return gasPrice === '0'
+  const gasPrice = tx?.polyjuice?.gas_price
+  const isGasless = gasPrice === '0'
+  const getGasPriceDisplayValue = (): string => {
+    return isGasless
       ? 'Gasless'
       : `${new BigNumber(gasPrice).dividedBy(10 ** PCKB_UDT_INFO.decimal).toFormat()} ${PCKB_UDT_INFO.symbol}`
   }
@@ -297,7 +299,7 @@ const Tx = () => {
   const method = tx?.method_name ?? tx?.method_id
   const from_bit_alias = tx?.from_account?.bit_alias
 
-  const overview: InfoItermProps[] = [
+  const overview: InfoItemProps[] = [
     {
       field: t('hash'),
       content: (
@@ -447,7 +449,7 @@ const Tx = () => {
     {
       field: t('gasPrice'),
       content: tx?.polyjuice?.gas_price ? (
-        <span className={styles.gasPrice}>{getGasPriceDisplayValue(tx.polyjuice.gas_price)}</span>
+        <span className={styles.gasPrice}>{getGasPriceDisplayValue()}</span>
       ) : isTxLoading ? (
         <Skeleton animation="wave" />
       ) : isPolyjuiceTx ? (
@@ -486,11 +488,15 @@ const Tx = () => {
       content:
         tx && tx.polyjuice?.gas_price && tx.polyjuice.gas_used ? (
           <span className={styles.gasFee}>
-            <Amount
-              amount={`${new BigNumber(tx.polyjuice.gas_used).times(new BigNumber(tx.polyjuice.gas_price))}`}
-              udt={PCKB_UDT_INFO}
-              showSymbol
-            />
+            {isGasless ? (
+              'Gasless'
+            ) : (
+              <Amount
+                amount={`${new BigNumber(tx.polyjuice.gas_used).times(new BigNumber(tx.polyjuice.gas_price))}`}
+                udt={PCKB_UDT_INFO}
+                showSymbol
+              />
+            )}
           </span>
         ) : isTxLoading ? (
           <Skeleton animation="wave" />
@@ -510,7 +516,10 @@ const Tx = () => {
     },
   ]
 
-  const userOperations: InfoItermProps[] = [
+  const paymaster = tx?.polyjuice?.paymaster_and_data ? tx.polyjuice.paymaster_and_data.slice(0, 42) : null
+  const paymasterData = tx?.polyjuice?.paymaster_and_data ? tx.polyjuice.paymaster_and_data.slice(42) : null
+
+  const userOperations: InfoItemProps[] = [
     {
       field: t('call_contract'),
       content: tx?.polyjuice?.call_contract ? (
@@ -523,14 +532,7 @@ const Tx = () => {
     { field: t('verification_gas_limit'), content: tx?.polyjuice?.verification_gas_limit || '-' },
     {
       field: t('paymaster'),
-      content: tx?.polyjuice?.paymaster_and_data ? (
-        <HashLink
-          label={tx.polyjuice.paymaster_and_data.slice(0, 20)}
-          href={`/address/${tx.polyjuice.paymaster_and_data.slice(0, 20)}`}
-        />
-      ) : (
-        '-'
-      ),
+      content: paymaster ? <HashLink label={paymaster} href={`/address/${paymaster}`} /> : '-',
       colSpan: 2,
     },
     {
@@ -549,6 +551,7 @@ const Tx = () => {
     },
     {
       field: t('max_priority_fee_per_gas'),
+      ddClassName: styles.priorityGasFee,
       content: tx?.polyjuice?.max_priority_fee_per_gas ? (
         <span className={styles.gasFee}>
           <Amount
@@ -566,7 +569,13 @@ const Tx = () => {
 
     {
       field: t('paymaster_data'),
-      content: tx?.polyjuice?.paymaster_and_data ? tx.polyjuice.paymaster_and_data.slice(20) : '-',
+      content: paymasterData ? (
+        <Tooltip title={paymasterData} placement="top">
+          <div className={styles.paymasterData}>{paymasterData}</div>
+        </Tooltip>
+      ) : (
+        '-'
+      ),
     },
     {
       field: t('call_data'),
@@ -604,7 +613,7 @@ const Tx = () => {
         </PageTitle>
         <InfoList title={t(`overview`)} list={overview} style={{ marginBottom: '2rem' }} />
         <InfoList title={t(`basicInfo`)} list={basicInfo} style={{ marginBottom: '2rem' }} type="two-columns" />
-        {tx?.polyjuice?.gas_price === '0' ? (
+        {isGasless ? (
           <InfoList
             title={t(`userOperations`)}
             list={userOperations}

@@ -1,6 +1,6 @@
 import styles from './styles.module.scss'
 
-export interface InfoItermProps {
+export interface InfoItemProps {
   field: string
   content: React.ReactNode
   expandable?: boolean
@@ -11,7 +11,7 @@ export interface InfoItermProps {
 
 const InfoList: React.FC<{
   title?: string | React.ReactNode
-  list: Array<InfoItermProps>
+  list: Array<InfoItemProps>
   style?: React.CSSProperties
   className?: string
   type?: 'one-column' | 'two-columns'

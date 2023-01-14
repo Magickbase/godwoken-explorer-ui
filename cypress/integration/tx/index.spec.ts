@@ -110,7 +110,7 @@ context('Transaction Page', () => {
     describe('user operations', () => {
       it('should have Call Contract', () => {
         cy.fixture('tx').then(tx => {
-          hash = tx.gasslessTxHash
+          hash = tx.gaslessTxHash
           return cy.visit(`/en-US/tx/${hash}`)
         })
         cy.get('dl[title="Call Contract"]')
