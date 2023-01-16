@@ -1,11 +1,13 @@
 import { useTranslation } from 'next-i18next'
 import { gql } from 'graphql-request'
+import { useTheme } from '@mui/material/styles'
 import Table from 'components/Table'
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/SimplePagination'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import { client, GraphQLSchema } from 'utils'
 import styles from './styles.module.scss'
+import useMediaQuery from '@mui/material/useMediaQuery'
 
 export type HolderListProps = {
   holders: {
@@ -54,6 +56,8 @@ export const fetchHoldersList = (variables: {
 
 const NFTHolderList: React.FC<HolderListProps> = ({ holders }) => {
   const [t] = useTranslation('list')
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
   return (
     <>
@@ -70,9 +74,12 @@ const NFTHolderList: React.FC<HolderListProps> = ({ holders }) => {
             holders.entries.map(item => (
               <tr key={item.address_hash}>
                 <td>{item.rank}</td>
-                <td className={styles.address}>
-                  <Address address={item.address_hash} domain={item.account?.bit_alias} />
-                  <Address address={item.address_hash} domain={item.account?.bit_alias} leading={22} />
+                <td>
+                  {isMobile ? (
+                    <Address address={item.address_hash} domain={item.account?.bit_alias} />
+                  ) : (
+                    <Address address={item.address_hash} domain={item.account?.bit_alias} leading={22} />
+                  )}
                 </td>
                 <td>{(+item.quantity).toLocaleString('en')}</td>
               </tr>
@@ -87,6 +94,14 @@ const NFTHolderList: React.FC<HolderListProps> = ({ holders }) => {
               </td>
             </tr>
           )}
+
+          {/* <div className={styles.test}>
+            <div>
+              first floor
+              <div>first -1 floor</div>
+            </div>
+            <div>second</div>
+          </div> */}
         </tbody>
       </Table>
       {!holders?.metadata.total_count ? null : (
