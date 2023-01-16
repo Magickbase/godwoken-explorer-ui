@@ -71,6 +71,12 @@
     h2 {
       padding: 1rem 0.75rem;
       line-height: 1;
+      font-size: 15px;
+      a {
+        padding-top: 15px;
+        font-size: 12px;
+        font-weight: 500;
+      }
     }
     .item {
       border-top: 1px solid #f0f0f0;
@@ -82,6 +88,9 @@
         margin: 0;
         flex-basis: 100px;
         flex-shrink: 0;
+      }
+      & > div:nth-of-type(2) {
+        width: 100%;
       }
     }
   }

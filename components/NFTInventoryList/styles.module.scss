@@ -46,11 +46,23 @@
   .info {
     display: flex;
     justify-content: space-between;
-    span:first-of-type {
+    span:nth-child(1) {
       flex-basis: 80px;
       flex-shrink: 0;
       color: var(--secondary-text-color);
       cursor: default;
+    }
+    span:nth-child(2) {
+      justify-content: flex-end;
+      overflow: hidden;
+      & > span {
+        flex-basis: 100px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        @media screen and (max-width: 1024px) {
+          overflow: visible;
+        }
+      }
     }
     a {
       text-align: right;

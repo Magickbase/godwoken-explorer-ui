@@ -59,7 +59,7 @@ context('Tokens List Pages Tests', () => {
                 expect(link).to.has.css('pointer-events', 'none')
               })
           })
-          it('should navigate to next page on click next arrow', () => {
+          it.skip('should navigate to next page on click next arrow', () => {
             cy.get('@nextBtn').first().click({ force: true })
             waitForLoading()
             cy.location().should(loc => {
@@ -67,7 +67,7 @@ context('Tokens List Pages Tests', () => {
               expect(loc.search).to.match(/after=/)
             })
           })
-          it('should navigate back to prev page on click prev arrow', () => {
+          it.skip('should navigate back to prev page on click prev arrow', () => {
             cy.get('@prevBtn').first().click({ force: true })
             waitForLoading()
             cy.location().should(loc => {

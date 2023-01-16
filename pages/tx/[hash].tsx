@@ -15,7 +15,6 @@ import InfoList, { InfoItermProps } from 'components/InfoList'
 import CommonERCTransferlist, { fetchERCTransferList } from 'components/CommonERCTransferlist'
 import TxLogsList from 'components/TxLogsList'
 import RawTxData from 'components/RawTxData'
-import CopyBtn from 'components/CopyBtn'
 import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
 import TxType from 'components/TxType'
 import HashLink from 'components/HashLink'
@@ -25,6 +24,7 @@ import Tooltip from 'components/Tooltip'
 import PolyjuiceStatus from 'components/PolyjuiceStatus'
 import Address from 'components/TruncatedAddress'
 import { TransferlistType } from 'components/BaseTransferlist'
+import ResponsiveHash from 'components/ResponsiveHash'
 import ExpandIcon from 'assets/icons/expand.svg'
 import {
   formatDatetime,
@@ -35,7 +35,6 @@ import {
   PCKB_UDT_INFO,
   provider,
 } from 'utils'
-
 import styles from './styles.module.scss'
 
 const tabs = ['erc20Records', 'erc721Records', 'erc1155Records', 'logs', 'rawData']
@@ -280,25 +279,21 @@ const Tx = () => {
   const overview: InfoItermProps[] = [
     {
       field: t('hash'),
-      content: (
-        <div className={styles.hash}>
-          <span className="mono-font">{hash as string}</span>
-          <CopyBtn content={hash as string} field={t('hash')} />
-        </div>
-      ),
+      content: <ResponsiveHash label={hash as string} btnRight="copy" copyAlertText={t('hash')} />,
     },
     {
       field: t('from'),
       content: isTxLoading ? (
         <Skeleton animation="wave" />
       ) : tx ? (
-        <HashLink
-          label={
-            from_bit_alias ? <Address address={fromAddrDisplay.label} domain={from_bit_alias} /> : fromAddrDisplay.label
-          }
-          href={`/address/${fromAddrDisplay.address}`}
-          style={{ wordBreak: 'break-all' }}
-        />
+        from_bit_alias ? (
+          <HashLink
+            label={<Address address={fromAddrDisplay.label} domain={from_bit_alias} />}
+            href={`/address/${fromAddrDisplay.address}`}
+          />
+        ) : (
+          <ResponsiveHash label={fromAddrDisplay.label} href={`/address/${fromAddrDisplay.address}`} />
+        )
       ) : (
         t('pending')
       ),
@@ -308,7 +303,7 @@ const Tx = () => {
       content: isTxLoading ? (
         <Skeleton animation="wave" />
       ) : tx ? (
-        <HashLink label={toAddrDisplay.label} href={`/address/${toAddrDisplay.address}`} />
+        <ResponsiveHash label={toAddrDisplay.label} href={`/address/${toAddrDisplay.address}`} />
       ) : (
         t('pending')
       ),

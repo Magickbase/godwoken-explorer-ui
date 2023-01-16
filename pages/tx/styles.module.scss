@@ -19,13 +19,6 @@
     }
   }
 
-  .hash {
-    word-break: break-all;
-    span {
-      padding-right: 6px;
-    }
-  }
-
   .value,
   .gasPrice,
   .gasFee {
@@ -66,6 +59,7 @@
 }
 
 .input {
+  width: 100%;
   summary {
     display: flex;
     align-items: center;
@@ -155,7 +149,12 @@
     &[data-page-name='transaction-detail'] {
       dl[role='listitem'] {
         dt {
-          flex-basis: 168px !important;
+          flex-basis: 120px;
+          white-space: break-spaces;
+        }
+        dd {
+          display: flex;
+          align-items: center;
         }
       }
     }
