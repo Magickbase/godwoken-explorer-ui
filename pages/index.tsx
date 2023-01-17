@@ -31,6 +31,7 @@ import BlockStateIcon from 'components/BlockStateIcon'
 import TxStatusIcon from 'components/TxStatusIcon'
 import Address from 'components/TruncatedAddress'
 import { fetchHome, timeDistance, formatInt, client, GraphQLSchema, IS_MAINNET } from 'utils'
+import styles from './index.module.scss'
 
 type State = API.Home.Parsed
 
@@ -230,7 +231,7 @@ const ListContainer = ({ link, title, tooltip, children }) => {
           {title}
         </Typography>
         <NextLink href={link} passHref>
-          <div className="tooltip " data-tooltip={tooltip}>
+          <div className={`tooltip ${styles.all}`} data-tooltip={tooltip}>
             <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
               <Typography variant="body2" fontSize={{ xs: 13, md: 14 }} fontWeight={500} color="primary">
                 {t('all')}
@@ -655,7 +656,7 @@ const Home = () => {
   })
 
   return (
-    <Box sx={{ pb: { xs: 5, md: 11 } }}>
+    <Box sx={{ pb: { xs: 5, md: 11 } }} className={styles.container}>
       <Box sx={{ bgcolor: 'primary.light' }}>
         <Container sx={{ px: { xs: 2, md: 2, lg: 0 } }}>
           <Search />

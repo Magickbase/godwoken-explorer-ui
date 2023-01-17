@@ -192,7 +192,7 @@ const SmartContract: React.FC<{
             </a>
           ) : null}
           {isSubmitted ? (
-            <div className="tooltip" data-tooltip={t('submitted')} key="submitted">
+            <div className={`tooltip ${styles.submitted}`} data-tooltip={t('submitted')} key="submitted">
               <SubmittedIcon />
             </div>
           ) : null}

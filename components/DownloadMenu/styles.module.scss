@@ -5,6 +5,15 @@
   font-family: Roboto;
   z-index: 99;
 
+  :global(.tooltip::before) {
+    white-space: nowrap;
+    width: 300px;
+    max-width: unset;
+    @media screen and (max-width: 1440px) {
+      transform: translate(-80%, -100%);
+    }
+  }
+
   label {
     display: flex;
     justify-content: center;
