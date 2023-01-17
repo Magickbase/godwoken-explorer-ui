@@ -109,7 +109,6 @@ const SmartContract: React.FC<{
       ) : (
         '-'
       ),
-      ddClassName: styles['item-dd-cls'],
     },
     {
       field: t('deployTx'),
@@ -120,7 +119,6 @@ const SmartContract: React.FC<{
       ) : (
         '-'
       ),
-      ddClassName: styles['item-dd-cls'],
     },
     tokenUrl
       ? {
