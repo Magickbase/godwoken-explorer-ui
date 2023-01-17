@@ -7,13 +7,13 @@ import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { Skeleton } from '@mui/material'
 import SubpageHead from 'components/SubpageHead'
-import HashLink from 'components/HashLink'
 import Tabs from 'components/Tabs'
 import { SIZES } from 'components/PageSize'
 import ActivityList, { fetchActivityList } from 'components/NFTActivityList'
 import CopyBtn from 'components/CopyBtn'
 import Metadata from 'components/Metadata'
 import ResponsiveHash from 'components/ResponsiveHash'
+import Address from 'components/TruncatedAddress'
 import { client, handleNftImageLoadError, getIpfsUrl } from 'utils'
 import styles from './styles.module.scss'
 
@@ -35,6 +35,11 @@ const collectionInfoQuery = gql`
         token_instance {
           metadata
         }
+        account {
+          eth_address
+          id
+          bit_alias
+        }
       }
     }
   }
@@ -50,6 +55,7 @@ interface CollectionInfo {
   minted_count: number
   owner: string | null
   metadata?: TokenMetadata
+  account?: Record<string, any> | null
 }
 
 interface NftCollectionProps {
@@ -60,6 +66,11 @@ interface NftCollectionProps {
     entries: Array<{
       address_hash: string
       token_instance?: { metadata: TokenMetadata }
+      account: {
+        eth_address: string
+        id: number
+        bit_alias: string
+      }
     }>
   }
 }
@@ -75,6 +86,7 @@ const fetchNftCollection = (variables: Variables): Promise<CollectionInfo | unde
     .then(data => ({
       ...data.erc721_udts.entries[0],
       owner: data.holders.entries[0]?.address_hash ?? null,
+      account: data.holders.entries[0]?.account ?? null,
       metadata: data.holders.entries[0]?.token_instance?.metadata,
     }))
     .catch(() => undefined)
@@ -114,6 +126,9 @@ const NftItem = () => {
     },
   )
 
+  const account = info?.account
+  const domain = account?.bit_alias
+
   const infoList: Array<{
     field: string
     content: React.ReactNode | string
@@ -121,12 +136,21 @@ const NftItem = () => {
     {
       field: t('owner'),
       content: info?.owner ? (
-        <ResponsiveHash
-          label={info.owner as string}
-          href={`/account/${info.owner}`}
-          btnRight="copy"
-          copyAlertText={t('address', { ns: 'common' })}
-        />
+        <div className={styles.owner}>
+          {domain ? (
+            <>
+              <Address address={info.account.eth_address} domain={domain} />
+              <CopyBtn content={info.owner as string} field={t('address', { ns: 'common' })} />
+            </>
+          ) : (
+            <ResponsiveHash
+              label={info.owner as string}
+              href={`/account/${info.owner}`}
+              btnRight="copy"
+              copyAlertText={t('address', { ns: 'common' })}
+            />
+          )}
+        </div>
       ) : isInfoLoading ? (
         <Skeleton animation="wave" />
       ) : (
@@ -170,6 +194,7 @@ const NftItem = () => {
       <div className={styles.container}>
         <div className={styles.overview}>
           <img
+            className={styles.logo}
             src={getIpfsUrl(metadata?.image ?? '/images/nft-placeholder.svg')}
             onError={handleNftImageLoadError}
             alt="nft-cover"

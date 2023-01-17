@@ -9,16 +9,17 @@ type Props = {
   hash: string
   href: string
   leading?: number
+  placement?: 'top' | 'bottom'
 }
 
-const AddressWithDomain = ({ domain, hash, href = '', leading = 8 }: Props) => {
+const AddressWithDomain = ({ domain, hash, href = '', leading = 8, placement = 'top' }: Props) => {
   return (
     <div>
       <div className={styles.container}>
-        <Tooltip title=".bit Name" placement="top">
+        <Tooltip title=".bit Name" placement={placement}>
           <img src={`${IMG_URL}bit-logo.svg`} loading="lazy" crossOrigin="anonymous" referrerPolicy="no-referrer" />
         </Tooltip>
-        <Tooltip title={hash} placement="top">
+        <Tooltip title={hash} placement={placement}>
           <div>
             <HashLink
               label={
