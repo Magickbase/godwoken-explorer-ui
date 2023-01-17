@@ -306,7 +306,8 @@ const Account = () => {
         <div className={styles.title}>
           <PageTitle>
             {title}
-            {!isEthAddress(id as string) && (
+            {/* for now, we only should check eth_address */}
+            {!isEthAddress(id as string) && id?.length !== 66 && (
               <div className={styles['invalid-tips']}>
                 <span>{t('invalidAddress')}</span>
               </div>
