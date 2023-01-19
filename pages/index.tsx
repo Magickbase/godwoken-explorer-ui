@@ -473,7 +473,7 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
                 primary={
                   <Stack direction="row" alignItems="center" sx={{ height: { xs: 52, md: 88 } }}>
                     <Stack
-                      flexGrow={1}
+                      flex={1}
                       px={{ xs: 1, md: 2 }}
                       justifyContent={{ xs: 'center', md: 'space-between' }}
                       height={{ xs: 36, md: 56 }}
@@ -528,6 +528,7 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
                       </Box>
                     </Stack>
                     <Stack
+                      flex={1}
                       height={{ xs: 36, md: 56 }}
                       sx={{ pl: { xs: 1, sm: 0 } }}
                       justifyContent={{ xs: 'center', md: 'space-between' }}
