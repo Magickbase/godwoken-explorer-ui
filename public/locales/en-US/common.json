@@ -45,5 +45,5 @@
   "block-hash": "block hash",
   "transaction-hash": "Transaction hash",
   "token-id": "Token ID",
-  "field-copied": "{{field}} has been copied to clipbaord"
+  "field-copied": "{{field}} has been copied to clipboard"
 }
