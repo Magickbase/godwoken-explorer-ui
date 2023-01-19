@@ -31,8 +31,17 @@ const ResponsiveHash = ({
   const [modifiedLabel, setModifiedLabel] = useState(label)
 
   useEffect(() => {
-    if (window && window.matchMedia('(max-width: 1024px)').matches) {
-      setIsMobile(true)
+    const checkIsMobile = () => {
+      if (window && window.matchMedia('(max-width: 1024px)').matches) {
+        setIsMobile(true)
+      } else {
+        setIsMobile(false)
+      }
+    }
+    checkIsMobile()
+    window.addEventListener('resize', checkIsMobile)
+    return () => {
+      window.removeEventListener('resize', checkIsMobile)
     }
   }, [])
 
@@ -43,6 +52,8 @@ const ResponsiveHash = ({
       } else {
         setModifiedLabel(`${label.slice(0, leading)}...`)
       }
+    } else {
+      setModifiedLabel(label)
     }
   }, [ellipsisPosition, isMobile, label, leading])
 
