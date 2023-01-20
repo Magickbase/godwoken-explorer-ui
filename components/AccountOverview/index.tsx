@@ -292,7 +292,7 @@ const AccountOverview: React.FC<AccountOverviewProps & { refetch: () => Promise<
 
   // Over there, account.type is used to determine whether the data is type of Address.
   // Cause the data of Address only have 3 parameters, `eth_address`,`token_transfer_count` and `bit_alias`
-  if (!account.type) {
+  if (!account?.type) {
     return (
       <div className={styles.container}>
         <InfoList
