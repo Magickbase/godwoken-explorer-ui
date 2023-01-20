@@ -1,19 +1,19 @@
 import { render, screen, cleanup, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom'
-import InfoList, { InfoItermProps } from '../../components/InfoList'
+import InfoList, { InfoItemProps } from '../../components/InfoList'
 
 import styles from './styles.module.scss'
 import { style } from '@mui/system'
 
-const defaultList: InfoItermProps[] = [
+const defaultList: InfoItemProps[] = [
   {
     field: 'testStatus',
     content: 'testStatus',
   },
 ]
 
-const testList: InfoItermProps[] = [
+const testList: InfoItemProps[] = [
   {
     field: 'type',
     content: 'Meta Contract',
@@ -23,7 +23,7 @@ const testList: InfoItermProps[] = [
     content: 'status',
   },
 ]
-const tooltipList: InfoItermProps[] = [
+const tooltipList: InfoItemProps[] = [
   {
     field: 'type',
     content: 'Meta Contract',
