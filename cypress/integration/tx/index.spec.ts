@@ -141,7 +141,7 @@ context('Transaction Page', () => {
           .find('dt')
           .should('have.text', 'Paymaster')
           .next()
-          .should('have.text', '0x8d8f646cfffa073c20')
+          .should('have.text', '0x8d8f646cfffa073c207eb8f83d62cb3d842ade4e')
       })
 
       it('should have Max Fee Per Gas', () => {
@@ -165,7 +165,7 @@ context('Transaction Page', () => {
           .find('dt')
           .should('have.text', 'Paymaster Data')
           .next()
-          .should('have.text', '7eb8f83d62cb3d842ade4e1234')
+          .should('have.text', '1234')
       })
 
       it('should have Call Data', () => {
