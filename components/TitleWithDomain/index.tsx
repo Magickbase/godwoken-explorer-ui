@@ -1,4 +1,5 @@
 import { useTranslation } from 'next-i18next'
+import Link from 'next/link'
 import { DOMAIN_LOGO_BASE_URL } from 'utils/constants'
 
 import styles from './styles.module.scss'
@@ -6,6 +7,8 @@ import styles from './styles.module.scss'
 type Props = {
   domain: string
 }
+
+const BIT_PAGE = 'https://data.did.id'
 
 const TitleWithDomain = ({ domain = '' }: Props) => {
   const [t] = useTranslation('account')
@@ -16,7 +19,11 @@ const TitleWithDomain = ({ domain = '' }: Props) => {
       <span>{t(`basicInfo`)}</span>
       <div className={`${styles['logo-domain']} tooltip`} data-tooltip={domain}>
         <img src={logoUrl} loading="lazy" crossOrigin="anonymous" referrerPolicy="no-referrer" />
-        <div className={styles.domian}>{domain}</div>
+        <Link href={`${BIT_PAGE}/${domain}`}>
+          <a className={styles.domain} target="_blank" rel="noopener noreferrer">
+            {domain}
+          </a>
+        </Link>
       </div>
     </div>
   )
