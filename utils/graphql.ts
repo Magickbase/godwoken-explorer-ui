@@ -138,6 +138,13 @@ export namespace GraphQLSchema {
     value: string
     created_contract_address_hash: string | null
     native_transfer_address_hash: string | null
+    call_contract: string
+    call_data: string
+    call_gas_limit: number
+    verification_gas_limit: number
+    max_fee_per_gas: string
+    max_priority_fee_per_gas: string
+    paymaster_and_data: string
   }
 
   export interface PolyjuiceCreator {
