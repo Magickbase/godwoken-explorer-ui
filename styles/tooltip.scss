@@ -16,8 +16,6 @@
   font-size: 0.875rem;
 
   &::before {
-    min-width: 100px;
-    max-width: 246px;
     padding: 8px;
     top: -16.5px;
     border-radius: 5px;
@@ -30,10 +28,6 @@
     display: none;
 
     @include tooltip-content-title;
-
-    @media screen and (max-width: 768px) {
-      max-width: 150px;
-    }
   }
   &::after {
     content: '';
