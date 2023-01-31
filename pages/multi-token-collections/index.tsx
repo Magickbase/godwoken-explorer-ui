@@ -12,10 +12,13 @@ import Table from 'components/Table'
 import Pagination from 'components/SimplePagination'
 import TokenLogo from 'components/TokenLogo'
 import HashLink from 'components/HashLink'
+import FilterMenu from 'components/FilterMenu'
+import Address from 'components/TruncatedAddress'
 import { SIZES } from 'components/PageSize'
+
 import NoDataIcon from 'assets/icons/no-data.svg'
 import SortIcon from 'assets/icons/sort.svg'
-import { client, GraphQLSchema } from 'utils'
+import { client, GraphQLSchema, handleDeleteInvalid } from 'utils'
 
 import styles from './styles.module.scss'
 
@@ -25,40 +28,35 @@ interface MultiTokenCollectionListProps {
     metadata: GraphQLSchema.PageMetadata
   }
 }
+
 interface Variables {
   name: string | null
   before: string | null
   after: string | null
   limit: number
-  holder_count_sort: string
-  name_sort: string
+  sorter: UdtsSorterInput[] | []
 }
+
+type UdtsSorterInput = {
+  sort_type: 'ASC' | 'DESC'
+  sort_value: 'EX_HOLDERS_COUNT' | 'ID' | 'NAME' | 'SUPPLY' | 'TOKEN_TYPE_COUNT'
+}
+
 enum SortTypesEnum {
   holder_count_sort = 'holder_count_sort',
   name_sort = 'name_sort',
+  type_count_sort = 'type_count_sort',
+}
+
+enum UdtsSorterValueEnum {
+  holder_count_sort = 'EX_HOLDERS_COUNT',
+  name_sort = 'NAME',
+  type_count_sort = 'TOKEN_TYPE_COUNT',
 }
 
 const erc1155ListQuery = gql`
-  query (
-    $limit: Int
-    $name: String
-    $before: String
-    $after: String
-    $holder_count_sort: SortType
-    $name_sort: SortType
-  ) {
-    erc1155_udts(
-      input: {
-        limit: $limit
-        fuzzy_name: $name
-        before: $before
-        after: $after
-        sorter: [
-          { sort_type: $holder_count_sort, sort_value: EX_HOLDERS_COUNT }
-          { sort_type: $name_sort, sort_value: NAME }
-        ]
-      }
-    ) {
+  query ($limit: Int, $name: String, $before: String, $after: String, $sorter: UdtsSorterInput) {
+    erc1155_udts(input: { limit: $limit, fuzzy_name: $name, before: $before, after: $after, sorter: $sorter }) {
       entries {
         id
         name
@@ -98,6 +96,7 @@ const fetchErc1155List = (variables: Variables): Promise<MultiTokenCollectionLis
     })
 
 const FILTER_KEYS = ['name']
+
 const MultiTokenCollectionList = () => {
   const [t] = useTranslation(['multi-token', 'common', 'list'])
   const {
@@ -108,23 +107,41 @@ const MultiTokenCollectionList = () => {
       after = null,
       name = null,
       page_size = SIZES[1],
-      holder_count_sort = 'DESC',
-      name_sort = 'DESC',
+      holder_count_sort,
+      name_sort,
+      type_count_sort,
       ...restQuery
     },
   } = useRouter()
 
+  const handleSorter = () => {
+    let originalSorter = {
+      holder_count_sort,
+      name_sort,
+      type_count_sort,
+    }
+
+    // delete the invalid properties
+    const validSorter = handleDeleteInvalid(originalSorter)
+
+    return Object.keys(validSorter)?.[0]
+      ? {
+          sort_type: Object.values(validSorter)[0],
+          sort_value: UdtsSorterValueEnum[Object.keys(validSorter)[0]],
+        }
+      : null
+  }
+
   const title = t(`multi-token-collections`)
   const { isLoading, data: list } = useQuery(
-    ['erc1155-list', page_size, before, after, name, holder_count_sort, name_sort],
+    ['erc1155-list', page_size, before, after, name, holder_count_sort, name_sort, type_count_sort],
     () =>
       fetchErc1155List({
         before: before as string,
         after: after as string,
         name: name ? `${name}%` : null,
         limit: Number.isNaN(!page_size) ? +SIZES[1] : +page_size,
-        holder_count_sort: holder_count_sort as string,
-        name_sort: name_sort as string,
+        sorter: handleSorter() ? [handleSorter()] : [],
       }),
     { refetchInterval: 10000 },
   )
@@ -138,9 +155,7 @@ const MultiTokenCollectionList = () => {
         ...restQuery,
         name: name ? (name as string) : '',
         page_size: page_size as string,
-        holder_count_sort: holder_count_sort as string,
-        name_sort: name_sort as string,
-        [type]: order === 'ASC' ? 'DESC' : 'ASC',
+        [type]: order === 'DESC' ? 'ASC' : 'DESC',
       })}`,
     )
   }
@@ -165,11 +180,11 @@ const MultiTokenCollectionList = () => {
             <thead>
               <tr>
                 {headers.map(item => (
-                  <th>
-                    <span className={styles['pr-4']}>{t(item)}</span>
+                  <th key={item}>
+                    <span className={styles['header-name']}>{t(item)}</span>
                     {item === 'token' ? (
                       <>
-                        <span className={styles['pr-8']}>
+                        <span className={styles['token-sorter']}>
                           <SortIcon
                             onClick={e => handleSorterClick(e, SortTypesEnum.name_sort)}
                             data-order={name_sort}
@@ -178,6 +193,13 @@ const MultiTokenCollectionList = () => {
                         </span>
                         <FilterMenu filterKeys={[FILTER_KEYS[0]]} />
                       </>
+                    ) : null}
+                    {item === 'type_count' ? (
+                      <SortIcon
+                        onClick={e => handleSorterClick(e, SortTypesEnum.type_count_sort)}
+                        data-order={type_count_sort}
+                        className={styles.sorter}
+                      />
                     ) : null}
                     {item === 'holder_count' ? (
                       <SortIcon
