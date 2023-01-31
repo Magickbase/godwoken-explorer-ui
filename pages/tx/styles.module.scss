@@ -30,6 +30,15 @@
     }
   }
 
+  .priorityGasFee {
+    margin-left: -4px !important;
+  }
+
+  .paymasterData {
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
   a {
     word-break: break-all;
   }
