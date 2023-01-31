@@ -23,6 +23,7 @@ interface Variables {
   after: string | null
   limit: number
   tx_count_sort: string
+  balance_sort: string
 }
 
 type ContractListProps = {
@@ -45,13 +46,16 @@ type ContractListProps = {
 }
 
 const contractListQuery = gql`
-  query ($before: String, $after: String, $limit: Int, $tx_count_sort: SortType) {
+  query ($before: String, $after: String, $limit: Int, $tx_count_sort: SortType, $balance_sort: SortType) {
     smart_contracts(
       input: {
         before: $before
         after: $after
         limit: $limit
-        sorter: [{ sort_type: $tx_count_sort, sort_value: EX_TX_COUNT }]
+        sorter: [
+          { sort_type: $tx_count_sort, sort_value: EX_TX_COUNT }
+          { sort_type: $balance_sort, sort_value: CKB_BALANCE }
+        ]
       }
     ) {
       entries {
@@ -98,7 +102,14 @@ const ContractList = () => {
   const {
     push,
     asPath,
-    query: { before = null, after = null, page_size = SIZES[1], tx_count_sort = 'DESC', ...restQuery },
+    query: {
+      before = null,
+      after = null,
+      page_size = SIZES[1],
+      tx_count_sort = 'DESC',
+      balance_sort = 'DESC',
+      ...restQuery
+    },
   } = useRouter()
 
   const { isLoading, data } = useQuery(
@@ -106,6 +117,7 @@ const ContractList = () => {
     () =>
       fetchList({
         tx_count_sort: tx_count_sort as string,
+        balance_sort: balance_sort as string,
         before: before as string,
         after: after as string,
         limit: Number.isNaN(+page_size) ? +SIZES[1] : +page_size,
@@ -122,8 +134,27 @@ const ContractList = () => {
     push(
       `${asPath.split('?')[0] ?? ''}?${new URLSearchParams({
         ...restQuery,
+        ...defaultSortValue,
         page_size: page_size as string,
         tx_count_sort: order === 'ASC' ? 'DESC' : 'ASC',
+      })}`,
+    )
+  }
+  const defaultSortValue = {
+    balance_sort: 'DESC',
+    tx_count_sort: 'DESC',
+  }
+
+  const handleBalanceSortClick = (e: React.MouseEvent<HTMLOrSVGElement>) => {
+    const {
+      dataset: { order },
+    } = e.currentTarget
+    push(
+      `${asPath.split('?')[0] ?? ''}?${new URLSearchParams({
+        ...restQuery,
+        ...defaultSortValue,
+        page_size: page_size as string,
+        balance_sort: order === 'ASC' ? 'DESC' : 'ASC',
       })}`,
     )
   }
@@ -183,6 +214,7 @@ const ContractList = () => {
                   <th>
                     {t(`balance`)}
                     <span style={{ textTransform: 'none' }}>{`(${PCKB_UDT_INFO.symbol})`}</span>
+                    <SortIcon onClick={handleBalanceSortClick} data-order={balance_sort} className={styles.sorter} />
                   </th>
                   <th style={{ textAlign: 'end' }}>
                     {t(`tx_count`)}
