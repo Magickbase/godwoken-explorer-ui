@@ -18,7 +18,7 @@ import FilterMenu from 'components/FilterMenu'
 import { SIZES } from 'components/PageSize'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import SortIcon from 'assets/icons/sort.svg'
-import { client, GraphQLSchema } from 'utils'
+import { client, GraphQLSchema, handleDeleteInvalid } from 'utils'
 import styles from './styles.module.scss'
 
 // TODO: minted count sort
@@ -27,9 +27,15 @@ interface Variables {
   before: string | null
   after: string | null
   limit: number
-  holder_count_sort: string
-  name_sort: string
-  minted_count_sort: string
+  // holder_count_sort: string
+  // name_sort: string
+  // minted_count_sort: string
+  sorter: UdtsSorterInput[] | []
+}
+
+type UdtsSorterInput = {
+  sort_type: 'ASC' | 'DESC'
+  sort_value: 'EX_HOLDERS_COUNT' | 'ID' | 'NAME' | 'SUPPLY' | 'MINTED_COUNT'
 }
 interface NftCollectionListProps {
   erc721_udts: {
@@ -42,30 +48,19 @@ enum SortTypesEnum {
   name_sort = 'name_sort',
   minted_count_sort = 'minted_count_sort',
 }
+enum UdtsSorterValueEnum {
+  holder_count_sort = 'EX_HOLDERS_COUNT',
+  name_sort = 'NAME',
+  minted_count_sort = 'MINTED_COUNT',
+}
+
+// $holder_count_sort: SortType
+//     $name_sort: SortType
+//     $minted_count_sort: SortType
 
 const erc721ListQuery = gql`
-  query (
-    $limit: Int
-    $name: String
-    $before: String
-    $after: String
-    $holder_count_sort: SortType
-    $name_sort: SortType
-    $minted_count_sort: SortType
-  ) {
-    erc721_udts(
-      input: {
-        limit: $limit
-        fuzzy_name: $name
-        before: $before
-        after: $after
-        sorter: [
-          { sort_type: $holder_count_sort, sort_value: EX_HOLDERS_COUNT }
-          { sort_type: $name_sort, sort_value: NAME }
-          { sort_type: $minted_count_sort, sort_value: MINTED_COUNT }
-        ]
-      }
-    ) {
+  query ($limit: Int, $name: String, $before: String, $after: String, $sorter: UdtsSorterInput) {
+    erc721_udts(input: { limit: $limit, fuzzy_name: $name, before: $before, after: $after, sorter: $sorter }) {
       entries {
         id
         name
@@ -103,11 +98,6 @@ const fetchErc721List = (variables: Variables): Promise<NftCollectionListProps['
       }
     })
 const FILTER_KEYS = ['name']
-const defaultSortValues = {
-  holder_count_sort: 'DESC',
-  name_sort: 'DESC',
-  minted_count_sort: 'DESC',
-}
 
 const NftCollectionList = () => {
   const {
@@ -118,26 +108,41 @@ const NftCollectionList = () => {
       after = null,
       name = null,
       page_size = SIZES[1],
-      holder_count_sort = 'DESC',
-      name_sort = 'DESC',
-      minted_count_sort = 'DESC',
+      holder_count_sort,
+      name_sort,
+      minted_count_sort,
       ...restQuery
     },
   } = useRouter()
   const [t] = useTranslation(['nft', 'common', 'list'])
   const title = t(`nft-collections`)
+  const handleSorter = () => {
+    let originalSorter = {
+      holder_count_sort,
+      name_sort,
+      minted_count_sort,
+    }
+
+    // delete the invalid properties
+    const validSorter = handleDeleteInvalid(originalSorter)
+
+    return Object.keys(validSorter)?.[0]
+      ? {
+          sort_type: Object.values(validSorter)[0],
+          sort_value: UdtsSorterValueEnum[Object.keys(validSorter)[0]],
+        }
+      : null
+  }
 
   const { isLoading, data: list } = useQuery(
-    ['erc721-list', page_size, before, after, name, holder_count_sort, name_sort],
+    ['erc721-list', page_size, before, after, name, holder_count_sort, name_sort, minted_count_sort],
     () =>
       fetchErc721List({
         before: before as string,
         after: after as string,
         name: name ? `${name}%` : null,
         limit: Number.isNaN(!page_size) ? +SIZES[1] : +page_size,
-        holder_count_sort: holder_count_sort as string,
-        name_sort: name_sort as string,
-        minted_count_sort: minted_count_sort as string,
+        sorter: handleSorter() ? [handleSorter()] : [],
       }),
     { refetchInterval: 10000 },
   )
@@ -149,10 +154,9 @@ const NftCollectionList = () => {
     push(
       `${asPath.split('?')[0] ?? ''}?${new URLSearchParams({
         ...restQuery,
-        ...defaultSortValues,
         name: name ? (name as string) : '',
         page_size: page_size as string,
-        [type]: order === 'ASC' ? 'DESC' : 'ASC',
+        [type]: order === 'DESC' ? 'ASC' : 'DESC',
       })}`,
     )
   }

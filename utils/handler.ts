@@ -124,3 +124,12 @@ export const handleSorterArrayInOrder = (pathSorterArray: sorterType[], onClicke
   }
   return pathSorterArray
 }
+
+export const handleDeleteInvalid = (obj: Record<string, any>) => {
+  Object.keys(obj).forEach(item => {
+    if (!obj[item] && obj[item] != 0) {
+      delete obj[item]
+    }
+  })
+  return obj
+}
