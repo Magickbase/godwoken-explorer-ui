@@ -54,13 +54,16 @@
     }
     div:nth-child(2) {
       overflow: hidden;
-      justify-content: flex-end;
       & > div {
         flex-basis: 120px;
         overflow: hidden;
         text-overflow: ellipsis;
         color: var(--primary-color);
-        @media screen and (max-width: 1024px) {
+      }
+      @media screen and (max-width: 1024px) {
+        justify-content: flex-end;
+        & > div {
+          flex-basis: 0;
           overflow: visible;
         }
       }

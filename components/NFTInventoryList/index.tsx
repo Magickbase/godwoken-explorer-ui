@@ -129,11 +129,10 @@ const NFTInventoryList: React.FC<InventoryListProps> = ({ inventory, viewer }) =
 
             <div className={styles.info}>
               <span>{t('token-id')}</span>
-              <HashLink
+              <ResponsiveHash
                 label={item.token_id}
                 href={`/nft-item/${item.token_contract_address_hash}/${item.token_id}`}
                 monoFont={false}
-                style={{ fontSize: 14 }}
               />
             </div>
             {!viewer ? (
