@@ -113,7 +113,7 @@ const ContractList = () => {
   } = useRouter()
 
   const { isLoading, data } = useQuery(
-    ['contract-list', before, after, page_size, tx_count_sort],
+    ['contract-list', before, after, page_size, tx_count_sort, balance_sort],
     () =>
       fetchList({
         tx_count_sort: tx_count_sort as string,
