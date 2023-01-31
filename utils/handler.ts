@@ -73,3 +73,12 @@ export const handleCopy = async (value: string) => {
 export const handleNftImageLoadError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
   e.currentTarget.src = '/images/nft-placeholder.svg'
 }
+
+export const handleDeleteInvalid = (obj: Record<string, any>) => {
+  Object.keys(obj).forEach(item => {
+    if (!obj[item] && obj[item] != 0) {
+      delete obj[item]
+    }
+  })
+  return obj
+}

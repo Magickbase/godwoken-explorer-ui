@@ -15,17 +15,27 @@ import Table from 'components/Table'
 import Amount from 'components/Amount'
 import SortIcon from 'assets/icons/sort.svg'
 import { SIZES } from 'components/PageSize'
-import { PCKB_UDT_INFO, client, GraphQLSchema } from 'utils'
+import { PCKB_UDT_INFO, client, GraphQLSchema, handleDeleteInvalid } from 'utils'
 import styles from './index.module.scss'
 
 interface Variables {
   before: string | null
   after: string | null
   limit: number
-  tx_count_sort: string
-  balance_sort: string
+  sorter: SmartContractsSorterInput[] | []
 }
-
+type SmartContractsSorterInput = {
+  sort_type: 'ASC' | 'DESC'
+  sort_value: 'EX_TX_COUNT' | 'ID' | 'NAME' | 'CKB_BALANCE'
+}
+enum SortTypesEnum {
+  tx_count_sort = 'tx_count_sort',
+  balance_sort = 'balance_sort',
+}
+enum SmartContractsSorterValueEnum {
+  tx_count_sort = 'EX_TX_COUNT',
+  balance_sort = 'CKB_BALANCE',
+}
 type ContractListProps = {
   smart_contracts: {
     entries: Array<{
@@ -46,18 +56,8 @@ type ContractListProps = {
 }
 
 const contractListQuery = gql`
-  query ($before: String, $after: String, $limit: Int, $tx_count_sort: SortType, $balance_sort: SortType) {
-    smart_contracts(
-      input: {
-        before: $before
-        after: $after
-        limit: $limit
-        sorter: [
-          { sort_type: $tx_count_sort, sort_value: EX_TX_COUNT }
-          { sort_type: $balance_sort, sort_value: CKB_BALANCE }
-        ]
-      }
-    ) {
+  query ($before: String, $after: String, $limit: Int, $sorter: SmartContractsSorterInput) {
+    smart_contracts(input: { before: $before, after: $after, limit: $limit, sorter: $sorter }) {
       entries {
         name
         id
@@ -102,59 +102,49 @@ const ContractList = () => {
   const {
     push,
     asPath,
-    query: {
-      before = null,
-      after = null,
-      page_size = SIZES[1],
-      tx_count_sort = 'DESC',
-      balance_sort = 'DESC',
-      ...restQuery
-    },
+    query: { before = null, after = null, page_size = SIZES[1], tx_count_sort, balance_sort, ...restQuery },
   } = useRouter()
+
+  const handleSorterValues = () => {
+    let originalSorter = {
+      tx_count_sort,
+      balance_sort,
+    }
+
+    // delete the invalid properties
+    const validSorter = handleDeleteInvalid(originalSorter)
+
+    return Object.keys(validSorter)?.[0]
+      ? {
+          sort_type: Object.values(validSorter)[0],
+          sort_value: SmartContractsSorterValueEnum[Object.keys(validSorter)[0]],
+        }
+      : null
+  }
 
   const { isLoading, data } = useQuery(
     ['contract-list', before, after, page_size, tx_count_sort, balance_sort],
     () =>
       fetchList({
-        tx_count_sort: tx_count_sort as string,
-        balance_sort: balance_sort as string,
         before: before as string,
         after: after as string,
         limit: Number.isNaN(+page_size) ? +SIZES[1] : +page_size,
+        sorter: handleSorterValues() ? [handleSorterValues()] : [],
       }),
     {
       refetchInterval: 10000,
     },
   )
 
-  const handleTXCountSortClick = (e: React.MouseEvent<HTMLOrSVGElement>) => {
+  const handleSorterClick = (e: React.MouseEvent<HTMLOrSVGElement>, type) => {
     const {
       dataset: { order },
     } = e.currentTarget
     push(
       `${asPath.split('?')[0] ?? ''}?${new URLSearchParams({
         ...restQuery,
-        ...defaultSortValue,
         page_size: page_size as string,
-        tx_count_sort: order === 'ASC' ? 'DESC' : 'ASC',
-      })}`,
-    )
-  }
-  const defaultSortValue = {
-    balance_sort: 'DESC',
-    tx_count_sort: 'DESC',
-  }
-
-  const handleBalanceSortClick = (e: React.MouseEvent<HTMLOrSVGElement>) => {
-    const {
-      dataset: { order },
-    } = e.currentTarget
-    push(
-      `${asPath.split('?')[0] ?? ''}?${new URLSearchParams({
-        ...restQuery,
-        ...defaultSortValue,
-        page_size: page_size as string,
-        balance_sort: order === 'ASC' ? 'DESC' : 'ASC',
+        [type]: order === 'DESC' ? 'ASC' : 'DESC',
       })}`,
     )
   }
@@ -214,11 +204,19 @@ const ContractList = () => {
                   <th>
                     {t(`balance`)}
                     <span style={{ textTransform: 'none' }}>{`(${PCKB_UDT_INFO.symbol})`}</span>
-                    <SortIcon onClick={handleBalanceSortClick} data-order={balance_sort} className={styles.sorter} />
+                    <SortIcon
+                      onClick={e => handleSorterClick(e, SortTypesEnum.balance_sort)}
+                      data-order={balance_sort}
+                      className={styles.sorter}
+                    />
                   </th>
                   <th style={{ textAlign: 'end' }}>
                     {t(`tx_count`)}
-                    <SortIcon onClick={handleTXCountSortClick} data-order={tx_count_sort} className={styles.sorter} />
+                    <SortIcon
+                      onClick={e => handleSorterClick(e, SortTypesEnum.tx_count_sort)}
+                      data-order={tx_count_sort}
+                      className={styles.sorter}
+                    />
                   </th>
                 </tr>
               </thead>
