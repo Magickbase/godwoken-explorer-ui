@@ -29,6 +29,7 @@ interface Variables {
   limit: number
   holder_count_sort: string
   name_sort: string
+  minted_count_sort: string
 }
 interface NftCollectionListProps {
   erc721_udts: {
@@ -39,6 +40,7 @@ interface NftCollectionListProps {
 enum SortTypesEnum {
   holder_count_sort = 'holder_count_sort',
   name_sort = 'name_sort',
+  minted_count_sort = 'minted_count_sort',
 }
 
 const erc721ListQuery = gql`
@@ -49,6 +51,7 @@ const erc721ListQuery = gql`
     $after: String
     $holder_count_sort: SortType
     $name_sort: SortType
+    $minted_count_sort: SortType
   ) {
     erc721_udts(
       input: {
@@ -59,6 +62,7 @@ const erc721ListQuery = gql`
         sorter: [
           { sort_type: $holder_count_sort, sort_value: EX_HOLDERS_COUNT }
           { sort_type: $name_sort, sort_value: NAME }
+          { sort_type: $minted_count_sort, sort_value: MINTED_COUNT }
         ]
       }
     ) {
@@ -99,6 +103,11 @@ const fetchErc721List = (variables: Variables): Promise<NftCollectionListProps['
       }
     })
 const FILTER_KEYS = ['name']
+const defaultSortValues = {
+  holder_count_sort: 'DESC',
+  name_sort: 'DESC',
+  minted_count_sort: 'DESC',
+}
 
 const NftCollectionList = () => {
   const {
@@ -111,6 +120,7 @@ const NftCollectionList = () => {
       page_size = SIZES[1],
       holder_count_sort = 'DESC',
       name_sort = 'DESC',
+      minted_count_sort = 'DESC',
       ...restQuery
     },
   } = useRouter()
@@ -127,6 +137,7 @@ const NftCollectionList = () => {
         limit: Number.isNaN(!page_size) ? +SIZES[1] : +page_size,
         holder_count_sort: holder_count_sort as string,
         name_sort: name_sort as string,
+        minted_count_sort: minted_count_sort as string,
       }),
     { refetchInterval: 10000 },
   )
@@ -138,10 +149,9 @@ const NftCollectionList = () => {
     push(
       `${asPath.split('?')[0] ?? ''}?${new URLSearchParams({
         ...restQuery,
+        ...defaultSortValues,
         name: name ? (name as string) : '',
         page_size: page_size as string,
-        holder_count_sort: holder_count_sort as string,
-        name_sort: name_sort as string,
         [type]: order === 'ASC' ? 'DESC' : 'ASC',
       })}`,
     )
@@ -168,11 +178,11 @@ const NftCollectionList = () => {
             <thead>
               <tr>
                 {headers.map(item => (
-                  <th>
-                    <span className={styles['pr-4']}>{t(item)}</span>
+                  <th key={item}>
+                    <span className={styles['header-name']}>{t(item)}</span>
                     {item === 'token' ? (
                       <>
-                        <span className={styles['pr-8']}>
+                        <span className={styles['token-sorter']}>
                           <SortIcon
                             onClick={e => handleSorterClick(e, SortTypesEnum.name_sort)}
                             data-order={name_sort}
@@ -186,6 +196,13 @@ const NftCollectionList = () => {
                       <SortIcon
                         onClick={e => handleSorterClick(e, SortTypesEnum.holder_count_sort)}
                         data-order={holder_count_sort}
+                        className={styles.sorter}
+                      />
+                    ) : null}
+                    {item === 'minted_count' ? (
+                      <SortIcon
+                        onClick={e => handleSorterClick(e, SortTypesEnum.minted_count_sort)}
+                        data-order={minted_count_sort}
                         className={styles.sorter}
                       />
                     ) : null}
