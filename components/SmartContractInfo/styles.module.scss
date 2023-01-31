@@ -15,6 +15,15 @@
     }
   }
 }
-.item-dd-cls {
+
+.item-dd-token {
   color: var(--primary-color);
+
+  @media screen and (max-width: 1024px) {
+    text-overflow: initial;
+    overflow: initial;
+    a {
+      white-space: normal;
+    }
+  }
 }

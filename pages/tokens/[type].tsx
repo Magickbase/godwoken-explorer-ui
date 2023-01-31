@@ -315,6 +315,9 @@ const TokenList = () => {
                   const addr = token.contract_address_hash || token.account.script_hash
                   const domain = token.account?.bit_alias
 
+                  const shortTruncatedAddr = `${addr.slice(0, 8)}...${addr.slice(-8)}`
+                  const longTruncatedAddr = `${addr.slice(0, 12)}...${addr.slice(-12)}`
+
                   return (
                     <tr key={id}>
                       <td title={name}>
@@ -383,14 +386,14 @@ const TokenList = () => {
                         ) : addr.length > 42 ? (
                           <Tooltip title={addr} placement="top">
                             <span>
-                              <HashLink label={`${addr.slice(0, 12)}...${addr.slice(-12)}`} href={`/account/${addr}`} />
+                              <HashLink
+                                label={isMobile ? shortTruncatedAddr : longTruncatedAddr}
+                                href={`/account/${addr}`}
+                              />
                             </span>
                           </Tooltip>
                         ) : (
-                          <HashLink
-                            label={isMobile ? `${addr.slice(0, 8)}...${addr.slice(-8)}` : addr}
-                            href={`/account/${addr}`}
-                          />
+                          <HashLink label={isMobile ? shortTruncatedAddr : addr} href={`/account/${addr}`} />
                         )}
                       </td>
                       <td>

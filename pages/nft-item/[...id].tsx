@@ -13,6 +13,7 @@ import { SIZES } from 'components/PageSize'
 import ActivityList, { fetchActivityList } from 'components/NFTActivityList'
 import CopyBtn from 'components/CopyBtn'
 import Metadata from 'components/Metadata'
+import ResponsiveHash from 'components/ResponsiveHash'
 import { client, handleNftImageLoadError, getIpfsUrl } from 'utils'
 import styles from './styles.module.scss'
 
@@ -120,10 +121,12 @@ const NftItem = () => {
     {
       field: t('owner'),
       content: info?.owner ? (
-        <div className={styles.owner}>
-          <HashLink label={info.owner as string} href={`/account/${info.owner}`} />
-          <CopyBtn content={info.owner as string} field={t('address', { ns: 'common' })} />
-        </div>
+        <ResponsiveHash
+          label={info.owner as string}
+          href={`/account/${info.owner}`}
+          btnRight="copy"
+          copyAlertText={t('address', { ns: 'common' })}
+        />
       ) : isInfoLoading ? (
         <Skeleton animation="wave" />
       ) : (
@@ -133,19 +136,23 @@ const NftItem = () => {
     {
       field: t('contract'),
       content: (
-        <div>
-          <HashLink label={address as string} href={`/account/${address}`} />
-          <CopyBtn content={address as string} field={t('address', { ns: 'common' })} />
-        </div>
+        <ResponsiveHash
+          label={address as string}
+          href={`/account/${address}`}
+          btnRight="copy"
+          copyAlertText={t('address', { ns: 'common' })}
+        />
       ),
     },
     {
       field: t('token-id'),
       content: (
-        <div>
-          {token_id}
-          <CopyBtn content={token_id as string} field={t('token-id', { ns: 'common' })} />
-        </div>
+        <ResponsiveHash
+          label={token_id}
+          btnRight="copy"
+          copyAlertText={t('token-id', { ns: 'common' })}
+          monoFont={false}
+        />
       ),
     },
     {

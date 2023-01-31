@@ -3,10 +3,11 @@ import NextLink from 'next/link'
 import { gql } from 'graphql-request'
 import Pagination from 'components/SimplePagination'
 import HashLink from 'components/HashLink'
+import Tooltip from 'components/Tooltip'
+import ResponsiveHash from 'components/ResponsiveHash'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import { client, getIpfsUrl, GraphQLSchema, handleNftImageLoadError } from 'utils'
 import styles from './styles.module.scss'
-import Tooltip from 'components/Tooltip'
 
 type InventoryListProps = {
   inventory: {
@@ -128,18 +129,17 @@ const NFTInventoryList: React.FC<InventoryListProps> = ({ inventory, viewer }) =
 
             <div className={styles.info}>
               <span>{t('token-id')}</span>
-              <HashLink
+              <ResponsiveHash
                 label={item.token_id}
                 href={`/nft-item/${item.token_contract_address_hash}/${item.token_id}`}
                 monoFont={false}
-                style={{ fontSize: 14 }}
               />
             </div>
             {!viewer ? (
               <Tooltip title={item.address_hash} placement="bottom">
                 <div className={styles.info}>
                   <span>{t('owner')}</span>
-                  <HashLink href={`/account/${item.address_hash}`} label={item.address_hash} />
+                  <ResponsiveHash href={`/account/${item.address_hash}`} label={item.address_hash} monoFont={false} />
                 </div>
               </Tooltip>
             ) : null}

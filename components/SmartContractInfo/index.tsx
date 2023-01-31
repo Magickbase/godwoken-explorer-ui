@@ -11,6 +11,7 @@ import SubmittedIcon from 'assets/icons/submit-success.svg'
 import { gql } from 'graphql-request'
 import { client, GraphQLSchema } from 'utils'
 import styles from './styles.module.scss'
+import ResponsiveHash from 'components/ResponsiveHash'
 
 const CONTRACT_FORM_URL = `https://github.com/Magickbase/godwoken_explorer/issues/new/choose`
 
@@ -101,47 +102,33 @@ const SmartContract: React.FC<{
         bit_alias ? (
           <Address address={deployerAddr} domain={bit_alias} />
         ) : (
-          <Tooltip title={deployerAddr} placement="top">
-            <span>
-              <NextLink href={`/account/${deployerAddr}`}>
-                <a className="mono-font">{deployerAddr}</a>
-              </NextLink>
-            </span>
-          </Tooltip>
+          <ResponsiveHash label={deployerAddr} href={`/account/${deployerAddr}`} labelTooltip={deployerAddr} />
         )
       ) : isLoading ? (
         <Skeleton animation="wave" />
       ) : (
         '-'
       ),
-      ddClassName: styles['item-dd-cls'],
     },
     {
       field: t('deployTx'),
       content: deployTxHash ? (
-        <Tooltip title={deployTxHash} placement="top">
-          <span>
-            <NextLink href={`/tx/${deployTxHash}`}>
-              <a className="mono-font">{deployTxHash}</a>
-            </NextLink>
-          </span>
-        </Tooltip>
+        <ResponsiveHash label={deployTxHash} href={`/tx/${deployTxHash}`} labelTooltip={deployTxHash} />
       ) : isLoading ? (
         <Skeleton animation="wave" />
       ) : (
         '-'
       ),
-      ddClassName: styles['item-dd-cls'],
     },
     tokenUrl
       ? {
           field: t('token'),
           content: (
             <NextLink href={tokenUrl}>
-              <a className="mono-font">{udt?.name ?? '-'}</a>
+              <a>{udt?.name ?? '-'}</a>
             </NextLink>
           ),
-          ddClassName: styles['item-dd-cls'],
+          ddClassName: styles['item-dd-token'],
         }
       : null,
     !isVerified

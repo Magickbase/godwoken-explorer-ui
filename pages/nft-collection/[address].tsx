@@ -15,6 +15,7 @@ import { SIZES } from 'components/PageSize'
 import ActivityList, { fetchActivityList } from 'components/NFTActivityList'
 import HolderList, { fetchHoldersList } from 'components/NFTHolderList'
 import InventoryList, { fetchInventoryListOfCollection } from 'components/NFTInventoryList'
+import ResponsiveHash from 'components/ResponsiveHash'
 import { client, GraphQLSchema } from 'utils'
 import styles from './styles.module.scss'
 
@@ -113,7 +114,7 @@ const NftCollection = () => {
     },
     {
       field: t('contract'),
-      content: <HashLink label={address as string} href={`/account/${address}`} />,
+      content: <ResponsiveHash label={address as string} href={`/account/${address}`} />,
     },
     {
       field: t('officialSite'),
