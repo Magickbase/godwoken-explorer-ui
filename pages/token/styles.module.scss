@@ -117,12 +117,20 @@
 }
 
 .metamask {
-  width: 1.6rem;
-  height: 1.6rem;
-  cursor: pointer;
+  img {
+    width: 1.6rem;
+    height: 1.6rem;
+    cursor: pointer;
+    @media screen and (max-width: 1024px) {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+  }
+
   @media screen and (max-width: 1024px) {
-    width: 1.25rem;
-    height: 1.25rem;
+    &:hover::before {
+      transform: translate(-80%, -100%);
+    }
   }
 }
 

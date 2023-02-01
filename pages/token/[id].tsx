@@ -344,12 +344,11 @@ const Token: React.FC<Props> = () => {
               <div className={styles.infoTitle}>
                 {t(`tokenInfo`)}
                 {token?.eth_type === 'ERC20' ? (
-                  <div className="tooltip" data-tooltip={t('import-token-into-metamask')}>
+                  <div className={`${'tooltip'} ${styles.metamask}`} data-tooltip={t('import-token-into-metamask')}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src="/logos/metamask.png"
                       alt="MetaMask"
-                      className={styles.metamask}
                       title={t('import-token-into-metamask')}
                       onClick={handleImportIntoMetamask}
                     />
