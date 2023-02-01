@@ -21,15 +21,11 @@ import SortIcon from 'assets/icons/sort.svg'
 import { client, GraphQLSchema, handleDeleteInvalid } from 'utils'
 import styles from './styles.module.scss'
 
-// TODO: minted count sort
 interface Variables {
   name: string | null
   before: string | null
   after: string | null
   limit: number
-  // holder_count_sort: string
-  // name_sort: string
-  // minted_count_sort: string
   sorter: UdtsSorterInput[] | []
 }
 
@@ -53,10 +49,6 @@ enum UdtsSorterValueEnum {
   name_sort = 'NAME',
   minted_count_sort = 'MINTED_COUNT',
 }
-
-// $holder_count_sort: SortType
-//     $name_sort: SortType
-//     $minted_count_sort: SortType
 
 const erc721ListQuery = gql`
   query ($limit: Int, $name: String, $before: String, $after: String, $sorter: UdtsSorterInput) {
