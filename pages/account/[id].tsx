@@ -261,15 +261,7 @@ const Account = () => {
     : []
 
   const accountType = account?.type
-  const title = account ? (
-    accountType ? (
-      t(`accountType.${accountType}`)
-    ) : (
-      t(`accountType.UNKNOWN`)
-    )
-  ) : (
-    <Skeleton animation="wave" width="200px" />
-  )
+  const title = accountType ? t(`accountType.${accountType}`) : t(`accountType.UNKNOWN`)
 
   const tabs = [
     { label: t('transactionRecords'), key: 'transactions' },
