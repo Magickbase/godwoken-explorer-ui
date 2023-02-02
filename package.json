@@ -28,7 +28,7 @@
     "@fontsource/roboto": "4.5.8",
     "@mui/icons-material": "5.11.0",
     "@mui/material": "5.11.6",
-    "@mui/x-date-pickers": "5.0.13",
+    "@mui/x-date-pickers": "5.0.16",
     "@nervosnetwork/ckb-sdk-utils": "0.103.1",
     "bignumber.js": "9.1.1",
     "dayjs": "1.11.7",
