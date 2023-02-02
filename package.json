@@ -46,7 +46,7 @@
     "react-dom": "18.2.0",
     "react-i18next": "12.1.4",
     "react-query": "3.39.2",
-    "recharts": "2.3.0",
+    "recharts": "2.3.2",
     "wagmi": "0.10.6"
   },
   "devDependencies": {
