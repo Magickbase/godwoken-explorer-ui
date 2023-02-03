@@ -1,4 +1,5 @@
 import type { GetStaticPaths, GetStaticProps } from 'next'
+import type { ReactNode } from 'react'
 import { useMemo, useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
@@ -287,10 +288,8 @@ const Tx = () => {
 
   const gasPrice = tx?.polyjuice?.gas_price
   const isGasless = gasPrice === '0'
-  const getGasPriceDisplayValue = (): string => {
-    return isGasless
-      ? 'Gasless'
-      : `${new BigNumber(gasPrice).dividedBy(10 ** PCKB_UDT_INFO.decimal).toFormat()} ${PCKB_UDT_INFO.symbol}`
+  const getGasPriceDisplayValue = (): ReactNode => {
+    return isGasless ? 'Gasless' : <Amount amount={gasPrice} udt={PCKB_UDT_INFO} showSymbol />
   }
 
   const fromAddrDisplay = getAddressDisplay(tx?.from_account)
@@ -518,27 +517,26 @@ const Tx = () => {
     {
       field: t('call_contract'),
       content: tx?.polyjuice?.call_contract ? (
-        <HashLink label={tx.polyjuice.call_contract} href={`/address/${tx.polyjuice.call_contract}`} />
+        <ResponsiveHash label={tx.polyjuice.call_contract} href={`/address/${tx.polyjuice.call_contract}`} />
       ) : (
         '-'
       ),
     },
-    { field: t('call_gas_limit'), content: tx?.polyjuice?.call_gas_limit || '-' },
-    { field: t('verification_gas_limit'), content: tx?.polyjuice?.verification_gas_limit || '-' },
+    { field: t('call_gas_limit'), content: new BigNumber(tx?.polyjuice?.call_gas_limit).toFormat() || '-' },
+    {
+      field: t('verification_gas_limit'),
+      content: new BigNumber(tx?.polyjuice?.verification_gas_limit).toFormat() || '-',
+    },
     {
       field: t('paymaster'),
-      content: paymaster ? <HashLink label={paymaster} href={`/address/${paymaster}`} /> : '-',
+      content: paymaster ? <ResponsiveHash label={paymaster} href={`/address/${paymaster}`} /> : '-',
       colSpan: 2,
     },
     {
       field: t('max_fee_per_gas'),
       content: tx?.polyjuice?.max_fee_per_gas ? (
         <span className={styles.gasFee}>
-          <Amount
-            amount={`${new BigNumber(tx.polyjuice.max_fee_per_gas).times(new BigNumber(tx.polyjuice.max_fee_per_gas))}`}
-            udt={PCKB_UDT_INFO}
-            showSymbol
-          />
+          <Amount amount={tx.polyjuice.max_fee_per_gas} udt={PCKB_UDT_INFO} showSymbol />
         </span>
       ) : (
         '-'
@@ -549,13 +547,7 @@ const Tx = () => {
       ddClassName: styles.priorityGasFee,
       content: tx?.polyjuice?.max_priority_fee_per_gas ? (
         <span className={styles.gasFee}>
-          <Amount
-            amount={`${new BigNumber(tx.polyjuice.max_priority_fee_per_gas).times(
-              new BigNumber(tx.polyjuice.max_priority_fee_per_gas),
-            )}`}
-            udt={PCKB_UDT_INFO}
-            showSymbol
-          />
+          <Amount amount={tx.polyjuice.max_priority_fee_per_gas} udt={PCKB_UDT_INFO} showSymbol />
         </span>
       ) : (
         '-'
@@ -566,7 +558,7 @@ const Tx = () => {
       field: t('paymaster_data'),
       content: paymasterData ? (
         <Tooltip title={paymasterData} placement="top">
-          <div className={styles.paymasterData}>{paymasterData}</div>
+          <div className={styles.paymasterData}>{new BigNumber(paymasterData).toFormat()}</div>
         </Tooltip>
       ) : (
         '-'
