@@ -34,7 +34,10 @@ import TokenApprovalList, { fetchTokenApprovalList } from 'components/TokenAppro
 import { SIZES } from 'components/PageSize'
 import { fetchBridgedRecordList, fetchEventLogsListByType, isEthAddress, GraphQLSchema, wagmiClient } from 'utils'
 import { WagmiConfig } from 'wagmi'
+
 import styles from './styles.module.scss'
+
+const createKeccakHash = require('keccak')
 
 const isSmartContractAccount = (account: AccountOverviewProps['account']): account is PolyjuiceContract => {
   return !!(account as PolyjuiceContract)?.smart_contract
@@ -291,6 +294,33 @@ const Account = () => {
     [GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType) ? { label: t('events'), key: 'events' } : null,
   ].filter(v => v)
 
+  const toChecksumAddress = (address: string) => {
+    address = address.toLowerCase().slice(2)
+    let hash = createKeccakHash('keccak256').update(address).digest('hex')
+    let ret = '0x'
+
+    for (let i = 0; i < address.length; i++) {
+      if (parseInt(hash[i], 16) >= 8) {
+        ret += address[i].toUpperCase()
+      } else {
+        ret += address[i]
+      }
+    }
+
+    return ret
+  }
+
+  const checkAddressIsValid = (address: string) => {
+    const len = address?.length || 0
+
+    if (len == 66) {
+      const sumResult = toChecksumAddress(address)
+      return address.toLowerCase() === address || address === sumResult
+    } else {
+      return isEthAddress(id as string)
+    }
+  }
+
   return (
     <>
       <SubpageHead subtitle={account ? `${title} ${id}` : (id as string)} />
@@ -299,7 +329,7 @@ const Account = () => {
           <PageTitle>
             {title}
             {/* for now, we only should check eth_address */}
-            {!isEthAddress(id as string) && id?.length !== 66 && (
+            {!checkAddressIsValid(id as string) && (
               <div className={styles['invalid-tips']}>
                 <span>{t('invalidAddress')}</span>
               </div>
