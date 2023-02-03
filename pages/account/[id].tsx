@@ -315,7 +315,8 @@ const Account = () => {
 
     if (len == 66) {
       const sumResult = toChecksumAddress(address)
-      return address.toLowerCase() === address || address === sumResult
+      const uppercasedAddress = address.toUpperCase().slice(2)
+      return address.toLowerCase() === address || `0x${uppercasedAddress}` === address || address === sumResult
     } else {
       return isEthAddress(id as string)
     }
