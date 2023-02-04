@@ -5,6 +5,13 @@
   font-family: Roboto;
   z-index: 99;
 
+  :global(.tooltip::before) {
+    white-space: nowrap;
+    @media screen and (max-width: 1440px) {
+      transform: translate(-80%, -100%);
+    }
+  }
+
   label {
     display: flex;
     justify-content: center;
