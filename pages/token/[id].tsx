@@ -23,6 +23,7 @@ import Alert from 'components/Alert'
 import { SIZES } from 'components/PageSize'
 import TokenLogo from 'components/TokenLogo'
 import Tooltip from 'components/Tooltip'
+import ResponsiveHash from 'components/ResponsiveHash'
 import { fetchToken, fetchBridgedRecordList, fetchTokenHolderList, client, currentChain, withWagmi } from 'utils'
 import type { API } from 'utils/api/utils'
 import TipsIcon from 'assets/icons/tips.svg'
@@ -199,9 +200,7 @@ const Token: React.FC<Props> = () => {
       content: !token ? (
         <Skeleton animation="wave" />
       ) : token.contract_address_hash ? (
-        <div className={styles.contract}>
-          <HashLink label={token.contract_address_hash} href={`/account/${token.contract_address_hash}`} />
-        </div>
+        <ResponsiveHash label={token.contract_address_hash} href={`/account/${token.contract_address_hash}`} />
       ) : (
         '-'
       ),
@@ -345,12 +344,11 @@ const Token: React.FC<Props> = () => {
               <div className={styles.infoTitle}>
                 {t(`tokenInfo`)}
                 {token?.eth_type === 'ERC20' ? (
-                  <div className="tooltip" data-tooltip={t('import-token-into-metamask')}>
+                  <div className={`${'tooltip'} ${styles.metamask}`} data-tooltip={t('import-token-into-metamask')}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src="/logos/metamask.png"
                       alt="MetaMask"
-                      className={styles.metamask}
                       title={t('import-token-into-metamask')}
                       onClick={handleImportIntoMetamask}
                     />
