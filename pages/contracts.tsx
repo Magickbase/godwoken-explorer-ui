@@ -15,7 +15,7 @@ import Table from 'components/Table'
 import Amount from 'components/Amount'
 import SortIcon from 'assets/icons/sort.svg'
 import { SIZES } from 'components/PageSize'
-import { PCKB_UDT_INFO, client, GraphQLSchema, handleDeleteInvalid } from 'utils'
+import { PCKB_UDT_INFO, client, GraphQLSchema, handleSorterArrayFromUrl, handleSorterArrayAfterClick } from 'utils'
 import styles from './index.module.scss'
 
 interface Variables {
@@ -105,22 +105,23 @@ const ContractList = () => {
     query: { before = null, after = null, page_size = SIZES[1], tx_count_sort, balance_sort, ...restQuery },
   } = useRouter()
 
-  const handleSorterValues = () => {
-    let originalSorter = {
-      tx_count_sort,
-      balance_sort,
-    }
+  const handleSorterValues = (url, sorters) => {
+    const paramArr = url.slice(url.indexOf('?') + 1).split('&')
+    const sorterParams = []
 
-    // delete the invalid properties
-    const validSorter = handleDeleteInvalid(originalSorter)
+    paramArr.map(param => {
+      const [key, val] = param.split('=')
+      const decodeVal = decodeURIComponent(val)
 
-    return Object.keys(validSorter)?.[0]
-      ? {
-          sort_type: Object.values(validSorter)[0],
-          sort_value: SmartContractsSorterValueEnum[Object.keys(validSorter)[0]],
-        }
-      : null
+      sorters.includes(key) &&
+        sorterParams.push({ sort_type: decodeVal, sort_value: SmartContractsSorterValueEnum[key] })
+    })
+    return sorterParams
   }
+
+  const sorters = ['tx_count_sort', 'balance_sort']
+  const pathSorterArray = handleSorterArrayFromUrl(asPath, sorters)
+  const sorterArray = handleSorterValues(asPath, sorters)
 
   const { isLoading, data } = useQuery(
     ['contract-list', before, after, page_size, tx_count_sort, balance_sort],
@@ -129,7 +130,7 @@ const ContractList = () => {
         before: before as string,
         after: after as string,
         limit: Number.isNaN(+page_size) ? +SIZES[1] : +page_size,
-        sorter: handleSorterValues() ? [handleSorterValues()] : [],
+        sorter: sorterArray ? sorterArray : [],
       }),
     {
       refetchInterval: 10000,
@@ -144,7 +145,7 @@ const ContractList = () => {
       `${asPath.split('?')[0] ?? ''}?${new URLSearchParams({
         ...restQuery,
         page_size: page_size as string,
-        [type]: order === 'DESC' ? 'ASC' : 'DESC',
+        ...handleSorterArrayAfterClick(pathSorterArray, { type, order: order === 'DESC' ? 'ASC' : 'DESC' }),
       })}`,
     )
   }
