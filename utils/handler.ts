@@ -74,11 +74,24 @@ export const handleNftImageLoadError = (e: React.SyntheticEvent<HTMLImageElement
   e.currentTarget.src = '/images/nft-placeholder.svg'
 }
 
-export const handleDeleteInvalid = (obj: Record<string, any>) => {
-  Object.keys(obj).forEach(item => {
-    if (!obj[item] && obj[item] != 0) {
-      delete obj[item]
-    }
+export const handleSorterArrayFromUrl = (url, sorters) => {
+  const paramArr = url.slice(url.indexOf('?') + 1).split('&')
+  const sorterParams = []
+
+  paramArr.map(param => {
+    const [key, val] = param.split('=')
+    const decodeVal = decodeURIComponent(val)
+
+    sorters.includes(key) && sorterParams.push({ type: key, order: decodeVal })
   })
-  return obj
+  return sorterParams
+}
+
+export const handleSorterArrayAfterClick = (pathSorterArray, onClickedSorter) => {
+  const { type } = onClickedSorter
+
+  const arrayExcludeClickedSorter = pathSorterArray.filter(item => item.type !== type)
+  arrayExcludeClickedSorter.unshift(onClickedSorter)
+
+  return arrayExcludeClickedSorter.reduce((pre, cur) => ({ ...pre, [cur.type]: cur.order }), {})
 }
