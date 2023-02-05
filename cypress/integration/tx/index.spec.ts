@@ -165,7 +165,7 @@ context('Transaction Page', () => {
           .find('dt')
           .should('have.text', 'Paymaster Data')
           .next()
-          .should('have.text', '1,234')
+          .should('have.text', '0x1234')
       })
 
       it('should have Call Data', () => {

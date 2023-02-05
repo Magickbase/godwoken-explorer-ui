@@ -558,7 +558,7 @@ const Tx = () => {
       field: t('paymaster_data'),
       content: paymasterData ? (
         <Tooltip title={paymasterData} placement="top">
-          <div className={styles.paymasterData}>{new BigNumber(paymasterData).toFormat()}</div>
+          <div className={styles.paymasterData}>{`0x${paymasterData}`}</div>
         </Tooltip>
       ) : (
         '-'
