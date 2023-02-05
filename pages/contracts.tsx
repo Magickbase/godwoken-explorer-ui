@@ -130,7 +130,7 @@ const ContractList = () => {
         before: before as string,
         after: after as string,
         limit: Number.isNaN(+page_size) ? +SIZES[1] : +page_size,
-        sorter: sorterArray ? sorterArray : [],
+        sorter: sorterArray || [],
       }),
     {
       refetchInterval: 10000,
