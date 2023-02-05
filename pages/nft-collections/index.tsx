@@ -18,7 +18,7 @@ import FilterMenu from 'components/FilterMenu'
 import { SIZES } from 'components/PageSize'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import SortIcon from 'assets/icons/sort.svg'
-import { client, GraphQLSchema, handleDeleteInvalid } from 'utils'
+import { client, GraphQLSchema, handleSorterArrayAfterClick, handleSorterArrayFromUrl } from 'utils'
 import styles from './styles.module.scss'
 
 interface Variables {
@@ -108,23 +108,23 @@ const NftCollectionList = () => {
   } = useRouter()
   const [t] = useTranslation(['nft', 'common', 'list'])
   const title = t(`nft-collections`)
-  const handleSorter = () => {
-    let originalSorter = {
-      holder_count_sort,
-      name_sort,
-      minted_count_sort,
-    }
 
-    // delete the invalid properties
-    const validSorter = handleDeleteInvalid(originalSorter)
+  const handleSorterValues = (url, sorters) => {
+    const paramArr = url.slice(url.indexOf('?') + 1).split('&')
+    const sorterParams = []
 
-    return Object.keys(validSorter)?.[0]
-      ? {
-          sort_type: Object.values(validSorter)[0],
-          sort_value: UdtsSorterValueEnum[Object.keys(validSorter)[0]],
-        }
-      : null
+    paramArr.map(param => {
+      const [key, val] = param.split('=')
+      const decodeVal = decodeURIComponent(val)
+
+      sorters.includes(key) && sorterParams.push({ sort_type: decodeVal, sort_value: UdtsSorterValueEnum[key] })
+    })
+    return sorterParams
   }
+
+  const sorters = ['holder_count_sort', 'name_sort', 'minted_count_sort']
+  const pathSorterArray = handleSorterArrayFromUrl(asPath, sorters)
+  const sorterArray = handleSorterValues(asPath, sorters)
 
   const { isLoading, data: list } = useQuery(
     ['erc721-list', page_size, before, after, name, holder_count_sort, name_sort, minted_count_sort],
@@ -134,7 +134,7 @@ const NftCollectionList = () => {
         after: after as string,
         name: name ? `${name}%` : null,
         limit: Number.isNaN(!page_size) ? +SIZES[1] : +page_size,
-        sorter: handleSorter() ? [handleSorter()] : [],
+        sorter: sorterArray || [],
       }),
     { refetchInterval: 10000 },
   )
@@ -148,7 +148,7 @@ const NftCollectionList = () => {
         ...restQuery,
         name: name ? (name as string) : '',
         page_size: page_size as string,
-        [type]: order === 'DESC' ? 'ASC' : 'DESC',
+        ...handleSorterArrayAfterClick(pathSorterArray, { type, order: order === 'DESC' ? 'ASC' : 'DESC' }),
       })}`,
     )
   }

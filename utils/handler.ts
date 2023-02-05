@@ -75,61 +75,24 @@ export const handleNftImageLoadError = (e: React.SyntheticEvent<HTMLImageElement
   e.currentTarget.src = '/images/nft-placeholder.svg'
 }
 
-// return a sorter array
-export const handleSorterArrayAboutPath = (url: string, sorters: string[], sorterValueEnum = null) => {
-  const params = url.slice(url.indexOf('?') + 1)
-  const sorterParamsArray = []
+export const handleSorterArrayFromUrl = (url, sorters) => {
+  const paramArr = url.slice(url.indexOf('?') + 1).split('&')
+  const sorterParams = []
 
-  const searchParams = new URLSearchParams(params)
-  const keys = [...searchParams.keys()]
+  paramArr.map(param => {
+    const [key, val] = param.split('=')
+    const decodeVal = decodeURIComponent(val)
 
-  keys?.map((item, index) => {
-    if (sorters.includes(item)) {
-      // return sort array which used for query, like: [{sort_type: ASC , sort_value: xxx}]
-      if (sorterValueEnum) {
-        sorterParamsArray.push({
-          sort_type: decodeURIComponent([...searchParams.values()][index]),
-          sort_value: sorterValueEnum[item],
-        })
-
-        // return sort array which from url, like: [{type: xxx , order: ASC}]
-      } else {
-        sorterParamsArray.push({ type: item, order: decodeURIComponent([...searchParams.values()][index]) })
-      }
-    }
+    sorters.includes(key) && sorterParams.push({ type: key, order: decodeVal })
   })
-
-  return sorterParamsArray
-}
-export type sorterType = {
-  type: string
-  order: 'ASC' | 'DESC'
+  return sorterParams
 }
 
-export const handleSorterArrayInOrder = (pathSorterArray: sorterType[], onClickedSorter: sorterType = null) => {
-  if (onClickedSorter) {
-    const { type } = onClickedSorter
+export const handleSorterArrayAfterClick = (pathSorterArray, onClickedSorter) => {
+  const { type } = onClickedSorter
 
-    // return a sorter array with the clicked one is on the first position
-    pathSorterArray.sort((preSorter, curSorter) => {
-      if (preSorter.type === type) {
-        return -1
-      } else if (curSorter.type === type) {
-        return 1
-      } else {
-        return 0
-      }
-    })
-    pathSorterArray[0] = onClickedSorter
-  }
-  return pathSorterArray
-}
+  const arrayExcludeClickedSorter = pathSorterArray.filter(item => item.type !== type)
+  arrayExcludeClickedSorter.unshift(onClickedSorter)
 
-export const handleDeleteInvalid = (obj: Record<string, any>) => {
-  Object.keys(obj).forEach(item => {
-    if (!obj[item] && obj[item] != 0) {
-      delete obj[item]
-    }
-  })
-  return obj
+  return arrayExcludeClickedSorter.reduce((pre, cur) => ({ ...pre, [cur.type]: cur.order }), {})
 }
