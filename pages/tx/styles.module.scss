@@ -30,13 +30,10 @@
     }
   }
 
-  .priorityGasFee {
-    margin-left: -4px !important;
-  }
-
   .paymasterData {
     text-overflow: ellipsis;
     overflow: hidden;
+    width: min-content;
   }
 
   a {
@@ -46,7 +43,7 @@
   dl[role='listitem'] {
     dt {
       @media screen and (min-width: 1024px) {
-        flex-basis: 168px !important;
+        flex-basis: 172px !important;
       }
     }
     dd {
