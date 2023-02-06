@@ -125,7 +125,7 @@ context('Transaction Page', () => {
           .find('dt')
           .should('have.text', 'Call Gas Limit')
           .next()
-          .should('have.text', '100000')
+          .should('have.text', '100,000')
       })
 
       it('should have Verification Gas Limit', () => {
@@ -133,7 +133,7 @@ context('Transaction Page', () => {
           .find('dt')
           .should('have.text', 'Verification Gas Limit')
           .next()
-          .should('have.text', '100000')
+          .should('have.text', '100,000')
       })
 
       it('should have Paymaster', () => {
@@ -165,7 +165,7 @@ context('Transaction Page', () => {
           .find('dt')
           .should('have.text', 'Paymaster Data')
           .next()
-          .should('have.text', '1234')
+          .should('have.text', '0x1234')
       })
 
       it('should have Call Data', () => {
