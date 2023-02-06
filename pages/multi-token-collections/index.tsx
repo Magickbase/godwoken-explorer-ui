@@ -18,13 +18,7 @@ import { SIZES } from 'components/PageSize'
 
 import NoDataIcon from 'assets/icons/no-data.svg'
 import SortIcon from 'assets/icons/sort.svg'
-import {
-  client,
-  GraphQLSchema,
-  handleDeleteInvalid,
-  handleSorterArrayAfterClick,
-  handleSorterArrayFromUrl,
-} from 'utils'
+import { client, GraphQLSchema, handleSorterArrayAfterClick, handleSorterArrayFromUrl } from 'utils'
 
 import styles from './styles.module.scss'
 
@@ -119,24 +113,6 @@ const MultiTokenCollectionList = () => {
       ...restQuery
     },
   } = useRouter()
-
-  // const handleSorter = () => {
-  //   let originalSorter = {
-  //     holder_count_sort,
-  //     name_sort,
-  //     type_count_sort,
-  //   }
-
-  //   // delete the invalid properties
-  //   const validSorter = handleDeleteInvalid(originalSorter)
-
-  //   return Object.keys(validSorter)?.[0]
-  //     ? {
-  //         sort_type: Object.values(validSorter)[0],
-  //         sort_value: UdtsSorterValueEnum[Object.keys(validSorter)[0]],
-  //       }
-  //     : null
-  // }
 
   const title = t(`multi-token-collections`)
 
