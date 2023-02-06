@@ -72,7 +72,7 @@
     "postcss-flexbugs-fixes": "5.0.2",
     "postcss-import": "15.1.0",
     "postcss-nesting": "11.1.0",
-    "postcss-preset-env": "7.8.3",
+    "postcss-preset-env": "8.0.1",
     "prettier": "2.8.3",
     "sass": "1.58.0",
     "ts-node": "10.9.1",
