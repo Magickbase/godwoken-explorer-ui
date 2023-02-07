@@ -37,8 +37,6 @@ import { WagmiConfig } from 'wagmi'
 
 import styles from './styles.module.scss'
 
-const createKeccakHash = require('keccak')
-
 const isSmartContractAccount = (account: AccountOverviewProps['account']): account is PolyjuiceContract => {
   return !!(account as PolyjuiceContract)?.smart_contract
 }
@@ -312,7 +310,6 @@ const Account = () => {
         <div className={styles.title}>
           <PageTitle>
             {title}
-
             {!checkAddressIsValid(id as string) && (
               <div className={styles['invalid-tips']}>
                 <span>{t('invalidAddress')}</span>
