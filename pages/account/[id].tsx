@@ -294,29 +294,12 @@ const Account = () => {
     [GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType) ? { label: t('events'), key: 'events' } : null,
   ].filter(v => v)
 
-  const toChecksumAddress = (address: string) => {
-    address = address.toLowerCase().slice(2)
-    let hash = createKeccakHash('keccak256').update(address).digest('hex')
-    let ret = '0x'
-
-    for (let i = 0; i < address.length; i++) {
-      if (parseInt(hash[i], 16) >= 8) {
-        ret += address[i].toUpperCase()
-      } else {
-        ret += address[i]
-      }
-    }
-
-    return ret
-  }
-
   const checkAddressIsValid = (address: string) => {
     const len = address?.length || 0
 
+    // for now, we skipped checking godwoken-script-hash
     if (len == 66) {
-      const sumResult = toChecksumAddress(address)
-      const uppercasedAddress = address.toUpperCase().slice(2)
-      return address.toLowerCase() === address || `0x${uppercasedAddress}` === address || address === sumResult
+      return address.startsWith('0x')
     } else {
       return isEthAddress(id as string)
     }
@@ -329,7 +312,7 @@ const Account = () => {
         <div className={styles.title}>
           <PageTitle>
             {title}
-            {/* for now, we only should check eth_address */}
+
             {!checkAddressIsValid(id as string) && (
               <div className={styles['invalid-tips']}>
                 <span>{t('invalidAddress')}</span>
