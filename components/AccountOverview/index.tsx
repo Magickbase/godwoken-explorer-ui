@@ -197,12 +197,9 @@ const fetchAccount = (variables: Variables, fetchApi) =>
         nonce: 0,
       } as UnknownUser),
   )
-
 export const fetchAccountOverview = (variables: Variables) => fetchAccount(variables, accountOverviewQuery)
 export const fetchAccountOverviewUnion = (variables: Variables) => fetchAccount(variables, accountOverviewQueryUnion)
-
 export const fetchAccountBalance = (address: string) => provider.getBalance(address).then(res => res.toString())
-
 export const fetchDeployAddress = (variables: { eth_hash: string }) =>
   client
     .request<{ transaction: { from_account: Pick<GraphQLSchema.Account, 'eth_address' | 'bit_alias'> } }>(
