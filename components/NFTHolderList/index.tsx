@@ -94,14 +94,6 @@ const NFTHolderList: React.FC<HolderListProps> = ({ holders }) => {
               </td>
             </tr>
           )}
-
-          {/* <div className={styles.test}>
-            <div>
-              first floor
-              <div>first -1 floor</div>
-            </div>
-            <div>second</div>
-          </div> */}
         </tbody>
       </Table>
       {!holders?.metadata.total_count ? null : (
