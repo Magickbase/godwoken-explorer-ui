@@ -34,6 +34,7 @@ import TokenApprovalList, { fetchTokenApprovalList } from 'components/TokenAppro
 import { SIZES } from 'components/PageSize'
 import { fetchBridgedRecordList, fetchEventLogsListByType, isEthAddress, GraphQLSchema, wagmiClient } from 'utils'
 import { WagmiConfig } from 'wagmi'
+
 import styles from './styles.module.scss'
 
 const isSmartContractAccount = (account: AccountOverviewProps['account']): account is PolyjuiceContract => {
@@ -63,6 +64,7 @@ const Account = () => {
       method_name = null,
     },
   } = useRouter()
+
   const [t] = useTranslation(['account', 'common'])
   const q = isEthAddress(id as string) ? { address: id as string } : { script_hash: id as string }
 
@@ -260,15 +262,7 @@ const Account = () => {
     : []
 
   const accountType = account?.type
-  const title = account ? (
-    accountType ? (
-      t(`accountType.${accountType}`)
-    ) : (
-      t(`accountType.UNKNOWN`)
-    )
-  ) : (
-    <Skeleton animation="wave" width="200px" />
-  )
+  const title = accountType ? t(`accountType.${accountType}`) : t(`accountType.UNKNOWN`)
 
   const tabs = [
     { label: t('transactionRecords'), key: 'transactions' },
@@ -298,12 +292,30 @@ const Account = () => {
     [GraphQLSchema.AccountType.PolyjuiceContract].includes(accountType) ? { label: t('events'), key: 'events' } : null,
   ].filter(v => v)
 
+  const checkAddressIsValid = (address: string) => {
+    const len = address?.length || 0
+
+    // for now, we skipped checking godwoken-script-hash
+    if (len == 66) {
+      return address.startsWith('0x')
+    } else {
+      return isEthAddress(id as string)
+    }
+  }
+
   return (
     <>
       <SubpageHead subtitle={account ? `${title} ${id}` : (id as string)} />
       <div className={styles.container}>
         <div className={styles.title}>
-          <PageTitle>{title}</PageTitle>
+          <PageTitle>
+            {title}
+            {!checkAddressIsValid(id as string) && (
+              <div className={styles['invalid-tips']}>
+                <span>{t('invalidAddress')}</span>
+              </div>
+            )}
+          </PageTitle>
           {downloadItems.length ? <DownloadMenu items={downloadItems} /> : null}
         </div>
         <div className={styles.hash}>
