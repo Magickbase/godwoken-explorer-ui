@@ -1,17 +1,20 @@
 @import '../../styles/mixin.scss';
-.address {
-  div:first-of-type {
-    display: none;
-  }
-  @media screen and (max-width: 1024px) {
-    div:first-of-type {
-      display: block;
-    }
-    div:last-of-type {
-      display: none;
-    }
-  }
-}
+// .address {
+//   div:first-of-type {
+//     display: none;
+//   }
+//   div:last-of-type {
+//     display: flex;
+//   }
+//   @media screen and (max-width: 1024px) {
+//     div:first-of-type {
+//       display: flex;
+//     }
+//     div:last-of-type {
+//       display: none;
+//     }
+//   }
+// }
 
 .noRecords {
   @include empty-list;

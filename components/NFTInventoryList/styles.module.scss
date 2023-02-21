@@ -45,7 +45,12 @@
   }
   .info {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
+
+    @media screen and (max-width: 1024px) {
+      justify-content: space-between;
+    }
+
     span:nth-child(1) {
       flex-basis: 80px;
       flex-shrink: 0;

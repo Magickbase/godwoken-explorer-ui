@@ -4,6 +4,8 @@ import Table from 'components/Table'
 import Address from 'components/TruncatedAddress'
 import Pagination from 'components/SimplePagination'
 import NoDataIcon from 'assets/icons/no-data.svg'
+import { useTheme } from '@mui/material/styles'
+import useMediaQuery from '@mui/material/useMediaQuery'
 import { client, GraphQLSchema } from 'utils'
 
 import styles from './styles.module.scss'
@@ -57,6 +59,10 @@ const itemHolderListQuery = gql`
         rank
         address_hash
         quantity
+        account {
+          bit_alias
+          eth_address
+        }
       }
       metadata {
         before
@@ -92,6 +98,8 @@ export const fetchItemHoldersList = (variables: ItemHoldersVariables): Promise<H
 
 const MultiTokenHolderList: React.FC<HolderListProps> = ({ holders }) => {
   const [t] = useTranslation('list')
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
   return (
     <>
@@ -109,12 +117,14 @@ const MultiTokenHolderList: React.FC<HolderListProps> = ({ holders }) => {
               const address = item.account?.eth_address
               const domain = item.account?.bit_alias
 
+              console.log(address, 'address')
+              console.log(domain, 'domain')
+
               return (
                 <tr key={address}>
                   <td>{item.rank}</td>
                   <td className={styles.address}>
-                    <Address address={address} domain={domain} />
-                    <Address address={address} domain={domain} leading={22} />
+                    <Address address={address} domain={domain} leading={!isMobile ? 22 : 8} />
                   </td>
                   <td>{(+item.quantity).toLocaleString('en')}</td>
                 </tr>
