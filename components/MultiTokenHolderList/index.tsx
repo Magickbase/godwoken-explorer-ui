@@ -117,9 +117,6 @@ const MultiTokenHolderList: React.FC<HolderListProps> = ({ holders }) => {
               const address = item.account?.eth_address
               const domain = item.account?.bit_alias
 
-              console.log(address, 'address')
-              console.log(domain, 'domain')
-
               return (
                 <tr key={address}>
                   <td>{item.rank}</td>
