@@ -2,6 +2,7 @@ import type { PolyjuiceContract as PolyjuiceContractProps } from 'components/Acc
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
+import { utils } from 'ethers'
 import OpenInNewIcon from 'assets/icons/open-in-new.svg'
 import ExpandIcon from 'assets/icons/expand.svg'
 import { currentChain as targetChain } from 'utils'
@@ -149,7 +150,8 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
     form.setAttribute(LOADING_ATTRIBUTE, 'true')
 
     try {
-      const result = await method(...params)
+      const pCKB = form.querySelector<HTMLInputElement>('input[name=pCKB]')?.value ?? '0'
+      const result = await method(...params, { value: utils.parseEther(pCKB) })
       if (tabIdx === 2) {
         const elm = resInputList[0]
         if (elm) {
@@ -340,7 +342,7 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
           ) : null}
           <div className={styles.methodGroupTitle}>Non-payable and Payable</div>
           {Object.keys(writeMethods).map(signature => {
-            const { inputs = [], outputs = [] } = contract.interface.functions[signature] ?? {}
+            const { inputs = [], outputs = [], payable } = contract.interface.functions[signature] ?? {}
             return (
               <details key={signature}>
                 <summary>
@@ -362,6 +364,12 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
                         </fieldset>
                       )
                     })}
+                    {payable ? (
+                      <fieldset key="pCKB">
+                        <label>pCKB</label>
+                        <input name="pCKB" title="pCKB" placeholder={t('pckb_send_along_with_tx')} />
+                      </fieldset>
+                    ) : null}
                     <div className={styles.response}>Response</div>
                     <fieldset>
                       <label>Txn Hash</label>
