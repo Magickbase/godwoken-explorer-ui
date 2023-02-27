@@ -70,19 +70,14 @@ export const LogFieldItemInTx: React.FC<{ value: string; type: string; indexed: 
 
   switch (type) {
     case 'address': {
+      const addr = parsed.toLowerCase()
       return (
         <div className={styles.logItemWithToggle}>
           <div className={`mono-font ${styles.content}`}>
             {
-              <NextLink href={`/account/${value}`}>
-                <Link
-                  href={`/account/${value}`}
-                  underline="none"
-                  color="primary.main"
-                  className="mono-font"
-                  whiteSpace="nowrap"
-                >
-                  {parsed.toLowerCase()}
+              <NextLink href={`/account/${addr}`} passHref>
+                <Link underline="none" color="primary.main" className="mono-font" whiteSpace="nowrap">
+                  {addr}
                 </Link>
               </NextLink>
             }
