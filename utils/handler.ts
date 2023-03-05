@@ -75,24 +75,41 @@ export const handleNftImageLoadError = (e: React.SyntheticEvent<HTMLImageElement
   e.currentTarget.src = '/images/nft-placeholder.svg'
 }
 
-export const handleSorterArrayFromUrl = (url, sorters) => {
-  const paramArr = url.slice(url.indexOf('?') + 1).split('&')
-  const sorterParams = []
+// return a sorter array
+export const handleSorterArrayAboutPath = (url, sorters, sorterValueEnum = null) => {
+  const params = url.slice(url.indexOf('?') + 1)
+  const sorterParamsArray = []
 
-  paramArr.map(param => {
-    const [key, val] = param.split('=')
-    const decodeVal = decodeURIComponent(val)
+  const searchParams = new URLSearchParams(params)
+  Array(...searchParams.keys()).forEach((item, index) => {
+    if (sorters.includes(item)) {
+      // return sort array which used for query, like: [{sort_type: ASC , sort_value: xxx}]
+      if (sorterValueEnum) {
+        sorterParamsArray.push({
+          sort_type: decodeURIComponent([...searchParams.values()][index]),
+          sort_value: sorterValueEnum[item],
+        })
 
-    sorters.includes(key) && sorterParams.push({ type: key, order: decodeVal })
+        // return sort array which from url, like: [{type: xxx , order: ASC}]
+      } else {
+        sorterParamsArray.push({ type: item, order: decodeURIComponent([...searchParams.values()][index]) })
+      }
+    }
   })
-  return sorterParams
+
+  return sorterParamsArray
 }
 
-export const handleSorterArrayAfterClick = (pathSorterArray, onClickedSorter) => {
-  const { type } = onClickedSorter
+export const handleSorterArrayToMap = (pathSorterArray, onClickedSorter = null) => {
+  if (onClickedSorter) {
+    const { type } = onClickedSorter
+    const arrayExcludeClickedSorter = pathSorterArray.filter(item => item.type !== type)
 
-  const arrayExcludeClickedSorter = pathSorterArray.filter(item => item.type !== type)
-  arrayExcludeClickedSorter.unshift(onClickedSorter)
+    arrayExcludeClickedSorter.unshift(onClickedSorter)
 
-  return arrayExcludeClickedSorter.reduce((pre, cur) => ({ ...pre, [cur.type]: cur.order }), {})
+    // return a sorter map with the clicked one is on the first position
+    return arrayExcludeClickedSorter.reduce((pre, cur) => ({ ...pre, [cur.type]: cur.order }), {})
+  } else {
+    return pathSorterArray.reduce((pre, cur) => ({ ...pre, [cur.type]: cur.order }), {})
+  }
 }

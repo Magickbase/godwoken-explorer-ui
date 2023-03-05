@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import type { GetStaticProps } from 'next'
 import { useRouter } from 'next/router'
 import NextLink from 'next/link'
@@ -18,7 +19,7 @@ import FilterMenu from 'components/FilterMenu'
 import { SIZES } from 'components/PageSize'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import SortIcon from 'assets/icons/sort.svg'
-import { client, GraphQLSchema, handleSorterArrayAfterClick, handleSorterArrayFromUrl } from 'utils'
+import { client, GraphQLSchema, handleSorterArrayAboutPath, handleSorterArrayToMap } from 'utils'
 import styles from './styles.module.scss'
 
 interface Variables {
@@ -109,22 +110,35 @@ const NftCollectionList = () => {
   const [t] = useTranslation(['nft', 'common', 'list'])
   const title = t(`nft-collections`)
 
-  const handleSorterValues = (url, sorters) => {
-    const paramArr = url.slice(url.indexOf('?') + 1).split('&')
-    const sorterParams = []
+  const sorters = ['holder_count_sort', 'name_sort', 'minted_count_sort']
+  const DEFAULT_SORTERS = [
+    { type: 'name_sort', order: 'ASC' },
+    { type: 'holder_count_sort', order: 'ASC' },
+    { type: 'minted_count_sort', order: 'ASC' },
+  ]
 
-    paramArr.map(param => {
-      const [key, val] = param.split('=')
-      const decodeVal = decodeURIComponent(val)
+  const sorterArrayFromPath = handleSorterArrayAboutPath(asPath, sorters)
 
-      sorters.includes(key) && sorterParams.push({ sort_type: decodeVal, sort_value: UdtsSorterValueEnum[key] })
-    })
-    return sorterParams
+  // get a sorter array to query listdata from server
+  const sorterArrayForQuery = handleSorterArrayAboutPath(asPath, sorters, UdtsSorterValueEnum)
+
+  const handleUrlForPush = (clickedSorter = null) => {
+    return `${asPath.split('?')[0] ?? ''}?${new URLSearchParams({
+      ...restQuery,
+      name: name ? (name as string) : '',
+      page_size: page_size as string,
+      ...handleSorterArrayToMap(clickedSorter ? sorterArrayFromPath : DEFAULT_SORTERS, clickedSorter),
+    })}`
   }
 
-  const sorters = ['holder_count_sort', 'name_sort', 'minted_count_sort']
-  const pathSorterArray = handleSorterArrayFromUrl(asPath, sorters)
-  const sorterArray = handleSorterValues(asPath, sorters)
+  useEffect(() => {
+    if (!sorterArrayFromPath.length) {
+      push(handleUrlForPush())
+    }
+  }, [sorterArrayFromPath])
+
+  // const pathSorterArray = handleSorterArrayFromUrl(asPath, sorters)
+  // const sorterArray = handleSorterValues(asPath, sorters)
 
   const { isLoading, data: list } = useQuery(
     ['erc721-list', page_size, before, after, name, holder_count_sort, name_sort, minted_count_sort],
@@ -134,7 +148,7 @@ const NftCollectionList = () => {
         after: after as string,
         name: name ? `${name}%` : null,
         limit: Number.isNaN(!page_size) ? +SIZES[1] : +page_size,
-        sorter: sorterArray || [],
+        sorter: sorterArrayForQuery,
       }),
     { refetchInterval: 10000 },
   )
@@ -143,14 +157,7 @@ const NftCollectionList = () => {
     const {
       dataset: { order },
     } = e.currentTarget
-    push(
-      `${asPath.split('?')[0] ?? ''}?${new URLSearchParams({
-        ...restQuery,
-        name: name ? (name as string) : '',
-        page_size: page_size as string,
-        ...handleSorterArrayAfterClick(pathSorterArray, { type, order: order === 'DESC' ? 'ASC' : 'DESC' }),
-      })}`,
-    )
+    push(handleUrlForPush({ type, order: order === 'DESC' ? 'ASC' : 'DESC' }))
   }
 
   const headers = ['token', 'address', 'holder_count', 'minted_count']
