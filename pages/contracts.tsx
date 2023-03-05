@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import type { GetStaticProps } from 'next'
 import { useQuery } from 'react-query'
 import { useRouter } from 'next/router'
@@ -15,7 +16,7 @@ import Table from 'components/Table'
 import Amount from 'components/Amount'
 import SortIcon from 'assets/icons/sort.svg'
 import { SIZES } from 'components/PageSize'
-import { PCKB_UDT_INFO, client, GraphQLSchema, handleSorterArrayFromUrl, handleSorterArrayAfterClick } from 'utils'
+import { PCKB_UDT_INFO, client, GraphQLSchema, handleSorterArrayAboutPath, handleSorterArrayToMap } from 'utils'
 import styles from './index.module.scss'
 
 interface Variables {
@@ -105,23 +106,31 @@ const ContractList = () => {
     query: { before = null, after = null, page_size = SIZES[1], tx_count_sort, balance_sort, ...restQuery },
   } = useRouter()
 
-  const handleSorterValues = (url, sorters) => {
-    const paramArr = url.slice(url.indexOf('?') + 1).split('&')
-    const sorterParams = []
+  const sorters = ['tx_count_sort', 'balance_sort']
 
-    paramArr.map(param => {
-      const [key, val] = param.split('=')
-      const decodeVal = decodeURIComponent(val)
+  const DEFAULT_SORTERS = [
+    { type: 'tx_count_sort', order: 'ASC' },
+    { type: 'balance_sort', order: 'ASC' },
+  ]
 
-      sorters.includes(key) &&
-        sorterParams.push({ sort_type: decodeVal, sort_value: SmartContractsSorterValueEnum[key] })
-    })
-    return sorterParams
+  const sorterArrayFromPath = handleSorterArrayAboutPath(asPath, sorters)
+
+  // get a sorter array to query listdata from server
+  const sorterArrayForQuery = handleSorterArrayAboutPath(asPath, sorters, SmartContractsSorterValueEnum)
+
+  const handleUrlForPush = (clickedSorter = null) => {
+    return `${asPath.split('?')[0] ?? ''}?${new URLSearchParams({
+      ...restQuery,
+      page_size: page_size as string,
+      ...handleSorterArrayToMap(clickedSorter ? sorterArrayFromPath : DEFAULT_SORTERS, clickedSorter),
+    })}`
   }
 
-  const sorters = ['tx_count_sort', 'balance_sort']
-  const pathSorterArray = handleSorterArrayFromUrl(asPath, sorters)
-  const sorterArray = handleSorterValues(asPath, sorters)
+  useEffect(() => {
+    if (!sorterArrayFromPath.length) {
+      push(handleUrlForPush())
+    }
+  }, [sorterArrayFromPath])
 
   const { isLoading, data } = useQuery(
     ['contract-list', before, after, page_size, tx_count_sort, balance_sort],
@@ -130,7 +139,7 @@ const ContractList = () => {
         before: before as string,
         after: after as string,
         limit: Number.isNaN(+page_size) ? +SIZES[1] : +page_size,
-        sorter: sorterArray || [],
+        sorter: sorterArrayForQuery,
       }),
     {
       refetchInterval: 10000,
@@ -141,13 +150,7 @@ const ContractList = () => {
     const {
       dataset: { order },
     } = e.currentTarget
-    push(
-      `${asPath.split('?')[0] ?? ''}?${new URLSearchParams({
-        ...restQuery,
-        page_size: page_size as string,
-        ...handleSorterArrayAfterClick(pathSorterArray, { type, order: order === 'DESC' ? 'ASC' : 'DESC' }),
-      })}`,
-    )
+    push(handleUrlForPush({ type, order: order === 'DESC' ? 'ASC' : 'DESC' }))
   }
 
   return (
