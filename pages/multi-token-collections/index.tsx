@@ -19,7 +19,7 @@ import { SIZES } from 'components/PageSize'
 
 import NoDataIcon from 'assets/icons/no-data.svg'
 import SortIcon from 'assets/icons/sort.svg'
-import { client, GraphQLSchema, handleSorterArrayToMap, handleSorterArrayFromPath } from 'utils'
+import { client, GraphQLSchema, handleSorterArrayToMap, handleSorterArrayAboutPath } from 'utils'
 
 import styles from './styles.module.scss'
 
@@ -124,10 +124,10 @@ const MultiTokenCollectionList = () => {
     { type: 'holder_count_sort', order: 'ASC' },
   ]
 
-  const sorterArrayFromPath = handleSorterArrayFromPath(asPath, sorters)
+  const sorterArrayFromPath = handleSorterArrayAboutPath(asPath, sorters)
 
   // get a sorter array to query listdata from server
-  const sorterArrayForQuery = handleSorterArrayFromPath(asPath, sorters, UdtsSorterValueEnum)
+  const sorterArrayForQuery = handleSorterArrayAboutPath(asPath, sorters, UdtsSorterValueEnum)
 
   const handleUrlForPush = (clickedSorter = null) => {
     return `${asPath.split('?')[0] ?? ''}?${new URLSearchParams({

@@ -75,18 +75,21 @@ export const handleNftImageLoadError = (e: React.SyntheticEvent<HTMLImageElement
 }
 
 // return a sorter array
-export const handleSorterArrayFromPath = (url, sorters, sorterValueEnum = null) => {
+export const handleSorterArrayAboutPath = (url, sorters, sorterValueEnum = null) => {
   const params = url.slice(url.indexOf('?') + 1)
   const sorterParamsArray = []
 
-  var searchParams = new URLSearchParams(params)
+  const searchParams = new URLSearchParams(params)
   Array(...searchParams.keys()).forEach((item, index) => {
     if (sorters.includes(item)) {
+      // return sort array which used for query, like: [{sort_type: ASC , sort_value: xxx}]
       if (sorterValueEnum) {
         sorterParamsArray.push({
           sort_type: decodeURIComponent([...searchParams.values()][index]),
           sort_value: sorterValueEnum[item],
         })
+
+        // return sort array which from url, like: [{type: xxx , order: ASC}]
       } else {
         sorterParamsArray.push({ type: item, order: decodeURIComponent([...searchParams.values()][index]) })
       }
