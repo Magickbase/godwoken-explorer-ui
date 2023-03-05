@@ -137,9 +137,6 @@ const NftCollectionList = () => {
     }
   }, [sorterArrayFromPath])
 
-  // const pathSorterArray = handleSorterArrayFromUrl(asPath, sorters)
-  // const sorterArray = handleSorterValues(asPath, sorters)
-
   const { isLoading, data: list } = useQuery(
     ['erc721-list', page_size, before, after, name, holder_count_sort, name_sort, minted_count_sort],
     () =>
