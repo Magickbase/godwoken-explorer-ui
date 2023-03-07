@@ -76,12 +76,14 @@ export const handleNftImageLoadError = (e: React.SyntheticEvent<HTMLImageElement
 }
 
 // return a sorter array
-export const handleSorterArrayAboutPath = (url, sorters, sorterValueEnum = null) => {
+export const handleSorterArrayAboutPath = (url: string, sorters: string[], sorterValueEnum = null) => {
   const params = url.slice(url.indexOf('?') + 1)
   const sorterParamsArray = []
 
   const searchParams = new URLSearchParams(params)
-  Array(...searchParams.keys()).forEach((item, index) => {
+  const keys = [...searchParams.keys()]
+
+  keys?.map((item, index) => {
     if (sorters.includes(item)) {
       // return sort array which used for query, like: [{sort_type: ASC , sort_value: xxx}]
       if (sorterValueEnum) {
@@ -99,17 +101,26 @@ export const handleSorterArrayAboutPath = (url, sorters, sorterValueEnum = null)
 
   return sorterParamsArray
 }
+export type sorterType = {
+  type: string
+  order: 'ASC' | 'DESC'
+}
 
-export const handleSorterArrayToMap = (pathSorterArray, onClickedSorter = null) => {
+export const handleSorterArrayInOrder = (pathSorterArray: sorterType[], onClickedSorter: sorterType = null) => {
   if (onClickedSorter) {
     const { type } = onClickedSorter
-    const arrayExcludeClickedSorter = pathSorterArray.filter(item => item.type !== type)
 
-    arrayExcludeClickedSorter.unshift(onClickedSorter)
-
-    // return a sorter map with the clicked one is on the first position
-    return arrayExcludeClickedSorter.reduce((pre, cur) => ({ ...pre, [cur.type]: cur.order }), {})
-  } else {
-    return pathSorterArray.reduce((pre, cur) => ({ ...pre, [cur.type]: cur.order }), {})
+    // return a sorter array with the clicked one is on the first position
+    pathSorterArray.sort((preSorter, curSorter) => {
+      if (preSorter.type === type) {
+        return -1
+      } else if (curSorter.type === type) {
+        return 1
+      } else {
+        return 0
+      }
+    })
+    pathSorterArray[0] = onClickedSorter
   }
+  return pathSorterArray
 }
