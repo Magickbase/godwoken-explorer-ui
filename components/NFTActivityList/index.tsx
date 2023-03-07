@@ -171,7 +171,7 @@ const ActivityList: React.FC<
                   {token_id ? null : (
                     <td>
                       <NextLink href={`/nft-item/${item.token_contract_address_hash}/${item.token_id}`}>
-                        <a>{(+item.token_id).toLocaleString('en')}</a>
+                        <a>{(item.token_id + '').replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</a>
                       </NextLink>
                     </td>
                   )}
