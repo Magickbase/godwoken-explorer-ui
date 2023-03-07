@@ -1,5 +1,5 @@
-import { useEffect } from 'react'
 import type { GetStaticProps } from 'next'
+import { useEffect } from 'react'
 import { useQuery } from 'react-query'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
@@ -16,7 +16,14 @@ import Table from 'components/Table'
 import Amount from 'components/Amount'
 import SortIcon from 'assets/icons/sort.svg'
 import { SIZES } from 'components/PageSize'
-import { PCKB_UDT_INFO, client, GraphQLSchema, handleSorterArrayAboutPath, handleSorterArrayToMap } from 'utils'
+import {
+  PCKB_UDT_INFO,
+  client,
+  GraphQLSchema,
+  handleSorterArrayAboutPath,
+  handleSorterArrayInOrder,
+  sorterType,
+} from 'utils'
 import styles from './index.module.scss'
 
 interface Variables {
@@ -108,7 +115,7 @@ const ContractList = () => {
 
   const sorters = ['tx_count_sort', 'balance_sort']
 
-  const DEFAULT_SORTERS = [
+  const DEFAULT_SORTERS: sorterType[] = [
     { type: 'tx_count_sort', order: 'ASC' },
     { type: 'balance_sort', order: 'ASC' },
   ]
@@ -118,12 +125,18 @@ const ContractList = () => {
   // get a sorter array to query listdata from server
   const sorterArrayForQuery = handleSorterArrayAboutPath(asPath, sorters, SmartContractsSorterValueEnum)
 
-  const handleUrlForPush = (clickedSorter = null) => {
-    return `${asPath.split('?')[0] ?? ''}?${new URLSearchParams({
+  const handleUrlForPush = (clickedSorter: sorterType = null) => {
+    const searchParams = new URLSearchParams({
       ...restQuery,
       page_size: page_size as string,
-      ...handleSorterArrayToMap(clickedSorter ? sorterArrayFromPath : DEFAULT_SORTERS, clickedSorter),
-    })}`
+    })
+
+    const orderedSorter = handleSorterArrayInOrder(clickedSorter ? sorterArrayFromPath : DEFAULT_SORTERS, clickedSorter)
+    for (const item of orderedSorter) {
+      searchParams.append(item.type, item.order)
+    }
+
+    return `${asPath.split('?')[0] ?? ''}?${searchParams}`
   }
 
   useEffect(() => {
