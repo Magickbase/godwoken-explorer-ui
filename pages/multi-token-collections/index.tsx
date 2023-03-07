@@ -1,5 +1,5 @@
-import { useEffect } from 'react'
 import type { GetStaticProps } from 'next'
+import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import NextLink from 'next/link'
 import { useTranslation } from 'next-i18next'
@@ -19,7 +19,7 @@ import { SIZES } from 'components/PageSize'
 
 import NoDataIcon from 'assets/icons/no-data.svg'
 import SortIcon from 'assets/icons/sort.svg'
-import { client, GraphQLSchema, handleSorterArrayToMap, handleSorterArrayAboutPath } from 'utils'
+import { client, GraphQLSchema, handleSorterArrayAboutPath, sorterType, handleSorterArrayInOrder } from 'utils'
 
 import styles from './styles.module.scss'
 
@@ -118,7 +118,7 @@ const MultiTokenCollectionList = () => {
   const title = t(`multi-token-collections`)
 
   const sorters = ['holder_count_sort', 'name_sort', 'type_count_sort']
-  const DEFAULT_SORTERS = [
+  const DEFAULT_SORTERS: sorterType[] = [
     { type: 'name_sort', order: 'ASC' },
     { type: 'type_count_sort', order: 'ASC' },
     { type: 'holder_count_sort', order: 'ASC' },
@@ -129,13 +129,18 @@ const MultiTokenCollectionList = () => {
   // get a sorter array to query listdata from server
   const sorterArrayForQuery = handleSorterArrayAboutPath(asPath, sorters, UdtsSorterValueEnum)
 
-  const handleUrlForPush = (clickedSorter = null) => {
-    return `${asPath.split('?')[0] ?? ''}?${new URLSearchParams({
+  const handleUrlForPush = (clickedSorter: sorterType = null) => {
+    const searchParams = new URLSearchParams({
       ...restQuery,
-      name: name ? (name as string) : '',
       page_size: page_size as string,
-      ...handleSorterArrayToMap(clickedSorter ? sorterArrayFromPath : DEFAULT_SORTERS, clickedSorter),
-    })}`
+    })
+
+    const orderedSorter = handleSorterArrayInOrder(clickedSorter ? sorterArrayFromPath : DEFAULT_SORTERS, clickedSorter)
+    for (const item of orderedSorter) {
+      searchParams.append(item.type, item.order)
+    }
+
+    return `${asPath.split('?')[0] ?? ''}?${searchParams}`
   }
 
   useEffect(() => {
