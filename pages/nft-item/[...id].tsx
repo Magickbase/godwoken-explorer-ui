@@ -194,7 +194,6 @@ const NftItem = () => {
       <div className={styles.container}>
         <div className={styles.overview}>
           <img
-            className={styles.logo}
             src={getIpfsUrl(metadata?.image ?? '/images/nft-placeholder.svg')}
             onError={handleNftImageLoadError}
             alt="nft-cover"

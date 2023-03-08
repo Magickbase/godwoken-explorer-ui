@@ -15,7 +15,9 @@ type InventoryListProps = {
       token_id: string
       contract_address_hash: string
       counts: string
-      owner?: Record<string, any>
+      owner?: {
+        account: Pick<GraphQLSchema.Account, 'bit_alias' | 'eth_address'>
+      }
       udt?: {
         id: number
         name: string | null
@@ -157,7 +159,6 @@ const MultiTokenInventoryList: React.FC<InventoryListProps> = ({ inventory, view
                 <div className={styles.info}>
                   <span>{t('owner')}</span>
                   <Address address={eth_address} domain={bit_alias} />
-                  {/* <HashLink href={`/account/${item.owner}`} label={item.owner} /> */}
                 </div>
               ) : (
                 <div className={styles.info}>
