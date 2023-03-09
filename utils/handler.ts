@@ -73,3 +73,53 @@ export const handleCopy = async (value: string) => {
 export const handleNftImageLoadError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
   e.currentTarget.src = '/images/nft-placeholder.svg'
 }
+
+// return a sorter array
+export const handleSorterArrayAboutPath = (url: string, sorters: string[], sorterValueEnum = null) => {
+  const params = url.slice(url.indexOf('?') + 1)
+  const sorterParamsArray = []
+
+  const searchParams = new URLSearchParams(params)
+  const keys = [...searchParams.keys()]
+
+  keys?.map((item, index) => {
+    if (sorters.includes(item)) {
+      // return sort array which used for query, like: [{sort_type: ASC , sort_value: xxx}]
+      if (sorterValueEnum) {
+        sorterParamsArray.push({
+          sort_type: decodeURIComponent([...searchParams.values()][index]),
+          sort_value: sorterValueEnum[item],
+        })
+
+        // return sort array which from url, like: [{type: xxx , order: ASC}]
+      } else {
+        sorterParamsArray.push({ type: item, order: decodeURIComponent([...searchParams.values()][index]) })
+      }
+    }
+  })
+
+  return sorterParamsArray
+}
+export type sorterType = {
+  type: string
+  order: 'ASC' | 'DESC'
+}
+
+export const handleSorterArrayInOrder = (pathSorterArray: sorterType[], onClickedSorter: sorterType = null) => {
+  if (onClickedSorter) {
+    const { type } = onClickedSorter
+
+    // return a sorter array with the clicked one is on the first position
+    pathSorterArray.sort((preSorter, curSorter) => {
+      if (preSorter.type === type) {
+        return -1
+      } else if (curSorter.type === type) {
+        return 1
+      } else {
+        return 0
+      }
+    })
+    pathSorterArray[0] = onClickedSorter
+  }
+  return pathSorterArray
+}
