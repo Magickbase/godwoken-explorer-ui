@@ -6,3 +6,12 @@
     }
   }
 }
+
+.sorter {
+  cursor: pointer;
+  margin-left: 4px;
+
+  &[data-order='DESC'] {
+    transform: rotate(0.5turn);
+  }
+}

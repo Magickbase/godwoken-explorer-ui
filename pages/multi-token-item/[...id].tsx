@@ -226,7 +226,7 @@ const MultiTokenItem = () => {
                     token_id,
                     contract_address_hash: address,
                     counts: item.quantity.toString(),
-                    owner: item.address_hash,
+                    owner: item,
                     token_instance: {
                       metadata: {
                         image: imageUrl,

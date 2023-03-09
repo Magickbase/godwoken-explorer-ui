@@ -31,7 +31,7 @@ jobs:
         run: npx cypress info
 
       - name: Cypress run
-        uses: cypress-io/github-action@v5.0.8
+        uses: cypress-io/github-action@v5.1.0
         with:
           install: false
           build: npm run build
