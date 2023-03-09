@@ -73,6 +73,7 @@ interface Transaction {
     | 'max_fee_per_gas'
     | 'max_priority_fee_per_gas'
     | 'paymaster_and_data'
+    | 'native_transfer_account'
   > | null
   polyjuice_creator: Pick<GraphQLSchema.PolyjuiceCreator, 'created_account'> | null
   block: Pick<GraphQLSchema.Block, 'number' | 'hash' | 'timestamp' | 'status' | 'layer1_block_number'>
@@ -118,6 +119,10 @@ const txQuery = gql`
       max_fee_per_gas
       max_priority_fee_per_gas
       paymaster_and_data
+      native_transfer_account {
+        bit_alias
+        eth_address
+      }
     }
     polyjuice_creator {
       created_account {
@@ -293,9 +298,11 @@ const Tx = () => {
   }
 
   const fromAddrDisplay = getAddressDisplay(tx?.from_account)
-  const toAddrDisplay = getAddressDisplay(tx?.to_account, tx?.polyjuice?.native_transfer_address_hash)
+  const toAddrDisplay = getAddressDisplay(tx?.to_account, tx?.polyjuice?.native_transfer_account?.eth_address)
+
   const method = tx?.method_name ?? tx?.method_id
   const from_bit_alias = tx?.from_account?.bit_alias
+  const to_bit_alias = tx?.polyjuice?.native_transfer_account?.bit_alias
 
   const overview: InfoItemProps[] = [
     {
@@ -324,7 +331,14 @@ const Tx = () => {
       content: isTxLoading ? (
         <Skeleton animation="wave" />
       ) : tx ? (
-        <ResponsiveHash label={toAddrDisplay.label} href={`/address/${toAddrDisplay.address}`} />
+        to_bit_alias ? (
+          <HashLink
+            label={to_bit_alias ? <Address address={toAddrDisplay.label} domain={to_bit_alias} /> : toAddrDisplay.label}
+            href={`/address/${toAddrDisplay.address}`}
+          />
+        ) : (
+          <ResponsiveHash label={toAddrDisplay.label} href={`/address/${toAddrDisplay.address}`} />
+        )
       ) : (
         t('pending')
       ),

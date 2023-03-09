@@ -92,6 +92,10 @@ const queryHomeLists = gql`
         polyjuice {
           status
           native_transfer_address_hash
+          native_transfer_account {
+            bit_alias
+            eth_address
+          }
         }
         type
       }
@@ -116,7 +120,7 @@ interface HomeLists {
       type: GraphQLSchema.TransactionType
       from_account: Pick<GraphQLSchema.Account, 'eth_address' | 'script_hash' | 'type' | 'bit_alias'>
       to_account: Pick<GraphQLSchema.Account, 'eth_address' | 'script_hash' | 'type' | 'bit_alias'>
-      polyjuice: Pick<GraphQLSchema.Polyjuice, 'status' | 'native_transfer_address_hash'>
+      polyjuice: Pick<GraphQLSchema.Polyjuice, 'status' | 'native_transfer_address_hash' | 'native_transfer_account'>
     }>
   }
 }
@@ -453,14 +457,15 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
       {list?.slice(0, length).map((tx, idx) => {
         const hash = tx.eth_hash ?? tx.hash
         const from = tx.from_account.eth_address || tx.from_account.script_hash
+        const from_bit_alias = tx.from_account?.bit_alias
+
         let to = tx.to_account?.eth_address || tx.to_account?.script_hash || '-'
+        let to_bit_alias = tx.to_account?.bit_alias
         let toType = tx.to_account?.type
 
-        const from_bit_alias = tx.from_account?.bit_alias
-        const to_bit_alias = tx.to_account?.bit_alias
-
-        if (tx.polyjuice?.native_transfer_address_hash) {
-          to = tx.polyjuice.native_transfer_address_hash
+        if (tx.polyjuice?.native_transfer_account) {
+          to = tx.polyjuice.native_transfer_account.eth_address
+          to_bit_alias = tx.polyjuice.native_transfer_account.bit_alias
           toType = GraphQLSchema.AccountType.EthUser
         }
         const isSpecialFrom = SPECIAL_ADDR_TYPES.includes(tx.from_account.type)

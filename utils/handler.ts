@@ -36,7 +36,8 @@ export const handleSearchKeyPress = async (e: React.KeyboardEvent<HTMLInputEleme
 
   // A non-number, could be a token name
   // Redirect to the `search-result-tokens` list page, uses `search_udt` query to fetch a list
-  if (Number.isNaN(+search)) {
+  // .bit need to be skiped to the keywordsearch
+  if (Number.isNaN(+search) && !search.endsWith('.bit')) {
     push(`/search-result-tokens?search=${encodeURIComponent(search)}`)
     return
   }

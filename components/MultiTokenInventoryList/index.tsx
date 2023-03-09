@@ -4,6 +4,7 @@ import { gql } from 'graphql-request'
 import Pagination from 'components/SimplePagination'
 import HashLink from 'components/HashLink'
 import Tooltip from 'components/Tooltip'
+import Address from 'components/TruncatedAddress'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import { client, getIpfsUrl, GraphQLSchema, handleNftImageLoadError } from 'utils'
 import styles from './styles.module.scss'
@@ -14,7 +15,9 @@ type InventoryListProps = {
       token_id: string
       contract_address_hash: string
       counts: string
-      owner?: string
+      owner?: {
+        account: Pick<GraphQLSchema.Account, 'bit_alias' | 'eth_address'>
+      }
       udt?: {
         id: number
         name: string | null
@@ -120,51 +123,57 @@ const MultiTokenInventoryList: React.FC<InventoryListProps> = ({ inventory, view
   return (
     <>
       <div className={styles.container}>
-        {inventory.entries.map((item, idx) => (
-          <div key={item.token_id + idx} className={styles.card}>
-            <NextLink href={`/multi-token-item/${item.contract_address_hash}/${item.token_id}`}>
-              <a className={styles.cover}>
-                <img
-                  src={getIpfsUrl(item.token_instance?.metadata?.image) ?? '/images/nft-placeholder.svg'}
-                  onError={handleNftImageLoadError}
-                  alt="nft-cover"
-                  loading="lazy"
-                />
-              </a>
-            </NextLink>
+        {inventory.entries.map((item, idx) => {
+          const {
+            owner: {
+              account: { bit_alias, eth_address },
+            },
+          } = item
 
-            {viewer ? (
-              <div className={styles.info}>
-                <span>{t('name')}</span>
-                <span>{item.udt.name?.length > 15 ? item.udt.name.slice(0, 15) + '...' : item.udt.name || '-'}</span>
-              </div>
-            ) : (
-              <div className={styles.info}>
-                <span>{t('quantity')}</span>
-                <span>{(+item.counts || 0).toLocaleString('en')}</span>
-              </div>
-            )}
+          return (
+            <div key={item.token_id + idx} className={styles.card}>
+              <NextLink href={`/multi-token-item/${item.contract_address_hash}/${item.token_id}`}>
+                <a className={styles.cover}>
+                  <img
+                    src={getIpfsUrl(item.token_instance?.metadata?.image) ?? '/images/nft-placeholder.svg'}
+                    onError={handleNftImageLoadError}
+                    alt="nft-cover"
+                    loading="lazy"
+                  />
+                </a>
+              </NextLink>
 
-            {token_id ? (
-              <Tooltip title={item.owner} placement="bottom">
+              {viewer ? (
+                <div className={styles.info}>
+                  <span>{t('name')}</span>
+                  <span>{item.udt.name?.length > 15 ? item.udt.name.slice(0, 15) + '...' : item.udt.name || '-'}</span>
+                </div>
+              ) : (
+                <div className={styles.info}>
+                  <span>{t('quantity')}</span>
+                  <span>{(+item.counts || 0).toLocaleString('en')}</span>
+                </div>
+              )}
+
+              {token_id ? (
                 <div className={styles.info}>
                   <span>{t('owner')}</span>
-                  <HashLink href={`/account/${item.owner}`} label={item.owner} />
+                  <Address address={eth_address} domain={bit_alias} />
                 </div>
-              </Tooltip>
-            ) : (
-              <div className={styles.info}>
-                <span>{t('token-id')}</span>
-                <HashLink
-                  label={item.token_id}
-                  href={`/multi-token-item/${item.contract_address_hash}/${item.token_id}`}
-                  monoFont={false}
-                  style={{ fontSize: 14 }}
-                />
-              </div>
-            )}
-          </div>
-        ))}
+              ) : (
+                <div className={styles.info}>
+                  <span>{t('token-id')}</span>
+                  <HashLink
+                    label={item.token_id}
+                    href={`/multi-token-item/${item.contract_address_hash}/${item.token_id}`}
+                    monoFont={false}
+                    style={{ fontSize: 14 }}
+                  />
+                </div>
+              )}
+            </div>
+          )
+        })}
       </div>
 
       {inventory.metadata.total_count ? <Pagination {...inventory.metadata} /> : null}
