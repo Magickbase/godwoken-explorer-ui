@@ -12,6 +12,7 @@ const TruncatedAddress = ({
   type,
   monoFont = true,
   domain,
+  placement = 'top',
 }: {
   address: string
   leading?: number
@@ -20,10 +21,11 @@ const TruncatedAddress = ({
   type?: GraphQLSchema.AccountType
   monoFont?: boolean
   domain?: string
+  placement?: 'top' | 'bottom'
 }) => {
   if (address === ZERO_ADDRESS) {
     return (
-      <Tooltip title={address} placement="top" sx={sx}>
+      <Tooltip title={address} placement={placement} sx={sx}>
         <Box sx={sx}>
           <span className="mono-font" style={{ color: 'var(--primary-text-color)', userSelect: 'none' }}>
             zero address
@@ -54,10 +56,16 @@ const TruncatedAddress = ({
     <>
       {domain ? (
         <Box sx={sx}>
-          <AddressWithDomain domain={domain} hash={address} href={`/account/${address}`} leading={leading} />
+          <AddressWithDomain
+            domain={domain}
+            hash={address}
+            href={`/account/${address}`}
+            leading={leading}
+            placement={placement}
+          />
         </Box>
       ) : (
-        <Tooltip title={address} placement="top" sx={sx}>
+        <Tooltip title={address} placement={placement} sx={sx}>
           <Box sx={sx}>
             <HashLink label={label} href={`/account/${address}`} monoFont={monoFont} />
           </Box>
