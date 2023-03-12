@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'next-i18next'
+import { useRouter } from 'next/router'
 import NextLink from 'next/link'
 import Image from 'next/image'
 import {
@@ -18,9 +19,10 @@ import {
   tableCellClasses,
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
-import ContractEventListItem from './ContractEventListItem'
+import ContractEventListItem from '../ContractEventListItem'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import { ParsedEventLog, IMG_URL, useDebounce } from 'utils'
+import styles from './styles.module.scss'
 
 const StyledTableCell = styled(TableCell)(() => ({
   [`&.${tableCellClasses.root}`]: {
@@ -46,10 +48,15 @@ export const EventFilterIcon = ({ setSearchText, tooltip, value }) => (
 )
 
 const ContractEventsList = ({ list }: { list: ParsedEventLog[] }) => {
-  const [t] = useTranslation('list')
+  const [t] = useTranslation(['list', 'account'])
   const [searchText, setSearchText] = useState('')
   const [listItems, setListItems] = useState(list)
+  const {
+    query: { proxied, id },
+  } = useRouter()
   const debouncedSetListItems = useDebounce(setListItems, 300)
+  const url = `/account/${id}?tab=events`
+  const isProxied = proxied === 'true'
 
   useEffect(() => {
     debouncedSetListItems(
@@ -70,19 +77,13 @@ const ContractEventsList = ({ list }: { list: ParsedEventLog[] }) => {
   }, [debouncedSetListItems, list, searchText])
 
   return listItems?.length ? (
-    <Box sx={{ px: 1, py: 2 }}>
-      <Stack direction="row" justifyContent="space-between" alignItems="center">
-        <Typography fontSize={14} color="#333333" sx={{ m: 1.5 }}>
-          <Image
-            src={`${IMG_URL}event-list.svg`}
-            loading="lazy"
-            width="12"
-            height="12"
-            layout="fixed"
-            alt="event-list-icon"
-          />{' '}
-          {t('latest25ContractEvents')}
-        </Typography>
+    <Box sx={{ px: 1, py: 2 }} className={styles.container}>
+      <div className={styles.header}>
+        <div className={styles.type} data-is-proxied={isProxied}>
+          <NextLink href={url}>{t('contract.current', { ns: 'account' })}</NextLink>
+          {/* TODO: hide this if contract is not a proxy contract */}
+          <NextLink href={`${url}&proxied=true`}>{t('contract.proxied', { ns: 'account' })}</NextLink>
+        </div>
         <TextField
           InputProps={{
             sx: {
@@ -115,6 +116,19 @@ const ContractEventsList = ({ list }: { list: ParsedEventLog[] }) => {
           size="small"
           sx={{ fontSize: 14, flex: '0 1 240px', height: 48 }}
         />
+      </div>
+      <Stack>
+        <Typography fontSize={14} color="#333333" sx={{ m: 1.5 }}>
+          <Image
+            src={`${IMG_URL}event-list.svg`}
+            loading="lazy"
+            width="12"
+            height="12"
+            layout="fixed"
+            alt="event-list-icon"
+          />{' '}
+          {t('latest25ContractEvents')}
+        </Typography>
       </Stack>
       <TableContainer>
         <Table size="small">

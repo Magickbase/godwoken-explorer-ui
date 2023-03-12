@@ -93,5 +93,9 @@
   "erc1155Assets": "ERC 1155 Assets",
   "erc20Assets": "ERC 20 Assets",
   "invalidAddress": "*Invalid address format",
-  "pckb_send_along_with_tx": "Send along with the transaction"
+  "pckb_send_along_with_tx": "Send along with the transaction",
+  "contract": {
+    "current": "Current",
+    "proxied": "Proxied"
+  }
 }
