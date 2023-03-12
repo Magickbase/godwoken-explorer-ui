@@ -42,6 +42,7 @@ export interface PolyjuiceContract extends AccountBase {
     | 'compiler_version'
     | 'compiler_file_format'
     | 'contract_source_code'
+    | 'sourcify_metadata'
     | 'abi'
     | 'constructor_arguments'
   > | null
@@ -110,6 +111,7 @@ const accountOverviewQuery = gql`
           compiler_version
           compiler_file_format
           contract_source_code
+          sourcify_metadata
           constructor_arguments
           abi
         }
@@ -146,6 +148,7 @@ const accountOverviewQueryUnion = gql`
           compiler_version
           compiler_file_format
           contract_source_code
+          sourcify_metadata
           constructor_arguments
           abi
         }

@@ -23,7 +23,15 @@ import Alert from 'components/Alert'
 
 const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps['smart_contract'] }> = ({
   address,
-  contract: { abi, compiler_file_format, compiler_version, name, contract_source_code, constructor_arguments },
+  contract: {
+    abi,
+    compiler_file_format,
+    compiler_version,
+    name,
+    contract_source_code,
+    sourcify_metadata,
+    constructor_arguments,
+  },
 }) => {
   const [t] = useTranslation(['account', 'tokens', 'list'])
   const [tabIdx, setTabIdx] = useState(0)
@@ -206,13 +214,29 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
             ))}
           </div>
           {contract_source_code ? (
-            <div className={styles.sourceCode}>
-              <div className={styles.title}>
-                <h6>{t(`contract_source_code`)}</h6>
-                {vm ? <div className={styles.vm}>{`(${vm})`}</div> : null}
-              </div>
-              <textarea defaultValue={contract_source_code} readOnly />
-            </div>
+            <>
+              {Array.isArray(sourcify_metadata) ? (
+                sourcify_metadata.slice(1).map(code => {
+                  return (
+                    <div className={styles.sourceCode} key={code.name}>
+                      <div className={styles.title}>
+                        <h6>{code.name}</h6>
+                        {vm ? <div className={styles.vm}>{`(${vm})`}</div> : null}
+                      </div>
+                      <textarea defaultValue={code.content} readOnly />
+                    </div>
+                  )
+                })
+              ) : (
+                <div className={styles.sourceCode}>
+                  <div className={styles.title}>
+                    <h6>{t(`contract_source_code`)}</h6>
+                    {vm ? <div className={styles.vm}>{`(${vm})`}</div> : null}
+                  </div>
+                  <textarea defaultValue={contract_source_code} readOnly />
+                </div>
+              )}
+            </>
           ) : null}
           {contract ? (
             <div className={styles.abi}>
