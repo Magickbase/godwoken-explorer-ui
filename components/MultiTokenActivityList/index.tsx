@@ -125,8 +125,8 @@ const ActivityList: React.FC<
           {transfers?.metadata.total_count ? (
             transfers.entries.map(item => {
               const method = item.transaction.method_name || item.transaction.method_id
-              const fromBitAlias = item.from_account.bit_alias
-              const toBitAlias = item.to_account.bit_alias
+              const fromBitAlias = item.from_account?.bit_alias
+              const toBitAlias = item.to_account?.bit_alias
 
               const token_ids = Array.isArray(item.token_ids) ? item.token_ids : [item.token_id]
               const amounts = Array.isArray(item.amounts) ? item.amounts : [item.amount]
