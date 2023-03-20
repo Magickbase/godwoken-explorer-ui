@@ -227,7 +227,7 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
               if (item.polyjuice?.native_transfer_account) {
                 to = item.polyjuice.native_transfer_account.eth_address
                 toType = GraphQLSchema.AccountType.EthUser
-                to_alias = item.polyjuice.native_transfer_account.bit_alias
+                to_alias = item.polyjuice.native_transfer_account?.bit_alias
               }
 
               const method = item.method_name || item.method_id

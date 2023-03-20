@@ -465,7 +465,7 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
 
         if (tx.polyjuice?.native_transfer_account) {
           to = tx.polyjuice.native_transfer_account.eth_address
-          to_bit_alias = tx.polyjuice.native_transfer_account.bit_alias
+          to_bit_alias = tx.polyjuice.native_transfer_account?.bit_alias
           toType = GraphQLSchema.AccountType.EthUser
         }
         const isSpecialFrom = SPECIAL_ADDR_TYPES.includes(tx.from_account.type)
