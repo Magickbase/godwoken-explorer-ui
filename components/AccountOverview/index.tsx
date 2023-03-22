@@ -348,7 +348,7 @@ const AccountOverview: React.FC<AccountOverviewProps & { refetch: () => Promise<
 
   const getInfoBlock = account => {
     const { type } = account
-    const domain = account.bit_alias
+    const domain = account?.bit_alias
 
     const blockMap = {
       [`${GraphQLSchema.AccountType.MetaContract}`]: <MetaContract {...(account.script as MetaContract['script'])} />,
