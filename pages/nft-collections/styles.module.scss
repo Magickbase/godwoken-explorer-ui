@@ -95,3 +95,11 @@
 .noRecords {
   @include empty-list;
 }
+
+.header-name {
+  padding-right: 4px;
+}
+
+.token-sorter {
+  padding-right: 8px;
+}
