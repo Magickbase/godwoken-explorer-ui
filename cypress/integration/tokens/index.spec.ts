@@ -202,7 +202,7 @@ context('Tokens List Pages Tests', () => {
               .first()
               .find('td')
               .first()
-              .should('contain.text', 'YokaiswapNFT')
+              .should('contain.text', '57us test Collection(57u)')
               .next()
               .should(field => {
                 expect(field.text()).to.match(FULL_ADDRESS_REGEX)
