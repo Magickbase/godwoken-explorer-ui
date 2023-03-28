@@ -116,8 +116,8 @@ const ActivityList: React.FC<
         </thead>
         <tbody>
           {transfers?.metadata.total_count ? (
-            transfers.entries.map(item => {
-              const method = item.transaction.method_name || item.transaction.method_id
+            transfers.entries?.map(item => {
+              const method = item.transaction?.method_name || item.transaction?.method_id
               const fromBitAlias = item.from_account?.bit_alias
               const toBitAlias = item.to_account?.bit_alias
 
@@ -158,10 +158,10 @@ const ActivityList: React.FC<
                     </time>
                   </td>
                   <td>
-                    <Address address={item.from_address} type={item.from_account.type} domain={fromBitAlias} />
+                    <Address address={item.from_address} type={item.from_account?.type} domain={fromBitAlias} />
                   </td>
                   <td>
-                    <Address address={item.to_address} type={item.to_account.type} domain={toBitAlias} />
+                    <Address address={item.to_address} type={item.to_account?.type} domain={toBitAlias} />
                   </td>
                   {viewer ? (
                     <td>
