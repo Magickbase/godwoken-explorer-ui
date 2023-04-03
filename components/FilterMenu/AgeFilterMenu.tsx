@@ -211,6 +211,7 @@ const AgeFilterMenu: React.FC<{ filterKeys: Array<string> }> = ({ filterKeys }) 
           type={alert.type}
         />
         <Popper
+          nonce={undefined}
           {...bindPopper(popupState)}
           onResize={undefined}
           onResizeCapture={undefined}
