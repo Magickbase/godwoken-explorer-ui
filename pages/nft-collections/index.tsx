@@ -130,7 +130,7 @@ const NftCollectionList = () => {
 
     const orderedSorter = handleSorterArrayInOrder(clickedSorter ? sorterArrayFromPath : DEFAULT_SORTERS, clickedSorter)
     for (const item of orderedSorter) {
-      searchParams.append(item.type, item.order)
+      searchParams.append(item?.type, item?.order)
     }
 
     return `${asPath.split('?')[0] ?? ''}?${searchParams}`
