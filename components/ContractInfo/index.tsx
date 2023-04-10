@@ -2,6 +2,7 @@ import type { PolyjuiceContract as PolyjuiceContractProps } from 'components/Acc
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
+import { utils } from 'ethers'
 import OpenInNewIcon from 'assets/icons/open-in-new.svg'
 import ExpandIcon from 'assets/icons/expand.svg'
 import { currentChain as targetChain } from 'utils'
@@ -22,7 +23,15 @@ import Alert from 'components/Alert'
 
 const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps['smart_contract'] }> = ({
   address,
-  contract: { abi, compiler_file_format, compiler_version, name, contract_source_code, constructor_arguments },
+  contract: {
+    abi,
+    compiler_file_format,
+    compiler_version,
+    name,
+    contract_source_code,
+    sourcify_metadata,
+    constructor_arguments,
+  },
 }) => {
   const [t] = useTranslation(['account', 'tokens', 'list'])
   const [tabIdx, setTabIdx] = useState(0)
@@ -149,7 +158,8 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
     form.setAttribute(LOADING_ATTRIBUTE, 'true')
 
     try {
-      const result = await method(...params)
+      const pCKB = form.querySelector<HTMLInputElement>('input[name=pCKB]')?.value ?? '0'
+      const result = await method(...params, { value: utils.parseEther(pCKB) })
       if (tabIdx === 2) {
         const elm = resInputList[0]
         if (elm) {
@@ -204,13 +214,29 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
             ))}
           </div>
           {contract_source_code ? (
-            <div className={styles.sourceCode}>
-              <div className={styles.title}>
-                <h6>{t(`contract_source_code`)}</h6>
-                {vm ? <div className={styles.vm}>{`(${vm})`}</div> : null}
-              </div>
-              <textarea defaultValue={contract_source_code} readOnly />
-            </div>
+            <>
+              {Array.isArray(sourcify_metadata) ? (
+                sourcify_metadata.slice(1).map(code => {
+                  return (
+                    <div className={styles.sourceCode} key={code.name}>
+                      <div className={styles.title}>
+                        <h6>{code.name}</h6>
+                        {vm ? <div className={styles.vm}>{`(${vm})`}</div> : null}
+                      </div>
+                      <textarea defaultValue={code.content} readOnly />
+                    </div>
+                  )
+                })
+              ) : (
+                <div className={styles.sourceCode}>
+                  <div className={styles.title}>
+                    <h6>{t(`contract_source_code`)}</h6>
+                    {vm ? <div className={styles.vm}>{`(${vm})`}</div> : null}
+                  </div>
+                  <textarea defaultValue={contract_source_code} readOnly />
+                </div>
+              )}
+            </>
           ) : null}
           {contract ? (
             <div className={styles.abi}>
@@ -340,7 +366,7 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
           ) : null}
           <div className={styles.methodGroupTitle}>Non-payable and Payable</div>
           {Object.keys(writeMethods).map(signature => {
-            const { inputs = [], outputs = [] } = contract.interface.functions[signature] ?? {}
+            const { inputs = [], outputs = [], payable } = contract.interface.functions[signature] ?? {}
             return (
               <details key={signature}>
                 <summary>
@@ -362,6 +388,12 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
                         </fieldset>
                       )
                     })}
+                    {payable ? (
+                      <fieldset key="pCKB">
+                        <label>pCKB</label>
+                        <input name="pCKB" title="pCKB" placeholder={t('pckb_send_along_with_tx')} />
+                      </fieldset>
+                    ) : null}
                     <div className={styles.response}>Response</div>
                     <fieldset>
                       <label>Txn Hash</label>

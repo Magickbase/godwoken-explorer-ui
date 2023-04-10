@@ -90,6 +90,7 @@ export namespace GraphQLSchema {
     compiler_version: String
     constructor_arguments: string
     contract_source_code: string
+    sourcify_metadata: Array<Record<'content' | 'name' | 'path', string>>
     deployment_tx_hash: string
     id: number
     name: string
@@ -125,6 +126,22 @@ export namespace GraphQLSchema {
     balance: string
   }
 
+  export interface PolyjuiceAccount {
+    bit_alias: string
+    bridged_udt: Udt
+    contract_code: string
+    eth_address: string
+    id: number
+    nonce: number
+    registry_address: string
+    script: object
+    script_hash: string
+    smart_contract: SmartContract
+    token_transfer_count: number
+    transaction_count: number
+    type: AccountType
+    udt: Udt
+  }
   export interface Polyjuice {
     gas_limit: number
     gas_price: string
@@ -138,6 +155,14 @@ export namespace GraphQLSchema {
     value: string
     created_contract_address_hash: string | null
     native_transfer_address_hash: string | null
+    call_contract: string
+    call_data: string
+    call_gas_limit: number
+    verification_gas_limit: number
+    max_fee_per_gas: string
+    max_priority_fee_per_gas: string
+    paymaster_and_data: string
+    native_transfer_account: PolyjuiceAccount
   }
 
   export interface PolyjuiceCreator {

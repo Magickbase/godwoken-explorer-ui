@@ -106,10 +106,89 @@ context('Transaction Page', () => {
         cy.get('dl[title="fee"').find('dt').should('have.text', 'fee').next().should('have.text', '2.43441 pCKB')
       })
     })
+
+    describe('user operations', () => {
+      it('should have Call Contract', () => {
+        cy.fixture('tx').then(tx => {
+          hash = tx.gaslessTxHash
+          return cy.visit(`/en-US/tx/${hash}`)
+        })
+        cy.get('dl[title="Call Contract"]')
+          .find('dt')
+          .should('have.text', 'Call Contract')
+          .next()
+          .should('have.text', '0x1005c8b8ee7a873576f5a6a9862c0c14909e01c1')
+      })
+
+      it('should have Call Gas Limit', () => {
+        cy.get('dl[title="Call Gas Limit"')
+          .find('dt')
+          .should('have.text', 'Call Gas Limit')
+          .next()
+          .should('have.text', '100,000')
+      })
+
+      it('should have Verification Gas Limit', () => {
+        cy.get('dl[title="Verification Gas Limit"')
+          .find('dt')
+          .should('have.text', 'Verification Gas Limit')
+          .next()
+          .should('have.text', '100,000')
+      })
+
+      it('should have Paymaster', () => {
+        cy.get('dl[title="Paymaster"')
+          .find('dt')
+          .should('have.text', 'Paymaster')
+          .next()
+          .should('have.text', '0x8d8f646cfffa073c207eb8f83d62cb3d842ade4e')
+      })
+
+      it('should have Max Fee Per Gas', () => {
+        cy.get('dl[title="Max Fee Per Gas"')
+          .find('dt')
+          .should('have.text', 'Max Fee Per Gas')
+          .next()
+          .should('have.text', '0.000000000000000001 pCKB')
+      })
+
+      it('should have Max Priority Fee Per Gas', () => {
+        cy.get('dl[title="Max Priority Fee Per Gas"')
+          .find('dt')
+          .should('have.text', 'Max Priority Fee Per Gas')
+          .next()
+          .should('have.text', '0.000000000000000001 pCKB')
+      })
+
+      it('should have Paymaster Data', () => {
+        cy.get('dl[title="Paymaster Data"')
+          .find('dt')
+          .should('have.text', 'Paymaster Data')
+          .next()
+          .should('have.text', '0x1234')
+      })
+
+      it('should have Call Data', () => {
+        cy.get('dl[title="Call Data"]')
+          .find('dt')
+          .first()
+          .should('have.text', 'Call Data')
+          .next()
+          .find('pre')
+          .should(
+            'have.text',
+            '0x4dd3b30b00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001',
+          )
+      })
+    })
   })
 
   describe('should have erc20 transfer, erc721 transfer, erc1155 transfer, logs, raw data tabs', () => {
     it('should have 5 tabs', () => {
+      cy.fixture('tx').then(tx => {
+        hash = tx.hash
+        return cy.visit(`/en-US/tx/${hash}`)
+      })
       cy.get('div[data-role="tabs"]')
         .find('a')
         .first()

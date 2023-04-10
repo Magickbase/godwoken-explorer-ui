@@ -4,6 +4,10 @@
   align-items: center;
   padding-right: 16px;
 
+  a {
+    color: #333333;
+  }
+
   @media screen and (max-width: 1024px) {
     padding-right: unset;
   }
@@ -21,11 +25,16 @@
     align-items: center;
     margin-right: 4px;
   }
-  .domian {
+  .domain {
+    display: flex;
     overflow: hidden;
+    color: #333;
     text-overflow: ellipsis;
     white-space: nowrap;
     padding-right: 4px;
+    &:hover {
+      color: var(--primary-color);
+    }
   }
   & img {
     width: 16px;

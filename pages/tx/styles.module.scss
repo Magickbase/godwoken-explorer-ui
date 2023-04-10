@@ -19,13 +19,6 @@
     }
   }
 
-  .hash {
-    word-break: break-all;
-    span {
-      padding-right: 6px;
-    }
-  }
-
   .value,
   .gasPrice,
   .gasFee {
@@ -37,6 +30,12 @@
     }
   }
 
+  .paymasterData {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: min-content;
+  }
+
   a {
     word-break: break-all;
   }
@@ -44,7 +43,7 @@
   dl[role='listitem'] {
     dt {
       @media screen and (min-width: 1024px) {
-        flex-basis: 168px !important;
+        flex-basis: 172px !important;
       }
     }
     dd {
@@ -66,6 +65,7 @@
 }
 
 .input {
+  width: 100%;
   summary {
     display: flex;
     align-items: center;
@@ -155,7 +155,12 @@
     &[data-page-name='transaction-detail'] {
       dl[role='listitem'] {
         dt {
-          flex-basis: 168px !important;
+          flex-basis: 120px;
+          white-space: break-spaces;
+        }
+        dd {
+          display: flex;
+          align-items: center;
         }
       }
     }

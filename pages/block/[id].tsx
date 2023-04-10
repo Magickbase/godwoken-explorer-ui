@@ -13,10 +13,9 @@ import TxList, { fetchTxList } from 'components/TxList'
 import BridgedRecordList from 'components/BridgedRecordList'
 import RawBlockData from 'components/RawBlockData'
 import PageTitle from 'components/PageTitle'
-import HashLink from 'components/HashLink'
-import CopyBtn from 'components/CopyBtn'
-import OpenInNewIcon from 'assets/icons/open-in-new.svg'
 import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
+import ResponsiveHash from 'components/ResponsiveHash'
+import OpenInNewIcon from 'assets/icons/open-in-new.svg'
 import { fetchBlock, formatDatetime, CKB_EXPLORER_URL, formatInt, fetchBridgedRecordList, isEthAddress } from 'utils'
 import styles from './styles.module.scss'
 
@@ -108,10 +107,7 @@ const Block = () => {
     {
       label: 'hash',
       value: block ? (
-        <div className={styles.blockHash}>
-          <span className="mono-font">{block.hash}</span>
-          <CopyBtn content={block.hash} field={t('block-hash', { ns: 'common' })} />
-        </div>
+        <ResponsiveHash label={block.hash} btnRight="copy" copyAlertText={t('block-hash', { ns: 'common' })} />
       ) : (
         <Skeleton animation="wave" width="66ch" />
       ),
@@ -147,10 +143,11 @@ const Block = () => {
               <hr attr-role="divider" />
               <div attr-role="tx">
                 交易
-                <HashLink
+                <ResponsiveHash
                   label={block.layer1.txHash}
                   href={`${CKB_EXPLORER_URL}/transaction/${block.layer1.txHash}`}
-                  external
+                  btnRight="openInNew"
+                  isExternalLink
                 />
               </div>
             </>
@@ -158,10 +155,11 @@ const Block = () => {
             <>
               <div attr-role="tx">
                 Transaction
-                <HashLink
+                <ResponsiveHash
                   label={block.layer1.txHash}
                   href={`${CKB_EXPLORER_URL}/transaction/${block.layer1.txHash}`}
-                  external
+                  btnRight="openInNew"
+                  isExternalLink
                 />
               </div>
               <hr attr-role="divider" />
@@ -190,11 +188,7 @@ const Block = () => {
     { label: 'txCount', value: block ? formatInt(block.txCount) : <Skeleton animation="wave" width="66ch" /> },
     {
       label: 'aggregator',
-      value: block ? (
-        <span className={`${styles.aggregator} mono-font`}>{block.miner.hash}</span>
-      ) : (
-        <Skeleton animation="wave" width="66ch" />
-      ),
+      value: block ? <ResponsiveHash label={block.miner.hash} /> : <Skeleton animation="wave" width="66ch" />,
     },
     {
       label: 'size',
@@ -215,7 +209,7 @@ const Block = () => {
     {
       label: 'parentHash',
       value: block ? (
-        <HashLink label={block.parentHash} href={`/block/${block.parentHash}`} style={{ wordBreak: 'break-all' }} />
+        <ResponsiveHash label={block.parentHash} href={`/block/${block.parentHash}`} />
       ) : (
         <Skeleton animation="wave" width="66ch" />
       ),

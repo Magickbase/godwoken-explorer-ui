@@ -29,7 +29,10 @@ export type TxListProps = {
       block?: Pick<GraphQLSchema.Block, 'hash' | 'number' | 'status' | 'timestamp'>
       from_account: Pick<GraphQLSchema.Account, 'eth_address' | 'script_hash' | 'type' | 'bit_alias'>
       to_account: Pick<GraphQLSchema.Account, 'eth_address' | 'script_hash' | 'type' | 'bit_alias'>
-      polyjuice: Pick<GraphQLSchema.Polyjuice, 'value' | 'status' | 'native_transfer_address_hash'>
+      polyjuice: Pick<
+        GraphQLSchema.Polyjuice,
+        'value' | 'status' | 'native_transfer_address_hash' | 'native_transfer_account'
+      >
     }>
     metadata: GraphQLSchema.PageMetadata
   }
@@ -101,6 +104,10 @@ const txListQuery = gql`
           value
           status
           native_transfer_address_hash
+          native_transfer_account {
+            bit_alias
+            eth_address
+          }
         }
         type
       }
@@ -217,9 +224,10 @@ const TxList: React.FC<TxListProps & { maxCount?: string; pageSize?: number }> =
               let toType = item.to_account?.type
               let to_alias = item.to_account?.bit_alias
 
-              if (item.polyjuice?.native_transfer_address_hash) {
-                to = item.polyjuice.native_transfer_address_hash
+              if (item.polyjuice?.native_transfer_account) {
+                to = item.polyjuice.native_transfer_account.eth_address
                 toType = GraphQLSchema.AccountType.EthUser
+                to_alias = item.polyjuice.native_transfer_account?.bit_alias
               }
 
               const method = item.method_name || item.method_id

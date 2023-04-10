@@ -116,10 +116,10 @@ const ActivityList: React.FC<
         </thead>
         <tbody>
           {transfers?.metadata.total_count ? (
-            transfers.entries.map(item => {
-              const method = item.transaction.method_name || item.transaction.method_id
-              const from_bit_alias = item?.from_account?.bit_alias
-              const to_bit_alias = item?.to_account?.bit_alias
+            transfers.entries?.map(item => {
+              const method = item.transaction?.method_name || item.transaction?.method_id
+              const fromBitAlias = item.from_account?.bit_alias
+              const toBitAlias = item.to_account?.bit_alias
 
               return (
                 <tr key={item.transaction.eth_hash + item.log_index}>
@@ -158,10 +158,10 @@ const ActivityList: React.FC<
                     </time>
                   </td>
                   <td>
-                    <Address address={item.from_address} type={item.from_account?.type} domain={from_bit_alias} />
+                    <Address address={item.from_address} type={item.from_account?.type} domain={fromBitAlias} />
                   </td>
                   <td>
-                    <Address address={item.to_address} type={item.to_account?.type} domain={to_bit_alias} />
+                    <Address address={item.to_address} type={item.to_account?.type} domain={toBitAlias} />
                   </td>
                   {viewer ? (
                     <td>
@@ -171,7 +171,7 @@ const ActivityList: React.FC<
                   {token_id ? null : (
                     <td>
                       <NextLink href={`/nft-item/${item.token_contract_address_hash}/${item.token_id}`}>
-                        <a>{(+item.token_id).toLocaleString('en')}</a>
+                        <a>{item.token_id}</a>
                       </NextLink>
                     </td>
                   )}

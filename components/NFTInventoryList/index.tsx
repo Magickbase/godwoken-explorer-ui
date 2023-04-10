@@ -3,10 +3,12 @@ import NextLink from 'next/link'
 import { gql } from 'graphql-request'
 import Pagination from 'components/SimplePagination'
 import HashLink from 'components/HashLink'
+import Tooltip from 'components/Tooltip'
+import ResponsiveHash from 'components/ResponsiveHash'
+import Address from 'components/TruncatedAddress'
 import NoDataIcon from 'assets/icons/no-data.svg'
 import { client, getIpfsUrl, GraphQLSchema, handleNftImageLoadError } from 'utils'
 import styles from './styles.module.scss'
-import Tooltip from 'components/Tooltip'
 
 type InventoryListProps = {
   inventory: {
@@ -21,6 +23,11 @@ type InventoryListProps = {
       }
       token_instance?: {
         metadata?: Record<'image', string>
+      }
+      account: {
+        eth_address: string
+        id: number
+        bit_alias: string
       }
     }>
     metadata: GraphQLSchema.PageMetadata
@@ -37,6 +44,11 @@ const inventoryListOfCollectionQuery = gql`
         token_contract_address_hash
         token_instance {
           metadata
+        }
+        account {
+          eth_address
+          id
+          bit_alias
         }
       }
       metadata {
@@ -107,44 +119,58 @@ const NFTInventoryList: React.FC<InventoryListProps> = ({ inventory, viewer }) =
   return (
     <>
       <div className={styles.container}>
-        {inventory.entries.map(item => (
-          <div key={item.token_id} className={styles.card}>
-            <NextLink href={`/nft-item/${item.token_contract_address_hash}/${item.token_id}`}>
-              <a className={styles.cover}>
-                <img
-                  src={getIpfsUrl(item.token_instance?.metadata?.image) ?? '/images/nft-placeholder.svg'}
-                  onError={handleNftImageLoadError}
-                  alt="nft-cover"
-                />
-              </a>
-            </NextLink>
+        {inventory.entries.map(item => {
+          const domain = item.account?.bit_alias
 
-            {viewer ? (
+          const TooltipHashLink = () => (
+            <Tooltip title={item.address_hash} placement="bottom">
               <div className={styles.info}>
-                <span>{t('name')}</span>
-                <span>{item.udt?.name?.length > 15 ? item.udt?.name.slice(0, 15) + '...' : item.udt?.name || '-'}</span>
+                <span>{t('owner')}</span>
+                <ResponsiveHash href={`/account/${item.address_hash}`} label={item.address_hash} monoFont={false} />
               </div>
-            ) : null}
-
+            </Tooltip>
+          )
+          const DomianAddressHashLink = () => (
             <div className={styles.info}>
-              <span>{t('token-id')}</span>
-              <HashLink
-                label={item.token_id}
-                href={`/nft-item/${item.token_contract_address_hash}/${item.token_id}`}
-                monoFont={false}
-                style={{ fontSize: 14 }}
-              />
+              <span>{t('owner')}</span>
+              <Address address={item.address_hash} domain={domain} placement="bottom" />
             </div>
-            {!viewer ? (
-              <Tooltip title={item.address_hash} placement="bottom">
+          )
+
+          return (
+            <div key={item.token_id} className={styles.card}>
+              <NextLink href={`/nft-item/${item.token_contract_address_hash}/${item.token_id}`}>
+                <a className={styles.cover}>
+                  <img
+                    src={getIpfsUrl(item.token_instance?.metadata?.image) ?? '/images/nft-placeholder.svg'}
+                    onError={handleNftImageLoadError}
+                    alt="nft-cover"
+                  />
+                </a>
+              </NextLink>
+
+              {viewer ? (
                 <div className={styles.info}>
-                  <span>{t('owner')}</span>
-                  <HashLink href={`/account/${item.address_hash}`} label={item.address_hash} />
+                  <span>{t('name')}</span>
+                  <span>
+                    {item.udt?.name?.length > 15 ? item.udt?.name.slice(0, 15) + '...' : item.udt?.name || '-'}
+                  </span>
                 </div>
-              </Tooltip>
-            ) : null}
-          </div>
-        ))}
+              ) : null}
+
+              <div className={styles.info}>
+                <span>{t('token-id')}</span>
+
+                <ResponsiveHash
+                  label={item.token_id}
+                  href={`/nft-item/${item.token_contract_address_hash}/${item.token_id}`}
+                  monoFont={false}
+                />
+              </div>
+              {!viewer ? domain ? <DomianAddressHashLink /> : <TooltipHashLink /> : null}
+            </div>
+          )
+        })}
       </div>
 
       {inventory.metadata.total_count ? <Pagination {...inventory.metadata} /> : null}

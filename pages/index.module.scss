@@ -1,0 +1,17 @@
+.container {
+  .all::before {
+    white-space: nowrap;
+    @media screen and (max-width: 1280px) {
+      transform: translate(-80%, -100%);
+    }
+  }
+}
+
+.sorter {
+  cursor: pointer;
+  margin-left: 4px;
+
+  &[data-order='DESC'] {
+    transform: rotate(0.5turn);
+  }
+}
