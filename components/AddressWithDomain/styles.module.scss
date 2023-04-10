@@ -3,8 +3,8 @@
   align-items: center;
   text-transform: initial;
   & img {
-    width: 16px;
-    height: 16px;
+    width: 16px !important;
+    height: 16px !important;
     border-radius: 50%;
     margin-right: 2px;
   }

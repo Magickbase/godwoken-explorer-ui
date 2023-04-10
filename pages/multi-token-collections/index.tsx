@@ -1,4 +1,5 @@
 import type { GetStaticProps } from 'next'
+import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import NextLink from 'next/link'
 import { useTranslation } from 'next-i18next'
@@ -12,12 +13,15 @@ import Table from 'components/Table'
 import Pagination from 'components/SimplePagination'
 import TokenLogo from 'components/TokenLogo'
 import HashLink from 'components/HashLink'
+import FilterMenu from 'components/FilterMenu'
 import Address from 'components/TruncatedAddress'
 import { SIZES } from 'components/PageSize'
+
 import NoDataIcon from 'assets/icons/no-data.svg'
-import { client, GraphQLSchema } from 'utils'
+import SortIcon from 'assets/icons/sort.svg'
+import { client, GraphQLSchema, handleSorterArrayAboutPath, sorterType, handleSorterArrayInOrder } from 'utils'
+
 import styles from './styles.module.scss'
-import FilterMenu from 'components/FilterMenu'
 
 interface MultiTokenCollectionListProps {
   erc1155_udts: {
@@ -26,9 +30,34 @@ interface MultiTokenCollectionListProps {
   }
 }
 
+interface Variables {
+  name: string | null
+  before: string | null
+  after: string | null
+  limit: number
+  sorter: UdtsSorterInput[] | []
+}
+
+type UdtsSorterInput = {
+  sort_type: 'ASC' | 'DESC'
+  sort_value: 'EX_HOLDERS_COUNT' | 'ID' | 'NAME' | 'SUPPLY' | 'TOKEN_TYPE_COUNT'
+}
+
+enum SortTypesEnum {
+  holder_count_sort = 'holder_count_sort',
+  name_sort = 'name_sort',
+  type_count_sort = 'type_count_sort',
+}
+
+enum UdtsSorterValueEnum {
+  holder_count_sort = 'EX_HOLDERS_COUNT',
+  name_sort = 'NAME',
+  type_count_sort = 'TOKEN_TYPE_COUNT',
+}
+
 const erc1155ListQuery = gql`
-  query ($limit: Int, $name: String, $before: String, $after: String) {
-    erc1155_udts(input: { limit: $limit, fuzzy_name: $name, before: $before, after: $after }) {
+  query ($limit: Int, $name: String, $before: String, $after: String, $sorter: UdtsSorterInput) {
+    erc1155_udts(input: { limit: $limit, fuzzy_name: $name, before: $before, after: $after, sorter: $sorter }) {
       entries {
         id
         name
@@ -51,13 +80,6 @@ const erc1155ListQuery = gql`
   }
 `
 
-interface Variables {
-  name: string | null
-  before: string | null
-  after: string | null
-  limit: number
-}
-
 const fetchErc1155List = (variables: Variables): Promise<MultiTokenCollectionListProps['erc1155_udts']> =>
   client
     .request<MultiTokenCollectionListProps>(erc1155ListQuery, variables)
@@ -75,24 +97,78 @@ const fetchErc1155List = (variables: Variables): Promise<MultiTokenCollectionLis
     })
 
 const FILTER_KEYS = ['name']
+
 const MultiTokenCollectionList = () => {
   const [t] = useTranslation(['multi-token', 'common', 'list'])
   const {
-    query: { before = null, after = null, name = null, page_size = SIZES[1] },
+    push,
+    asPath,
+    query: {
+      before = null,
+      after = null,
+      name = null,
+      page_size = SIZES[1],
+      holder_count_sort,
+      name_sort,
+      type_count_sort,
+      ...restQuery
+    },
   } = useRouter()
 
   const title = t(`multi-token-collections`)
+
+  const sorters = ['holder_count_sort', 'name_sort', 'type_count_sort']
+  const DEFAULT_SORTERS: sorterType[] = [
+    { type: 'name_sort', order: 'ASC' },
+    { type: 'type_count_sort', order: 'ASC' },
+    { type: 'holder_count_sort', order: 'ASC' },
+  ]
+
+  const sorterArrayFromPath = handleSorterArrayAboutPath(asPath, sorters)
+
+  // get a sorter array to query listdata from server
+  const sorterArrayForQuery = handleSorterArrayAboutPath(asPath, sorters, UdtsSorterValueEnum)
+
+  const handleUrlForPush = (clickedSorter: sorterType = null) => {
+    const searchParams = new URLSearchParams({
+      ...restQuery,
+      page_size: page_size as string,
+    })
+
+    const orderedSorter = handleSorterArrayInOrder(clickedSorter ? sorterArrayFromPath : DEFAULT_SORTERS, clickedSorter)
+    for (const item of orderedSorter) {
+      searchParams.append(item.type, item.order)
+    }
+
+    return `${asPath.split('?')[0] ?? ''}?${searchParams}`
+  }
+
+  useEffect(() => {
+    if (!sorterArrayFromPath.length) {
+      push(handleUrlForPush())
+    }
+  }, [sorterArrayFromPath])
+
   const { isLoading, data: list } = useQuery(
-    ['erc1155-list', page_size, before, after, name],
+    ['erc1155-list', page_size, before, after, name, holder_count_sort, name_sort, type_count_sort],
     () =>
       fetchErc1155List({
         before: before as string,
         after: after as string,
         name: name ? `${name}%` : null,
         limit: Number.isNaN(!page_size) ? +SIZES[1] : +page_size,
+        sorter: sorterArrayForQuery,
       }),
     { refetchInterval: 10000 },
   )
+
+  const handleSorterClick = (e: React.MouseEvent<HTMLOrSVGElement>, type) => {
+    const {
+      dataset: { order },
+    } = e.currentTarget
+    push(handleUrlForPush({ type, order: order === 'DESC' ? 'ASC' : 'DESC' }))
+  }
+  const headers = ['token', 'address', 'type_count', 'holder_count']
 
   return (
     <>
@@ -112,15 +188,37 @@ const MultiTokenCollectionList = () => {
           <Table>
             <thead>
               <tr>
-                <th>
-                  {t('token')}
-                  <span>
-                    <FilterMenu filterKeys={[FILTER_KEYS[0]]} />
-                  </span>
-                </th>
-                <th>{t('address')} </th>
-                <th>{t('type_count')}</th>
-                <th>{t('holder_count')} </th>
+                {headers.map(item => (
+                  <th key={item}>
+                    <span className={styles['header-name']}>{t(item)}</span>
+                    {item === 'token' ? (
+                      <>
+                        <span className={styles['token-sorter']}>
+                          <SortIcon
+                            onClick={e => handleSorterClick(e, SortTypesEnum.name_sort)}
+                            data-order={name_sort}
+                            className={styles.sorter}
+                          />
+                        </span>
+                        <FilterMenu filterKeys={[FILTER_KEYS[0]]} />
+                      </>
+                    ) : null}
+                    {item === 'type_count' ? (
+                      <SortIcon
+                        onClick={e => handleSorterClick(e, SortTypesEnum.type_count_sort)}
+                        data-order={type_count_sort}
+                        className={styles.sorter}
+                      />
+                    ) : null}
+                    {item === 'holder_count' ? (
+                      <SortIcon
+                        onClick={e => handleSorterClick(e, SortTypesEnum.holder_count_sort)}
+                        data-order={holder_count_sort}
+                        className={styles.sorter}
+                      />
+                    ) : null}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>

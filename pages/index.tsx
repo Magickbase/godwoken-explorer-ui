@@ -31,6 +31,7 @@ import BlockStateIcon from 'components/BlockStateIcon'
 import TxStatusIcon from 'components/TxStatusIcon'
 import Address from 'components/TruncatedAddress'
 import { fetchHome, timeDistance, formatInt, client, GraphQLSchema, IS_MAINNET } from 'utils'
+import styles from './index.module.scss'
 
 type State = API.Home.Parsed
 
@@ -91,6 +92,10 @@ const queryHomeLists = gql`
         polyjuice {
           status
           native_transfer_address_hash
+          native_transfer_account {
+            bit_alias
+            eth_address
+          }
         }
         type
       }
@@ -115,7 +120,7 @@ interface HomeLists {
       type: GraphQLSchema.TransactionType
       from_account: Pick<GraphQLSchema.Account, 'eth_address' | 'script_hash' | 'type' | 'bit_alias'>
       to_account: Pick<GraphQLSchema.Account, 'eth_address' | 'script_hash' | 'type' | 'bit_alias'>
-      polyjuice: Pick<GraphQLSchema.Polyjuice, 'status' | 'native_transfer_address_hash'>
+      polyjuice: Pick<GraphQLSchema.Polyjuice, 'status' | 'native_transfer_address_hash' | 'native_transfer_account'>
     }>
   }
 }
@@ -230,7 +235,7 @@ const ListContainer = ({ link, title, tooltip, children }) => {
           {title}
         </Typography>
         <NextLink href={link} passHref>
-          <div className="tooltip " data-tooltip={tooltip}>
+          <div className={`tooltip ${styles.all}`} data-tooltip={tooltip}>
             <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
               <Typography variant="body2" fontSize={{ xs: 13, md: 14 }} fontWeight={500} color="primary">
                 {t('all')}
@@ -452,14 +457,15 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
       {list?.slice(0, length).map((tx, idx) => {
         const hash = tx.eth_hash ?? tx.hash
         const from = tx.from_account.eth_address || tx.from_account.script_hash
+        const from_bit_alias = tx.from_account?.bit_alias
+
         let to = tx.to_account?.eth_address || tx.to_account?.script_hash || '-'
+        let to_bit_alias = tx.to_account?.bit_alias
         let toType = tx.to_account?.type
 
-        const from_bit_alias = tx.from_account?.bit_alias
-        const to_bit_alias = tx.to_account?.bit_alias
-
-        if (tx.polyjuice?.native_transfer_address_hash) {
-          to = tx.polyjuice.native_transfer_address_hash
+        if (tx.polyjuice?.native_transfer_account) {
+          to = tx.polyjuice.native_transfer_account.eth_address
+          to_bit_alias = tx.polyjuice.native_transfer_account?.bit_alias
           toType = GraphQLSchema.AccountType.EthUser
         }
         const isSpecialFrom = SPECIAL_ADDR_TYPES.includes(tx.from_account.type)
@@ -473,7 +479,7 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
                 primary={
                   <Stack direction="row" alignItems="center" sx={{ height: { xs: 52, md: 88 } }}>
                     <Stack
-                      flexGrow={1}
+                      flex={1}
                       px={{ xs: 1, md: 2 }}
                       justifyContent={{ xs: 'center', md: 'space-between' }}
                       height={{ xs: 36, md: 56 }}
@@ -528,6 +534,7 @@ const TxList: React.FC<{ list: HomeLists['transactions']['entries']; isLoading: 
                       </Box>
                     </Stack>
                     <Stack
+                      flex={1}
                       height={{ xs: 36, md: 56 }}
                       sx={{ pl: { xs: 1, sm: 0 } }}
                       justifyContent={{ xs: 'center', md: 'space-between' }}
@@ -654,7 +661,7 @@ const Home = () => {
   })
 
   return (
-    <Box sx={{ pb: { xs: 5, md: 11 } }}>
+    <Box sx={{ pb: { xs: 5, md: 11 } }} className={styles.container}>
       <Box sx={{ bgcolor: 'primary.light' }}>
         <Container sx={{ px: { xs: 2, md: 2, lg: 0 } }}>
           <Search />

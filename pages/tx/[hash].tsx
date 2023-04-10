@@ -1,4 +1,5 @@
 import type { GetStaticPaths, GetStaticProps } from 'next'
+import type { ReactNode } from 'react'
 import { useMemo, useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
@@ -11,11 +12,10 @@ import BigNumber from 'bignumber.js'
 import Tabs from 'components/Tabs'
 import SubpageHead from 'components/SubpageHead'
 import PageTitle from 'components/PageTitle'
-import InfoList, { InfoItermProps } from 'components/InfoList'
+import InfoList, { InfoItemProps } from 'components/InfoList'
 import CommonERCTransferlist, { fetchERCTransferList } from 'components/CommonERCTransferlist'
 import TxLogsList from 'components/TxLogsList'
 import RawTxData from 'components/RawTxData'
-import CopyBtn from 'components/CopyBtn'
 import DownloadMenu, { DOWNLOAD_HREF_LIST } from 'components/DownloadMenu'
 import TxType from 'components/TxType'
 import HashLink from 'components/HashLink'
@@ -25,6 +25,7 @@ import Tooltip from 'components/Tooltip'
 import PolyjuiceStatus from 'components/PolyjuiceStatus'
 import Address from 'components/TruncatedAddress'
 import { TransferlistType } from 'components/BaseTransferlist'
+import ResponsiveHash from 'components/ResponsiveHash'
 import ExpandIcon from 'assets/icons/expand.svg'
 import {
   formatDatetime,
@@ -35,7 +36,6 @@ import {
   PCKB_UDT_INFO,
   provider,
 } from 'utils'
-
 import styles from './styles.module.scss'
 
 const tabs = ['erc20Records', 'erc721Records', 'erc1155Records', 'logs', 'rawData']
@@ -66,6 +66,14 @@ interface Transaction {
     | 'gas_used'
     | 'gas_limit'
     | 'gas_price'
+    | 'call_contract'
+    | 'call_data'
+    | 'call_gas_limit'
+    | 'verification_gas_limit'
+    | 'max_fee_per_gas'
+    | 'max_priority_fee_per_gas'
+    | 'paymaster_and_data'
+    | 'native_transfer_account'
   > | null
   polyjuice_creator: Pick<GraphQLSchema.PolyjuiceCreator, 'created_account'> | null
   block: Pick<GraphQLSchema.Block, 'number' | 'hash' | 'timestamp' | 'status' | 'layer1_block_number'>
@@ -104,6 +112,17 @@ const txQuery = gql`
       gas_used
       gas_limit
       gas_price
+      call_contract
+      call_data
+      call_gas_limit
+      verification_gas_limit
+      max_fee_per_gas
+      max_priority_fee_per_gas
+      paymaster_and_data
+      native_transfer_account {
+        bit_alias
+        eth_address
+      }
     }
     polyjuice_creator {
       created_account {
@@ -272,33 +291,37 @@ const Tx = () => {
     utf8Input ? { type: 'utf8', text: utf8Input } : null,
   ].filter(v => v)
 
+  const gasPrice = tx?.polyjuice?.gas_price
+  const isGasless = gasPrice === '0'
+  const getGasPriceDisplayValue = (): ReactNode => {
+    return isGasless ? 'Gasless' : <Amount amount={gasPrice} udt={PCKB_UDT_INFO} showSymbol />
+  }
+
   const fromAddrDisplay = getAddressDisplay(tx?.from_account)
-  const toAddrDisplay = getAddressDisplay(tx?.to_account, tx?.polyjuice?.native_transfer_address_hash)
+  const toAddrDisplay = getAddressDisplay(tx?.to_account, tx?.polyjuice?.native_transfer_account?.eth_address)
+
   const method = tx?.method_name ?? tx?.method_id
   const from_bit_alias = tx?.from_account?.bit_alias
+  const to_bit_alias = tx?.polyjuice?.native_transfer_account?.bit_alias
 
-  const overview: InfoItermProps[] = [
+  const overview: InfoItemProps[] = [
     {
       field: t('hash'),
-      content: (
-        <div className={styles.hash}>
-          <span className="mono-font">{hash as string}</span>
-          <CopyBtn content={hash as string} field={t('hash')} />
-        </div>
-      ),
+      content: <ResponsiveHash label={hash as string} btnRight="copy" copyAlertText={t('hash')} />,
     },
     {
       field: t('from'),
       content: isTxLoading ? (
         <Skeleton animation="wave" />
       ) : tx ? (
-        <HashLink
-          label={
-            from_bit_alias ? <Address address={fromAddrDisplay.label} domain={from_bit_alias} /> : fromAddrDisplay.label
-          }
-          href={`/address/${fromAddrDisplay.address}`}
-          style={{ wordBreak: 'break-all' }}
-        />
+        from_bit_alias ? (
+          <HashLink
+            label={<Address address={fromAddrDisplay.label} domain={from_bit_alias} />}
+            href={`/address/${fromAddrDisplay.address}`}
+          />
+        ) : (
+          <ResponsiveHash label={fromAddrDisplay.label} href={`/address/${fromAddrDisplay.address}`} />
+        )
       ) : (
         t('pending')
       ),
@@ -308,7 +331,14 @@ const Tx = () => {
       content: isTxLoading ? (
         <Skeleton animation="wave" />
       ) : tx ? (
-        <HashLink label={toAddrDisplay.label} href={`/address/${toAddrDisplay.address}`} />
+        to_bit_alias ? (
+          <HashLink
+            label={to_bit_alias ? <Address address={toAddrDisplay.label} domain={to_bit_alias} /> : toAddrDisplay.label}
+            href={`/address/${toAddrDisplay.address}`}
+          />
+        ) : (
+          <ResponsiveHash label={toAddrDisplay.label} href={`/address/${toAddrDisplay.address}`} />
+        )
       ) : (
         t('pending')
       ),
@@ -427,9 +457,7 @@ const Tx = () => {
     {
       field: t('gasPrice'),
       content: tx?.polyjuice?.gas_price ? (
-        <span className={styles.gasPrice}>{`${new BigNumber(tx.polyjuice.gas_price)
-          .dividedBy(10 ** PCKB_UDT_INFO.decimal)
-          .toFormat()} ${PCKB_UDT_INFO.symbol}`}</span>
+        <span className={styles.gasPrice}>{getGasPriceDisplayValue()}</span>
       ) : isTxLoading ? (
         <Skeleton animation="wave" />
       ) : isPolyjuiceTx ? (
@@ -468,11 +496,15 @@ const Tx = () => {
       content:
         tx && tx.polyjuice?.gas_price && tx.polyjuice.gas_used ? (
           <span className={styles.gasFee}>
-            <Amount
-              amount={`${new BigNumber(tx.polyjuice.gas_used).times(new BigNumber(tx.polyjuice.gas_price))}`}
-              udt={PCKB_UDT_INFO}
-              showSymbol
-            />
+            {isGasless ? (
+              'Gasless'
+            ) : (
+              <Amount
+                amount={`${new BigNumber(tx.polyjuice.gas_used).times(new BigNumber(tx.polyjuice.gas_price))}`}
+                udt={PCKB_UDT_INFO}
+                showSymbol
+              />
+            )}
           </span>
         ) : isTxLoading ? (
           <Skeleton animation="wave" />
@@ -492,6 +524,82 @@ const Tx = () => {
     },
   ]
 
+  const paymaster = tx?.polyjuice?.paymaster_and_data ? tx.polyjuice.paymaster_and_data.slice(0, 42) : null
+  const paymasterData = tx?.polyjuice?.paymaster_and_data ? tx.polyjuice.paymaster_and_data.slice(42) : null
+
+  const userOperations: InfoItemProps[] = [
+    {
+      field: t('call_contract'),
+      content: tx?.polyjuice?.call_contract ? (
+        <ResponsiveHash label={tx.polyjuice.call_contract} href={`/address/${tx.polyjuice.call_contract}`} />
+      ) : (
+        '-'
+      ),
+    },
+    { field: t('call_gas_limit'), content: new BigNumber(tx?.polyjuice?.call_gas_limit).toFormat() || '-' },
+    {
+      field: t('verification_gas_limit'),
+      content: new BigNumber(tx?.polyjuice?.verification_gas_limit).toFormat() || '-',
+    },
+    {
+      field: t('paymaster'),
+      content: paymaster ? <ResponsiveHash label={paymaster} href={`/address/${paymaster}`} /> : '-',
+      colSpan: 2,
+    },
+    {
+      field: t('max_fee_per_gas'),
+      content: tx?.polyjuice?.max_fee_per_gas ? (
+        <span className={styles.gasFee}>
+          <Amount amount={tx.polyjuice.max_fee_per_gas} udt={PCKB_UDT_INFO} showSymbol />
+        </span>
+      ) : (
+        '-'
+      ),
+    },
+    {
+      field: t('max_priority_fee_per_gas'),
+      ddClassName: styles.priorityGasFee,
+      content: tx?.polyjuice?.max_priority_fee_per_gas ? (
+        <span className={styles.gasFee}>
+          <Amount amount={tx.polyjuice.max_priority_fee_per_gas} udt={PCKB_UDT_INFO} showSymbol />
+        </span>
+      ) : (
+        '-'
+      ),
+    },
+
+    {
+      field: t('paymaster_data'),
+      content: paymasterData ? (
+        <Tooltip title={paymasterData} placement="top">
+          <div className={styles.paymasterData}>{`0x${paymasterData}`}</div>
+        </Tooltip>
+      ) : (
+        '-'
+      ),
+    },
+    {
+      field: t('call_data'),
+      content: tx?.polyjuice?.call_data ? (
+        <details className={styles.input}>
+          <summary>
+            {t('check')}
+            <ExpandIcon />
+          </summary>
+          <pre>
+            <dl className={styles.decodedInput}>
+              <dd>{tx.polyjuice.call_data}</dd>
+            </dl>
+          </pre>
+        </details>
+      ) : (
+        '-'
+      ),
+      expandable: true,
+      colSpan: 2,
+    },
+  ]
+
   const title = t('txInfo')
 
   return (
@@ -506,6 +614,14 @@ const Tx = () => {
         </PageTitle>
         <InfoList title={t(`overview`)} list={overview} style={{ marginBottom: '2rem' }} />
         <InfoList title={t(`basicInfo`)} list={basicInfo} style={{ marginBottom: '2rem' }} type="two-columns" />
+        {isGasless ? (
+          <InfoList
+            title={t(`userOperations`)}
+            list={userOperations}
+            style={{ marginBottom: '2rem' }}
+            type="two-columns"
+          />
+        ) : null}
         <div className={styles.list}>
           <Tabs
             value={tabs.indexOf(tab as string)}

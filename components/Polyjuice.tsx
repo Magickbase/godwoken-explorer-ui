@@ -2,11 +2,11 @@ import type { PolyjuiceCreator as PolyjuiceCreatorProps } from './AccountOvervie
 import { useTranslation } from 'next-i18next'
 import ScriptCode from 'components/ScriptCode'
 import Tooltip from './Tooltip'
-import InfoList, { InfoItermProps } from './InfoList'
+import InfoList, { InfoItemProps } from './InfoList'
 
 const Polyjuice = ({ script, scriptHash }: { script: PolyjuiceCreatorProps['script']; scriptHash: string }) => {
   const [t] = useTranslation('account')
-  const list: Array<InfoItermProps> = [
+  const list: Array<InfoItemProps> = [
     {
       field: t('type'),
       content: `Polyjuice`,

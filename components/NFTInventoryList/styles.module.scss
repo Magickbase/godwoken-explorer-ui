@@ -45,12 +45,33 @@
   }
   .info {
     display: flex;
-    justify-content: space-between;
-    span:first-of-type {
+    justify-content: flex-start;
+
+    @media screen and (max-width: 1024px) {
+      justify-content: space-between;
+    }
+
+    span:nth-child(1) {
       flex-basis: 80px;
       flex-shrink: 0;
       color: var(--secondary-text-color);
       cursor: default;
+    }
+    div:nth-child(2) {
+      overflow: hidden;
+      & > div {
+        flex-basis: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: var(--primary-color);
+      }
+      @media screen and (max-width: 1024px) {
+        justify-content: flex-end;
+        & > div {
+          flex-basis: 0;
+          overflow: visible;
+        }
+      }
     }
     a {
       text-align: right;
