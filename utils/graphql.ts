@@ -90,6 +90,7 @@ export namespace GraphQLSchema {
     compiler_version: String
     constructor_arguments: string
     contract_source_code: string
+    sourcify_metadata: Array<Record<'content' | 'name' | 'path', string>>
     deployment_tx_hash: string
     id: number
     name: string
