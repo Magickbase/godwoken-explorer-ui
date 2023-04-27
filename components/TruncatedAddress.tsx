@@ -23,18 +23,7 @@ const TruncatedAddress = ({
   domain?: string
   placement?: 'top' | 'bottom'
 }) => {
-  if (address === ZERO_ADDRESS) {
-    return (
-      <Tooltip title={address} placement={placement} sx={sx}>
-        <Box sx={sx}>
-          <span className="mono-font" style={{ color: 'var(--primary-text-color)', userSelect: 'none' }}>
-            zero address
-          </span>
-        </Box>
-      </Tooltip>
-    )
-  }
-
+  const isZeroAddress = address === ZERO_ADDRESS
   const addrDisplay = getAddressDisplay({
     eth_address: address,
     script_hash: address,
@@ -67,7 +56,7 @@ const TruncatedAddress = ({
       ) : (
         <Tooltip title={address} placement={placement} sx={sx}>
           <Box sx={sx}>
-            <HashLink label={label} href={`/account/${address}`} monoFont={monoFont} />
+            <HashLink label={isZeroAddress ? 'zero address' : label} href={`/account/${address}`} monoFont={monoFont} />
           </Box>
         </Tooltip>
       )}
