@@ -216,7 +216,10 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
           {contract_source_code ? (
             <>
               {Array.isArray(sourcify_metadata) ? (
-                sourcify_metadata.slice(1).map(code => {
+                sourcify_metadata.map(code => {
+                  if (!code.name.endsWith('.sol')) {
+                    return null
+                  }
                   return (
                     <div className={styles.sourceCode} key={code.name}>
                       <div className={styles.title}>
