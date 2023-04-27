@@ -122,16 +122,16 @@ const ActivityList: React.FC<
               const toBitAlias = item.to_account?.bit_alias
 
               return (
-                <tr key={item.transaction.eth_hash + item.log_index}>
+                <tr key={item.transaction?.eth_hash + item.log_index}>
                   <td>
                     <div className={styles.hash}>
-                      <Tooltip title={item.transaction.eth_hash} placement="top">
+                      <Tooltip title={item.transaction?.eth_hash} placement="top">
                         <span>
-                          <NextLink href={`/tx/${item.transaction.eth_hash}`}>
-                            <a className="mono-font">{`${item.transaction.eth_hash.slice(
+                          <NextLink href={`/tx/${item.transaction?.eth_hash}`}>
+                            <a className="mono-font">{`${item.transaction?.eth_hash.slice(
                               0,
                               8,
-                            )}...${item.transaction.eth_hash.slice(-8)}`}</a>
+                            )}...${item.transaction?.eth_hash.slice(-8)}`}</a>
                           </NextLink>
                         </span>
                       </Tooltip>
@@ -143,7 +143,7 @@ const ActivityList: React.FC<
                   </td>
                   <td>
                     {method ? (
-                      <Tooltip title={item.transaction.method_id} placement="top">
+                      <Tooltip title={item.transaction?.method_id} placement="top">
                         <div className={styles.method} title={method}>
                           {method}
                         </div>
