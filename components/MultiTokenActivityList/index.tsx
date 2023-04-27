@@ -124,7 +124,7 @@ const ActivityList: React.FC<
         <tbody>
           {transfers?.metadata.total_count ? (
             transfers.entries.map(item => {
-              const method = item.transaction.method_name || item.transaction.method_id
+              const method = item.transaction?.method_name || item.transaction?.method_id
               const fromBitAlias = item.from_account?.bit_alias
               const toBitAlias = item.to_account?.bit_alias
 
@@ -132,16 +132,16 @@ const ActivityList: React.FC<
               const amounts = Array.isArray(item.amounts) ? item.amounts : [item.amount]
 
               return (
-                <tr key={item.transaction.eth_hash + item.log_index}>
+                <tr key={item.transaction?.eth_hash + item.log_index}>
                   <td>
                     <div className={styles.hash}>
-                      <Tooltip title={item.transaction.eth_hash} placement="top">
+                      <Tooltip title={item.transaction?.eth_hash} placement="top">
                         <span>
-                          <NextLink href={`/tx/${item.transaction.eth_hash}`}>
-                            <a className="mono-font">{`${item.transaction.eth_hash.slice(
+                          <NextLink href={`/tx/${item.transaction?.eth_hash}`}>
+                            <a className="mono-font">{`${item.transaction?.eth_hash.slice(
                               0,
                               8,
-                            )}...${item.transaction.eth_hash.slice(-8)}`}</a>
+                            )}...${item.transaction?.eth_hash.slice(-8)}`}</a>
                           </NextLink>
                         </span>
                       </Tooltip>
@@ -154,7 +154,7 @@ const ActivityList: React.FC<
                   <td>
                     {method ? (
                       <div
-                        data-tooltip={item.transaction.method_id}
+                        data-tooltip={item.transaction?.method_id}
                         className={`${styles.method} tooltip`}
                         title={method}
                       >
@@ -170,10 +170,10 @@ const ActivityList: React.FC<
                     </time>
                   </td>
                   <td>
-                    <Address address={item.from_address} type={item.from_account.type} domain={fromBitAlias} />
+                    <Address address={item.from_address} type={item.from_account?.type} domain={fromBitAlias} />
                   </td>
                   <td>
-                    <Address address={item.to_address} type={item.to_account.type} domain={toBitAlias} />
+                    <Address address={item.to_address} type={item.to_account?.type} domain={toBitAlias} />
                   </td>
                   {viewer ? (
                     <td>
