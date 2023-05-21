@@ -136,7 +136,10 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
         try {
           return JSON.parse(p.value)
         } catch {
-          return p.value.split(',').map(v => v.trim())
+          return p.value
+            .replace(/(\[|\])/g, '')
+            .split(',')
+            .map(v => v.trim())
         }
       }
       return p.value
