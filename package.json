@@ -51,7 +51,7 @@
     "wagmi": "0.10.6"
   },
   "devDependencies": {
-    "@cypress/code-coverage": "3.10.0",
+    "@cypress/code-coverage": "3.10.6",
     "@svgr/webpack": "6.5.1",
     "@types/node": "18.11.19",
     "@types/phoenix": "1.5.4",
