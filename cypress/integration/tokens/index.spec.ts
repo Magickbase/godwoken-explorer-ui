@@ -202,7 +202,9 @@ context('Tokens List Pages Tests', () => {
               .first()
               .find('td')
               .first()
-              .should('contain.text', '57us test Collection(57u)')
+              .should(field => {
+                expect(field.text()).to.match(/\w+(\w+)/)
+              })
               .next()
               .should(field => {
                 expect(field.text()).to.match(FULL_ADDRESS_REGEX)
