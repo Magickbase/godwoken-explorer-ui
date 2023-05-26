@@ -2,7 +2,7 @@ import type { PolyjuiceContract as PolyjuiceContractProps } from 'components/Acc
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'next-i18next'
 import NextLink from 'next/link'
-import { utils } from 'ethers'
+import { ethers, utils } from 'ethers'
 import OpenInNewIcon from 'assets/icons/open-in-new.svg'
 import ExpandIcon from 'assets/icons/expand.svg'
 import { currentChain as targetChain } from 'utils'
@@ -128,7 +128,22 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
     const method = isCallStatic
       ? contract.callStatic[contract.interface.functions[signature].name]
       : contract[contract.interface.functions[signature].name]
-    const params = Array.from(paramInputList).map(i => i.value)
+
+    const fragment = contract.interface.functions[signature]
+
+    const params = Array.from(paramInputList).map((p, idx) => {
+      if (fragment.inputs[idx].type.endsWith('[]')) {
+        try {
+          return JSON.parse(p.value)
+        } catch {
+          return p.value
+            .replace(/(\[|\])/g, '')
+            .split(',')
+            .map(v => v.trim())
+        }
+      }
+      return p.value
+    })
 
     if (!method) return
     btn.disabled = true
@@ -160,6 +175,11 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
     try {
       const pCKB = form.querySelector<HTMLInputElement>('input[name=pCKB]')?.value ?? '0'
       const result = await method(...params, { value: utils.parseEther(pCKB) })
+
+      if (!resInputList.length) {
+        return
+      }
+
       if (tabIdx === 2) {
         const elm = resInputList[0]
         if (elm) {
@@ -170,9 +190,22 @@ const ContractInfo: React.FC<{ address: string; contract: PolyjuiceContractProps
             window.open(`/tx/${result.hash}`)
           }
         }
+        return
+      }
+
+      if (!Array.isArray(result)) {
+        resInputList[0].value = result.toString()
+        return
+      }
+
+      if (result.length <= fragment.outputs?.length) {
+        result.forEach((res, i) => {
+          if (resInputList[i]) {
+            resInputList[i].value = res.toString()
+          }
+        })
       } else {
-        const resList = Array.isArray(result) ? result : [result]
-        resList.map((res, i) => (resInputList[i] ? (resInputList[i].value = res.toString()) : null))
+        resInputList[0].value = `[${result.join(', ')}]`
       }
     } catch (err: any) {
       if (err.code === 4001 || err.code === 'ACTION_REJECTED') {
