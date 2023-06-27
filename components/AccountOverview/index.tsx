@@ -351,7 +351,13 @@ const AccountOverview: React.FC<AccountOverviewProps & { refetch: () => Promise<
 
   const getInfoBlock = account => {
     const { type } = account
-    const domain = account?.bit_alias
+    let domain = account?.bit_alias
+
+    if (domain && domain.includes('#')) {
+      const [domainName, subDomain] = domain.split('#')
+
+      domain = `${subDomain.split('.')[0]}.${domainName}.bit`
+    }
 
     const blockMap = {
       [`${GraphQLSchema.AccountType.MetaContract}`]: <MetaContract {...(account.script as MetaContract['script'])} />,
