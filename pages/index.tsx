@@ -211,9 +211,11 @@ const TxList = ({ list }: { list: State['txList'] }) => {
                       </Box>
                     </Tooltip>
                     <Box alignItems="bottom" fontWeight={400} fontSize="0.875rem" pt={1} ml={1} color="rgba(0,0,0,0.6)">
-                      <time dateTime={new Date(+tx.timestamp).toISOString()} title={t('timestamp')}>
-                        {timeDistance(tx.timestamp, language)}
-                      </time>
+                      {tx.timestamp > 0 ? (
+                        <time dateTime={new Date(+tx.timestamp).toISOString()} title={t('timestamp')}>
+                          {timeDistance(tx.timestamp, language)}
+                        </time>
+                      ) : null}
                     </Box>
                   </Stack>
                   <Stack sx={{ pl: { xs: 1, sm: 0 } }}>
