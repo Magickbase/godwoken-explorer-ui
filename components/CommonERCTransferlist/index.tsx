@@ -108,7 +108,7 @@ export const fetchERCTransferList = (
 
 const SimpleERC20Transferlist: React.FC<Erc20ResponseProps> = props => {
   const { token_transfers: dataSource } = props
-  const handleTokenName = udt => udt.symbol.split('.')[0] || ''
+  const handleTokenName = udt => udt.symbol?.split('.')[0] || ''
 
   return <BaseTransferlist {...dataSource} handleTokenName={handleTokenName} type={TransferlistType.Erc20} />
 }

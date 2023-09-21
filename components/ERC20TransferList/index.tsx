@@ -341,7 +341,7 @@ const TransferList: React.FC<
                           {isShowLogo ? (
                             <TokenLogo name={item.udt?.name} logo={item.udt?.icon} />
                           ) : (
-                            item.udt?.symbol.split('.')[0]
+                            item.udt?.symbol?.split('.')[0] ?? ''
                           )}
                         </a>
                       </NextLink>
