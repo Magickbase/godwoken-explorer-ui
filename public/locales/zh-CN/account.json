@@ -93,5 +93,9 @@
   "erc1155Assets": "ERC 1155 资产",
   "erc20Assets": "ERC 20 资产",
   "invalidAddress": "*无效的地址格式",
-  "pckb_send_along_with_tx": "与交易一起发送"
+  "pckb_send_along_with_tx": "与交易一起发送",
+  "contract": {
+    "current": "当前",
+    "proxied": "代理"
+  }
 }
