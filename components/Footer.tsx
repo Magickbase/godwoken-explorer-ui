@@ -179,7 +179,7 @@ const Footer = () => {
             opacity: 0.5,
           }}
         >
-          Copyright &copy; 2022 Magickbase All Rights Reserved.
+          Copyright &copy; 2024 Magickbase All Rights Reserved.
         </Typography>
       </Box>
     </StyledFooter>
