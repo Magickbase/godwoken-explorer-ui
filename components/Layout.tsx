@@ -27,6 +27,21 @@ const Layout = ({ children }) => {
             </Link>
           </Alert>
         ) : null}
+        {GW_VERSION === 0 && process.env.NEXT_PUBLIC_CHAIN_TYPE === 'mainnet' ? (
+          <Alert severity="info" sx={{ display: 'flex', justifyContent: 'center', borderRadius: 0 }}>
+            {t(`dropV0Annotation`)}
+            <Link
+              href={`https://github.com/godwokenrises/godwoken/discussions/1023`}
+              target="_blank"
+              rel="noopener noreferrer"
+              ml={1}
+              color="secondary"
+              sx={{ fontWeight: 700 }}
+            >
+              Discussion
+            </Link>
+          </Alert>
+        ) : null}
         {GW_VERSION === 1 ? (
           <Alert severity="info" sx={{ display: 'flex', justifyContent: 'center', borderRadius: 0 }}>
             {t(`alphanetAnnotation`)}
