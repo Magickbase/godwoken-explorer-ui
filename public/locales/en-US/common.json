@@ -16,7 +16,7 @@
   "contracts": "Contracts",
   "registered_contracts": "Registered Contracts",
   "mainnetAnnotation": "Due to congestion on Nervos Network L1, Godwoken has encountered new and unexpected challenges. We would like to inform the community that we are aware of these issues and currently working to push a hotfix to the Godwoken L2 Blockchain. In the meantime, we have halted the chain to address any necessary fixes.",
-  "testnetAnnotation": "This is for testnet, and mainnet data are available on",
+  "testnetAnnotation": "The Data Service for Godwoken Testnet is scheduled for downtime on March 31, 2025. If you wish to host it yourself, please contact the team",
   "alphanetAnnotation": "Godwoken v1 is under active development, Godwoken v1 alphanet will be reset periodically.",
   "betanetAnnotation": "Godwoken v1 is under active development",
   "en-US": "English",

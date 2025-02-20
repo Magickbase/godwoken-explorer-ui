@@ -1,4 +1,4 @@
-import { Alert, Container, Link } from '@mui/material'
+import { Alert, Container } from '@mui/material'
 import { useTranslation } from 'next-i18next'
 import { useRouter } from 'next/router'
 import Head from 'components/Head'
@@ -7,7 +7,7 @@ import Footer from 'components/Footer'
 import Search from 'components/Search'
 
 const Layout = ({ children }) => {
-  const [t, { language }] = useTranslation('common')
+  const [t] = useTranslation('common')
   const { asPath } = useRouter()
   const isHome = asPath === '/' || asPath === '/zh-CN'
 
@@ -36,15 +36,6 @@ const Layout = ({ children }) => {
             }}
           >
             {t(`testnetAnnotation`)}
-            <Link
-              href={`https://${process.env.NEXT_PUBLIC_MAINNET_EXPLORER_HOSTNAME}/${language}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              ml={0.5}
-              sx={{ fontWeight: 700, color: '#4C2CE4', textDecorationColor: '#4C2CE4' }}
-            >
-              GwScan
-            </Link>
           </Alert>
         ) : null}
         {!isHome && (
